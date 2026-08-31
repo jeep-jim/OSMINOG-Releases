@@ -1,0 +1,213 @@
+name: Publish OSMINOG Chrome package v2
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'staging/chrome-extension/**/ACTIVATE-V2'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Chrome extension version to publish
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+concurrency:
+  group: osminog-chrome-registry-v2
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - name: Checkout release registry
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Resolve release and verify immutable package
+        id: release
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          if [ -n "${{ inputs.version || '' }}" ]; then
+            version='${{ inputs.version || '' }}'
+          else
+            marker=$(find staging/chrome-extension -mindepth 2 -maxdepth 2 -type f -name ACTIVATE-V2 | sort -V | tail -n 1)
+            test -n "$marker"
+            version=$(basename "$(dirname "$marker")")
+          fi
+
+          release_dir="platforms/chrome-extension/releases/$version"
+          meta="$release_dir/release-v2.json"
+          test -f "$meta"
+
+          package=$(jq -r '.package' "$meta")
+          expected_size=$(jq -r '.size' "$meta")
+          expected_sha=$(jq -r '.sha256' "$meta")
+          expected_manifest=$(jq -r '.manifestVersion' "$meta")
+          min_devhub=$(jq -r '.minDevHubVersion' "$meta")
+          package_path="$release_dir/$package"
+
+          # Text-safe bootstrap is a recovery fallback only. The canonical result is
+          # always the complete immutable ZIP stored under the versioned release path.
+          if [ ! -f "$package_path" ]; then
+            parts_dir="staging/chrome-extension/$version/parts"
+            test -d "$parts_dir"
+            count=$(find "$parts_dir" -maxdepth 1 -type f -name 'part-*.b64' | wc -l | tr -d ' ')
+            test "$count" -gt 0
+            tmp=$(mktemp)
+            find "$parts_dir" -maxdepth 1 -type f -name 'part-*.b64' -print0 \
+              | sort -z -V \
+              | xargs -0 cat \
+              | tr -d '\r\n\t ' > "$tmp"
+            mkdir -p "$release_dir"
+            base64 --decode "$tmp" > "$package_path"
+            rm -f "$tmp"
+          fi
+
+          actual_size=$(stat -c%s "$package_path")
+          actual_sha=$(sha256sum "$package_path" | awk '{print $1}')
+          test "$actual_size" = "$expected_size"
+          test "$actual_sha" = "$expected_sha"
+
+          python - "$package_path" "$expected_manifest" <<'PY'
+          import json, sys, zipfile
+          path, expected = sys.argv[1], sys.argv[2]
+          with zipfile.ZipFile(path) as z:
+              names = z.namelist()
+              if 'manifest.json' not in names:
+                  raise SystemExit('root manifest.json missing')
+              manifest = json.loads(z.read('manifest.json'))
+              if manifest.get('version') != expected:
+                  raise SystemExit(f"manifest version {manifest.get('version')} != {expected}")
+              if manifest.get('name') != 'OSMINOG':
+                  raise SystemExit('manifest product name is not OSMINOG')
+              if not manifest.get('key'):
+                  raise SystemExit('fixed Chrome extension key is missing')
+              if any(name.startswith('/') or '..' in name.split('/') for name in names):
+                  raise SystemExit('unsafe ZIP path detected')
+          PY
+
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "release_dir=$release_dir" >> "$GITHUB_OUTPUT"
+          echo "package=$package" >> "$GITHUB_OUTPUT"
+          echo "package_path=$package_path" >> "$GITHUB_OUTPUT"
+          echo "size=$actual_size" >> "$GITHUB_OUTPUT"
+          echo "sha256=$actual_sha" >> "$GITHUB_OUTPUT"
+          echo "min_devhub=$min_devhub" >> "$GITHUB_OUTPUT"
+
+      - name: Archive package in registry when reconstructed
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add '${{ steps.release.outputs.package_path }}'
+          if ! git diff --cached --quiet; then
+            git commit -m 'Archive immutable OSMINOG Chrome ${{ steps.release.outputs.version }} package [skip ci]'
+            git push origin HEAD:main
+          fi
+
+      - name: Publish verified GitHub Release asset
+        shell: bash
+        run: |
+          set -euo pipefail
+          version='${{ steps.release.outputs.version }}'
+          tag="chrome-v$version"
+          title="OSMINOG Chrome $version"
+          notes=$(jq -r '.notes' '${{ steps.release.outputs.release_dir }}/release-v2.json')
+          body=$(printf '%s\n\nPackage: `%s`\nSHA-256: `%s`\nSize: `%s` bytes\nMinimum Dev Hub: `%s`' \
+            "$notes" \
+            '${{ steps.release.outputs.package }}' \
+            '${{ steps.release.outputs.sha256 }}' \
+            '${{ steps.release.outputs.size }}' \
+            '${{ steps.release.outputs.min_devhub }}')
+
+          if gh release view "$tag" >/dev/null 2>&1; then
+            gh release edit "$tag" --target main --title "$title" --prerelease --notes "$body"
+          else
+            gh release create "$tag" --target main --title "$title" --prerelease --notes "$body"
+          fi
+          gh release upload "$tag" '${{ steps.release.outputs.package_path }}' --clobber
+
+          asset=$(gh api "repos/${GITHUB_REPOSITORY}/releases/tags/$tag" \
+            --jq '.assets[] | select(.name == "${{ steps.release.outputs.package }}")')
+          test -n "$asset"
+          remote_size=$(printf '%s' "$asset" | jq -r '.size')
+          remote_digest=$(printf '%s' "$asset" | jq -r '.digest // empty')
+          test "$remote_size" = '${{ steps.release.outputs.size }}'
+          if [ -n "$remote_digest" ]; then
+            test "$remote_digest" = 'sha256:${{ steps.release.outputs.sha256 }}'
+          fi
+
+      - name: Advance dev feed only after remote verification
+        shell: bash
+        run: |
+          set -euo pipefail
+          version='${{ steps.release.outputs.version }}'
+          package='${{ steps.release.outputs.package }}'
+          encoded_package=$(python -c 'import urllib.parse,sys; print(urllib.parse.quote(sys.argv[1]))' "$package")
+          package_url="https://github.com/${GITHUB_REPOSITORY}/releases/download/chrome-v${version}/${encoded_package}"
+          notes_url="https://raw.githubusercontent.com/${GITHUB_REPOSITORY}/main/platforms/chrome-extension/releases/${version}/README.md"
+          mkdir -p channels/dev
+
+          python - "$version" "$package_url" "$notes_url" <<'PY'
+          import json, pathlib, sys
+          from datetime import datetime, timezone
+          version, package_url, notes_url = sys.argv[1:4]
+          meta_path = pathlib.Path(f'platforms/chrome-extension/releases/{version}/release-v2.json')
+          meta = json.loads(meta_path.read_text(encoding='utf-8'))
+          now = datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace('+00:00', 'Z')
+          meta['publishedAt'] = now
+          meta_path.write_text(json.dumps(meta, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+          feed = {
+              'schema': 'osminog-update-feed/v2',
+              'product': 'OSMINOG',
+              'platform': 'chrome-extension',
+              'channel': 'dev',
+              'generatedAt': now,
+              'latest': {
+                  'version': version,
+                  'kind': 'full-package',
+                  'packageUrl': package_url,
+                  'size': meta['size'],
+                  'sha256': meta['sha256'],
+                  'manifestVersion': meta['manifestVersion'],
+                  'fixedExtensionKeyRequired': True,
+                  'minDevHubVersion': meta['minDevHubVersion'],
+                  'runtimeVerified': meta.get('runtimeVerified', False),
+                  'notesUrl': notes_url,
+                  'publishedAt': now,
+              }
+          }
+          pathlib.Path('channels/dev/chrome-extension.json').write_text(
+              json.dumps(feed, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+          PY
+
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add channels/dev/chrome-extension.json '${{ steps.release.outputs.release_dir }}/release-v2.json'
+          if ! git diff --cached --quiet; then
+            git commit -m 'Advance Chrome dev feed to ${{ steps.release.outputs.version }} [skip ci]'
+            git push origin HEAD:main
+          fi
+
+      - name: Final public feed verification
+        shell: bash
+        run: |
+          set -euo pipefail
+          sleep 2
+          raw="https://raw.githubusercontent.com/${GITHUB_REPOSITORY}/main/channels/dev/chrome-extension.json"
+          latest=$(curl -fsSL "$raw" | jq -r '.latest.version')
+          sha=$(curl -fsSL "$raw" | jq -r '.latest.sha256')
+          test "$latest" = '${{ steps.release.outputs.version }}'
+          test "$sha" = '${{ steps.release.outputs.sha256 }}'
+          echo "OSMINOG Chrome dev feed safely advanced to $latest"
