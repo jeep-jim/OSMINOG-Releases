@@ -1,0 +1,17 @@
+{
+  "schema": "osminog-staged-release/v1",
+  "platform": "chrome-extension",
+  "version": "3.11.34",
+  "channel": "dev",
+  "package": "OSMINOG-Chrome-3.11.34-SPACE-FX-PROTOCOL-CANVAS-TASKS-LAYERS-GAP-ROOT.zip",
+  "size": 351987,
+  "sha256": "9bb9c77e1f8ef5a0c566d8e216c93bd3dc8cc95ce1411dff1b3b2184b873eb75",
+  "manifestVersion": "3.11.34",
+  "fixedIdentitySha256": "1ddb8d87f3a6f6cb38a229bd81ba8076d1d37d3ba6b8a15b2a91129d4904012e",
+  "targetPath": "platforms/02-chrome-extension/releases/3.11.34/OSMINOG-Chrome-3.11.34-SPACE-FX-PROTOCOL-CANVAS-TASKS-LAYERS-GAP-ROOT.zip",
+  "releaseTag": "chrome-v3.11.34",
+  "releaseTitle": "OSMINOG Chrome 3.11.34",
+  "feedPath": "channels/dev/chrome-extension.json",
+  "minUpdaterVersion": "2.0.0",
+  "notes": "Managed Dev Channel v2 bootstrap baseline."
+}
