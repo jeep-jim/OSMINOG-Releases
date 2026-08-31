@@ -1,0 +1,30 @@
+{
+  "schema": "osminog-release-manifest/v1",
+  "product": "OSMINOG",
+  "platform": "chrome-extension",
+  "version": "3.11.34",
+  "channel": "dev",
+  "package": "OSMINOG-Chrome-3.11.34-SPACE-FX-PROTOCOL-CANVAS-TASKS-LAYERS-GAP-ROOT.zip",
+  "size": 351987,
+  "sha256": "9bb9c77e1f8ef5a0c566d8e216c93bd3dc8cc95ce1411dff1b3b2184b873eb75",
+  "publishedAt": "2026-08-31T10:05:34Z",
+  "manifestVersion": "3.11.34",
+  "fixedIdentitySha256": "1ddb8d87f3a6f6cb38a229bd81ba8076d1d37d3ba6b8a15b2a91129d4904012e",
+  "minUpdaterVersion": "2.0.0",
+  "runtimeVerified": false,
+  "notes": [
+    "Canonical Space FX protocol fields and legacy migration.",
+    "Browser Presence can create real task cards.",
+    "Expanded Layers panel preserves a 14px bottom gap.",
+    "Space FX visibility fix from 3.11.33 and freeze fix from 3.11.32 are preserved."
+  ],
+  "validation": {
+    "zipIntegrity": "pass",
+    "manifestAtRoot": true,
+    "fileCount": 56,
+    "jsSyntax": "21 pass",
+    "jsonParse": "9 pass",
+    "duplicateHtmlIds": "0 real duplicates",
+    "ownerRuntime": "pending"
+  }
+}
