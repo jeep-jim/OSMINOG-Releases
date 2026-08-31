@@ -1,0 +1,18 @@
+{
+  "schema": "osminog-release/v2",
+  "product": "OSMINOG",
+  "platform": "chrome-extension",
+  "channel": "dev",
+  "version": "3.11.34",
+  "package": "OSMINOG-Chrome-3.11.34-SPACE-FX-PROTOCOL-CANVAS-TASKS-LAYERS-GAP-ROOT.zip",
+  "size": 351987,
+  "sha256": "9bb9c77e1f8ef5a0c566d8e216c93bd3dc8cc95ce1411dff1b3b2184b873eb75",
+  "manifestVersion": "3.11.34",
+  "manifestAtRoot": true,
+  "fixedExtensionKeyRequired": true,
+  "minDevHubVersion": "2.0.0",
+  "runtimeVerified": false,
+  "ownerRuntime": "pending",
+  "notes": "Canonical Space FX Presence protocol, canvas task objects and Layers bottom-gap correction. Space FX visibility was runtime-confirmed in 3.11.33; this 3.11.34 package still requires owner runtime confirmation.",
+  "publishedAt": null
+}
