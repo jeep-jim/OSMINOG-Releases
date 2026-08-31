@@ -1,0 +1,94 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/jeep-jim/OSMINOG-Releases/main/schemas/osminog-release-manifest-v1.schema.json",
+  "title": "OSMINOG release manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "product",
+    "platform",
+    "version",
+    "channel",
+    "package",
+    "size",
+    "sha256",
+    "publishedAt",
+    "validation"
+  ],
+  "properties": {
+    "schema": {
+      "const": "osminog-release-manifest/v1"
+    },
+    "product": {
+      "const": "OSMINOG"
+    },
+    "platform": {
+      "enum": [
+        "web-pwa",
+        "chrome-extension",
+        "windows",
+        "macos",
+        "android",
+        "ios",
+        "devhub"
+      ]
+    },
+    "version": {
+      "type": "string"
+    },
+    "channel": {
+      "enum": [
+        "dev",
+        "beta",
+        "stable"
+      ]
+    },
+    "package": {
+      "type": "string"
+    },
+    "size": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "publishedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "manifestVersion": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "fixedIdentitySha256": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "minUpdaterVersion": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "runtimeVerified": {
+      "type": "boolean"
+    },
+    "notes": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "validation": {
+      "type": "object"
+    }
+  }
+}
