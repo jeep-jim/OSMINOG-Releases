@@ -1,0 +1,11 @@
+{
+  "schema": "osminog-public-key/v1",
+  "keyId": "osminog-release-2026-01",
+  "algorithm": "ed25519",
+  "encoding": "base64-raw",
+  "publicKey": "koq4dSGl1Rd8GGTE+PCEWtVTkGzycGhinv9zACLl7lg=",
+  "sha256": "df627e9463d1c41e819a291f35a69b9eb0c83c14d83598ca24e0402283a4275e",
+  "createdAt": "2026-08-31T10:05:34Z",
+  "status": "active",
+  "purpose": "OSMINOG release-feed signing"
+}
