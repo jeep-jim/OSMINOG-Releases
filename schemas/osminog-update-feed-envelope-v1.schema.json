@@ -1,0 +1,170 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/jeep-jim/OSMINOG-Releases/main/schemas/osminog-update-feed-envelope-v1.schema.json",
+  "title": "OSMINOG signed update feed envelope",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "signed",
+    "signature"
+  ],
+  "properties": {
+    "schema": {
+      "const": "osminog-update-feed-envelope/v1"
+    },
+    "signed": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema",
+        "product",
+        "channel",
+        "platform",
+        "generatedAt",
+        "status",
+        "latest"
+      ],
+      "properties": {
+        "schema": {
+          "const": "osminog-update-feed/v2"
+        },
+        "product": {
+          "const": "OSMINOG"
+        },
+        "channel": {
+          "enum": [
+            "dev",
+            "beta",
+            "stable"
+          ]
+        },
+        "platform": {
+          "enum": [
+            "web-pwa",
+            "chrome-extension",
+            "windows",
+            "macos",
+            "android",
+            "ios"
+          ]
+        },
+        "generatedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "status": {
+          "enum": [
+            "active",
+            "not-published",
+            "paused"
+          ]
+        },
+        "latest": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "version",
+                "packageName",
+                "packageUrl",
+                "releaseManifestUrl",
+                "size",
+                "sha256",
+                "publishedAt"
+              ],
+              "properties": {
+                "version": {
+                  "type": "string",
+                  "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+(?:[-+][0-9A-Za-z.-]+)?$"
+                },
+                "packageName": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "packageUrl": {
+                  "type": "string",
+                  "format": "uri"
+                },
+                "releaseManifestUrl": {
+                  "type": "string",
+                  "format": "uri"
+                },
+                "size": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "sha256": {
+                  "type": "string",
+                  "pattern": "^[a-f0-9]{64}$"
+                },
+                "publishedAt": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "minUpdaterVersion": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "manifestVersion": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "fixedIdentitySha256": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "pattern": "^[a-f0-9]{64}$"
+                },
+                "notes": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "signature": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "algorithm",
+            "keyId",
+            "value"
+          ],
+          "properties": {
+            "algorithm": {
+              "const": "ed25519"
+            },
+            "keyId": {
+              "type": "string",
+              "minLength": 1
+            },
+            "value": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
+      ]
+    }
+  }
+}
