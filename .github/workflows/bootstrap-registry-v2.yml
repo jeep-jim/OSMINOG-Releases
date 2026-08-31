@@ -1,0 +1,162 @@
+name: Bootstrap OSMINOG release registry v2
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'bootstrap/REGISTRY-V2'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  bootstrap:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Materialize canonical six-platform layout
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          platforms = {
+              'web-pwa': 'Web + PWA',
+              'chrome-extension': 'Chrome extension',
+              'windows': 'Windows desktop',
+              'macos': 'macOS desktop',
+              'android': 'Android mobile application',
+              'ios': 'iOS mobile application',
+          }
+          channels = ('dev', 'beta', 'stable')
+
+          def write(path, value, overwrite=True):
+              path = Path(path)
+              path.parent.mkdir(parents=True, exist_ok=True)
+              if not overwrite and path.exists():
+                  return
+              if isinstance(value, (dict, list)):
+                  value = json.dumps(value, ensure_ascii=False, indent=2) + '\n'
+              path.write_text(value, encoding='utf-8')
+
+          registry = {
+              'schema': 'osminog-release-registry/v2',
+              'product': 'OSMINOG',
+              'sourceRepository': 'jeep-jim/OSMINOG',
+              'releaseRepository': 'jeep-jim/OSMINOG-Releases',
+              'platforms': [
+                  {
+                      'id': platform,
+                      'name': name,
+                      'channels': {
+                          channel: f'channels/{channel}/{platform}.json'
+                          for channel in channels
+                      }
+                  }
+                  for platform, name in platforms.items()
+              ],
+              'policy': {
+                  'fullPackagesRequired': True,
+                  'immutableVersionedArtifacts': True,
+                  'feedAdvancesAfterRemoteVerification': True,
+                  'sourceCodeStoredHere': False,
+              }
+          }
+          write('registry.json', registry)
+
+          pending = lambda platform, channel: {
+              'schema': 'osminog-update-feed/v2',
+              'product': 'OSMINOG',
+              'platform': platform,
+              'channel': channel,
+              'generatedAt': None,
+              'latest': None,
+              'status': 'not-published',
+          }
+          for platform, name in platforms.items():
+              write(
+                  f'platforms/{platform}/README.md',
+                  f'# {name}\n\nImmutable OSMINOG {name} packages and release metadata.\n'
+              )
+              for channel in channels:
+                  write(f'channels/{channel}/{platform}.json', pending(platform, channel), overwrite=False)
+
+          update_feed_schema = {
+              '$schema': 'https://json-schema.org/draft/2020-12/schema',
+              '$id': 'https://raw.githubusercontent.com/jeep-jim/OSMINOG-Releases/main/schemas/osminog-update-feed-v2.schema.json',
+              'title': 'OSMINOG update feed v2',
+              'type': 'object',
+              'required': ['schema', 'product', 'platform', 'channel', 'latest'],
+              'properties': {
+                  'schema': {'const': 'osminog-update-feed/v2'},
+                  'product': {'const': 'OSMINOG'},
+                  'platform': {'type': 'string'},
+                  'channel': {'enum': ['dev', 'beta', 'stable']},
+                  'generatedAt': {'type': ['string', 'null']},
+                  'status': {'type': 'string'},
+                  'latest': {
+                      'oneOf': [
+                          {'type': 'null'},
+                          {
+                              'type': 'object',
+                              'required': [
+                                  'version', 'kind', 'packageUrl', 'size', 'sha256',
+                                  'manifestVersion', 'minDevHubVersion', 'publishedAt'
+                              ],
+                              'properties': {
+                                  'version': {'type': 'string'},
+                                  'kind': {'const': 'full-package'},
+                                  'packageUrl': {'type': 'string', 'format': 'uri'},
+                                  'size': {'type': 'integer', 'minimum': 1},
+                                  'sha256': {'type': 'string', 'pattern': '^[0-9a-f]{64}$'},
+                                  'manifestVersion': {'type': 'string'},
+                                  'minDevHubVersion': {'type': 'string'},
+                                  'publishedAt': {'type': 'string'},
+                              },
+                              'additionalProperties': True,
+                          },
+                      ]
+                  },
+              },
+              'additionalProperties': True,
+          }
+          write('schemas/osminog-update-feed-v2.schema.json', update_feed_schema)
+
+          release_schema = {
+              '$schema': 'https://json-schema.org/draft/2020-12/schema',
+              '$id': 'https://raw.githubusercontent.com/jeep-jim/OSMINOG-Releases/main/schemas/osminog-release-v2.schema.json',
+              'title': 'OSMINOG immutable release metadata v2',
+              'type': 'object',
+              'required': ['schema', 'product', 'platform', 'version', 'package', 'size', 'sha256'],
+              'properties': {
+                  'schema': {'const': 'osminog-release/v2'},
+                  'product': {'const': 'OSMINOG'},
+                  'platform': {'type': 'string'},
+                  'version': {'type': 'string'},
+                  'package': {'type': 'string'},
+                  'size': {'type': 'integer', 'minimum': 1},
+                  'sha256': {'type': 'string', 'pattern': '^[0-9a-f]{64}$'},
+                  'runtimeVerified': {'type': 'boolean'},
+              },
+              'additionalProperties': True,
+          }
+          write('schemas/osminog-release-v2.schema.json', release_schema)
+
+          write('devhub/README.md', '''# OSMINOG Dev Hub\n\nDev Hub installers, public metadata and update feeds. Development Chrome builds use the managed folder `%LOCALAPPDATA%\\OSMINOG\\Chrome\\current`.\n''')
+          write('public-keys/README.md', '''# Public verification keys\n\nPublic keys used to verify signed OSMINOG feeds and native installers. Private signing keys must never be committed to this repository.\n''')
+          write('.nojekyll', '')
+          PY
+
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add registry.json channels platforms schemas devhub public-keys .nojekyll
+          if ! git diff --cached --quiet; then
+            git commit -m 'Bootstrap canonical OSMINOG release registry v2 [skip ci]'
+            git push origin HEAD:main
+          fi
