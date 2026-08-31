@@ -1,0 +1,4 @@
+schema=osminog-release-registry/v2
+requested_at=2026-08-31T10:35:00Z
+platforms=web-pwa,chrome-extension,windows,macos,android,ios
+channels=dev,beta,stable
