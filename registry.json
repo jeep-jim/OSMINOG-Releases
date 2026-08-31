@@ -1,0 +1,54 @@
+{
+  "schema": "osminog-release-registry/v1",
+  "product": "OSMINOG",
+  "generatedAt": "2026-08-31T10:05:34Z",
+  "sourceRepository": "https://github.com/jeep-jim/OSMINOG",
+  "releaseRepository": "https://github.com/jeep-jim/OSMINOG-Releases",
+  "channels": [
+    "dev",
+    "beta",
+    "stable"
+  ],
+  "platforms": [
+    {
+      "id": "web-pwa",
+      "path": "platforms/01-web-pwa"
+    },
+    {
+      "id": "chrome-extension",
+      "path": "platforms/02-chrome-extension",
+      "feeds": {
+        "dev": "channels/dev/chrome-extension.json",
+        "beta": "channels/beta/chrome-extension.json",
+        "stable": "channels/stable/chrome-extension.json"
+      }
+    },
+    {
+      "id": "windows",
+      "path": "platforms/03-windows"
+    },
+    {
+      "id": "macos",
+      "path": "platforms/04-macos"
+    },
+    {
+      "id": "android",
+      "path": "platforms/05-android"
+    },
+    {
+      "id": "ios",
+      "path": "platforms/06-ios"
+    }
+  ],
+  "signing": {
+    "algorithm": "ed25519",
+    "activeKeyId": "osminog-release-2026-01",
+    "publicKeyPath": "public-keys/osminog-release-2026-01.json"
+  },
+  "policy": {
+    "fullPackagesRequired": true,
+    "channelAdvanceRequiresRemoteArtifactVerification": true,
+    "immutableVersionPaths": true,
+    "sourceCodeAllowed": false
+  }
+}
