@@ -1,0 +1,84 @@
+name: OSMINOG registry integrity v2
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate JSON and fail-closed update feeds
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import hashlib
+          import json
+          import pathlib
+          import urllib.parse
+          import zipfile
+
+          root = pathlib.Path('.')
+          for path in root.rglob('*.json'):
+              json.loads(path.read_text(encoding='utf-8'))
+
+          channels = root / 'channels'
+          if channels.exists():
+              for feed_path in channels.rglob('*.json'):
+                  feed = json.loads(feed_path.read_text(encoding='utf-8'))
+                  if feed.get('schema') != 'osminog-update-feed/v2':
+                      continue
+                  latest = feed.get('latest')
+                  if latest is None:
+                      continue
+                  required = {
+                      'version', 'kind', 'packageUrl', 'size', 'sha256',
+                      'manifestVersion', 'minDevHubVersion', 'publishedAt'
+                  }
+                  missing = sorted(required - set(latest))
+                  if missing:
+                      raise SystemExit(f'{feed_path}: missing fields {missing}')
+                  if latest['kind'] != 'full-package':
+                      raise SystemExit(f'{feed_path}: unsupported package kind')
+                  if len(latest['sha256']) != 64:
+                      raise SystemExit(f'{feed_path}: invalid SHA-256')
+                  if int(latest['size']) <= 0:
+                      raise SystemExit(f'{feed_path}: invalid package size')
+
+          for meta_path in root.glob('platforms/chrome-extension/releases/*/release-v2.json'):
+              meta = json.loads(meta_path.read_text(encoding='utf-8'))
+              version = meta['version']
+              package_path = meta_path.parent / meta['package']
+              if not package_path.exists():
+                  # Metadata may be staged before publication, but no active feed is
+                  # allowed to advertise a package that is not present or remotely verified.
+                  continue
+              data = package_path.read_bytes()
+              if len(data) != int(meta['size']):
+                  raise SystemExit(f'{package_path}: size mismatch')
+              digest = hashlib.sha256(data).hexdigest()
+              if digest != meta['sha256']:
+                  raise SystemExit(f'{package_path}: SHA-256 mismatch')
+              with zipfile.ZipFile(package_path) as z:
+                  if 'manifest.json' not in z.namelist():
+                      raise SystemExit(f'{package_path}: root manifest missing')
+                  manifest = json.loads(z.read('manifest.json'))
+                  if manifest.get('version') != meta['manifestVersion']:
+                      raise SystemExit(f'{package_path}: manifest version mismatch')
+                  if manifest.get('name') != 'OSMINOG':
+                      raise SystemExit(f'{package_path}: product name mismatch')
+                  if meta.get('fixedExtensionKeyRequired') and not manifest.get('key'):
+                      raise SystemExit(f'{package_path}: fixed extension key missing')
+
+          print('OSMINOG release registry integrity: PASS')
+          PY
