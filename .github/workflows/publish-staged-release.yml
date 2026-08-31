@@ -1,0 +1,185 @@
+name: Publish staged OSMINOG release
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'staging/**/PUBLISH-READY'
+  workflow_dispatch:
+    inputs:
+      staged_release:
+        description: 'Path below staging, for example chrome-extension/3.11.34'
+        required: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: osminog-release-publish
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Reconstruct, verify, publish and advance feed
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SIGNING_KEY_B64: ${{ secrets.OSMINOG_RELEASE_SIGNING_KEY_B64 }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          requested='${{ inputs.staged_release || '' }}'
+          if [ -n "$requested" ]; then
+            stage="staging/$requested"
+          else
+            marker=$(find staging -mindepth 3 -maxdepth 3 -type f -name PUBLISH-READY | sort -V | tail -n 1)
+            test -n "$marker"
+            stage=$(dirname "$marker")
+          fi
+
+          meta="$stage/release.json"
+          test -f "$meta"
+
+          platform=$(jq -r '.platform' "$meta")
+          version=$(jq -r '.version' "$meta")
+          package=$(jq -r '.package' "$meta")
+          expected_size=$(jq -r '.size' "$meta")
+          expected_sha=$(jq -r '.sha256' "$meta")
+          manifest_version=$(jq -r '.manifestVersion' "$meta")
+          identity_sha=$(jq -r '.fixedIdentitySha256 // empty' "$meta")
+          target_path=$(jq -r '.targetPath' "$meta")
+          release_tag=$(jq -r '.releaseTag' "$meta")
+          release_title=$(jq -r '.releaseTitle' "$meta")
+          feed_path=$(jq -r '.feedPath' "$meta")
+          min_updater=$(jq -r '.minUpdaterVersion // empty' "$meta")
+          notes=$(jq -r '.notes // "OSMINOG release"' "$meta")
+
+          parts="$stage/parts"
+          test -d "$parts"
+          count=$(find "$parts" -maxdepth 1 -type f -name 'part-*.b64' | wc -l)
+          test "$count" -gt 0
+
+          tmp=$(mktemp -d)
+          trap 'rm -rf "$tmp"' EXIT
+
+          cat "$parts"/part-*.b64 | tr -d '\r\n\t ' | base64 --decode > "$tmp/$package"
+
+          actual_size=$(stat -c%s "$tmp/$package")
+          actual_sha=$(sha256sum "$tmp/$package" | awk '{print $1}')
+          test "$actual_size" = "$expected_size"
+          test "$actual_sha" = "$expected_sha"
+
+          python - "$tmp/$package" "$manifest_version" "$identity_sha" <<'PY'
+          import hashlib
+          import json
+          import sys
+          import zipfile
+
+          package, expected_version, expected_identity = sys.argv[1:]
+          with zipfile.ZipFile(package) as archive:
+              assert 'manifest.json' in archive.namelist(), 'root manifest.json missing'
+              manifest = json.loads(archive.read('manifest.json'))
+              assert manifest.get('version') == expected_version
+              assert manifest.get('name') == 'OSMINOG'
+              key = manifest.get('key') or ''
+              if expected_identity:
+                  assert hashlib.sha256(key.encode()).hexdigest() == expected_identity
+          PY
+
+          mkdir -p "$(dirname "$target_path")"
+          cp "$tmp/$package" "$target_path"
+
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add "$target_path"
+          git commit -m "Archive verified OSMINOG $platform $version package"
+          git push
+          artifact_commit=$(git rev-parse HEAD)
+
+          release_notes=$(printf '%s\n\nPackage: `%s`\nSHA-256: `%s`\nSize: `%s` bytes' "$notes" "$package" "$expected_sha" "$expected_size")
+          if gh release view "$release_tag" >/dev/null 2>&1; then
+            gh release edit "$release_tag" --target "$artifact_commit" --title "$release_title" --prerelease --notes "$release_notes"
+          else
+            gh release create "$release_tag" --target "$artifact_commit" --title "$release_title" --prerelease --notes "$release_notes"
+          fi
+          gh release upload "$release_tag" "$target_path" --clobber
+
+          remote=$(gh api "repos/${GITHUB_REPOSITORY}/releases/tags/${release_tag}")
+          remote_size=$(printf '%s' "$remote" | jq -r ".assets[] | select(.name==\"$package\") | .size")
+          remote_digest=$(printf '%s' "$remote" | jq -r ".assets[] | select(.name==\"$package\") | .digest // empty")
+          test "$remote_size" = "$expected_size"
+          if [ -n "$remote_digest" ]; then
+            test "$remote_digest" = "sha256:$expected_sha"
+          fi
+
+          package_url="https://github.com/${GITHUB_REPOSITORY}/releases/download/${release_tag}/${package}"
+          manifest_url="https://raw.githubusercontent.com/${GITHUB_REPOSITORY}/${artifact_commit}/platforms/02-chrome-extension/releases/${version}/release.json"
+          generated=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+
+          python - "$feed_path" "$version" "$package" "$package_url" "$manifest_url" "$expected_size" "$expected_sha" "$generated" "$min_updater" "$manifest_version" "$identity_sha" "$notes" <<'PY'
+          import base64
+          import json
+          import os
+          import sys
+
+          path, version, name, url, manifest_url, size, sha, generated, min_updater, manifest_version, identity, notes = sys.argv[1:]
+          signed = {
+              'schema': 'osminog-update-feed/v2',
+              'product': 'OSMINOG',
+              'channel': 'dev',
+              'platform': 'chrome-extension',
+              'generatedAt': generated,
+              'status': 'active',
+              'latest': {
+                  'version': version,
+                  'packageName': name,
+                  'packageUrl': url,
+                  'releaseManifestUrl': manifest_url,
+                  'size': int(size),
+                  'sha256': sha,
+                  'publishedAt': generated,
+                  'minUpdaterVersion': min_updater or None,
+                  'manifestVersion': manifest_version or None,
+                  'fixedIdentitySha256': identity or None,
+                  'notes': notes
+              }
+          }
+          signature = None
+          encoded_private_key = os.environ.get('SIGNING_KEY_B64', '').strip()
+          if encoded_private_key:
+              from cryptography.hazmat.primitives import serialization
+              private_key = serialization.load_pem_private_key(base64.b64decode(encoded_private_key), password=None)
+              canonical = json.dumps(signed, ensure_ascii=False, sort_keys=True, separators=(',', ':')).encode('utf-8')
+              signature = {
+                  'algorithm': 'ed25519',
+                  'keyId': 'osminog-release-2026-01',
+                  'value': base64.b64encode(private_key.sign(canonical)).decode('ascii')
+              }
+          feed = {
+              'schema': 'osminog-update-feed-envelope/v1',
+              'signed': signed,
+              'signature': signature
+          }
+          with open(path, 'w', encoding='utf-8') as handle:
+              json.dump(feed, handle, ensure_ascii=False, indent=2)
+              handle.write('\n')
+          PY
+
+          rm -rf "$parts" "$stage/PUBLISH-READY"
+          git add "$feed_path" "$stage" "$target_path"
+          git commit -m "Advance OSMINOG dev feed to $version after remote verification"
+          git push
+
+          echo "Published $release_title"
+          echo "Package SHA-256: $expected_sha"
+          if [ -n "$SIGNING_KEY_B64" ]; then
+            echo "Feed signature: enabled"
+          else
+            echo "Feed signature: bootstrap unsigned"
+          fi
