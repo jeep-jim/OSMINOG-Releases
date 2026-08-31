@@ -1,0 +1,53 @@
+name: Validate OSMINOG release registry
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate JSON, feeds and published artifacts
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import hashlib
+          import json
+          import pathlib
+          import re
+
+          root = pathlib.Path('.')
+          for path in root.rglob('*.json'):
+              json.loads(path.read_text(encoding='utf-8'))
+
+          registry = json.loads(pathlib.Path('registry.json').read_text(encoding='utf-8'))
+          assert registry['schema'] == 'osminog-release-registry/v1'
+
+          for channel in ('dev', 'beta', 'stable'):
+              path = pathlib.Path('channels') / channel / 'chrome-extension.json'
+              feed = json.loads(path.read_text(encoding='utf-8'))
+              assert feed['schema'] == 'osminog-update-feed-envelope/v1'
+              signed = feed['signed']
+              assert signed['channel'] == channel
+              assert signed['platform'] == 'chrome-extension'
+              latest = signed.get('latest')
+              if latest:
+                  assert re.fullmatch(r'[a-f0-9]{64}', latest['sha256'])
+                  repository_path = latest.get('repositoryPath')
+                  if repository_path:
+                      package = root / repository_path
+                      assert package.exists(), f'Missing package: {package}'
+                      payload = package.read_bytes()
+                      assert len(payload) == latest['size']
+                      assert hashlib.sha256(payload).hexdigest() == latest['sha256']
+
+          print('OSMINOG release registry validation PASS')
+          PY
