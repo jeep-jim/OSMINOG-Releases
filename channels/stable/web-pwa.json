@@ -1,0 +1,9 @@
+{
+  "schema": "osminog-update-feed/v2",
+  "product": "OSMINOG",
+  "platform": "web-pwa",
+  "channel": "stable",
+  "generatedAt": null,
+  "latest": null,
+  "status": "not-published"
+}

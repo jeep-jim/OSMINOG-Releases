@@ -1,0 +1,44 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/jeep-jim/OSMINOG-Releases/main/schemas/osminog-release-v2.schema.json",
+  "title": "OSMINOG immutable release metadata v2",
+  "type": "object",
+  "required": [
+    "schema",
+    "product",
+    "platform",
+    "version",
+    "package",
+    "size",
+    "sha256"
+  ],
+  "properties": {
+    "schema": {
+      "const": "osminog-release/v2"
+    },
+    "product": {
+      "const": "OSMINOG"
+    },
+    "platform": {
+      "type": "string"
+    },
+    "version": {
+      "type": "string"
+    },
+    "package": {
+      "type": "string"
+    },
+    "size": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "runtimeVerified": {
+      "type": "boolean"
+    }
+  },
+  "additionalProperties": true
+}

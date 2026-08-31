@@ -1,0 +1,9 @@
+{
+  "schema": "osminog-update-feed/v2",
+  "product": "OSMINOG",
+  "platform": "android",
+  "channel": "beta",
+  "generatedAt": null,
+  "latest": null,
+  "status": "not-published"
+}

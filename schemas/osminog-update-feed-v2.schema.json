@@ -1,0 +1,91 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/jeep-jim/OSMINOG-Releases/main/schemas/osminog-update-feed-v2.schema.json",
+  "title": "OSMINOG update feed v2",
+  "type": "object",
+  "required": [
+    "schema",
+    "product",
+    "platform",
+    "channel",
+    "latest"
+  ],
+  "properties": {
+    "schema": {
+      "const": "osminog-update-feed/v2"
+    },
+    "product": {
+      "const": "OSMINOG"
+    },
+    "platform": {
+      "type": "string"
+    },
+    "channel": {
+      "enum": [
+        "dev",
+        "beta",
+        "stable"
+      ]
+    },
+    "generatedAt": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "status": {
+      "type": "string"
+    },
+    "latest": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "object",
+          "required": [
+            "version",
+            "kind",
+            "packageUrl",
+            "size",
+            "sha256",
+            "manifestVersion",
+            "minDevHubVersion",
+            "publishedAt"
+          ],
+          "properties": {
+            "version": {
+              "type": "string"
+            },
+            "kind": {
+              "const": "full-package"
+            },
+            "packageUrl": {
+              "type": "string",
+              "format": "uri"
+            },
+            "size": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "manifestVersion": {
+              "type": "string"
+            },
+            "minDevHubVersion": {
+              "type": "string"
+            },
+            "publishedAt": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": true
+        }
+      ]
+    }
+  },
+  "additionalProperties": true
+}
