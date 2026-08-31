@@ -1,0 +1,18 @@
+{
+  "schema": "osminog-release-manifest/v2",
+  "product": "OSMINOG",
+  "platform": "chrome-extension",
+  "channel": "dev",
+  "version": "3.11.40",
+  "baseVersion": "3.11.39",
+  "codename": "OCEAN CHAT COLOR + PROJECT HANDOFF",
+  "package": "OSMINOG-Chrome-3.11.40-OCEAN-CHAT-COLOR-DELTA.zip",
+  "packageKind": "verified-overlay-zip",
+  "size": 111712,
+  "sha256": "c440c2e8e9121c76bd7e2ffe5b1c11c60a6b15f72b44a041683a35dc0501fa6a",
+  "manifestVersion": "3.11.40",
+  "fixedIdentitySha256": "1ddb8d87f3a6f6cb38a229bd81ba8076d1d37d3ba6b8a15b2a91129d4904012e",
+  "runtimeVerified": false,
+  "ownerRuntime": "pending",
+  "notes": "Owner-confirmed 3.11.39 three-pane messenger retained. Ocean central chat background changed from the legacy light default to the dark blue Ocean glass palette. Existing legacy white chat defaults migrate automatically."
+}
