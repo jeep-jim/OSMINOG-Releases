@@ -1,0 +1,26 @@
+{
+  "schema": "osminog-release/v2",
+  "product": "OSMINOG",
+  "platform": "chrome-extension",
+  "channel": "dev",
+  "version": "3.11.47",
+  "baseVersion": "3.11.46",
+  "codename": "TEAM LIVE PRESENCE",
+  "package": "OSMINOG-Chrome-3.11.47-TEAM-LIVE-PRESENCE-ROOT.zip",
+  "size": 387148,
+  "sha256": "dabcd956e4f1ad1e9d028c4abd3e6b30a071f3105805976f025e04e60b8e0664",
+  "manifestVersion": "3.11.47",
+  "manifestAtRoot": true,
+  "fixedExtensionKeyRequired": true,
+  "minDevHubVersion": "2.0.0",
+  "files": 59,
+  "runtimeVerified": false,
+  "ownerRuntime": "pending",
+  "notes": "Adds visible author avatars and provider identity to messages plus live per-agent progress, typing dots, active-agent highlighting and queued participant states in Team and personal chats.",
+  "updateCompatibility": {
+    "minimumInstalledVersion": "3.11.40",
+    "feed": "osminog-update-feed-envelope/v1",
+    "signedPayload": "osminog-update-feed/v2",
+    "buttonPathPreserved": true
+  }
+}
