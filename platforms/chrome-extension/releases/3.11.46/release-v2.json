@@ -1,0 +1,26 @@
+{
+  "schema": "osminog-release/v2",
+  "product": "OSMINOG",
+  "platform": "chrome-extension",
+  "channel": "dev",
+  "version": "3.11.46",
+  "baseVersion": "3.11.45",
+  "codename": "TEAM CHAT CONTROLS",
+  "package": "OSMINOG-Chrome-3.11.46-TEAM-CHAT-CONTROLS-ROOT.zip",
+  "size": 384465,
+  "sha256": "9a1987f255b000597f5e426c5bef348ca78962878677d0efc49e7e8b3d5a9e25",
+  "manifestVersion": "3.11.46",
+  "manifestAtRoot": true,
+  "fixedExtensionKeyRequired": true,
+  "minDevHubVersion": "2.0.0",
+  "files": 59,
+  "runtimeVerified": false,
+  "ownerRuntime": "pending",
+  "notes": "Adds dedicated shared Team-chat controls for participants, mode, rounds, reply length, total timeout, final summary, patch application, project access and immediate stop behavior.",
+  "updateCompatibility": {
+    "minimumInstalledVersion": "3.11.40",
+    "feed": "osminog-update-feed-envelope/v1",
+    "signedPayload": "osminog-update-feed/v2",
+    "buttonPathPreserved": true
+  }
+}
