@@ -1,0 +1,27 @@
+{
+  "schema": "osminog-release/v2",
+  "product": "OSMINOG",
+  "platform": "chrome-extension",
+  "channel": "dev",
+  "version": "3.11.51",
+  "baseVersion": "3.11.50",
+  "codename": "AUTONOMOUS SELF-BUILD",
+  "package": "OSMINOG-Chrome-3.11.51-AUTONOMOUS-SELF-BUILD-ROOT.zip",
+  "size": 397477,
+  "sha256": "9d97f10614d89e585b6949405c49b5fe93b81c7c345a099b93b9f59261fe9861",
+  "manifestVersion": "3.11.51",
+  "manifestAtRoot": true,
+  "fixedExtensionKeyRequired": true,
+  "minDevHubVersion": "2.0.0",
+  "files": 59,
+  "runtimeVerified": false,
+  "ownerRuntime": "pending",
+  "notes": "Reconnects the permanent main chat to the autonomous Poseidon executor, preserves attachments, routes self-repair to source tools and retains validated canvas execution for widgets and objects.",
+  "updateCompatibility": {
+    "minimumInstalledVersion": "3.11.40",
+    "feed": "osminog-update-feed-envelope/v1",
+    "signedPayload": "osminog-update-feed/v2",
+    "buttonPathPreserved": true
+  },
+  "publishedAt": "2026-09-01T15:36:00Z"
+}
