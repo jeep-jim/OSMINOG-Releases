@@ -1,0 +1,27 @@
+{
+  "schema": "osminog-release/v2",
+  "product": "OSMINOG",
+  "platform": "chrome-extension",
+  "channel": "dev",
+  "version": "3.11.50",
+  "baseVersion": "3.11.49",
+  "codename": "OSMINOG EXECUTOR RUNTIME",
+  "package": "OSMINOG-Chrome-3.11.50-OSMINOG-EXECUTOR-RUNTIME-ROOT.zip",
+  "size": 397097,
+  "sha256": "aa86483f1d358836cf6288283761adf0c5304406c418e4a7dded463dc502f0da",
+  "manifestVersion": "3.11.50",
+  "manifestAtRoot": true,
+  "fixedExtensionKeyRequired": true,
+  "minDevHubVersion": "2.0.0",
+  "files": 59,
+  "runtimeVerified": false,
+  "ownerRuntime": "pending",
+  "notes": "Corrects the non-executing behavior in 3.11.49 with a dedicated minimal canvas executor, visible factual execution stages, indeterminate unknown-duration status and OSMINOG-native protocol, context and asset names. Legacy BriefCraft protocol input remains accepted only for compatibility.",
+  "updateCompatibility": {
+    "minimumInstalledVersion": "3.11.40",
+    "feed": "osminog-update-feed-envelope/v1",
+    "signedPayload": "osminog-update-feed/v2",
+    "buttonPathPreserved": true
+  },
+  "publishedAt": "2026-09-01T14:29:51Z"
+}
