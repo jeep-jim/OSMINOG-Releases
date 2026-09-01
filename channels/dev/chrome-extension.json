@@ -5,20 +5,20 @@
     "product": "OSMINOG",
     "platform": "chrome-extension",
     "channel": "dev",
-    "generatedAt": "2026-09-01T09:48:03Z",
+    "generatedAt": "2026-09-01T10:19:17Z",
     "status": "active",
     "latest": {
-      "version": "3.11.42",
+      "version": "3.11.43",
       "kind": "full-package",
-      "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/chrome-v3.11.42/OSMINOG-Chrome-3.11.42-POSEIDON-MAX-ACCESS-ROOT.zip",
-      "size": 372440,
-      "sha256": "a8651f1467291743378b7ad6a151208368aca51bf9ab85f9f4a63389562d6ca2",
-      "manifestVersion": "3.11.42",
+      "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/chrome-v3.11.43/OSMINOG-Chrome-3.11.43-UNIFIED-AI-SESSIONS-ROOT.zip",
+      "size": 375069,
+      "sha256": "db29e7bcf99cee27d50c73ed9e571de47b7e10a21eb4996a628783ba4f103306",
+      "manifestVersion": "3.11.43",
       "fixedExtensionKeyRequired": true,
       "minDevHubVersion": "2.0.0",
       "runtimeVerified": false,
-      "notesUrl": "https://raw.githubusercontent.com/jeep-jim/OSMINOG-Releases/main/platforms/chrome-extension/releases/3.11.42/README.md",
-      "publishedAt": "2026-09-01T09:48:03Z"
+      "notesUrl": "https://raw.githubusercontent.com/jeep-jim/OSMINOG-Releases/main/platforms/chrome-extension/releases/3.11.43/README.md",
+      "publishedAt": "2026-09-01T10:19:17Z"
     }
   },
   "signature": null
