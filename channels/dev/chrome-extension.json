@@ -3,11 +3,23 @@
   "signed": {
     "schema": "osminog-update-feed/v2",
     "product": "OSMINOG",
-    "channel": "dev",
     "platform": "chrome-extension",
-    "generatedAt": "2026-08-31T10:05:34Z",
-    "status": "not-published",
-    "latest": null
+    "channel": "dev",
+    "generatedAt": "2026-09-01T09:12:27Z",
+    "status": "active",
+    "latest": {
+      "version": "3.11.41",
+      "kind": "full-package",
+      "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/chrome-v3.11.41/OSMINOG-Chrome-3.11.41-UNIFIED-CANVAS-TOOLBAR-ROOT.zip",
+      "size": 365952,
+      "sha256": "1360a3a678a4d3e9a12856128285cd50b88e9329ce3554b58217e984ed375eb5",
+      "manifestVersion": "3.11.41",
+      "fixedExtensionKeyRequired": true,
+      "minDevHubVersion": "2.0.0",
+      "runtimeVerified": false,
+      "notesUrl": "https://raw.githubusercontent.com/jeep-jim/OSMINOG-Releases/main/platforms/chrome-extension/releases/3.11.41/README.md",
+      "publishedAt": "2026-09-01T09:12:27Z"
+    }
   },
   "signature": null
 }
