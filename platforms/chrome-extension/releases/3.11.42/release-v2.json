@@ -21,5 +21,6 @@
     "feed": "osminog-update-feed-envelope/v1",
     "signedPayload": "osminog-update-feed/v2",
     "buttonPathPreserved": true
-  }
+  },
+  "publishedAt": "2026-09-01T09:48:03Z"
 }
