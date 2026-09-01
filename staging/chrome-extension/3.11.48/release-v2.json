@@ -1,0 +1,26 @@
+{
+  "schema": "osminog-release/v2",
+  "product": "OSMINOG",
+  "platform": "chrome-extension",
+  "channel": "dev",
+  "version": "3.11.48",
+  "baseVersion": "3.11.47",
+  "codename": "LIVE PROVIDER HEALTH",
+  "package": "OSMINOG-Chrome-3.11.48-LIVE-PROVIDER-HEALTH-ROOT.zip",
+  "size": 388634,
+  "sha256": "e5623a3f2cf9386f03a1891daafd58008f0b7fbbc0f4ae391527095d6369a035",
+  "manifestVersion": "3.11.48",
+  "manifestAtRoot": true,
+  "fixedExtensionKeyRequired": true,
+  "minDevHubVersion": "2.0.0",
+  "files": 59,
+  "runtimeVerified": false,
+  "ownerRuntime": "pending",
+  "notes": "Replaces URL-only provider badges with live transport health checks, adds Not ready and reconnect states, broadens Google/generic composer discovery and preflights Team agents before each mission.",
+  "updateCompatibility": {
+    "minimumInstalledVersion": "3.11.40",
+    "feed": "osminog-update-feed-envelope/v1",
+    "signedPayload": "osminog-update-feed/v2",
+    "buttonPathPreserved": true
+  }
+}
