@@ -169,24 +169,29 @@ jobs:
           meta['publishedAt'] = now
           meta_path.write_text(json.dumps(meta, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
           feed = {
-              'schema': 'osminog-update-feed/v2',
-              'product': 'OSMINOG',
-              'platform': 'chrome-extension',
-              'channel': 'dev',
-              'generatedAt': now,
-              'latest': {
-                  'version': version,
-                  'kind': 'full-package',
-                  'packageUrl': package_url,
-                  'size': meta['size'],
-                  'sha256': meta['sha256'],
-                  'manifestVersion': meta['manifestVersion'],
-                  'fixedExtensionKeyRequired': True,
-                  'minDevHubVersion': meta['minDevHubVersion'],
-                  'runtimeVerified': meta.get('runtimeVerified', False),
-                  'notesUrl': notes_url,
-                  'publishedAt': now,
-              }
+              'schema': 'osminog-update-feed-envelope/v1',
+              'signed': {
+                  'schema': 'osminog-update-feed/v2',
+                  'product': 'OSMINOG',
+                  'platform': 'chrome-extension',
+                  'channel': 'dev',
+                  'generatedAt': now,
+                  'status': 'active',
+                  'latest': {
+                      'version': version,
+                      'kind': 'full-package',
+                      'packageUrl': package_url,
+                      'size': meta['size'],
+                      'sha256': meta['sha256'],
+                      'manifestVersion': meta['manifestVersion'],
+                      'fixedExtensionKeyRequired': True,
+                      'minDevHubVersion': meta['minDevHubVersion'],
+                      'runtimeVerified': meta.get('runtimeVerified', False),
+                      'notesUrl': notes_url,
+                      'publishedAt': now,
+                  }
+              },
+              'signature': None
           }
           pathlib.Path('channels/dev/chrome-extension.json').write_text(
               json.dumps(feed, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
@@ -206,8 +211,8 @@ jobs:
           set -euo pipefail
           sleep 2
           raw="https://raw.githubusercontent.com/${GITHUB_REPOSITORY}/main/channels/dev/chrome-extension.json"
-          latest=$(curl -fsSL "$raw" | jq -r '.latest.version')
-          sha=$(curl -fsSL "$raw" | jq -r '.latest.sha256')
+          latest=$(curl -fsSL "$raw" | jq -r '.signed.latest.version')
+          sha=$(curl -fsSL "$raw" | jq -r '.signed.latest.sha256')
           test "$latest" = '${{ steps.release.outputs.version }}'
           test "$sha" = '${{ steps.release.outputs.sha256 }}'
           echo "OSMINOG Chrome dev feed safely advanced to $latest"

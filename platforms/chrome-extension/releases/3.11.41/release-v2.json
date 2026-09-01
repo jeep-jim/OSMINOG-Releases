@@ -1,0 +1,18 @@
+{
+  "schema": "osminog-release/v2",
+  "product": "OSMINOG",
+  "platform": "chrome-extension",
+  "channel": "dev",
+  "version": "3.11.41",
+  "package": "OSMINOG-Chrome-3.11.41-UNIFIED-CANVAS-TOOLBAR-ROOT.zip",
+  "size": 365952,
+  "sha256": "1360a3a678a4d3e9a12856128285cd50b88e9329ce3554b58217e984ed375eb5",
+  "manifestVersion": "3.11.41",
+  "manifestAtRoot": true,
+  "fixedExtensionKeyRequired": true,
+  "minDevHubVersion": "2.0.0",
+  "runtimeVerified": false,
+  "ownerRuntime": "pending",
+  "notes": "Removed the visible Brief, Code, Browser, Design and Team tabs from the top bar. Code, Markdown Studio, Browser and internal browser tabs now remain available in the unified bottom canvas toolbar. The folder updater accepts both envelope and direct v2 feeds.",
+  "publishedAt": null
+}
