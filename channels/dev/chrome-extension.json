@@ -5,20 +5,20 @@
     "product": "OSMINOG",
     "platform": "chrome-extension",
     "channel": "dev",
-    "generatedAt": "2026-09-01T12:22:05Z",
+    "generatedAt": "2026-09-01T13:13:48Z",
     "status": "active",
     "latest": {
-      "version": "3.11.47",
+      "version": "3.11.48",
       "kind": "full-package",
-      "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/chrome-v3.11.47/OSMINOG-Chrome-3.11.47-TEAM-LIVE-PRESENCE-ROOT.zip",
-      "size": 387148,
-      "sha256": "dabcd956e4f1ad1e9d028c4abd3e6b30a071f3105805976f025e04e60b8e0664",
-      "manifestVersion": "3.11.47",
+      "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/chrome-v3.11.48/OSMINOG-Chrome-3.11.48-LIVE-PROVIDER-HEALTH-ROOT.zip",
+      "size": 388634,
+      "sha256": "e5623a3f2cf9386f03a1891daafd58008f0b7fbbc0f4ae391527095d6369a035",
+      "manifestVersion": "3.11.48",
       "fixedExtensionKeyRequired": true,
       "minDevHubVersion": "2.0.0",
       "runtimeVerified": false,
-      "notesUrl": "https://raw.githubusercontent.com/jeep-jim/OSMINOG-Releases/main/platforms/chrome-extension/releases/3.11.47/README.md",
-      "publishedAt": "2026-09-01T12:22:05Z"
+      "notesUrl": "https://raw.githubusercontent.com/jeep-jim/OSMINOG-Releases/main/platforms/chrome-extension/releases/3.11.48/README.md",
+      "publishedAt": "2026-09-01T13:13:48Z"
     }
   },
   "signature": null
