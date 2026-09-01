@@ -26,5 +26,5 @@ jobs:
             | tail -n 1)
           test -n "$changed"
           version=$(printf '%s' "$changed" | cut -d/ -f4)
-          gh workflow run publish-chrome-package-v2.yml --ref main -f version="$version"
+          gh workflow run publish-chrome-package-v2.yml --repo "$GITHUB_REPOSITORY" --ref main -f version="$version"
           echo "Dispatched verified publication for Chrome $version"
