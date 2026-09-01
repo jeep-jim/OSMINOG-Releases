@@ -5,20 +5,20 @@
     "product": "OSMINOG",
     "platform": "chrome-extension",
     "channel": "dev",
-    "generatedAt": "2026-09-01T10:47:53Z",
+    "generatedAt": "2026-09-01T11:18:19Z",
     "status": "active",
     "latest": {
-      "version": "3.11.44",
+      "version": "3.11.45",
       "kind": "full-package",
-      "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/chrome-v3.11.44/OSMINOG-Chrome-3.11.44-CONNECTION-CENTER-UI-REPAIR-ROOT.zip",
-      "size": 378050,
-      "sha256": "ada1b5e73bd257ca01edbdf449ed2d4e5aecffcf9947638d5c262d8e1a764c6b",
-      "manifestVersion": "3.11.44",
+      "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/chrome-v3.11.45/OSMINOG-Chrome-3.11.45-UNIFIED-TEAM-ROOM-ROOT.zip",
+      "size": 378444,
+      "sha256": "dbecb4c641c2f5ef7a501d796ae1771033f323b2cee8c9302f2cf574325d3248",
+      "manifestVersion": "3.11.45",
       "fixedExtensionKeyRequired": true,
       "minDevHubVersion": "2.0.0",
       "runtimeVerified": false,
-      "notesUrl": "https://raw.githubusercontent.com/jeep-jim/OSMINOG-Releases/main/platforms/chrome-extension/releases/3.11.44/README.md",
-      "publishedAt": "2026-09-01T10:47:53Z"
+      "notesUrl": "https://raw.githubusercontent.com/jeep-jim/OSMINOG-Releases/main/platforms/chrome-extension/releases/3.11.45/README.md",
+      "publishedAt": "2026-09-01T11:18:19Z"
     }
   },
   "signature": null
