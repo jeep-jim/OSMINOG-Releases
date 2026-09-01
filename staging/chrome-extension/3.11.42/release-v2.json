@@ -1,0 +1,24 @@
+{
+  "schema": "osminog.release/v2",
+  "product": "OSMINOG",
+  "platform": "chrome-extension",
+  "channel": "dev",
+  "version": "3.11.42",
+  "baseVersion": "3.11.41",
+  "codename": "POSEIDON MAX ACCESS",
+  "artifact": "OSMINOG-Chrome-3.11.42-POSEIDON-MAX-ACCESS-ROOT.zip",
+  "size": 372440,
+  "sha256": "a8651f1467291743378b7ad6a151208368aca51bf9ab85f9f4a63389562d6ca2",
+  "manifestVersion": "3.11.42",
+  "manifestAtRoot": true,
+  "fixedManifestKeyPreserved": true,
+  "files": 59,
+  "runtimeState": "candidate",
+  "ownerRuntime": "pending",
+  "updateCompatibility": {
+    "minimumInstalledVersion": "3.11.40",
+    "feed": "osminog-update-feed-envelope/v1",
+    "signedPayload": "osminog-update-feed/v2",
+    "buttonPathPreserved": true
+  }
+}
