@@ -1,0 +1,26 @@
+{
+  "schema": "osminog-release/v2",
+  "product": "OSMINOG",
+  "platform": "chrome-extension",
+  "channel": "dev",
+  "version": "3.11.45",
+  "baseVersion": "3.11.44",
+  "codename": "UNIFIED TEAM ROOM ROUTING",
+  "package": "OSMINOG-Chrome-3.11.45-UNIFIED-TEAM-ROOM-ROOT.zip",
+  "size": 378444,
+  "sha256": "dbecb4c641c2f5ef7a501d796ae1771033f323b2cee8c9302f2cf574325d3248",
+  "manifestVersion": "3.11.45",
+  "manifestAtRoot": true,
+  "fixedExtensionKeyRequired": true,
+  "minDevHubVersion": "2.0.0",
+  "files": 59,
+  "runtimeVerified": false,
+  "ownerRuntime": "pending",
+  "notes": "Repairs Team mode so all selected-agent replies are serialized into one shared chat while personal agent tabs remain separate for direct conversations.",
+  "updateCompatibility": {
+    "minimumInstalledVersion": "3.11.40",
+    "feed": "osminog-update-feed-envelope/v1",
+    "signedPayload": "osminog-update-feed/v2",
+    "buttonPathPreserved": true
+  }
+}
