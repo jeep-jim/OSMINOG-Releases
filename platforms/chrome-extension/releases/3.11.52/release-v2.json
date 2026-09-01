@@ -1,0 +1,27 @@
+{
+  "schema": "osminog-release/v2",
+  "product": "OSMINOG",
+  "platform": "chrome-extension",
+  "channel": "dev",
+  "version": "3.11.52",
+  "baseVersion": "3.11.51",
+  "codename": "WORKSPACE APP RUNTIME",
+  "package": "OSMINOG-Chrome-3.11.52-WORKSPACE-APP-RUNTIME-ROOT.zip",
+  "size": 402198,
+  "sha256": "bd9b87445f0538976740a9e3652b76a192acf4fc0d75d416e8b86c2459dc321e",
+  "manifestVersion": "3.11.52",
+  "manifestAtRoot": true,
+  "fixedExtensionKeyRequired": true,
+  "minDevHubVersion": "2.0.0",
+  "files": 59,
+  "runtimeVerified": false,
+  "ownerRuntime": "pending",
+  "notes": "Adds a deterministic Workspace App Runtime: any connected AI supplies standalone HTML, then OSMINOG itself installs an editable application window and a linked one-click desktop launcher. Includes a functional image-editor fallback when provider output is unusable.",
+  "updateCompatibility": {
+    "minimumInstalledVersion": "3.11.40",
+    "feed": "osminog-update-feed-envelope/v1",
+    "signedPayload": "osminog-update-feed/v2",
+    "buttonPathPreserved": true
+  },
+  "publishedAt": "2026-09-01T16:16:41Z"
+}
