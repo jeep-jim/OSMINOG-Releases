@@ -1,0 +1,26 @@
+{
+  "schema": "osminog-release/v2",
+  "product": "OSMINOG",
+  "platform": "chrome-extension",
+  "channel": "dev",
+  "version": "3.11.44",
+  "baseVersion": "3.11.43",
+  "codename": "CONNECTION CENTER UI REPAIR",
+  "package": "OSMINOG-Chrome-3.11.44-CONNECTION-CENTER-UI-REPAIR-ROOT.zip",
+  "size": 378050,
+  "sha256": "ada1b5e73bd257ca01edbdf449ed2d4e5aecffcf9947638d5c262d8e1a764c6b",
+  "manifestVersion": "3.11.44",
+  "manifestAtRoot": true,
+  "fixedExtensionKeyRequired": true,
+  "minDevHubVersion": "2.0.0",
+  "files": 59,
+  "runtimeVerified": false,
+  "ownerRuntime": "pending",
+  "notes": "Restores the familiar Internal tabs interface as one adaptive connection center, returns the large in-chat Connect action, removes the small grey header button, and keeps safe existing-tab provider sessions without silent background windows.",
+  "updateCompatibility": {
+    "minimumInstalledVersion": "3.11.40",
+    "feed": "osminog-update-feed-envelope/v1",
+    "signedPayload": "osminog-update-feed/v2",
+    "buttonPathPreserved": true
+  }
+}
