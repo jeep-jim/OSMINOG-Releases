@@ -1,0 +1,25 @@
+{
+  "schema": "osminog-release/v2",
+  "product": "OSMINOG",
+  "platform": "chrome-extension",
+  "channel": "dev",
+  "version": "3.11.43",
+  "baseVersion": "3.11.42",
+  "codename": "UNIFIED AI SESSIONS",
+  "package": "OSMINOG-Chrome-3.11.43-UNIFIED-AI-SESSIONS-ROOT.zip",
+  "size": 375069,
+  "sha256": "db29e7bcf99cee27d50c73ed9e571de47b7e10a21eb4996a628783ba4f103306",
+  "manifestVersion": "3.11.43",
+  "manifestAtRoot": true,
+  "fixedExtensionKeyRequired": true,
+  "minDevHubVersion": "2.0.0",
+  "files": 59,
+  "runtimeVerified": false,
+  "ownerRuntime": "pending",
+  "updateCompatibility": {
+    "minimumInstalledVersion": "3.11.40",
+    "feed": "osminog-update-feed-envelope/v1",
+    "signedPayload": "osminog-update-feed/v2",
+    "buttonPathPreserved": true
+  }
+}
