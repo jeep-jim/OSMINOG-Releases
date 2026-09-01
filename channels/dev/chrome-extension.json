@@ -5,20 +5,20 @@
     "product": "OSMINOG",
     "platform": "chrome-extension",
     "channel": "dev",
-    "generatedAt": "2026-09-01T11:48:21Z",
+    "generatedAt": "2026-09-01T12:22:05Z",
     "status": "active",
     "latest": {
-      "version": "3.11.46",
+      "version": "3.11.47",
       "kind": "full-package",
-      "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/chrome-v3.11.46/OSMINOG-Chrome-3.11.46-TEAM-CHAT-CONTROLS-ROOT.zip",
-      "size": 384465,
-      "sha256": "9a1987f255b000597f5e426c5bef348ca78962878677d0efc49e7e8b3d5a9e25",
-      "manifestVersion": "3.11.46",
+      "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/chrome-v3.11.47/OSMINOG-Chrome-3.11.47-TEAM-LIVE-PRESENCE-ROOT.zip",
+      "size": 387148,
+      "sha256": "dabcd956e4f1ad1e9d028c4abd3e6b30a071f3105805976f025e04e60b8e0664",
+      "manifestVersion": "3.11.47",
       "fixedExtensionKeyRequired": true,
       "minDevHubVersion": "2.0.0",
       "runtimeVerified": false,
-      "notesUrl": "https://raw.githubusercontent.com/jeep-jim/OSMINOG-Releases/main/platforms/chrome-extension/releases/3.11.46/README.md",
-      "publishedAt": "2026-09-01T11:48:21Z"
+      "notesUrl": "https://raw.githubusercontent.com/jeep-jim/OSMINOG-Releases/main/platforms/chrome-extension/releases/3.11.47/README.md",
+      "publishedAt": "2026-09-01T12:22:05Z"
     }
   },
   "signature": null
