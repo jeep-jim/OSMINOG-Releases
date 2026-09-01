@@ -5,20 +5,20 @@
     "product": "OSMINOG",
     "platform": "chrome-extension",
     "channel": "dev",
-    "generatedAt": "2026-09-01T10:19:17Z",
+    "generatedAt": "2026-09-01T10:47:53Z",
     "status": "active",
     "latest": {
-      "version": "3.11.43",
+      "version": "3.11.44",
       "kind": "full-package",
-      "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/chrome-v3.11.43/OSMINOG-Chrome-3.11.43-UNIFIED-AI-SESSIONS-ROOT.zip",
-      "size": 375069,
-      "sha256": "db29e7bcf99cee27d50c73ed9e571de47b7e10a21eb4996a628783ba4f103306",
-      "manifestVersion": "3.11.43",
+      "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/chrome-v3.11.44/OSMINOG-Chrome-3.11.44-CONNECTION-CENTER-UI-REPAIR-ROOT.zip",
+      "size": 378050,
+      "sha256": "ada1b5e73bd257ca01edbdf449ed2d4e5aecffcf9947638d5c262d8e1a764c6b",
+      "manifestVersion": "3.11.44",
       "fixedExtensionKeyRequired": true,
       "minDevHubVersion": "2.0.0",
       "runtimeVerified": false,
-      "notesUrl": "https://raw.githubusercontent.com/jeep-jim/OSMINOG-Releases/main/platforms/chrome-extension/releases/3.11.43/README.md",
-      "publishedAt": "2026-09-01T10:19:17Z"
+      "notesUrl": "https://raw.githubusercontent.com/jeep-jim/OSMINOG-Releases/main/platforms/chrome-extension/releases/3.11.44/README.md",
+      "publishedAt": "2026-09-01T10:47:53Z"
     }
   },
   "signature": null
