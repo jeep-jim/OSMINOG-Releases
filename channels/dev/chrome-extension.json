@@ -5,20 +5,20 @@
     "product": "OSMINOG",
     "platform": "chrome-extension",
     "channel": "dev",
-    "generatedAt": "2026-09-01T11:18:19Z",
+    "generatedAt": "2026-09-01T11:48:21Z",
     "status": "active",
     "latest": {
-      "version": "3.11.45",
+      "version": "3.11.46",
       "kind": "full-package",
-      "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/chrome-v3.11.45/OSMINOG-Chrome-3.11.45-UNIFIED-TEAM-ROOM-ROOT.zip",
-      "size": 378444,
-      "sha256": "dbecb4c641c2f5ef7a501d796ae1771033f323b2cee8c9302f2cf574325d3248",
-      "manifestVersion": "3.11.45",
+      "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/chrome-v3.11.46/OSMINOG-Chrome-3.11.46-TEAM-CHAT-CONTROLS-ROOT.zip",
+      "size": 384465,
+      "sha256": "9a1987f255b000597f5e426c5bef348ca78962878677d0efc49e7e8b3d5a9e25",
+      "manifestVersion": "3.11.46",
       "fixedExtensionKeyRequired": true,
       "minDevHubVersion": "2.0.0",
       "runtimeVerified": false,
-      "notesUrl": "https://raw.githubusercontent.com/jeep-jim/OSMINOG-Releases/main/platforms/chrome-extension/releases/3.11.45/README.md",
-      "publishedAt": "2026-09-01T11:18:19Z"
+      "notesUrl": "https://raw.githubusercontent.com/jeep-jim/OSMINOG-Releases/main/platforms/chrome-extension/releases/3.11.46/README.md",
+      "publishedAt": "2026-09-01T11:48:21Z"
     }
   },
   "signature": null
