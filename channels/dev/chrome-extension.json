@@ -5,20 +5,20 @@
     "product": "OSMINOG",
     "platform": "chrome-extension",
     "channel": "dev",
-    "generatedAt": "2026-09-01T14:31:29Z",
+    "generatedAt": "2026-09-01T15:51:48Z",
     "status": "active",
     "latest": {
-      "version": "3.11.50",
+      "version": "3.11.51",
       "kind": "full-package",
-      "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/chrome-v3.11.50/OSMINOG-Chrome-3.11.50-OSMINOG-EXECUTOR-RUNTIME-ROOT.zip",
-      "size": 397097,
-      "sha256": "aa86483f1d358836cf6288283761adf0c5304406c418e4a7dded463dc502f0da",
-      "manifestVersion": "3.11.50",
+      "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/chrome-v3.11.51/OSMINOG-Chrome-3.11.51-AUTONOMOUS-SELF-BUILD-ROOT.zip",
+      "size": 397477,
+      "sha256": "9d97f10614d89e585b6949405c49b5fe93b81c7c345a099b93b9f59261fe9861",
+      "manifestVersion": "3.11.51",
       "fixedExtensionKeyRequired": true,
       "minDevHubVersion": "2.0.0",
       "runtimeVerified": false,
-      "notesUrl": "https://raw.githubusercontent.com/jeep-jim/OSMINOG-Releases/main/platforms/chrome-extension/releases/3.11.50/README.md",
-      "publishedAt": "2026-09-01T14:31:29Z"
+      "notesUrl": "https://raw.githubusercontent.com/jeep-jim/OSMINOG-Releases/main/platforms/chrome-extension/releases/3.11.51/README.md",
+      "publishedAt": "2026-09-01T15:51:48Z"
     }
   },
   "signature": null
