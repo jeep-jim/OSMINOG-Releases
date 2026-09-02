@@ -5,20 +5,20 @@
     "product": "OSMINOG",
     "platform": "chrome-extension",
     "channel": "dev",
-    "generatedAt": "2026-09-02T01:04:48Z",
+    "generatedAt": "2026-09-02T01:50:27Z",
     "status": "active",
     "latest": {
-      "version": "3.11.53",
+      "version": "3.11.54",
       "kind": "full-package",
-      "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/chrome-v3.11.53/OSMINOG-Chrome-3.11.53-NATIVE-WORKSPACE-APPS-ROOT.zip",
-      "size": 403761,
-      "sha256": "793b06d9e8cbe388c4c6c1e67a781f960362b00d1fe8d7dfd71bf668e43bd3f5",
-      "manifestVersion": "3.11.53",
+      "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/chrome-v3.11.54/OSMINOG-Chrome-3.11.54-OWNER-POSEIDON-PUBLISH-ROOT.zip",
+      "size": 404428,
+      "sha256": "ab924d0c48b307ba1c357c4b20e5ffa8695c5af94ac1d0b0442aa0582322a450",
+      "manifestVersion": "3.11.54",
       "fixedExtensionKeyRequired": true,
       "minDevHubVersion": "2.0.0",
       "runtimeVerified": false,
-      "notesUrl": "https://raw.githubusercontent.com/jeep-jim/OSMINOG-Releases/main/platforms/chrome-extension/releases/3.11.53/README.md",
-      "publishedAt": "2026-09-02T01:04:48Z"
+      "notesUrl": "https://raw.githubusercontent.com/jeep-jim/OSMINOG-Releases/main/platforms/chrome-extension/releases/3.11.54/README.md",
+      "publishedAt": "2026-09-02T01:50:27Z"
     }
   },
   "signature": null

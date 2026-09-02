@@ -13,5 +13,6 @@
   "runtimeVerified": false,
   "notes": "Owner-only Poseidon publication controls with persistent pending state, confirmed cancel, local-folder portability and private-source/public-release routing.",
   "sourceRepository": "jeep-jim/OSMINOG",
-  "sourceCommit": "f5cb32d73af5388691cdf19b4d2bdb433f3cf466"
+  "sourceCommit": "f5cb32d73af5388691cdf19b4d2bdb433f3cf466",
+  "publishedAt": "2026-09-02T01:50:27Z"
 }
