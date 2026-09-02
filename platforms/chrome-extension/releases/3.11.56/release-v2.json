@@ -1,0 +1,17 @@
+{
+  "schema": "osminog-chrome-release/v2",
+  "product": "OSMINOG",
+  "platform": "chrome-extension",
+  "channel": "dev",
+  "version": "3.11.56",
+  "package": "OSMINOG-Chrome-3.11.56-AUTONOMOUS-WORKSPACE-RUNTIME-ROOT.zip",
+  "size": 409710,
+  "sha256": "b4e8c502b343f00d95cfde0fe93aeaff3092b0e388af9a2c21fdc3eab70412a2",
+  "manifestVersion": "3.11.56",
+  "fixedExtensionKeyRequired": true,
+  "minDevHubVersion": "2.0.0",
+  "runtimeVerified": false,
+  "notes": "Autonomous task runtime, visible execution stages, verified-result completion and no fake extension fallback.",
+  "sourceRepository": "jeep-jim/OSMINOG",
+  "sourceCommit": "27578ca8fd920bb903fc3ba565649213a4551feb"
+}
