@@ -13,5 +13,6 @@
   "runtimeVerified": false,
   "notes": "First-class custom Extension Studio runtime and single-voice chat.",
   "sourceRepository": "jeep-jim/OSMINOG",
-  "sourceCommit": "e50fb548688e540d1a40ee705b3a24c774bbe924"
+  "sourceCommit": "e50fb548688e540d1a40ee705b3a24c774bbe924",
+  "publishedAt": "2026-09-02T02:30:38Z"
 }
