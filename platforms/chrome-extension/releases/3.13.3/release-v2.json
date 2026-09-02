@@ -10,7 +10,7 @@
   "manifestVersion": "3.13.3",
   "fixedExtensionKeyRequired": true,
   "runtimeVerified": false,
-  "publishedAt": null,
+  "publishedAt": "2026-09-02T11:08:30Z",
   "notes": "Unified Browser application with internal tabs and in-window layout editing, plus one access center for AI sessions, canvas rights, Poseidon, GitHub and project sharing.",
   "sourceRepository": "jeep-jim/OSMINOG",
   "sourceCommit": "36c927e901d5b1f078f9ad4769ea09306f38b54f",

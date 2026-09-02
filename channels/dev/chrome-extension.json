@@ -5,20 +5,20 @@
     "product": "OSMINOG",
     "platform": "chrome-extension",
     "channel": "dev",
-    "generatedAt": "2026-09-02T10:25:38Z",
+    "generatedAt": "2026-09-02T11:08:30Z",
     "status": "active",
     "latest": {
-      "version": "3.13.2",
+      "version": "3.13.3",
       "kind": "full-package",
-      "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/chrome-v3.13.2/OSMINOG-Chrome-3.13.2-WINDOWS-GRAPHICS-HOTFIX.zip",
-      "size": 555026,
-      "sha256": "38e97a2cbd4f85d3dc852432af2321af80dbb3d83a5b43fd78101ef055de6b68",
-      "manifestVersion": "3.13.2",
+      "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/chrome-v3.13.3/OSMINOG-Chrome-3.13.3-UNIFIED-BROWSER-ACCESS.zip",
+      "size": 567522,
+      "sha256": "83b10277b3ba38765ab6d3e78ce6aabeec0d66865a0b7532af345068e90c49df",
+      "manifestVersion": "3.13.3",
       "fixedExtensionKeyRequired": true,
       "minDevHubVersion": "2.0.0",
       "runtimeVerified": false,
-      "notesUrl": "https://raw.githubusercontent.com/jeep-jim/OSMINOG-Releases/main/platforms/chrome-extension/releases/3.13.2/README.md",
-      "publishedAt": "2026-09-02T10:25:38Z"
+      "notesUrl": "https://raw.githubusercontent.com/jeep-jim/OSMINOG-Releases/main/platforms/chrome-extension/releases/3.13.3/README.md",
+      "publishedAt": "2026-09-02T11:08:30Z"
     }
   },
   "signature": null
