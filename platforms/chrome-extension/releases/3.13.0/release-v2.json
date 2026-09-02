@@ -1,0 +1,18 @@
+{
+  "schema": "osminog-chrome-release/v2",
+  "product": "OSMINOG",
+  "platform": "chrome-extension",
+  "channel": "dev",
+  "version": "3.13.0",
+  "package": "OSMINOG-Chrome-3.13.0-APPLICATION-WORKSPACE.zip",
+  "size": 450895,
+  "sha256": "24c59748bb98c81fc530c72a74aa3bd217b702be3b4fdcb26f49683f9c0f2891",
+  "manifestVersion": "3.13.0",
+  "fixedExtensionKeyRequired": true,
+  "runtimeVerified": false,
+  "publishedAt": "2026-09-02T08:30:42Z",
+  "notes": "Rebuilds OSMINOG around eight permanent dock applications, one window model and one permissions center. Consolidates graphics and text editing, adds grouped two-click connections, repairs Module Store and Extension Studio, keeps AI chat pinned to the latest message, and exposes live asset_create so internet files with transparency become real canvas assets with verified object IDs.",
+  "sourceRepository": "jeep-jim/OSMINOG",
+  "sourceCommit": "7fb91d882f5b4d698cc6aaebaa4fc9e1dbbd2835",
+  "minDevHubVersion": "2.0.0"
+}
