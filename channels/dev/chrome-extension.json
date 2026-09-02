@@ -5,20 +5,20 @@
     "product": "OSMINOG",
     "platform": "chrome-extension",
     "channel": "dev",
-    "generatedAt": "2026-09-02T04:04:55Z",
+    "generatedAt": "2026-09-02T04:28:51Z",
     "status": "active",
     "latest": {
-      "version": "3.11.57",
+      "version": "3.12.0",
       "kind": "full-package",
-      "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/chrome-v3.11.57/OSMINOG-Chrome-3.11.57-UNIFIED-MODULE-STORE-MEMORY.zip",
-      "size": 409445,
-      "sha256": "cdd0bcc6c3aadcd4e56daf954b7f5780a4a4c9f117639ced8b5aabf262c8eed4",
-      "manifestVersion": "3.11.57",
+      "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/chrome-v3.12.0/OSMINOG-Chrome-3.12.0-CAPABILITY-OS.zip",
+      "size": 417326,
+      "sha256": "5aafeac19f46ef0f9d735abe21ba22920d2b8317663eba5ae9f6f84ba43df0bc",
+      "manifestVersion": "3.12.0",
       "fixedExtensionKeyRequired": true,
       "minDevHubVersion": "2.0.0",
       "runtimeVerified": false,
-      "notesUrl": "https://raw.githubusercontent.com/jeep-jim/OSMINOG-Releases/main/platforms/chrome-extension/releases/3.11.57/README.md",
-      "publishedAt": "2026-09-02T04:04:55Z"
+      "notesUrl": "https://raw.githubusercontent.com/jeep-jim/OSMINOG-Releases/main/platforms/chrome-extension/releases/3.12.0/README.md",
+      "publishedAt": "2026-09-02T04:28:51Z"
     }
   },
   "signature": null
