@@ -10,7 +10,7 @@
   "manifestVersion": "3.14.1",
   "fixedExtensionKeyRequired": true,
   "runtimeVerified": false,
-  "publishedAt": null,
+  "publishedAt": "2026-09-02T13:49:23Z",
   "notes": "Keeps the 3.14 desktop design and restores ChatGPT Live Presence, attached-tab fallback, automatic status recovery and reusable managed background AI sessions.",
   "sourceRepository": "jeep-jim/OSMINOG",
   "sourceCommit": "59fe0c7efc4b82bec6ac829856f9b158bdcdecdf",
