@@ -1,0 +1,18 @@
+{
+  "schema": "osminog-chrome-release/v2",
+  "product": "OSMINOG",
+  "platform": "chrome-extension",
+  "channel": "dev",
+  "version": "3.11.57",
+  "package": "OSMINOG-Chrome-3.11.57-UNIFIED-MODULE-STORE-MEMORY.zip",
+  "size": 409445,
+  "sha256": "cdd0bcc6c3aadcd4e56daf954b7f5780a4a4c9f117639ced8b5aabf262c8eed4",
+  "manifestVersion": "3.11.57",
+  "fixedExtensionKeyRequired": true,
+  "minDevHubVersion": "2.0.0",
+  "runtimeVerified": false,
+  "notes": "Unified Module Store, persistent thread memory and restored bottom streaming progress.",
+  "sourceRepository": "jeep-jim/OSMINOG",
+  "sourceCommit": "7a1fb8c62d98c66f3abf127e07311aace365b2bf",
+  "publishedAt": "2026-09-02T04:04:32.356Z"
+}
