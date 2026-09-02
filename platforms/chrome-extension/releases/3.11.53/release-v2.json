@@ -1,0 +1,27 @@
+{
+  "schema": "osminog-release/v2",
+  "product": "OSMINOG",
+  "platform": "chrome-extension",
+  "channel": "dev",
+  "version": "3.11.53",
+  "baseVersion": "3.11.52",
+  "codename": "NATIVE WORKSPACE APPS",
+  "package": "OSMINOG-Chrome-3.11.53-NATIVE-WORKSPACE-APPS-ROOT.zip",
+  "size": 403761,
+  "sha256": "793b06d9e8cbe388c4c6c1e67a781f960362b00d1fe8d7dfd71bf668e43bd3f5",
+  "manifestVersion": "3.11.53",
+  "manifestAtRoot": true,
+  "fixedExtensionKeyRequired": true,
+  "minDevHubVersion": "2.0.0",
+  "files": 59,
+  "runtimeVerified": false,
+  "ownerRuntime": "pending",
+  "notes": "Replaces the prototype button and code-preview shell with a rounded desktop icon and a clean internal application window. Existing 3.11.52 app pairs migrate automatically; source remains accessible through an explicit developer toggle.",
+  "updateCompatibility": {
+    "minimumInstalledVersion": "3.11.40",
+    "feed": "osminog-update-feed-envelope/v1",
+    "signedPayload": "osminog-update-feed/v2",
+    "buttonPathPreserved": true
+  },
+  "publishedAt": "2026-09-02T00:50:31Z"
+}
