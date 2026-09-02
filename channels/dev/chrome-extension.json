@@ -5,20 +5,20 @@
     "product": "OSMINOG",
     "platform": "chrome-extension",
     "channel": "dev",
-    "generatedAt": "2026-09-02T08:32:05Z",
+    "generatedAt": "2026-09-02T09:37:03Z",
     "status": "active",
     "latest": {
-      "version": "3.13.0",
+      "version": "3.13.1",
       "kind": "full-package",
-      "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/chrome-v3.13.0/OSMINOG-Chrome-3.13.0-APPLICATION-WORKSPACE.zip",
-      "size": 450895,
-      "sha256": "24c59748bb98c81fc530c72a74aa3bd217b702be3b4fdcb26f49683f9c0f2891",
-      "manifestVersion": "3.13.0",
+      "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/chrome-v3.13.1/OSMINOG-Chrome-3.13.1-ART-ICONS-READER-SCROLL.zip",
+      "size": 453013,
+      "sha256": "f0af66e4d59951688df732d96e26b1b76054c18ff9ef124c71529c1332ed4d23",
+      "manifestVersion": "3.13.1",
       "fixedExtensionKeyRequired": true,
       "minDevHubVersion": "2.0.0",
       "runtimeVerified": false,
-      "notesUrl": "https://raw.githubusercontent.com/jeep-jim/OSMINOG-Releases/main/platforms/chrome-extension/releases/3.13.0/README.md",
-      "publishedAt": "2026-09-02T08:32:05Z"
+      "notesUrl": "https://raw.githubusercontent.com/jeep-jim/OSMINOG-Releases/main/platforms/chrome-extension/releases/3.13.1/README.md",
+      "publishedAt": "2026-09-02T09:37:03Z"
     }
   },
   "signature": null

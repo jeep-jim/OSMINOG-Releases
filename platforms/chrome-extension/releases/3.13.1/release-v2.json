@@ -10,7 +10,7 @@
   "manifestVersion": "3.13.1",
   "fixedExtensionKeyRequired": true,
   "runtimeVerified": false,
-  "publishedAt": "2026-09-02T09:35:25Z",
+  "publishedAt": "2026-09-02T09:37:03Z",
   "notes": "Opening or changing a chat reveals the latest message once, while incoming AI content preserves the reader's manual scroll position. Replaces the eight colored icon containers with independent multicolor SVG artworks and a dimensional yellow Files folder.",
   "sourceRepository": "jeep-jim/OSMINOG",
   "sourceCommit": "59618fcea41de3eeda950e548dc621ab66d3158c",
