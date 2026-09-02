@@ -5,20 +5,20 @@
     "product": "OSMINOG",
     "platform": "chrome-extension",
     "channel": "dev",
-    "generatedAt": "2026-09-02T04:28:51Z",
+    "generatedAt": "2026-09-02T04:58:28Z",
     "status": "active",
     "latest": {
-      "version": "3.12.0",
+      "version": "3.11.48",
       "kind": "full-package",
-      "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/chrome-v3.12.0/OSMINOG-Chrome-3.12.0-CAPABILITY-OS.zip",
-      "size": 417326,
-      "sha256": "5aafeac19f46ef0f9d735abe21ba22920d2b8317663eba5ae9f6f84ba43df0bc",
-      "manifestVersion": "3.12.0",
+      "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/chrome-v3.11.48/OSMINOG-Chrome-3.11.48-LIVE-PROVIDER-HEALTH-ROOT.zip",
+      "size": 388634,
+      "sha256": "e5623a3f2cf9386f03a1891daafd58008f0b7fbbc0f4ae391527095d6369a035",
+      "manifestVersion": "3.11.48",
       "fixedExtensionKeyRequired": true,
       "minDevHubVersion": "2.0.0",
       "runtimeVerified": false,
-      "notesUrl": "https://raw.githubusercontent.com/jeep-jim/OSMINOG-Releases/main/platforms/chrome-extension/releases/3.12.0/README.md",
-      "publishedAt": "2026-09-02T04:28:51Z"
+      "notesUrl": "https://raw.githubusercontent.com/jeep-jim/OSMINOG-Releases/main/platforms/chrome-extension/releases/3.11.48/README.md",
+      "publishedAt": "2026-09-02T04:58:28Z"
     }
   },
   "signature": null
