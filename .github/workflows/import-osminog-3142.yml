@@ -1,0 +1,93 @@
+name: Import OSMINOG Chrome 3.14.2 package
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/import-osminog-3142.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  import:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Download and verify 3.14.2 package
+        shell: bash
+        run: |
+          set -euo pipefail
+          url='https://sdmntprnortheu.oaiusercontent.com/files/00000000-dfc8-81f4-af07-87da001435ec/raw?se=2026-09-02T15%3A50%3A13Z&sp=r&sv=2026-02-06&sr=b&scid=cbc047cc-a50e-52c6-ba9b-85eaa7964797&skoid=9b41a688-1b44-4731-856e-b0efcf3660ed&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-09-02T07%3A34%3A38Z&ske=2026-09-03T07%3A34%3A38Z&sks=b&skv=2026-02-06&sig=31ZEpvM2%2Bi%2B%2BCtSTy4X1IgAivvGfaGAPTlNNfkpXF1w%3D'
+          curl -fL --retry 3 "$url" -o artifact.zip
+          rm -rf unpacked
+          mkdir unpacked
+          unzip -q artifact.zip -d unpacked
+          inner=$(find unpacked -type f -name 'OSMINOG-Chrome-3.14.2-CHAT-OWNER-RUNTIME-RC1.zip' | head -n 1)
+          test -n "$inner"
+          actual_size=$(stat -c%s "$inner")
+          actual_sha=$(sha256sum "$inner" | awk '{print $1}')
+          test "$actual_size" = '571484'
+          test "$actual_sha" = '706932135376e3408b2eba0ad1f55b987cda7f3a4e614c042aa5468e3505e24e'
+          python - "$inner" <<'PY'
+          import json, sys, zipfile, hashlib
+          path=sys.argv[1]
+          with zipfile.ZipFile(path) as z:
+              assert 'manifest.json' in z.namelist()
+              m=json.loads(z.read('manifest.json'))
+              assert m.get('name') == 'OSMINOG'
+              assert m.get('version') == '3.14.2'
+              assert m.get('key')
+              assert hashlib.sha256(m['key'].encode()).hexdigest() == '1ddb8d87f3a6f6cb38a229bd81ba8076d1d37d3ba6b8a15b2a91129d4904012e'
+          PY
+
+          dir='platforms/chrome-extension/releases/3.14.2'
+          package='OSMINOG-Chrome-3.14.2-CHAT-OWNER-RUNTIME.zip'
+          mkdir -p "$dir"
+          cp "$inner" "$dir/$package"
+          cat > "$dir/release-v2.json" <<'JSON'
+          {
+            "schema": "osminog-release/v2",
+            "product": "OSMINOG",
+            "platform": "chrome-extension",
+            "version": "3.14.2",
+            "codename": "CHAT OWNER RUNTIME",
+            "baseVersion": "3.14.1",
+            "package": "OSMINOG-Chrome-3.14.2-CHAT-OWNER-RUNTIME.zip",
+            "size": 571484,
+            "sha256": "706932135376e3408b2eba0ad1f55b987cda7f3a4e614c042aa5468e3505e24e",
+            "manifestVersion": "3.14.2",
+            "fixedExtensionKeyRequired": true,
+            "fixedIdentitySha256": "1ddb8d87f3a6f6cb38a229bd81ba8076d1d37d3ba6b8a15b2a91129d4904012e",
+            "minDevHubVersion": "2.0.0",
+            "runtimeVerified": false,
+            "notes": "Repairs ChatGPT Owner Max execution, real module creation for utilities, visible execution progress, direct background provider connection actions, and restores persistent OSMINOG project context without rolling back the 3.14 desktop UI."
+          }
+          JSON
+          cat > "$dir/README.md" <<'MD'
+          # OSMINOG Chrome 3.14.2 — CHAT OWNER RUNTIME
+
+          Recovery release over 3.14.1. Restores the working Owner Max execution contract while preserving the current 3.14 desktop UI.
+
+          - real module/app creation instead of loose canvas primitives for stopwatch/timer/calculator-style requests;
+          - full direct ChatGPT Owner Max tool surface;
+          - visible concise execution stages in chat;
+          - working background connect/authorize actions for provider sessions;
+          - restored persistent project log, roadmap and update architecture context.
+
+          Package SHA-256: `706932135376e3408b2eba0ad1f55b987cda7f3a4e614c042aa5468e3505e24e`
+          MD
+
+      - name: Archive package and metadata
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add platforms/chrome-extension/releases/3.14.2
+          git commit -m 'Archive OSMINOG Chrome 3.14.2 package'
+          git push origin HEAD:main
