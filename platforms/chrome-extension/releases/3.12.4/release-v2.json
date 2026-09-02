@@ -1,0 +1,18 @@
+{
+  "schema": "osminog-chrome-release/v2",
+  "product": "OSMINOG",
+  "platform": "chrome-extension",
+  "channel": "dev",
+  "version": "3.12.4",
+  "package": "OSMINOG-Chrome-3.12.4-DOCK-PERFORMANCE-HOTFIX.zip",
+  "size": 439183,
+  "sha256": "1dd90680a22ad27f481b42225379cdd6b0d2f6ee172874915d97d37c991512f5",
+  "manifestVersion": "3.12.4",
+  "fixedExtensionKeyRequired": true,
+  "runtimeVerified": false,
+  "publishedAt": null,
+  "notes": "Removes the window-manager self-observer loop and Module Store empty-render loop. Application and provider icons are moved out of the zoomable world into one fixed bottom dock with one Nano Banana-compatible size and hover behavior. Closing or minimizing reusable windows returns them to the dock; open and restore bring windows to front.",
+  "sourceRepository": "jeep-jim/OSMINOG",
+  "sourceCommit": "ef21ab0441eb3d6d7da98eaaba23bccd0970e6b8",
+  "minDevHubVersion": "2.0.0"
+}
