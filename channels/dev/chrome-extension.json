@@ -5,20 +5,20 @@
     "product": "OSMINOG",
     "platform": "chrome-extension",
     "channel": "dev",
-    "generatedAt": "2026-09-02T02:30:38Z",
+    "generatedAt": "2026-09-02T03:40:10Z",
     "status": "active",
     "latest": {
-      "version": "3.11.55",
+      "version": "3.11.56",
       "kind": "full-package",
-      "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/chrome-v3.11.55/OSMINOG-Chrome-3.11.55-CUSTOM-EXTENSION-STUDIO-ROOT.zip",
-      "size": 407804,
-      "sha256": "b85aa19eb13f27688e95fcb8543deb9fa3751cac28757d4492c5cec067395275",
-      "manifestVersion": "3.11.55",
+      "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/chrome-v3.11.56/OSMINOG-Chrome-3.11.56-AUTONOMOUS-WORKSPACE-RUNTIME-ROOT.zip",
+      "size": 409710,
+      "sha256": "b4e8c502b343f00d95cfde0fe93aeaff3092b0e388af9a2c21fdc3eab70412a2",
+      "manifestVersion": "3.11.56",
       "fixedExtensionKeyRequired": true,
       "minDevHubVersion": "2.0.0",
       "runtimeVerified": false,
-      "notesUrl": "https://raw.githubusercontent.com/jeep-jim/OSMINOG-Releases/main/platforms/chrome-extension/releases/3.11.55/README.md",
-      "publishedAt": "2026-09-02T02:30:38Z"
+      "notesUrl": "https://raw.githubusercontent.com/jeep-jim/OSMINOG-Releases/main/platforms/chrome-extension/releases/3.11.56/README.md",
+      "publishedAt": "2026-09-02T03:40:10Z"
     }
   },
   "signature": null

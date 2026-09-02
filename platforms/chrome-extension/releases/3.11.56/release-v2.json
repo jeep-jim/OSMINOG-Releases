@@ -13,5 +13,6 @@
   "runtimeVerified": false,
   "notes": "Autonomous task runtime, visible execution stages, verified-result completion and no fake extension fallback.",
   "sourceRepository": "jeep-jim/OSMINOG",
-  "sourceCommit": "27578ca8fd920bb903fc3ba565649213a4551feb"
+  "sourceCommit": "27578ca8fd920bb903fc3ba565649213a4551feb",
+  "publishedAt": "2026-09-02T03:40:10Z"
 }
