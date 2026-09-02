@@ -13,5 +13,6 @@
   "fixedIdentitySha256": "1ddb8d87f3a6f6cb38a229bd81ba8076d1d37d3ba6b8a15b2a91129d4904012e",
   "minDevHubVersion": "2.0.0",
   "runtimeVerified": false,
-  "notes": "Repairs ChatGPT Owner Max execution, real module creation for utilities, visible execution progress, direct background provider connection actions, and restores persistent OSMINOG project context without rolling back the 3.14 desktop UI."
+  "notes": "Repairs ChatGPT Owner Max execution, real module creation for utilities, visible execution progress, direct background provider connection actions, and restores persistent OSMINOG project context without rolling back the 3.14 desktop UI.",
+  "publishedAt": "2026-09-02T15:47:41Z"
 }
