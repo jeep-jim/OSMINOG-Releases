@@ -1,11 +1,1 @@
-{
-  "schema": "osminog-release-activation/v2",
-  "platform": "chrome-extension",
-  "version": "3.12.1",
-  "package": "OSMINOG-Chrome-3.12.1-NATIVE-WIDGETS.zip",
-  "sha256": "ee3cca233784fab3e6777088f365e14ffcff945da3110921a5fd1dbe9a9bf42d",
-  "size": 418392,
-  "sourceRepository": "jeep-jim/OSMINOG",
-  "sourceCommit": "764471249697f2a4c051062efa68d0a5955b8f08",
-  "publishedAt": "2026-09-02T04:56:16.857Z"
-}
+activate 3.12.1
