@@ -10,7 +10,7 @@
   "manifestVersion": "3.13.2",
   "fixedExtensionKeyRequired": true,
   "runtimeVerified": false,
-  "publishedAt": null,
+  "publishedAt": "2026-09-02T10:25:38Z",
   "notes": "Unified managed-window controls and z-order, minimized-window dock restore, instant reader-controlled chat opening, browser layout editing, yellow Nano Banana artwork, and a full offline Fabric.js graphics studio with tools, layers, properties and explicit apply.",
   "sourceRepository": "jeep-jim/OSMINOG",
   "sourceCommit": "bc63dd7791f3100f1cdaaeb36b5461a945f6d4be",
