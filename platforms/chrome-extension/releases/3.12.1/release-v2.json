@@ -10,7 +10,7 @@
   "manifestVersion": "3.12.1",
   "fixedExtensionKeyRequired": true,
   "runtimeVerified": false,
-  "publishedAt": "2026-09-02T04:55:56.293Z",
+  "publishedAt": "2026-09-02T04:59:43Z",
   "notes": "Widgets and tools now open as compact native workspace elements with content-driven sizing, transparent host shells and hover-only controls. Full application containers remain available only for app and connector module types.",
   "sourceRepository": "jeep-jim/OSMINOG",
   "sourceCommit": "764471249697f2a4c051062efa68d0a5955b8f08",
