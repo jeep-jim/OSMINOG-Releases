@@ -10,7 +10,7 @@
   "manifestVersion": "3.12.3",
   "fixedExtensionKeyRequired": true,
   "runtimeVerified": false,
-  "publishedAt": null,
+  "publishedAt": "2026-09-02T06:36:11Z",
   "notes": "Main-chat product edits now write directly to jeep-jim/OSMINOG with owner confirmation. The workspace uses one movable/resizable window runtime with deterministic z-order, a top minimize tray and a shared action shelf. Module Store is master/detail without duplicate card actions; custom modules can be deleted, system modules are protected, widgets have no redundant host container, desktop icons are unified, vector Bézier guidance is stronger, and web results are embedded as real files with transparency preserved.",
   "sourceRepository": "jeep-jim/OSMINOG",
   "sourceCommit": "d1a49f1f244a1227c4265f67b5035afdf04a10cf",
