@@ -10,7 +10,7 @@
   "manifestVersion": "3.12.4",
   "fixedExtensionKeyRequired": true,
   "runtimeVerified": false,
-  "publishedAt": null,
+  "publishedAt": "2026-09-02T07:21:23Z",
   "notes": "Removes the window-manager self-observer loop and Module Store empty-render loop. Application and provider icons are moved out of the zoomable world into one fixed bottom dock with one Nano Banana-compatible size and hover behavior. Closing or minimizing reusable windows returns them to the dock; open and restore bring windows to front.",
   "sourceRepository": "jeep-jim/OSMINOG",
   "sourceCommit": "ef21ab0441eb3d6d7da98eaaba23bccd0970e6b8",

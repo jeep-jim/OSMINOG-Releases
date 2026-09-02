@@ -5,20 +5,20 @@
     "product": "OSMINOG",
     "platform": "chrome-extension",
     "channel": "dev",
-    "generatedAt": "2026-09-02T06:36:11Z",
+    "generatedAt": "2026-09-02T07:21:23Z",
     "status": "active",
     "latest": {
-      "version": "3.12.3",
+      "version": "3.12.4",
       "kind": "full-package",
-      "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/chrome-v3.12.3/OSMINOG-Chrome-3.12.3-UNIFIED-WORKSPACE.zip",
-      "size": 437242,
-      "sha256": "ddfe08e70f3fc1c05a1847abb127fed6701f1aeaae87dbdfdaeeb0948fa46874",
-      "manifestVersion": "3.12.3",
+      "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/chrome-v3.12.4/OSMINOG-Chrome-3.12.4-DOCK-PERFORMANCE-HOTFIX.zip",
+      "size": 439183,
+      "sha256": "1dd90680a22ad27f481b42225379cdd6b0d2f6ee172874915d97d37c991512f5",
+      "manifestVersion": "3.12.4",
       "fixedExtensionKeyRequired": true,
       "minDevHubVersion": "2.0.0",
       "runtimeVerified": false,
-      "notesUrl": "https://raw.githubusercontent.com/jeep-jim/OSMINOG-Releases/main/platforms/chrome-extension/releases/3.12.3/README.md",
-      "publishedAt": "2026-09-02T06:36:11Z"
+      "notesUrl": "https://raw.githubusercontent.com/jeep-jim/OSMINOG-Releases/main/platforms/chrome-extension/releases/3.12.4/README.md",
+      "publishedAt": "2026-09-02T07:21:23Z"
     }
   },
   "signature": null
