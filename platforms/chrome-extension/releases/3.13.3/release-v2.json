@@ -1,0 +1,18 @@
+{
+  "schema": "osminog-chrome-release/v2",
+  "product": "OSMINOG",
+  "platform": "chrome-extension",
+  "channel": "dev",
+  "version": "3.13.3",
+  "package": "OSMINOG-Chrome-3.13.3-UNIFIED-BROWSER-ACCESS.zip",
+  "size": 567522,
+  "sha256": "83b10277b3ba38765ab6d3e78ce6aabeec0d66865a0b7532af345068e90c49df",
+  "manifestVersion": "3.13.3",
+  "fixedExtensionKeyRequired": true,
+  "runtimeVerified": false,
+  "publishedAt": null,
+  "notes": "Unified Browser application with internal tabs and in-window layout editing, plus one access center for AI sessions, canvas rights, Poseidon, GitHub and project sharing.",
+  "sourceRepository": "jeep-jim/OSMINOG",
+  "sourceCommit": "36c927e901d5b1f078f9ad4769ea09306f38b54f",
+  "minDevHubVersion": "2.0.0"
+}
