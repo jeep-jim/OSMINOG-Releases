@@ -1,0 +1,18 @@
+{
+  "schema": "osminog-chrome-release/v2",
+  "product": "OSMINOG",
+  "platform": "chrome-extension",
+  "channel": "dev",
+  "version": "3.12.2",
+  "package": "OSMINOG-Chrome-3.12.2-VERIFIED-ARTIFACT-LOOP.zip",
+  "size": 422833,
+  "sha256": "fb8330e85928754be8ff032196421dcc69b26005ca371d2440a42c9bd545c32c",
+  "manifestVersion": "3.12.2",
+  "fixedExtensionKeyRequired": true,
+  "runtimeVerified": false,
+  "publishedAt": null,
+  "notes": "Visual canvas tasks now build a holistic editable artifact, render it, inspect a fresh viewport capture and run up to three model-driven correction cycles. OSMINOG reports done only after an applied result passes visual QA; unverified fragments fail closed.",
+  "sourceRepository": "jeep-jim/OSMINOG",
+  "sourceCommit": "ddade1bd17a52fd0fee5922d28f460d4702a12f6",
+  "minDevHubVersion": "2.0.0"
+}
