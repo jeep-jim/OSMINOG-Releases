@@ -1,0 +1,17 @@
+{
+  "schema": "osminog-chrome-release/v2",
+  "product": "OSMINOG",
+  "platform": "chrome-extension",
+  "channel": "dev",
+  "version": "3.11.54",
+  "package": "OSMINOG-Chrome-3.11.54-OWNER-POSEIDON-PUBLISH-ROOT.zip",
+  "size": 404428,
+  "sha256": "ab924d0c48b307ba1c357c4b20e5ffa8695c5af94ac1d0b0442aa0582322a450",
+  "manifestVersion": "3.11.54",
+  "fixedExtensionKeyRequired": true,
+  "minDevHubVersion": "2.0.0",
+  "runtimeVerified": false,
+  "notes": "Owner-only Poseidon publication controls with persistent pending state, confirmed cancel, local-folder portability and private-source/public-release routing.",
+  "sourceRepository": "jeep-jim/OSMINOG",
+  "sourceCommit": "f5cb32d73af5388691cdf19b4d2bdb433f3cf466"
+}
