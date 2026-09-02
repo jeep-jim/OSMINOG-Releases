@@ -5,20 +5,20 @@
     "product": "OSMINOG",
     "platform": "chrome-extension",
     "channel": "dev",
-    "generatedAt": "2026-09-02T04:59:43Z",
+    "generatedAt": "2026-09-02T05:31:30Z",
     "status": "active",
     "latest": {
-      "version": "3.12.1",
+      "version": "3.12.2",
       "kind": "full-package",
-      "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/chrome-v3.12.1/OSMINOG-Chrome-3.12.1-NATIVE-WIDGETS.zip",
-      "size": 418392,
-      "sha256": "ee3cca233784fab3e6777088f365e14ffcff945da3110921a5fd1dbe9a9bf42d",
-      "manifestVersion": "3.12.1",
+      "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/chrome-v3.12.2/OSMINOG-Chrome-3.12.2-VERIFIED-ARTIFACT-LOOP.zip",
+      "size": 422833,
+      "sha256": "fb8330e85928754be8ff032196421dcc69b26005ca371d2440a42c9bd545c32c",
+      "manifestVersion": "3.12.2",
       "fixedExtensionKeyRequired": true,
       "minDevHubVersion": "2.0.0",
       "runtimeVerified": false,
-      "notesUrl": "https://raw.githubusercontent.com/jeep-jim/OSMINOG-Releases/main/platforms/chrome-extension/releases/3.12.1/README.md",
-      "publishedAt": "2026-09-02T04:59:43Z"
+      "notesUrl": "https://raw.githubusercontent.com/jeep-jim/OSMINOG-Releases/main/platforms/chrome-extension/releases/3.12.2/README.md",
+      "publishedAt": "2026-09-02T05:31:30Z"
     }
   },
   "signature": null

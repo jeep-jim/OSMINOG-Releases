@@ -10,7 +10,7 @@
   "manifestVersion": "3.12.2",
   "fixedExtensionKeyRequired": true,
   "runtimeVerified": false,
-  "publishedAt": null,
+  "publishedAt": "2026-09-02T05:31:30Z",
   "notes": "Visual canvas tasks now build a holistic editable artifact, render it, inspect a fresh viewport capture and run up to three model-driven correction cycles. OSMINOG reports done only after an applied result passes visual QA; unverified fragments fail closed.",
   "sourceRepository": "jeep-jim/OSMINOG",
   "sourceCommit": "ddade1bd17a52fd0fee5922d28f460d4702a12f6",
