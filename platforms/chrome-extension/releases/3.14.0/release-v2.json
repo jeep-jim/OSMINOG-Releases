@@ -1,0 +1,18 @@
+{
+  "schema": "osminog-chrome-release/v2",
+  "product": "OSMINOG",
+  "platform": "chrome-extension",
+  "channel": "dev",
+  "version": "3.14.0",
+  "package": "OSMINOG-Chrome-3.14.0-NATIVE-OWNER-RUNTIME.zip",
+  "size": 576102,
+  "sha256": "8e68c19559e194231c867b2087e4f6957e2015d7ff0e4bfa8c59e5f53737632b",
+  "manifestVersion": "3.14.0",
+  "fixedExtensionKeyRequired": true,
+  "runtimeVerified": false,
+  "publishedAt": null,
+  "notes": "Native verified modules, direct Owner Runtime, editable graphics, reliable windows, revision history, unified account/access and icon overrides.",
+  "sourceRepository": "jeep-jim/OSMINOG",
+  "sourceCommit": "f888b999e354e80931c6ab073677346652dc5308",
+  "minDevHubVersion": "2.0.0"
+}
