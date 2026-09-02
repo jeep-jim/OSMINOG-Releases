@@ -1,0 +1,17 @@
+{
+  "schema": "osminog-release/v2",
+  "product": "OSMINOG",
+  "platform": "chrome-extension",
+  "version": "3.14.2",
+  "codename": "CHAT OWNER RUNTIME",
+  "baseVersion": "3.14.1",
+  "package": "OSMINOG-Chrome-3.14.2-CHAT-OWNER-RUNTIME.zip",
+  "size": 571484,
+  "sha256": "706932135376e3408b2eba0ad1f55b987cda7f3a4e614c042aa5468e3505e24e",
+  "manifestVersion": "3.14.2",
+  "fixedExtensionKeyRequired": true,
+  "fixedIdentitySha256": "1ddb8d87f3a6f6cb38a229bd81ba8076d1d37d3ba6b8a15b2a91129d4904012e",
+  "minDevHubVersion": "2.0.0",
+  "runtimeVerified": false,
+  "notes": "Repairs ChatGPT Owner Max execution, real module creation for utilities, visible execution progress, direct background provider connection actions, and restores persistent OSMINOG project context without rolling back the 3.14 desktop UI."
+}
