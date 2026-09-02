@@ -1,0 +1,18 @@
+{
+  "schema": "osminog-chrome-release/v2",
+  "product": "OSMINOG",
+  "platform": "chrome-extension",
+  "channel": "dev",
+  "version": "3.14.1",
+  "package": "OSMINOG-Chrome-3.14.1-PRESENCE-RECOVERY.zip",
+  "size": 583996,
+  "sha256": "0744b0ec5abbb29c368ed0d7a52e85fde3ffb0ce6e273c45b1f811a4d34a4643",
+  "manifestVersion": "3.14.1",
+  "fixedExtensionKeyRequired": true,
+  "runtimeVerified": false,
+  "publishedAt": null,
+  "notes": "Keeps the 3.14 desktop design and restores ChatGPT Live Presence, attached-tab fallback, automatic status recovery and reusable managed background AI sessions.",
+  "sourceRepository": "jeep-jim/OSMINOG",
+  "sourceCommit": "59fe0c7efc4b82bec6ac829856f9b158bdcdecdf",
+  "minDevHubVersion": "2.0.0"
+}

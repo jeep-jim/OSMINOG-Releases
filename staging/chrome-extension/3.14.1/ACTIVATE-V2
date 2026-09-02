@@ -1,0 +1,6 @@
+version=3.14.1
+channel=dev
+expected_size=583996
+expected_sha256=0744b0ec5abbb29c368ed0d7a52e85fde3ffb0ce6e273c45b1f811a4d34a4643
+source_repository=jeep-jim/OSMINOG
+source_commit=59fe0c7efc4b82bec6ac829856f9b158bdcdecdf
