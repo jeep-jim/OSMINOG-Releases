@@ -5,20 +5,20 @@
     "product": "OSMINOG",
     "platform": "chrome-extension",
     "channel": "dev",
-    "generatedAt": "2026-09-02T03:40:10Z",
+    "generatedAt": "2026-09-02T04:04:55Z",
     "status": "active",
     "latest": {
-      "version": "3.11.56",
+      "version": "3.11.57",
       "kind": "full-package",
-      "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/chrome-v3.11.56/OSMINOG-Chrome-3.11.56-AUTONOMOUS-WORKSPACE-RUNTIME-ROOT.zip",
-      "size": 409710,
-      "sha256": "b4e8c502b343f00d95cfde0fe93aeaff3092b0e388af9a2c21fdc3eab70412a2",
-      "manifestVersion": "3.11.56",
+      "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/chrome-v3.11.57/OSMINOG-Chrome-3.11.57-UNIFIED-MODULE-STORE-MEMORY.zip",
+      "size": 409445,
+      "sha256": "cdd0bcc6c3aadcd4e56daf954b7f5780a4a4c9f117639ced8b5aabf262c8eed4",
+      "manifestVersion": "3.11.57",
       "fixedExtensionKeyRequired": true,
       "minDevHubVersion": "2.0.0",
       "runtimeVerified": false,
-      "notesUrl": "https://raw.githubusercontent.com/jeep-jim/OSMINOG-Releases/main/platforms/chrome-extension/releases/3.11.56/README.md",
-      "publishedAt": "2026-09-02T03:40:10Z"
+      "notesUrl": "https://raw.githubusercontent.com/jeep-jim/OSMINOG-Releases/main/platforms/chrome-extension/releases/3.11.57/README.md",
+      "publishedAt": "2026-09-02T04:04:55Z"
     }
   },
   "signature": null
