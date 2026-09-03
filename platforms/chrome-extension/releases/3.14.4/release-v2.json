@@ -1,0 +1,17 @@
+{
+  "schema": "osminog-release/v2",
+  "product": "OSMINOG",
+  "platform": "chrome-extension",
+  "version": "3.14.4",
+  "codename": "CHAT EXECUTION RECOVERY",
+  "baseVersion": "3.14.3",
+  "package": "OSMINOG-Chrome-3.14.4-CHAT-EXECUTION-RECOVERY.zip",
+  "size": 575015,
+  "sha256": "424c8e116d85f9261ee64d8c7c3e06a3bfbf9ded229740c8699b6ee235847912",
+  "manifestVersion": "3.14.4",
+  "fixedExtensionKeyRequired": true,
+  "fixedIdentitySha256": "1ddb8d87f3a6f6cb38a229bd81ba8076d1d37d3ba6b8a15b2a91129d4904012e",
+  "minDevHubVersion": "2.0.0",
+  "runtimeVerified": false,
+  "notes": "Restores a single-provider chat stream with elapsed progress and stable scrolling, fixes compact widget close/recreate lifecycle, makes internet image placement deterministic, corrects live version display, and makes interface text presets distinct."
+}
