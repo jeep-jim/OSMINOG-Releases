@@ -5,20 +5,20 @@
     "product": "OSMINOG",
     "platform": "chrome-extension",
     "channel": "dev",
-    "generatedAt": "2026-09-03T01:23:12Z",
+    "generatedAt": "2026-09-03T02:25:47Z",
     "status": "active",
     "latest": {
-      "version": "3.14.5",
+      "version": "3.15.0",
       "kind": "full-package",
-      "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/chrome-v3.14.5/OSMINOG-Chrome-3.14.5-LEGACY-CHAT-POLISH.zip",
-      "size": 575061,
-      "sha256": "9f91a9f206251d5374eab06c4a714281de807a2c0a1036d5f359ac493b97a342",
-      "manifestVersion": "3.14.5",
+      "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/chrome-v3.15.0/OSMINOG-Chrome-3.15.0-INTERACTIVE-CAPABILITY-RUNTIME.zip",
+      "size": 580151,
+      "sha256": "9838c05ded643e4034cc9ce601e64819b94e94f98878a83f8a48f03283e20031",
+      "manifestVersion": "3.15.0",
       "fixedExtensionKeyRequired": true,
       "minDevHubVersion": "2.0.0",
       "runtimeVerified": false,
-      "notesUrl": "https://raw.githubusercontent.com/jeep-jim/OSMINOG-Releases/main/platforms/chrome-extension/releases/3.14.5/README.md",
-      "publishedAt": "2026-09-03T01:23:12Z"
+      "notesUrl": "https://raw.githubusercontent.com/jeep-jim/OSMINOG-Releases/main/platforms/chrome-extension/releases/3.15.0/README.md",
+      "publishedAt": "2026-09-03T02:25:47Z"
     }
   },
   "signature": null
