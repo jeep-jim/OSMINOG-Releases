@@ -5,20 +5,20 @@
     "product": "OSMINOG",
     "platform": "chrome-extension",
     "channel": "dev",
-    "generatedAt": "2026-09-03T00:08:10Z",
+    "generatedAt": "2026-09-03T01:16:38Z",
     "status": "active",
     "latest": {
-      "version": "3.14.3",
+      "version": "3.14.4",
       "kind": "full-package",
-      "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/chrome-v3.14.3/OSMINOG-Chrome-3.14.3-DESKTOP-ACTION-RECOVERY.zip",
-      "size": 572498,
-      "sha256": "3b87675defd0b97b95ff79596b585afa51eb53f8807b404341800204124f41e8",
-      "manifestVersion": "3.14.3",
+      "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/chrome-v3.14.4/OSMINOG-Chrome-3.14.4-CHAT-EXECUTION-RECOVERY.zip",
+      "size": 575015,
+      "sha256": "424c8e116d85f9261ee64d8c7c3e06a3bfbf9ded229740c8699b6ee235847912",
+      "manifestVersion": "3.14.4",
       "fixedExtensionKeyRequired": true,
       "minDevHubVersion": "2.0.0",
       "runtimeVerified": false,
-      "notesUrl": "https://raw.githubusercontent.com/jeep-jim/OSMINOG-Releases/main/platforms/chrome-extension/releases/3.14.3/README.md",
-      "publishedAt": "2026-09-03T00:08:10Z"
+      "notesUrl": "https://raw.githubusercontent.com/jeep-jim/OSMINOG-Releases/main/platforms/chrome-extension/releases/3.14.4/README.md",
+      "publishedAt": "2026-09-03T01:16:38Z"
     }
   },
   "signature": null
