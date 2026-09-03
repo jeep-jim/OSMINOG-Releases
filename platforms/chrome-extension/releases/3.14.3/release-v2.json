@@ -14,5 +14,5 @@
   "minDevHubVersion": "2.0.0",
   "runtimeVerified": false,
   "notes": "Removes the shell around compact desktop widgets, routes explicit internet image/file placement through web_search/web_fetch to asset_create, and hardens real source editing of the OSMINOG product UI.",
-  "publishedAt": "2026-09-03T00:07:42Z"
+  "publishedAt": "2026-09-03T00:08:10Z"
 }
