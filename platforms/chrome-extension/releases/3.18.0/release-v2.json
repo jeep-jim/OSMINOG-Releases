@@ -1,0 +1,18 @@
+{
+  "schema": "osminog-release/v2",
+  "product": "OSMINOG",
+  "platform": "chrome-extension",
+  "version": "3.18.0",
+  "codename": "PRODUCT CORE RECOVERY",
+  "baseVersion": "3.17.0",
+  "package": "OSMINOG-Chrome-3.18.0-PRODUCT-CORE-RECOVERY.zip",
+  "size": 586414,
+  "sha256": "0905a2c133fbf3024467df768626885b833e4063ebc8cfe3ee7d4802590bd1be",
+  "manifestVersion": "3.18.0",
+  "fixedExtensionKeyRequired": true,
+  "fixedIdentitySha256": "1ddb8d87f3a6f6cb38a229bd81ba8076d1d37d3ba6b8a15b2a91129d4904012e",
+  "minDevHubVersion": "2.0.0",
+  "runtimeVerified": false,
+  "notes": "Product-core recovery: reliable multi-source updates, explicit AI/Poseidon semantics, sharing-only Access, user GitHub/Drive/web-service integrations, deletable test modules and cleaner chat/UI while preserving the 3.17 generative app runtime.",
+  "publishedAt": null
+}
