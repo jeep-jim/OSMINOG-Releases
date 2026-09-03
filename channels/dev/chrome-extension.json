@@ -5,20 +5,20 @@
     "product": "OSMINOG",
     "platform": "chrome-extension",
     "channel": "dev",
-    "generatedAt": "2026-09-03T05:23:24Z",
+    "generatedAt": "2026-09-03T06:21:00Z",
     "status": "active",
     "latest": {
-      "version": "3.15.2",
+      "version": "3.16.0",
       "kind": "full-package",
-      "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/chrome-v3.15.2/OSMINOG-Chrome-3.15.2-GITHUB-OWNER-STATUS-SYNC.zip",
-      "size": 583112,
-      "sha256": "7d022e78cb0a52d22d176e4ebcd8ea2ed1ad4e739be8bec2da17ac5412b66534",
-      "manifestVersion": "3.15.2",
+      "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/chrome-v3.16.0/OSMINOG-Chrome-3.16.0-SIMPLE-ACCESS-RUNTIME.zip",
+      "size": 578416,
+      "sha256": "840adfc1f8cbfbf04b0727e3b447d0724c4581133e2d7d71632665a1f77ee0bd",
+      "manifestVersion": "3.16.0",
       "fixedExtensionKeyRequired": true,
       "minDevHubVersion": "2.0.0",
       "runtimeVerified": false,
-      "notesUrl": "https://raw.githubusercontent.com/jeep-jim/OSMINOG-Releases/main/platforms/chrome-extension/releases/3.15.2/README.md",
-      "publishedAt": "2026-09-03T05:23:24Z"
+      "notesUrl": "https://raw.githubusercontent.com/jeep-jim/OSMINOG-Releases/main/platforms/chrome-extension/releases/3.16.0/README.md",
+      "publishedAt": "2026-09-03T06:21:00Z"
     }
   },
   "signature": null
