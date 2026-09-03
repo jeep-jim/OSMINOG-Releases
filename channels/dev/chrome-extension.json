@@ -5,20 +5,20 @@
     "product": "OSMINOG",
     "platform": "chrome-extension",
     "channel": "dev",
-    "generatedAt": "2026-09-03T09:24:15Z",
+    "generatedAt": "2026-09-03T10:33:16Z",
     "status": "active",
     "latest": {
-      "version": "3.18.0",
+      "version": "3.18.1",
       "kind": "full-package",
-      "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/chrome-v3.18.0/OSMINOG-Chrome-3.18.0-PRODUCT-CORE-RECOVERY.zip",
-      "size": 586414,
-      "sha256": "0905a2c133fbf3024467df768626885b833e4063ebc8cfe3ee7d4802590bd1be",
-      "manifestVersion": "3.18.0",
+      "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/chrome-v3.18.1/OSMINOG-Chrome-3.18.1-POSEIDON-SOURCE-EXECUTOR-RECOVERY.zip",
+      "size": 587295,
+      "sha256": "9db9266fa064cbfc6bcb55abd9a3c87e56cd94a24810d06cd6ceffb72363e004",
+      "manifestVersion": "3.18.1",
       "fixedExtensionKeyRequired": true,
       "minDevHubVersion": "2.0.0",
       "runtimeVerified": false,
-      "notesUrl": "https://raw.githubusercontent.com/jeep-jim/OSMINOG-Releases/main/platforms/chrome-extension/releases/3.18.0/README.md",
-      "publishedAt": "2026-09-03T09:24:15Z"
+      "notesUrl": "https://raw.githubusercontent.com/jeep-jim/OSMINOG-Releases/main/platforms/chrome-extension/releases/3.18.1/README.md",
+      "publishedAt": "2026-09-03T10:33:16Z"
     }
   },
   "signature": null
