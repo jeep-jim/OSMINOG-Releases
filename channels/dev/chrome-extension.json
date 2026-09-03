@@ -5,20 +5,20 @@
     "product": "OSMINOG",
     "platform": "chrome-extension",
     "channel": "dev",
-    "generatedAt": "2026-09-03T08:38:26Z",
+    "generatedAt": "2026-09-03T09:24:15Z",
     "status": "active",
     "latest": {
-      "version": "3.14.1",
+      "version": "3.18.0",
       "kind": "full-package",
-      "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/chrome-v3.14.1/OSMINOG-Chrome-3.14.1-PRESENCE-RECOVERY.zip",
-      "size": 583996,
-      "sha256": "0744b0ec5abbb29c368ed0d7a52e85fde3ffb0ce6e273c45b1f811a4d34a4643",
-      "manifestVersion": "3.14.1",
+      "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/chrome-v3.18.0/OSMINOG-Chrome-3.18.0-PRODUCT-CORE-RECOVERY.zip",
+      "size": 586414,
+      "sha256": "0905a2c133fbf3024467df768626885b833e4063ebc8cfe3ee7d4802590bd1be",
+      "manifestVersion": "3.18.0",
       "fixedExtensionKeyRequired": true,
       "minDevHubVersion": "2.0.0",
       "runtimeVerified": false,
-      "notesUrl": "https://raw.githubusercontent.com/jeep-jim/OSMINOG-Releases/main/platforms/chrome-extension/releases/3.14.1/README.md",
-      "publishedAt": "2026-09-03T08:38:26Z"
+      "notesUrl": "https://raw.githubusercontent.com/jeep-jim/OSMINOG-Releases/main/platforms/chrome-extension/releases/3.18.0/README.md",
+      "publishedAt": "2026-09-03T09:24:15Z"
     }
   },
   "signature": null
