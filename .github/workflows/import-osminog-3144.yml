@@ -1,0 +1,98 @@
+name: Import OSMINOG Chrome 3.14.4 package
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/import-osminog-3144.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  import:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Download and verify 3.14.4 package
+        shell: bash
+        run: |
+          set -euo pipefail
+          url='https://sdmntprpolandcentral.oaiusercontent.com/files/00000000-56f8-820a-98da-34b23915a3f6/raw?se=2026-09-03T01%3A18%3A45Z&sp=r&sv=2026-02-06&sr=b&scid=959b75d0-8a12-5d31-9716-f47700bc22e7&skoid=e5f84a89-964a-4fd3-92c2-c2cb3a12ea16&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-09-02T19%3A46%3A03Z&ske=2026-09-03T19%3A46%3A03Z&sks=b&skv=2026-02-06&sig=hBj2jXgT49XF3YETG12nQIUI3nxb/TFtlILwEvO9NnI%3D'
+          curl -fL --retry 3 "$url" -o artifact.zip
+          rm -rf unpacked
+          mkdir unpacked
+          unzip -q artifact.zip -d unpacked
+          inner=$(find unpacked -type f -name 'OSMINOG-Chrome-3.14.4-CHAT-EXECUTION-RECOVERY.zip' | head -n 1)
+          test -n "$inner"
+          actual_size=$(stat -c%s "$inner")
+          actual_sha=$(sha256sum "$inner" | awk '{print $1}')
+          test "$actual_size" = '575015'
+          test "$actual_sha" = '424c8e116d85f9261ee64d8c7c3e06a3bfbf9ded229740c8699b6ee235847912'
+          python - "$inner" <<'PY'
+          import json, sys, zipfile, hashlib
+          path=sys.argv[1]
+          with zipfile.ZipFile(path) as z:
+              assert 'manifest.json' in z.namelist()
+              m=json.loads(z.read('manifest.json'))
+              assert m.get('name') == 'OSMINOG'
+              assert m.get('version') == '3.14.4'
+              assert m.get('version_name') == '3.14.4'
+              assert m.get('key')
+              assert hashlib.sha256(m['key'].encode()).hexdigest() == '1ddb8d87f3a6f6cb38a229bd81ba8076d1d37d3ba6b8a15b2a91129d4904012e'
+          PY
+
+          dir='platforms/chrome-extension/releases/3.14.4'
+          package='OSMINOG-Chrome-3.14.4-CHAT-EXECUTION-RECOVERY.zip'
+          mkdir -p "$dir"
+          cp "$inner" "$dir/$package"
+          cat > "$dir/release-v2.json" <<'JSON'
+          {
+            "schema": "osminog-release/v2",
+            "product": "OSMINOG",
+            "platform": "chrome-extension",
+            "version": "3.14.4",
+            "codename": "CHAT EXECUTION RECOVERY",
+            "baseVersion": "3.14.3",
+            "package": "OSMINOG-Chrome-3.14.4-CHAT-EXECUTION-RECOVERY.zip",
+            "size": 575015,
+            "sha256": "424c8e116d85f9261ee64d8c7c3e06a3bfbf9ded229740c8699b6ee235847912",
+            "manifestVersion": "3.14.4",
+            "fixedExtensionKeyRequired": true,
+            "fixedIdentitySha256": "1ddb8d87f3a6f6cb38a229bd81ba8076d1d37d3ba6b8a15b2a91129d4904012e",
+            "minDevHubVersion": "2.0.0",
+            "runtimeVerified": false,
+            "notes": "Restores a single-provider chat stream with elapsed progress and stable scrolling, fixes compact widget close/recreate lifecycle, makes internet image placement deterministic, corrects live version display, and makes interface text presets distinct."
+          }
+          JSON
+          cat > "$dir/README.md" <<'MD'
+          # OSMINOG Chrome 3.14.4 — CHAT EXECUTION RECOVERY
+
+          Focused recovery over 3.14.3 after owner live testing.
+
+          - only the selected AI provider appears as the chat speaker; OSMINOG execution telemetry stays in the progress strip;
+          - moving response progress shows elapsed seconds and reader-aware auto-scroll follows the proven 3.11.34-era chat behavior;
+          - compact desktop widgets close their whole managed parent and can be recreated without stale transparent shells;
+          - explicit internet-image-to-desktop requests run through real image bytes and finish with `asset_create`;
+          - repeated no-tool provider replies fail fast instead of looping through many attempts;
+          - the version badge reads the running manifest version from first paint;
+          - Normal is the default interface text size and Compact/Normal/Large/Extra Large apply distinct CSS sizes.
+
+          Package SHA-256: `424c8e116d85f9261ee64d8c7c3e06a3bfbf9ded229740c8699b6ee235847912`
+          Source repair commit: `91a65cc063dc555688f5ee26e409be717ab695ec`
+          Source main: `cdd3692d797ff8af9664ac2e6635a0add194c292`
+          MD
+
+      - name: Archive package and metadata
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add platforms/chrome-extension/releases/3.14.4
+          git commit -m 'Archive OSMINOG Chrome 3.14.4 package'
+          git push origin HEAD:main
