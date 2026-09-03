@@ -1,0 +1,94 @@
+name: Import OSMINOG Chrome 3.18.0 package
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/import-osminog-3180.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  import:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download and verify CI artifact
+        shell: bash
+        run: |
+          set -euxo pipefail
+          URL='https://sdmntprsoutheastus3.oaiusercontent.com/files/00000000-ca18-820c-8f0a-d34eaa8bcb0f/raw?se=2026-09-03T09%3A27%3A35Z&sp=r&sv=2026-02-06&sr=b&scid=cedd61eb-56d5-50cd-bb87-bac608d09e88&skoid=0a4a0f0c-99ac-4752-9d87-cfac036fa93f&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-09-03T05%3A53%3A42Z&ske=2026-09-04T05%3A53%3A42Z&sks=b&skv=2026-02-06&sig=v/Npl5XliUUht69OAWIU2YDWipybYTt5vIw2BuA2aX8%3D'
+          curl -fL --retry 3 "$URL" -o /tmp/artifact.zip
+          mkdir -p /tmp/artifact
+          unzip -q /tmp/artifact.zip -d /tmp/artifact
+          PKG=/tmp/artifact/OSMINOG-Chrome-3.18.0-PRODUCT-CORE-RECOVERY.zip
+          test -f "$PKG"
+          test "$(stat -c%s "$PKG")" = '586414'
+          test "$(sha256sum "$PKG" | awk '{print $1}')" = '0905a2c133fbf3024467df768626885b833e4063ebc8cfe3ee7d4802590bd1be'
+          unzip -t "$PKG"
+          python3 - "$PKG" <<'PY'
+          import sys,zipfile,json,hashlib
+          p=sys.argv[1]
+          with zipfile.ZipFile(p) as z:
+              m=json.loads(z.read('manifest.json'))
+              assert m['name']=='OSMINOG'
+              assert m['version']=='3.18.0' and m.get('version_name')=='3.18.0'
+              assert hashlib.sha256(m['key'].encode()).hexdigest()=='1ddb8d87f3a6f6cb38a229bd81ba8076d1d37d3ba6b8a15b2a91129d4904012e'
+          PY
+      - name: Archive package and metadata
+        shell: bash
+        run: |
+          set -euxo pipefail
+          DIR='platforms/chrome-extension/releases/3.18.0'
+          PKG='OSMINOG-Chrome-3.18.0-PRODUCT-CORE-RECOVERY.zip'
+          mkdir -p "$DIR"
+          cp "/tmp/artifact/$PKG" "$DIR/$PKG"
+          cat > "$DIR/release-v2.json" <<'JSON'
+          {
+            "schema": "osminog-release/v2",
+            "product": "OSMINOG",
+            "platform": "chrome-extension",
+            "version": "3.18.0",
+            "codename": "PRODUCT CORE RECOVERY",
+            "baseVersion": "3.17.0",
+            "package": "OSMINOG-Chrome-3.18.0-PRODUCT-CORE-RECOVERY.zip",
+            "size": 586414,
+            "sha256": "0905a2c133fbf3024467df768626885b833e4063ebc8cfe3ee7d4802590bd1be",
+            "manifestVersion": "3.18.0",
+            "fixedExtensionKeyRequired": true,
+            "fixedIdentitySha256": "1ddb8d87f3a6f6cb38a229bd81ba8076d1d37d3ba6b8a15b2a91129d4904012e",
+            "minDevHubVersion": "2.0.0",
+            "runtimeVerified": false,
+            "notes": "Product-core recovery: reliable multi-source updates, explicit AI/Poseidon semantics, sharing-only Access, user GitHub/Drive/web-service integrations, deletable test modules and cleaner chat/UI while preserving the 3.17 generative app runtime.",
+            "publishedAt": null
+          }
+          JSON
+          cat > "$DIR/README.md" <<'MD'
+          # OSMINOG Chrome 3.18.0 — PRODUCT CORE RECOVERY
+
+          Restores the simple product model of the proven 3.11 generation while retaining the 3.17 generative application runtime.
+
+          - updater reads GitHub API, raw GitHub and jsDelivr independently and cannot claim “up to date” when the channel check failed;
+          - top bar has explicit **AI** and **Poseidon** states;
+          - normal canvas/files/apps/graphics/web/project capabilities need no permission toggles;
+          - **Access** is only human canvas sharing and view/comment/edit roles;
+          - user GitHub project storage is separate from owner-only Poseidon;
+          - Google Drive is surfaced again through the existing OAuth/Drive API;
+          - arbitrary web services can be added by URL and use their real favicon;
+          - stale test modules incorrectly marked system become deletable;
+          - header/action alignment and chat nested surfaces are simplified;
+          - 3.17 Generative App Runtime remains intact.
+
+          Package: `OSMINOG-Chrome-3.18.0-PRODUCT-CORE-RECOVERY.zip`
+          SHA-256: `0905a2c133fbf3024467df768626885b833e4063ebc8cfe3ee7d4802590bd1be`
+          Size: `586414` bytes
+          Source commit: `a7d43bb3eadc37fc4a35cb856a0cd1ceb5148fe1`
+          MD
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git rm -f .github/workflows/import-osminog-3180.yml
+          git add "$DIR"
+          git commit -m 'Import OSMINOG Chrome 3.18.0 package [skip ci]'
+          git push origin HEAD:main
