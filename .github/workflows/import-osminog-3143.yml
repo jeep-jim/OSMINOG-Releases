@@ -1,0 +1,94 @@
+name: Import OSMINOG Chrome 3.14.3 package
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/import-osminog-3143.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  import:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Download and verify 3.14.3 package
+        shell: bash
+        run: |
+          set -euo pipefail
+          url='https://sdmntprpolandcentral.oaiusercontent.com/files/00000000-938c-820a-92d8-b6640471f57f/raw?se=2026-09-03T00%3A10%3A38Z&sp=r&sv=2026-02-06&sr=b&scid=bacdd183-f7d0-51ab-b3ab-0411e35f588e&skoid=e5f84a89-964a-4fd3-92c2-c2cb3a12ea16&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-09-02T22%3A34%3A38Z&ske=2026-09-03T22%3A34%3A38Z&sks=b&skv=2026-02-06&sig=/X1MB9VPx%2BGAR2jTY/iafOx182NYP/e4wCMy9maSoFs%3D'
+          curl -fL --retry 3 "$url" -o artifact.zip
+          rm -rf unpacked
+          mkdir unpacked
+          unzip -q artifact.zip -d unpacked
+          inner=$(find unpacked -type f -name 'OSMINOG-Chrome-3.14.3-DESKTOP-ACTION-RECOVERY.zip' | head -n 1)
+          test -n "$inner"
+          actual_size=$(stat -c%s "$inner")
+          actual_sha=$(sha256sum "$inner" | awk '{print $1}')
+          test "$actual_size" = '572498'
+          test "$actual_sha" = '3b87675defd0b97b95ff79596b585afa51eb53f8807b404341800204124f41e8'
+          python - "$inner" <<'PY'
+          import json, sys, zipfile, hashlib
+          path=sys.argv[1]
+          with zipfile.ZipFile(path) as z:
+              assert 'manifest.json' in z.namelist()
+              m=json.loads(z.read('manifest.json'))
+              assert m.get('name') == 'OSMINOG'
+              assert m.get('version') == '3.14.3'
+              assert m.get('version_name') == '3.14.3'
+              assert m.get('key')
+              assert hashlib.sha256(m['key'].encode()).hexdigest() == '1ddb8d87f3a6f6cb38a229bd81ba8076d1d37d3ba6b8a15b2a91129d4904012e'
+          PY
+
+          dir='platforms/chrome-extension/releases/3.14.3'
+          package='OSMINOG-Chrome-3.14.3-DESKTOP-ACTION-RECOVERY.zip'
+          mkdir -p "$dir"
+          cp "$inner" "$dir/$package"
+          cat > "$dir/release-v2.json" <<'JSON'
+          {
+            "schema": "osminog-release/v2",
+            "product": "OSMINOG",
+            "platform": "chrome-extension",
+            "version": "3.14.3",
+            "codename": "DESKTOP ACTION RECOVERY",
+            "baseVersion": "3.14.2",
+            "package": "OSMINOG-Chrome-3.14.3-DESKTOP-ACTION-RECOVERY.zip",
+            "size": 572498,
+            "sha256": "3b87675defd0b97b95ff79596b585afa51eb53f8807b404341800204124f41e8",
+            "manifestVersion": "3.14.3",
+            "fixedExtensionKeyRequired": true,
+            "fixedIdentitySha256": "1ddb8d87f3a6f6cb38a229bd81ba8076d1d37d3ba6b8a15b2a91129d4904012e",
+            "minDevHubVersion": "2.0.0",
+            "runtimeVerified": false,
+            "notes": "Removes the shell around compact desktop widgets, routes explicit internet image/file placement through web_search/web_fetch to asset_create, and hardens real source editing of the OSMINOG product UI."
+          }
+          JSON
+          cat > "$dir/README.md" <<'MD'
+          # OSMINOG Chrome 3.14.3 — DESKTOP ACTION RECOVERY
+
+          Focused recovery over 3.14.2.
+
+          - compact stopwatch/timer/calculator-style modules open as frameless transparent desktop widgets;
+          - internet photo/image/file placement must finish as a real embedded canvas object through `asset_create`;
+          - OSMINOG UI/layout/source edit requests are routed to the canonical private source repository instead of canvas mockups;
+          - current 3.14 desktop design and fixed Chrome extension identity are preserved.
+
+          Package SHA-256: `3b87675defd0b97b95ff79596b585afa51eb53f8807b404341800204124f41e8`
+          Source commit: `0aa252adde8dc685885b0cc90761976221fb7243`
+          MD
+
+      - name: Archive package and metadata
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add platforms/chrome-extension/releases/3.14.3
+          git commit -m 'Archive OSMINOG Chrome 3.14.3 package'
+          git push origin HEAD:main
