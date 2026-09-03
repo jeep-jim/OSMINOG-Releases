@@ -1,0 +1,90 @@
+name: Import OSMINOG Chrome 3.15.1 package
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/import-osminog-3151.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  import:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Download and verify 3.15.1 package
+        shell: bash
+        run: |
+          set -euo pipefail
+          url='https://sdmntprnortheu.oaiusercontent.com/files/00000000-012c-81f4-965a-b9d46bed099b/raw?se=2026-09-03T03%3A40%3A21Z&sp=r&sv=2026-02-06&sr=b&scid=985c4973-f593-5942-8220-bc27ed2d66a1&skoid=0a4a0f0c-99ac-4752-9d87-cfac036fa93f&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-09-02T17%3A00%3A41Z&ske=2026-09-03T17%3A00%3A41Z&sks=b&skv=2026-02-06&sig=bAz3lkkl5kp2BcyeCaPMPsI37r4yljMX6xRyfyp2qM4%3D'
+          curl -fL --retry 3 "$url" -o artifact.zip
+          rm -rf unpacked && mkdir unpacked
+          unzip -q artifact.zip -d unpacked
+          inner=$(find unpacked -type f -name 'OSMINOG-Chrome-3.15.1-OWNER-ACCESS-RECOVERY.zip' | head -n 1)
+          test -n "$inner"
+          test "$(stat -c%s "$inner")" = '582018'
+          test "$(sha256sum "$inner" | awk '{print $1}')" = 'aa639f889a46b580dd1a0ec4777cf046a2cb04fd4e925682eed7de0af77fca5f'
+          python - "$inner" <<'PY'
+          import json,sys,zipfile,hashlib
+          p=sys.argv[1]
+          with zipfile.ZipFile(p) as z:
+              m=json.loads(z.read('manifest.json'))
+              assert m['name']=='OSMINOG'
+              assert m['version']=='3.15.1' and m['version_name']=='3.15.1'
+              assert hashlib.sha256(m['key'].encode()).hexdigest()=='1ddb8d87f3a6f6cb38a229bd81ba8076d1d37d3ba6b8a15b2a91129d4904012e'
+              for f in ['bridge.js','osminog-access-center.js','osminog-browser-app.js','background.js']:
+                  assert f in z.namelist()
+          PY
+          dir='platforms/chrome-extension/releases/3.15.1'
+          package='OSMINOG-Chrome-3.15.1-OWNER-ACCESS-RECOVERY.zip'
+          mkdir -p "$dir"
+          cp "$inner" "$dir/$package"
+          cat > "$dir/release-v2.json" <<'JSON'
+          {
+            "schema":"osminog-release/v2",
+            "product":"OSMINOG",
+            "platform":"chrome-extension",
+            "version":"3.15.1",
+            "codename":"OWNER ACCESS RECOVERY",
+            "baseVersion":"3.15.0",
+            "package":"OSMINOG-Chrome-3.15.1-OWNER-ACCESS-RECOVERY.zip",
+            "size":582018,
+            "sha256":"aa639f889a46b580dd1a0ec4777cf046a2cb04fd4e925682eed7de0af77fca5f",
+            "manifestVersion":"3.15.1",
+            "fixedExtensionKeyRequired":true,
+            "fixedIdentitySha256":"1ddb8d87f3a6f6cb38a229bd81ba8076d1d37d3ba6b8a15b2a91129d4904012e",
+            "minDevHubVersion":"2.0.0",
+            "runtimeVerified":false,
+            "notes":"Owner/Poseidon recovery, resilient cached owner grant, direct fine-grained token setup, and managed real-Chrome routing for GitHub/protected sites."
+          }
+          JSON
+          cat > "$dir/README.md" <<'MD'
+          # OSMINOG Chrome 3.15.1 — OWNER ACCESS RECOVERY
+
+          - fixes Owner/Poseidon lockout caused by temporary GitHub status failures;
+          - keeps a previously verified owner grant for up to 30 days while the local GitHub token remains present;
+          - adds fine-grained GitHub token setup directly to Control Center; secrets are never inserted into AI chat text;
+          - GitHub and other protected sites use managed real Chrome tabs instead of blocked iframes, inheriting the same Chrome profile, system VPN/proxy and installed browser extensions;
+          - active managed tabs are restored and focused correctly;
+          - normal users keep Interactive Workspace capabilities but cannot unlock OSMINOG product source/release tools without verified write access to the private owner repository.
+
+          Recommended token repositories: `jeep-jim/OSMINOG` and `jeep-jim/OSMINOG-Releases`. Permissions: Contents Read/Write, Pull requests Read/Write, Actions Read/Write.
+
+          Package SHA-256: `aa639f889a46b580dd1a0ec4777cf046a2cb04fd4e925682eed7de0af77fca5f`
+          Package bytes: `582018`
+          Source commit: `a06311405d7669102abd8e24af64fd539e421143`
+          MD
+      - name: Archive package and metadata
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add platforms/chrome-extension/releases/3.15.1
+          git commit -m 'Archive OSMINOG Chrome 3.15.1 package'
+          git push origin HEAD:main
