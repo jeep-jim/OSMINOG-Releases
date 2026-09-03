@@ -1,0 +1,23 @@
+name: Trigger OSMINOG Chrome 3.14.3 publication
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/trigger-publish-3143.yml'
+
+permissions:
+  actions: write
+  contents: read
+
+jobs:
+  dispatch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Dispatch verified 3.14.3 publisher
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          gh workflow run publish-chrome-package-v2.yml --repo "$GITHUB_REPOSITORY" --ref main -f version='3.14.3'
+          echo 'Dispatched publish-chrome-package-v2.yml for 3.14.3'
