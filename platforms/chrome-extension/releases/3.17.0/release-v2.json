@@ -14,5 +14,5 @@
   "minDevHubVersion": "2.0.0",
   "runtimeVerified": false,
   "notes": "Preset widgets removed. Any app or widget is generated from the current user request; OSMINOG provides verified install/update/rollback, app focus for follow-up edits, selected-file and capture APIs, proportional widget scaling and binary JS/WASM fetch support.",
-  "publishedAt": "2026-09-03T08:36:32Z"
+  "publishedAt": "2026-09-03T08:37:18Z"
 }

@@ -5,7 +5,7 @@
     "product": "OSMINOG",
     "platform": "chrome-extension",
     "channel": "dev",
-    "generatedAt": "2026-09-03T08:36:32Z",
+    "generatedAt": "2026-09-03T08:37:18Z",
     "status": "active",
     "latest": {
       "version": "3.17.0",
@@ -18,7 +18,7 @@
       "minDevHubVersion": "2.0.0",
       "runtimeVerified": false,
       "notesUrl": "https://raw.githubusercontent.com/jeep-jim/OSMINOG-Releases/main/platforms/chrome-extension/releases/3.17.0/README.md",
-      "publishedAt": "2026-09-03T08:36:32Z"
+      "publishedAt": "2026-09-03T08:37:18Z"
     }
   },
   "signature": null
