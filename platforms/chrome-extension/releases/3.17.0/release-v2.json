@@ -1,0 +1,18 @@
+{
+  "schema": "osminog-release/v2",
+  "product": "OSMINOG",
+  "platform": "chrome-extension",
+  "version": "3.17.0",
+  "codename": "GENERATIVE APP RUNTIME",
+  "baseVersion": "3.16.0",
+  "package": "OSMINOG-Chrome-3.17.0-GENERATIVE-APP-RUNTIME.zip",
+  "size": 577190,
+  "sha256": "8b4ee419f6b1459c9a38936ff71609eb6f85111afd43f9e69e7a80d1a149923d",
+  "manifestVersion": "3.17.0",
+  "fixedExtensionKeyRequired": true,
+  "fixedIdentitySha256": "1ddb8d87f3a6f6cb38a229bd81ba8076d1d37d3ba6b8a15b2a91129d4904012e",
+  "minDevHubVersion": "2.0.0",
+  "runtimeVerified": false,
+  "notes": "Preset widgets removed. Any app or widget is generated from the current user request; OSMINOG provides verified install/update/rollback, app focus for follow-up edits, selected-file and capture APIs, proportional widget scaling and binary JS/WASM fetch support.",
+  "publishedAt": null
+}
