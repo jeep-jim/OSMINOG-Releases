@@ -5,20 +5,20 @@
     "product": "OSMINOG",
     "platform": "chrome-extension",
     "channel": "dev",
-    "generatedAt": "2026-09-03T02:25:47Z",
+    "generatedAt": "2026-09-03T03:38:27Z",
     "status": "active",
     "latest": {
-      "version": "3.15.0",
+      "version": "3.15.1",
       "kind": "full-package",
-      "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/chrome-v3.15.0/OSMINOG-Chrome-3.15.0-INTERACTIVE-CAPABILITY-RUNTIME.zip",
-      "size": 580151,
-      "sha256": "9838c05ded643e4034cc9ce601e64819b94e94f98878a83f8a48f03283e20031",
-      "manifestVersion": "3.15.0",
+      "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/chrome-v3.15.1/OSMINOG-Chrome-3.15.1-OWNER-ACCESS-RECOVERY.zip",
+      "size": 582018,
+      "sha256": "aa639f889a46b580dd1a0ec4777cf046a2cb04fd4e925682eed7de0af77fca5f",
+      "manifestVersion": "3.15.1",
       "fixedExtensionKeyRequired": true,
       "minDevHubVersion": "2.0.0",
       "runtimeVerified": false,
-      "notesUrl": "https://raw.githubusercontent.com/jeep-jim/OSMINOG-Releases/main/platforms/chrome-extension/releases/3.15.0/README.md",
-      "publishedAt": "2026-09-03T02:25:47Z"
+      "notesUrl": "https://raw.githubusercontent.com/jeep-jim/OSMINOG-Releases/main/platforms/chrome-extension/releases/3.15.1/README.md",
+      "publishedAt": "2026-09-03T03:38:27Z"
     }
   },
   "signature": null
