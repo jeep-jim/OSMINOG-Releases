@@ -1,0 +1,85 @@
+name: Import OSMINOG Chrome 3.18.1 package
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/import-osminog-3181.yml'
+
+permissions:
+  contents: write
+
+env:
+  VERSION: '3.18.1'
+  PACKAGE: 'OSMINOG-Chrome-3.18.1-POSEIDON-SOURCE-EXECUTOR-RECOVERY.zip'
+  SIZE: '587295'
+  SHA256: '9db9266fa064cbfc6bcb55abd9a3c87e56cd94a24810d06cd6ceffb72363e004'
+  SOURCE_URL: 'https://sdmntprnortheu.oaiusercontent.com/files/00000000-a0bc-81f4-aaa6-f30c364e4c30/raw?se=2026-09-03T10%3A36%3A16Z&sp=r&sv=2026-02-06&sr=b&scid=edfdbe4b-cebb-5140-b5c6-fa2fb40896f0&skoid=0a4a0f0c-99ac-4752-9d87-cfac036fa93f&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-09-02T21%3A20%3A28Z&ske=2026-09-03T21%3A20%3A28Z&sks=b&skv=2026-02-06&sig=AxlKMUNZbrQSUDkUlVz3HGRJhgpbDMVn9D8kKLKScDY%3D'
+
+jobs:
+  import:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Download verified CI artifact
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl -fL --retry 3 "$SOURCE_URL" -o /tmp/artifact.zip
+          mkdir -p /tmp/art
+          unzip -q /tmp/artifact.zip -d /tmp/art
+          src="/tmp/art/$PACKAGE"
+          test -f "$src"
+          test "$(stat -c%s "$src")" = "$SIZE"
+          echo "$SHA256  $src" | sha256sum -c -
+          test "$(unzip -p "$src" manifest.json | python -c 'import json,sys;print(json.load(sys.stdin)["version"])')" = "$VERSION"
+          unzip -t "$src" >/dev/null
+      - name: Register immutable package
+        shell: bash
+        run: |
+          set -euo pipefail
+          dir="platforms/chrome-extension/releases/$VERSION"
+          mkdir -p "$dir"
+          cp "/tmp/art/$PACKAGE" "$dir/$PACKAGE"
+          cat > "$dir/release-v2.json" <<EOF
+          {
+            "schema": "osminog-release/v2",
+            "product": "OSMINOG",
+            "platform": "chrome-extension",
+            "version": "$VERSION",
+            "codename": "POSEIDON SOURCE EXECUTOR RECOVERY",
+            "baseVersion": "3.18.0",
+            "package": "$PACKAGE",
+            "size": $SIZE,
+            "sha256": "$SHA256",
+            "manifestVersion": "$VERSION",
+            "fixedExtensionKeyRequired": true,
+            "fixedIdentitySha256": "1ddb8d87f3a6f6cb38a229bd81ba8076d1d37d3ba6b8a15b2a91129d4904012e",
+            "minDevHubVersion": "2.0.0",
+            "runtimeVerified": false,
+            "notes": "Repairs Poseidon source execution after Owner Unlock: fresh owner-max context, mandatory source executor, verified mutation tracking, retries for prose-only source turns and fail-loud empty-result handling.",
+            "publishedAt": null
+          }
+          EOF
+          cat > "$dir/README.md" <<'EOF'
+          # OSMINOG Chrome 3.18.1 — POSEIDON SOURCE EXECUTOR RECOVERY
+
+          - Owner Unlock refreshes the live AI tool context immediately.
+          - Source/repository/release tasks receive a mandatory source executor contract.
+          - Successful GitHub/source writes are tracked as verified mutations.
+          - Prose-only or empty source turns are retried up to two times.
+          - A failed source task now returns a concrete blocker instead of ending silently.
+          - 3.18 product-core recovery and 3.17 generative app runtime remain intact.
+          EOF
+      - name: Commit registry entry and remove importer
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -f .github/workflows/import-osminog-3181.yml
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git commit -m 'Import OSMINOG Chrome 3.18.1 package'
+          git push
