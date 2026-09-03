@@ -1,0 +1,18 @@
+{
+  "schema": "osminog-release/v2",
+  "product": "OSMINOG",
+  "platform": "chrome-extension",
+  "version": "3.18.1",
+  "codename": "POSEIDON SOURCE EXECUTOR RECOVERY",
+  "baseVersion": "3.18.0",
+  "package": "OSMINOG-Chrome-3.18.1-POSEIDON-SOURCE-EXECUTOR-RECOVERY.zip",
+  "size": 587295,
+  "sha256": "9db9266fa064cbfc6bcb55abd9a3c87e56cd94a24810d06cd6ceffb72363e004",
+  "manifestVersion": "3.18.1",
+  "fixedExtensionKeyRequired": true,
+  "fixedIdentitySha256": "1ddb8d87f3a6f6cb38a229bd81ba8076d1d37d3ba6b8a15b2a91129d4904012e",
+  "minDevHubVersion": "2.0.0",
+  "runtimeVerified": false,
+  "notes": "Repairs Poseidon source execution after Owner Unlock: fresh owner-max context, mandatory source executor, verified mutation tracking, retries for prose-only source turns and fail-loud empty-result handling.",
+  "publishedAt": null
+}
