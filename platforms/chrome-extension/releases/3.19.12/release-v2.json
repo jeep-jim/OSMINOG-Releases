@@ -14,5 +14,5 @@
   "minDevHubVersion": "2.0.0",
   "runtimeVerified": false,
   "notes": "Shared same-revision OSMINOG Vision Context for all connected providers. External ChatGPT Presence now intercepts natural canvas-look requests, asks the live editor for fresh structured context plus a viewport/selection/object/overview capture, attaches that image before the user turn is sent, hides machine context/tool hops, and silently reconnects to an existing previously-authorized ChatGPT tab. All 3.19.11 hero, localization, provider, canvas, hover and closed-inspector fixes are preserved.",
-  "publishedAt": null
+  "publishedAt": "2026-09-04T11:15:30Z"
 }
