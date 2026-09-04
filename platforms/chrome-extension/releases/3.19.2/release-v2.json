@@ -14,5 +14,5 @@
   "minDevHubVersion": "2.0.0",
   "runtimeVerified": false,
   "notes": "Graphics Studio v2.1 UX recovery: compact bottom icon dock, left layer panel, right inspector, desktop-style zoom/pan, white/color/transparent document background, and a guarded atomic Canvas round-trip that fixes the На холст hang and caps pathological path complexity.",
-  "publishedAt": null
+  "publishedAt": "2026-09-04T01:58:15Z"
 }

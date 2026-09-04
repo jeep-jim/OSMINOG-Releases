@@ -5,20 +5,20 @@
     "product": "OSMINOG",
     "platform": "chrome-extension",
     "channel": "dev",
-    "generatedAt": "2026-09-03T10:33:16Z",
+    "generatedAt": "2026-09-04T01:58:15Z",
     "status": "active",
     "latest": {
-      "version": "3.18.1",
+      "version": "3.19.2",
       "kind": "full-package",
-      "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/chrome-v3.18.1/OSMINOG-Chrome-3.18.1-POSEIDON-SOURCE-EXECUTOR-RECOVERY.zip",
-      "size": 587295,
-      "sha256": "9db9266fa064cbfc6bcb55abd9a3c87e56cd94a24810d06cd6ceffb72363e004",
-      "manifestVersion": "3.18.1",
+      "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/chrome-v3.19.2/OSMINOG-Chrome-3.19.2-GRAPHICS-STUDIO-UX-CANVAS-FIX.zip",
+      "size": 607767,
+      "sha256": "779f4f0c35f137553a72fc7ace8e3b6fc34eb1e23150206407eb95d3f6ea6ea2",
+      "manifestVersion": "3.19.2",
       "fixedExtensionKeyRequired": true,
       "minDevHubVersion": "2.0.0",
       "runtimeVerified": false,
-      "notesUrl": "https://raw.githubusercontent.com/jeep-jim/OSMINOG-Releases/main/platforms/chrome-extension/releases/3.18.1/README.md",
-      "publishedAt": "2026-09-03T10:33:16Z"
+      "notesUrl": "https://raw.githubusercontent.com/jeep-jim/OSMINOG-Releases/main/platforms/chrome-extension/releases/3.19.2/README.md",
+      "publishedAt": "2026-09-04T01:58:15Z"
     }
   },
   "signature": null
