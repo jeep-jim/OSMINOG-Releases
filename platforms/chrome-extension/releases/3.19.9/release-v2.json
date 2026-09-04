@@ -1,0 +1,18 @@
+{
+  "schema": "osminog-release/v2",
+  "product": "OSMINOG",
+  "platform": "chrome-extension",
+  "version": "3.19.9",
+  "codename": "LANGUAGE CANVAS PROVIDERS FIX",
+  "baseVersion": "3.19.8",
+  "package": "OSMINOG-Chrome-3.19.9-LANG-CANVAS-PROVIDERS-FIX.zip",
+  "size": 2498004,
+  "sha256": "4e75fd5e22da42cfb151416aa483eaec5f471bb68cc1b9eacac5264964f8c99f",
+  "manifestVersion": "3.19.9",
+  "fixedExtensionKeyRequired": true,
+  "fixedIdentitySha256": "1ddb8d87f3a6f6cb38a229bd81ba8076d1d37d3ba6b8a15b2a91129d4904012e",
+  "minDevHubVersion": "2.0.0",
+  "runtimeVerified": false,
+  "notes": "Welcome title localization restored and raised; provider pills route separately to ChatGPT, Claude, Gemini, DeepSeek and Grok; Light hover contrast repaired; Light and Dark canvas background and grid color controls restored; hero PNG unchanged.",
+  "publishedAt": null
+}
