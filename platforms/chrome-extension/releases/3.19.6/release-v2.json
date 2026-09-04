@@ -1,0 +1,18 @@
+{
+  "schema": "osminog-release/v2",
+  "product": "OSMINOG",
+  "platform": "chrome-extension",
+  "version": "3.19.6",
+  "codename": "CINEMATIC CORE HERO",
+  "baseVersion": "3.19.5",
+  "package": "OSMINOG-Chrome-3.19.6-CINEMATIC-CORE-HERO.zip",
+  "size": 2497004,
+  "sha256": "898e174ea7b1b7b2db17d4c899d218297d83f0e1ce1b5ff24eec3d43edf36f9e",
+  "manifestVersion": "3.19.6",
+  "fixedExtensionKeyRequired": true,
+  "fixedIdentitySha256": "1ddb8d87f3a6f6cb38a229bd81ba8076d1d37d3ba6b8a15b2a91129d4904012e",
+  "minDevHubVersion": "2.0.0",
+  "runtimeVerified": false,
+  "notes": "Cinematic startup hero: exact 1672x941 RGBA owner art; octopus behind the real launch card, human leg above it, close button fixed top-right, compact action buttons and five AI provider pills.",
+  "publishedAt": null
+}
