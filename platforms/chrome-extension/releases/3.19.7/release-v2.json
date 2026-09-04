@@ -1,0 +1,18 @@
+{
+  "schema": "osminog-release/v2",
+  "product": "OSMINOG",
+  "platform": "chrome-extension",
+  "version": "3.19.7",
+  "codename": "DOCKED CORE HERO",
+  "baseVersion": "3.19.6",
+  "package": "OSMINOG-Chrome-3.19.7-DOCKED-CORE-HERO.zip",
+  "size": 2497244,
+  "sha256": "bd31f8d532895fc04f8517ba3cf06066185aeda8da65acf2a8476bf4ead8d660",
+  "manifestVersion": "3.19.7",
+  "fixedExtensionKeyRequired": true,
+  "fixedIdentitySha256": "1ddb8d87f3a6f6cb38a229bd81ba8076d1d37d3ba6b8a15b2a91129d4904012e",
+  "minDevHubVersion": "2.0.0",
+  "runtimeVerified": false,
+  "notes": "Welcome art lowered onto the launch card; float animation and shadow filters removed to eliminate horizontal shadow bands; action buttons now have icons; provider pills are evenly spaced and include Grok.",
+  "publishedAt": null
+}
