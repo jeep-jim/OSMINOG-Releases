@@ -1,0 +1,18 @@
+{
+  "schema": "osminog-release/v2",
+  "product": "OSMINOG",
+  "platform": "chrome-extension",
+  "version": "3.19.8",
+  "codename": "SOLID DOCKED HERO",
+  "baseVersion": "3.19.7",
+  "package": "OSMINOG-Chrome-3.19.8-SOLID-DOCKED-HERO.zip",
+  "size": 2497411,
+  "sha256": "3de59c3968e3d7884e1e3c588a6228216bc68bbb8abbc0c1f9a9536cd81eec28",
+  "manifestVersion": "3.19.8",
+  "fixedExtensionKeyRequired": true,
+  "fixedIdentitySha256": "1ddb8d87f3a6f6cb38a229bd81ba8076d1d37d3ba6b8a15b2a91129d4904012e",
+  "minDevHubVersion": "2.0.0",
+  "runtimeVerified": false,
+  "notes": "Solid welcome card refinement: orb/kicker removed, title forced to two lines, card top raised 12px, Ocean background made opaque so the clipped hero back-layer cannot show through. Exact original hero PNG is preserved.",
+  "publishedAt": null
+}
