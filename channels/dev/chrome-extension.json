@@ -5,20 +5,20 @@
     "product": "OSMINOG",
     "platform": "chrome-extension",
     "channel": "dev",
-    "generatedAt": "2026-09-04T05:24:51Z",
+    "generatedAt": "2026-09-04T08:33:03Z",
     "status": "active",
     "latest": {
-      "version": "3.19.5",
+      "version": "3.19.6",
       "kind": "full-package",
-      "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/chrome-v3.19.5/OSMINOG-Chrome-3.19.5-SPLIT-CORE-HERO-NATIVE-DROP.zip",
-      "size": 701669,
-      "sha256": "f2372d12dbbbbb7c41b149ee16e48336c489d62a7bd83890cb571c50bde81505",
-      "manifestVersion": "3.19.5",
+      "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/chrome-v3.19.6/OSMINOG-Chrome-3.19.6-CINEMATIC-CORE-HERO.zip",
+      "size": 2497004,
+      "sha256": "898e174ea7b1b7b2db17d4c899d218297d83f0e1ce1b5ff24eec3d43edf36f9e",
+      "manifestVersion": "3.19.6",
       "fixedExtensionKeyRequired": true,
       "minDevHubVersion": "2.0.0",
       "runtimeVerified": false,
-      "notesUrl": "https://raw.githubusercontent.com/jeep-jim/OSMINOG-Releases/main/platforms/chrome-extension/releases/3.19.5/README.md",
-      "publishedAt": "2026-09-04T05:24:51Z"
+      "notesUrl": "https://raw.githubusercontent.com/jeep-jim/OSMINOG-Releases/main/platforms/chrome-extension/releases/3.19.6/README.md",
+      "publishedAt": "2026-09-04T08:33:03Z"
     }
   },
   "signature": null
