@@ -14,5 +14,5 @@
   "minDevHubVersion": "2.0.0",
   "runtimeVerified": false,
   "notes": "Graphics Studio stability hotfix: tools actually moved to compact bottom dock, layers moved left, both side panels resizable, resize/render loop guarded, and native PC file drag-drop restored to the main canvas.",
-  "publishedAt": null
+  "publishedAt": "2026-09-04T02:16:59Z"
 }
