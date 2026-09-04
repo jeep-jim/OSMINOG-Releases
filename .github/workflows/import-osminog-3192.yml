@@ -1,4 +1,4 @@
-# rerun with corrected part00 split
+# rerun with corrected part00 split and stale release-notes deletion removed
 name: Import OSMINOG Chrome 3.19.2 package
 
 on:
@@ -46,6 +46,18 @@ jobs:
           echo "$B64_SHA  /tmp/patch.xz.b64" | sha256sum -c -
           base64 --decode /tmp/patch.xz.b64 | xz -d > /tmp/3192.patch
           echo "$PATCH_SHA  /tmp/3192.patch" | sha256sum -c -
+          python - <<'PY'
+          from pathlib import Path
+          src=Path('/tmp/3192.patch').read_text()
+          parts=src.split('diff --git ')
+          out=[parts[0]]
+          for block in parts[1:]:
+              first=block.splitlines()[0] if block.splitlines() else ''
+              if 'RELEASE_NOTES_3.18.1.md' in first:
+                  continue
+              out.append('diff --git '+block)
+          Path('/tmp/3192.apply.patch').write_text(''.join(out))
+          PY
 
       - name: Rebuild package from verified 3.18.1 base
         shell: bash
@@ -61,7 +73,7 @@ jobs:
           PY
           )
           cd /tmp/pkg
-          patch -p4 < /tmp/3192.patch
+          patch --batch --forward -p4 < /tmp/3192.apply.patch
           test "$(python -c 'import json;print(json.load(open("manifest.json"))["version"])')" = "$VERSION"
           test "$(python -c 'import json;print(json.load(open("manifest.json"))["key"])')" = "$base_key"
           python -m json.tool manifest.json >/dev/null
