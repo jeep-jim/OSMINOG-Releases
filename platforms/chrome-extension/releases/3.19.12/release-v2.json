@@ -1,0 +1,18 @@
+{
+  "schema": "osminog-release/v2",
+  "product": "OSMINOG",
+  "platform": "chrome-extension",
+  "version": "3.19.12",
+  "codename": "SEAMLESS SHARED VISION",
+  "baseVersion": "3.19.11",
+  "package": "OSMINOG-Chrome-3.19.12-SEAMLESS-SHARED-VISION.zip",
+  "size": 2499285,
+  "sha256": "fc0fcf634ce7cb2731dbbd8ec9fabca78d433cb2b1ad24f5b47abc88a5558892",
+  "manifestVersion": "3.19.12",
+  "fixedExtensionKeyRequired": true,
+  "fixedIdentitySha256": "1ddb8d87f3a6f6cb38a229bd81ba8076d1d37d3ba6b8a15b2a91129d4904012e",
+  "minDevHubVersion": "2.0.0",
+  "runtimeVerified": false,
+  "notes": "Shared same-revision OSMINOG Vision Context for all connected providers. External ChatGPT Presence now intercepts natural canvas-look requests, asks the live editor for fresh structured context plus a viewport/selection/object/overview capture, attaches that image before the user turn is sent, hides machine context/tool hops, and silently reconnects to an existing previously-authorized ChatGPT tab. All 3.19.11 hero, localization, provider, canvas, hover and closed-inspector fixes are preserved.",
+  "publishedAt": null
+}
