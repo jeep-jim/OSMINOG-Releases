@@ -1,0 +1,87 @@
+name: Import OSMINOG Chrome 3.19.11 package
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/import-osminog-31911.yml'
+
+permissions:
+  contents: write
+
+env:
+  VERSION: '3.19.11'
+  PACKAGE: 'OSMINOG-Chrome-3.19.11-LIGHT-HOVER-CLOSED-INSPECTOR.zip'
+  BASE_URL: 'https://github.com/jeep-jim/OSMINOG-Releases/releases/download/chrome-v3.19.10/OSMINOG-Chrome-3.19.10-HERO-TITLE-LIFT.zip'
+  HERO_SIZE: '1796453'
+  HERO_SHA: '0f3bfa90a683f9efe4ca81f28889bd2b29543b7e52469815dd36a281c843214c'
+
+jobs:
+  import:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Rebuild 3.19.11 from verified public 3.19.10 base
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf /tmp/pkg && mkdir -p /tmp/pkg
+          curl -fL --retry 3 -o /tmp/base.zip "$BASE_URL"
+          unzip -q /tmp/base.zip -d /tmp/pkg
+          python scripts/import_31911.py /tmp/pkg
+          test "$(stat -c%s /tmp/pkg/assets/core/core-hero-3196.png)" = "$HERO_SIZE"
+          test "$(sha256sum /tmp/pkg/assets/core/core-hero-3196.png | awk '{print $1}')" = "$HERO_SHA"
+          grep -q '<aside id="inspector" class="inspector glass collapsed">' /tmp/pkg/editor.html
+          grep -q 'OSMINOG 3.19.11 · LIGHT PRIMARY HOVER + CLOSED INSPECTOR' /tmp/pkg/osminog-product-core-recovery.css
+          grep -q 'background:linear-gradient(120deg,#536dff,#7b4dff)!important' /tmp/pkg/osminog-product-core-recovery.css
+          grep -q 'margin:-10px auto 12px!important' /tmp/pkg/editor.css
+          grep -q 'dataset.providerOpen' /tmp/pkg/editor.js
+          grep -q 'grok:"https://grok.com/"' /tmp/pkg/editor.js
+          node --check /tmp/pkg/editor.js
+          python -m json.tool /tmp/pkg/manifest.json >/dev/null
+          test "$(python -c 'import json;print(json.load(open("/tmp/pkg/manifest.json"))["version"])')" = "$VERSION"
+          python - <<'PY'
+          import hashlib,json
+          m=json.load(open('/tmp/pkg/manifest.json',encoding='utf-8'))
+          assert hashlib.sha256((m.get('key') or '').encode()).hexdigest() == '1ddb8d87f3a6f6cb38a229bd81ba8076d1d37d3ba6b8a15b2a91129d4904012e'
+          PY
+          (cd /tmp/pkg && zip -qr "$GITHUB_WORKSPACE/$PACKAGE" .)
+          unzip -t "$PACKAGE" >/dev/null
+
+      - name: Register immutable 3.19.11 package
+        shell: bash
+        run: |
+          set -euo pipefail
+          release_dir="platforms/chrome-extension/releases/$VERSION"
+          mkdir -p "$release_dir"
+          cp "$PACKAGE" "$release_dir/$PACKAGE"
+          size=$(stat -c%s "$release_dir/$PACKAGE")
+          sha=$(sha256sum "$release_dir/$PACKAGE" | awk '{print $1}')
+          python - "$release_dir/release-v2.json" "$size" "$sha" <<'PY'
+          import json,pathlib,sys
+          out,size,sha=sys.argv[1:4]
+          meta={'schema':'osminog-release/v2','product':'OSMINOG','platform':'chrome-extension','version':'3.19.11','codename':'LIGHT HOVER + CLOSED INSPECTOR','baseVersion':'3.19.10','package':'OSMINOG-Chrome-3.19.11-LIGHT-HOVER-CLOSED-INSPECTOR.zip','size':int(size),'sha256':sha,'manifestVersion':'3.19.11','fixedExtensionKeyRequired':True,'fixedIdentitySha256':'1ddb8d87f3a6f6cb38a229bd81ba8076d1d37d3ba6b8a15b2a91129d4904012e','minDevHubVersion':'2.0.0','runtimeVerified':False,'notes':'Light-theme primary hover stays readable, and the right inspector starts collapsed. All 3.19.10 hero, localization, provider and canvas fixes are preserved.','publishedAt':None}
+          pathlib.Path(out).write_text(json.dumps(meta,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+          PY
+          cat > "$release_dir/README.md" <<'EOF'
+          # OSMINOG Chrome 3.19.11 — Light Hover + Closed Inspector
+
+          - Light-theme primary button hover/focus keeps white text and icon on purple;
+          - the right Properties/Canvas inspector starts collapsed on first workspace entry;
+          - original hero art and all 3.19.10 behavior are preserved.
+          EOF
+
+      - name: Commit registry and cleanup importer
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -f .github/workflows/import-osminog-31911.yml scripts/import_31911.py
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git commit -m 'Import OSMINOG Chrome 3.19.11 package [skip ci]'
+          git push origin HEAD:main
