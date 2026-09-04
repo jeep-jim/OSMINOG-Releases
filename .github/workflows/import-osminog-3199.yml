@@ -33,68 +33,7 @@ jobs:
           rm -rf /tmp/pkg && mkdir -p /tmp/pkg
           curl -fL --retry 3 -o /tmp/base.zip "$BASE_URL"
           unzip -q /tmp/base.zip -d /tmp/pkg
-
-          python - <<'PY'
-          from pathlib import Path
-          import json
-          root=Path('/tmp/pkg')
-
-          p=root/'editor.js'
-          s=p.read_text(encoding='utf-8')
-          old='  if(title)title.textContent=value.title;if(body)body.textContent=value.text;'
-          new='''  if(title){\n    const titleLines={\n      en:["Build the project","with your AI team"],\n      ru:["Соберите проект","вместе с командой ИИ"],\n      de:["Erstelle das Projekt","mit deinem KI-Team"],\n      es:["Construye el proyecto","con tu equipo de IA"],\n      ja:["AIチームと一緒に","プロジェクトを構築"],\n      zh:["与 AI 团队一起","构建项目"]\n    }[state.language]||[value.title];\n    title.replaceChildren(...titleLines.map(line=>{const span=document.createElement("span");span.textContent=line;return span}));\n    title.setAttribute("aria-label",value.title);\n  }\n  if(body)body.textContent=value.text;'''
-          assert old in s, 'language sync target missing'
-          s=s.replace(old,new,1)
-          old_provider='''  $$('[data-provider-open]').forEach(btn=>btn.addEventListener("click",()=>{const p=btn.dataset.provider,url=p==="gpt"?"https://chatgpt.com/":p==="claude"?"https://claude.ai/":p==="gemini"?"https://gemini.google.com/":"https://chat.deepseek.com/";window.open(url,"_blank","noopener")}));'''
-          new_provider='''  $$('[data-provider-open]').forEach(btn=>btn.addEventListener("click",async()=>{const p=btn.dataset.providerOpen,urls={gpt:"https://chatgpt.com/",claude:"https://claude.ai/",gemini:"https://gemini.google.com/",deepseek:"https://chat.deepseek.com/",grok:"https://grok.com/"},url=urls[p];if(!url)return;try{if(globalThis.OSMINOGBrowserHubAPI?.open){await globalThis.OSMINOGBrowserHubAPI.open({provider:p});return}}catch{}window.open(url,"_blank","noopener")}));'''
-          assert old_provider in s, 'provider handler target missing'
-          s=s.replace(old_provider,new_provider,1)
-          p.write_text(s,encoding='utf-8')
-
-          p=root/'editor.css'
-          s=p.read_text(encoding='utf-8')
-          s=s.replace('/* OSMINOG 3.19.8 · SOLID DOCKED HERO */','/* OSMINOG 3.19.9 · LOCALIZED DOCKED HERO */',1)
-          s=s.replace('.core-hero-launch h2.core-hero-title{max-width:590px!important;margin:50px auto 12px!important;font-size:0!important;line-height:1!important;color:var(--text)!important}',
-                      '.core-hero-launch h2.core-hero-title{max-width:590px!important;margin:28px auto 12px!important;font-size:clamp(30px,3.25vw,44px)!important;line-height:1.04!important;color:var(--text)!important;font-weight:800!important;letter-spacing:-.035em!important}',1)
-          old_css='.core-hero-launch h2.core-hero-title::before,.core-hero-launch h2.core-hero-title::after{display:block!important;font-size:clamp(30px,3.25vw,44px)!important;line-height:1.04!important;font-weight:800!important;letter-spacing:-.035em!important}\n.core-hero-launch h2.core-hero-title::before{content:"Build the project"}\n.core-hero-launch h2.core-hero-title::after{content:"with your AI team";margin-top:4px}'
-          new_css='.core-hero-launch h2.core-hero-title>span{display:block!important}.core-hero-launch h2.core-hero-title>span+span{margin-top:4px!important}.core-hero-launch h2.core-hero-title::before,.core-hero-launch h2.core-hero-title::after{content:none!important;display:none!important}'
-          assert old_css in s, 'fixed English title CSS target missing'
-          s=s.replace(old_css,new_css,1)
-          p.write_text(s,encoding='utf-8')
-
-          p=root/'osminog-product-core-recovery.css'
-          s=p.read_text(encoding='utf-8')
-          patch=r'''
-
-/* OSMINOG 3.19.9 · LIGHT HOVER + LIVE CANVAS COLORS */
-html[data-theme="light"] .soft-btn:hover,
-html[data-theme="light"] .icon-btn:hover,
-html[data-theme="light"] .inspector-mini button:hover,
-html[data-theme="light"] .tool-rail button:hover,
-html[data-theme="light"] .core-hero-launch .empty-launch-actions>button:not(.primary-btn):hover,
-html[data-theme="light"] .core-hero-launch .empty-provider-row>button:hover{color:#18202c!important;background:#e9edf4!important;border-color:#c8d0dc!important}
-html[data-theme="light"] .primary-btn:hover,html[data-theme="light"] .core-hero-launch .empty-launch-actions>.primary-btn:hover{color:#fff!important}
-html[data-theme="light"] #viewport,html[data-theme="dark"] #viewport{background-color:var(--board-bg)!important}
-html[data-theme="light"] #viewport[data-grid="plain"],html[data-theme="dark"] #viewport[data-grid="plain"]{background-image:none!important}
-html[data-theme="light"] #viewport[data-grid="dots"],html[data-theme="dark"] #viewport[data-grid="dots"]{background-image:radial-gradient(circle,var(--grid-color) 1px,transparent 1.4px)!important;background-size:var(--grid-size) var(--grid-size)!important;background-position:var(--grid-x) var(--grid-y)!important}
-html[data-theme="light"] #viewport[data-grid="grid"],html[data-theme="dark"] #viewport[data-grid="grid"]{background-image:linear-gradient(to right,var(--grid-color) 1px,transparent 1px),linear-gradient(to bottom,var(--grid-color) 1px,transparent 1px)!important;background-size:var(--grid-size) var(--grid-size)!important;background-position:var(--grid-x) var(--grid-y)!important}
-html[data-theme="light"] #viewport[data-grid="both"],html[data-theme="dark"] #viewport[data-grid="both"]{background-image:linear-gradient(to right,color-mix(in srgb,var(--grid-color) 44%,transparent) 1px,transparent 1px),linear-gradient(to bottom,color-mix(in srgb,var(--grid-color) 44%,transparent) 1px,transparent 1px),radial-gradient(circle,var(--grid-color) 1px,transparent 1.4px)!important;background-size:var(--major-grid-size) var(--major-grid-size),var(--major-grid-size) var(--major-grid-size),var(--grid-size) var(--grid-size)!important;background-position:var(--grid-x) var(--grid-y)!important}
-'''
-          if 'OSMINOG 3.19.9 · LIGHT HOVER + LIVE CANVAS COLORS' not in s:
-              s=s.rstrip()+patch+'\n'
-          p.write_text(s,encoding='utf-8')
-
-          mpath=root/'manifest.json'
-          m=json.loads(mpath.read_text(encoding='utf-8'))
-          m['version']='3.19.9';m['version_name']='3.19.9'
-          mpath.write_text(json.dumps(m,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
-
-          bpath=root/'OSMINOG_BUILD.json'
-          b=json.loads(bpath.read_text(encoding='utf-8'))
-          b.update({'version':'3.19.9','versionName':'3.19.9','build':'3.19.9','codename':'LANGUAGE CANVAS PROVIDERS FIX','baseVersion':'3.19.8','artifact':'OSMINOG-Chrome-3.19.9-LANG-CANVAS-PROVIDERS-FIX.zip','manifestVersion':'3.19.9','release':'LANG-CANVAS-PROVIDERS-FIX','notes':'Localized two-line title raised; five welcome provider buttons route independently through Browser Hub; Light hover contrast fixed; Light/Dark board and grid colors restored.'})
-          bpath.write_text(json.dumps(b,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
-          PY
-
+          python scripts/import_3199.py /tmp/pkg
           test "$(stat -c%s /tmp/pkg/assets/core/core-hero-3196.png)" = "$HERO_SIZE"
           test "$(sha256sum /tmp/pkg/assets/core/core-hero-3196.png | awk '{print $1}')" = "$HERO_SHA"
           grep -q 'dataset.providerOpen' /tmp/pkg/editor.js
@@ -126,28 +65,24 @@ html[data-theme="light"] #viewport[data-grid="both"],html[data-theme="dark"] #vi
           python - "$release_dir/release-v2.json" "$size" "$sha" <<'PY'
           import json,pathlib,sys
           out,size,sha=sys.argv[1:4]
-          meta={'schema':'osminog-release/v2','product':'OSMINOG','platform':'chrome-extension','version':'3.19.9','codename':'LANGUAGE CANVAS PROVIDERS FIX','baseVersion':'3.19.8','package':'OSMINOG-Chrome-3.19.9-LANG-CANVAS-PROVIDERS-FIX.zip','size':int(size),'sha256':sha,'manifestVersion':'3.19.9','fixedExtensionKeyRequired':True,'fixedIdentitySha256':'1ddb8d87f3a6f6cb38a229bd81ba8076d1d37d3ba6b8a15b2a91129d4904012e','minDevHubVersion':'2.0.0','runtimeVerified':False,'notes':'Welcome title localization restored and raised; provider pills route separately to ChatGPT/Claude/Gemini/DeepSeek/Grok; Light hover contrast repaired; Light/Dark canvas background and grid color controls restored. Original hero PNG is unchanged.','publishedAt':None}
+          meta={'schema':'osminog-release/v2','product':'OSMINOG','platform':'chrome-extension','version':'3.19.9','codename':'LANGUAGE CANVAS PROVIDERS FIX','baseVersion':'3.19.8','package':'OSMINOG-Chrome-3.19.9-LANG-CANVAS-PROVIDERS-FIX.zip','size':int(size),'sha256':sha,'manifestVersion':'3.19.9','fixedExtensionKeyRequired':True,'fixedIdentitySha256':'1ddb8d87f3a6f6cb38a229bd81ba8076d1d37d3ba6b8a15b2a91129d4904012e','minDevHubVersion':'2.0.0','runtimeVerified':False,'notes':'Welcome title localization restored and raised; provider pills route separately to ChatGPT, Claude, Gemini, DeepSeek and Grok; Light hover contrast repaired; Light and Dark canvas background and grid color controls restored; hero PNG unchanged.','publishedAt':None}
           pathlib.Path(out).write_text(json.dumps(meta,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
           PY
           cat > "$release_dir/README.md" <<'EOF'
-          # OSMINOG Chrome 3.19.9 — Language / Canvas / Providers Fix
+          # OSMINOG Chrome 3.19.9
 
-          - welcome title follows EN/RU/DE/ES/JA/ZH again and stays in two lines;
-          - title moved slightly upward;
-          - ChatGPT, Claude, Gemini, DeepSeek and Grok pills no longer fall through to DeepSeek;
-          - quick provider buttons prefer OSMINOG Browser Hub and use the exact provider as fallback;
-          - Light-theme hover labels/icons remain readable;
-          - Light/Dark canvas background and grid color controls again affect the visible workspace;
-          - the original cinematic hero PNG is preserved byte-for-byte.
-
-          Runtime UI verification remains an owner-side Chrome check after update.
+          - translated two-line welcome title restored and moved slightly upward;
+          - ChatGPT, Claude, Gemini, DeepSeek and Grok welcome pills route independently;
+          - Light-theme hover labels and icons remain readable;
+          - Light/Dark canvas background and grid colors work again;
+          - original cinematic hero PNG is preserved byte-for-byte.
           EOF
 
       - name: Commit registry and cleanup importer
         shell: bash
         run: |
           set -euo pipefail
-          rm -f .github/workflows/import-osminog-3199.yml
+          rm -f .github/workflows/import-osminog-3199.yml scripts/import_3199.py
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add -A
