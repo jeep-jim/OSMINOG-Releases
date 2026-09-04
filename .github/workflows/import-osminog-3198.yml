@@ -1,0 +1,162 @@
+name: Import OSMINOG Chrome 3.19.8 package
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/import-osminog-3198.yml'
+
+permissions:
+  contents: write
+  actions: write
+
+env:
+  VERSION: '3.19.8'
+  PACKAGE: 'OSMINOG-Chrome-3.19.8-SOLID-DOCKED-HERO.zip'
+  BASE_URL: 'https://github.com/jeep-jim/OSMINOG-Releases/releases/download/chrome-v3.19.7/OSMINOG-Chrome-3.19.7-DOCKED-CORE-HERO.zip'
+  HERO_SIZE: '1796453'
+  HERO_SHA: '0f3bfa90a683f9efe4ca81f28889bd2b29543b7e52469815dd36a281c843214c'
+
+jobs:
+  import:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Rebuild 3.19.8 from verified public 3.19.7 base
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf /tmp/pkg && mkdir -p /tmp/pkg
+          curl -fL --retry 3 -o /tmp/base.zip "$BASE_URL"
+          unzip -q /tmp/base.zip -d /tmp/pkg
+
+          python - <<'PY'
+          from pathlib import Path
+          import json
+          root=Path('/tmp/pkg')
+
+          h=root/'editor.html'
+          s=h.read_text(encoding='utf-8')
+          old='''        <div class="hint-orb"><svg><use href="#i-logo"/></svg></div>\n        <small class="empty-kicker">OSMINOG · CORE</small>\n        <h2>Положи. Соедини. Покажи ИИ.</h2>'''
+          new='''        <h2 class="core-hero-title" aria-label="Build the project with your AI team"><span>Build the project</span><span>with your AI team</span></h2>'''
+          assert old in s, '3.19.7 welcome heading block missing'
+          h.write_text(s.replace(old,new,1),encoding='utf-8')
+
+          c=root/'editor.css'
+          s=c.read_text(encoding='utf-8')
+          assert '/* OSMINOG 3.19.7 · DOCKED CORE HERO */' in s
+          s=s.replace('/* OSMINOG 3.19.7 · DOCKED CORE HERO */','/* OSMINOG 3.19.8 · SOLID DOCKED HERO */',1)
+          s=s.replace('content:"";position:absolute;z-index:2;inset:0;border-radius:28px;','content:"";position:absolute;z-index:2;inset:-12px 0 0;border-radius:28px;',1)
+          old_title='''.core-hero-launch .hint-orb{margin-bottom:14px!important}\n.core-hero-launch .empty-kicker{letter-spacing:.16em!important}\n.core-hero-launch h2{max-width:590px!important;margin:12px auto 10px!important;font-size:clamp(30px,3.25vw,44px)!important;line-height:1.04!important}'''
+          new_title='''.core-hero-launch .hint-orb,.core-hero-launch .empty-kicker{display:none!important}\n.core-hero-launch h2.core-hero-title{max-width:590px!important;margin:50px auto 12px!important;font-size:0!important;line-height:1!important;color:var(--text)!important}\n.core-hero-launch h2.core-hero-title::before,.core-hero-launch h2.core-hero-title::after{display:block!important;font-size:clamp(30px,3.25vw,44px)!important;line-height:1.04!important;font-weight:800!important;letter-spacing:-.035em!important}\n.core-hero-launch h2.core-hero-title::before{content:"Build the project"}\n.core-hero-launch h2.core-hero-title::after{content:"with your AI team";margin-top:4px}'''
+          assert old_title in s, '3.19.7 title CSS block missing'
+          s=s.replace(old_title,new_title,1)
+          ocean='html[data-theme="ocean"] .core-hero-launch::after{background:#09577c!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important}'
+          if ocean not in s:
+              s=s.rstrip()+'\n\n'+ocean+'\n'
+          c.write_text(s,encoding='utf-8')
+
+          m=json.loads((root/'manifest.json').read_text(encoding='utf-8'))
+          m['version']='3.19.8';m['version_name']='3.19.8'
+          (root/'manifest.json').write_text(json.dumps(m,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+
+          bpath=root/'OSMINOG_BUILD.json'
+          if bpath.exists():
+              b=json.loads(bpath.read_text(encoding='utf-8'))
+              b.update({'version':'3.19.8','versionName':'3.19.8','build':'3.19.8','codename':'SOLID DOCKED HERO','baseVersion':'3.19.7','artifact':'OSMINOG-Chrome-3.19.8-SOLID-DOCKED-HERO.zip','manifestVersion':'3.19.8','release':'SOLID-DOCKED-HERO','notes':'Orb/kicker removed; fixed two-line hero title; card top raised 12px; Ocean card is opaque to hide clipped back-layer bleed-through; 3.19.7 buttons/icons preserved.'})
+              bpath.write_text(json.dumps(b,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+          PY
+
+          test "$(stat -c%s /tmp/pkg/assets/core/core-hero-3196.png)" = "$HERO_SIZE"
+          test "$(sha256sum /tmp/pkg/assets/core/core-hero-3196.png | awk '{print $1}')" = "$HERO_SHA"
+          test "$(python -c 'import json;print(json.load(open("/tmp/pkg/manifest.json"))["version"])')" = "$VERSION"
+          test "$(python -c 'import json;print(json.load(open("/tmp/pkg/manifest.json"))["version_name"])')" = "$VERSION"
+          python - <<'PY'
+          import hashlib,json
+          m=json.load(open('/tmp/pkg/manifest.json',encoding='utf-8'))
+          assert hashlib.sha256((m.get('key') or '').encode()).hexdigest() == '1ddb8d87f3a6f6cb38a229bd81ba8076d1d37d3ba6b8a15b2a91129d4904012e'
+          PY
+          grep -q 'class="core-hero-title"' /tmp/pkg/editor.html
+          grep -q 'Build the project' /tmp/pkg/editor.html
+          grep -q 'with your AI team' /tmp/pkg/editor.html
+          ! grep -q '<div class="hint-orb"><svg><use href="#i-logo"/></svg></div>' /tmp/pkg/editor.html
+          ! grep -q '<small class="empty-kicker">OSMINOG · CORE</small>' /tmp/pkg/editor.html
+          grep -q 'inset:-12px 0 0' /tmp/pkg/editor.css
+          grep -q 'background:#09577c!important' /tmp/pkg/editor.css
+          grep -q 'animation:none!important' /tmp/pkg/editor.css
+          grep -q 'filter:none!important' /tmp/pkg/editor.css
+          grep -q 'repeat(5,minmax(0,1fr))' /tmp/pkg/editor.css
+          node --check /tmp/pkg/editor.js
+          python -m json.tool /tmp/pkg/manifest.json >/dev/null
+
+          (cd /tmp/pkg && zip -qr "$GITHUB_WORKSPACE/$PACKAGE" .)
+          unzip -t "$PACKAGE" >/dev/null
+
+      - name: Register immutable 3.19.8 package
+        shell: bash
+        run: |
+          set -euo pipefail
+          release_dir="platforms/chrome-extension/releases/$VERSION"
+          mkdir -p "$release_dir"
+          cp "$PACKAGE" "$release_dir/$PACKAGE"
+          size=$(stat -c%s "$release_dir/$PACKAGE")
+          sha=$(sha256sum "$release_dir/$PACKAGE" | awk '{print $1}')
+          python - "$release_dir/release-v2.json" "$size" "$sha" <<'PY'
+          import json,pathlib,sys
+          out,size,sha=sys.argv[1:4]
+          meta={
+            'schema':'osminog-release/v2',
+            'product':'OSMINOG',
+            'platform':'chrome-extension',
+            'version':'3.19.8',
+            'codename':'SOLID DOCKED HERO',
+            'baseVersion':'3.19.7',
+            'package':'OSMINOG-Chrome-3.19.8-SOLID-DOCKED-HERO.zip',
+            'size':int(size),
+            'sha256':sha,
+            'manifestVersion':'3.19.8',
+            'fixedExtensionKeyRequired':True,
+            'fixedIdentitySha256':'1ddb8d87f3a6f6cb38a229bd81ba8076d1d37d3ba6b8a15b2a91129d4904012e',
+            'minDevHubVersion':'2.0.0',
+            'runtimeVerified':False,
+            'notes':'Solid welcome card refinement: orb/kicker removed, title forced to two lines, card top raised 12px, Ocean background made opaque so the clipped hero back-layer cannot show through. Exact original hero PNG is preserved.',
+            'publishedAt':None,
+          }
+          pathlib.Path(out).write_text(json.dumps(meta,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+          PY
+          cat > "$release_dir/README.md" <<'EOF'
+          # OSMINOG Chrome 3.19.8 — Solid Docked Hero
+
+          - exact original `core-hero-3196.png` is preserved byte-for-byte;
+          - orb and `OSMINOG · CORE` kicker removed from the welcome card;
+          - title is locked to two lines: `Build the project` / `with your AI team`;
+          - real card top extends 12 px upward to meet the hero art with no visible gap;
+          - Ocean card uses an opaque `#09577c` fill, so the hidden/clipped back-layer cannot bleed through;
+          - no hero animation and no shadow filters;
+          - 3.19.7 action icons and five-provider pill layout are preserved.
+
+          Runtime UI verification remains an owner-side Chrome check after updating.
+          EOF
+
+      - name: Commit registry and cleanup importer
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -f .github/workflows/import-osminog-3198.yml
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git commit -m 'Import OSMINOG Chrome 3.19.8 package [skip ci]'
+          git push origin HEAD:main
+
+      - name: Dispatch verified publisher
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh workflow run publish-chrome-package-v2.yml --repo "$GITHUB_REPOSITORY" --ref main -f version="$VERSION"
