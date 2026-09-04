@@ -1,4 +1,4 @@
-# rerun after all verified source parts were staged
+# rerun with whitespace-normalized verified source parts
 name: Import OSMINOG Chrome 3.19.2 package
 
 on:
@@ -32,7 +32,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          cat staging/chrome-extension/3.19.2/source/part-*.b64 > /tmp/patch.xz.b64
+          cat staging/chrome-extension/3.19.2/source/part-*.b64 | tr -d '\r\n\t ' > /tmp/patch.xz.b64
           echo "$B64_SHA  /tmp/patch.xz.b64" | sha256sum -c -
           base64 --decode /tmp/patch.xz.b64 | xz -d > /tmp/3192.patch
           echo "$PATCH_SHA  /tmp/3192.patch" | sha256sum -c -
