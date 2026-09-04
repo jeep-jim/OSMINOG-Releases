@@ -1,0 +1,18 @@
+{
+  "schema": "osminog-release/v2",
+  "product": "OSMINOG",
+  "platform": "chrome-extension",
+  "version": "3.19.10",
+  "codename": "HERO TITLE LIFT",
+  "baseVersion": "3.19.9",
+  "package": "OSMINOG-Chrome-3.19.10-HERO-TITLE-LIFT.zip",
+  "size": 2497985,
+  "sha256": "a6a80a1f293380a4f4f4524f9c2499a3ae179be027bc57977364431c4b0b3766",
+  "manifestVersion": "3.19.10",
+  "fixedExtensionKeyRequired": true,
+  "fixedIdentitySha256": "1ddb8d87f3a6f6cb38a229bd81ba8076d1d37d3ba6b8a15b2a91129d4904012e",
+  "minDevHubVersion": "2.0.0",
+  "runtimeVerified": false,
+  "notes": "Welcome heading/content flow raised by 38 px versus 3.19.9. Original hero PNG and all 3.19.9 provider, localization, hover and canvas-color fixes are preserved.",
+  "publishedAt": null
+}
