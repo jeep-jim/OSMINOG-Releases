@@ -1,4 +1,4 @@
-# rerun with whitespace-normalized verified source parts
+# rerun with corrected part00 split
 name: Import OSMINOG Chrome 3.19.2 package
 
 on:
@@ -32,7 +32,17 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          cat staging/chrome-extension/3.19.2/source/part-*.b64 | tr -d '\r\n\t ' > /tmp/patch.xz.b64
+          cat \
+            staging/chrome-extension/3.19.2/source/part-00a.b64 \
+            staging/chrome-extension/3.19.2/source/part-00b.b64 \
+            staging/chrome-extension/3.19.2/source/part-01.b64 \
+            staging/chrome-extension/3.19.2/source/part-02.b64 \
+            staging/chrome-extension/3.19.2/source/part-03.b64 \
+            staging/chrome-extension/3.19.2/source/part-04.b64 \
+            staging/chrome-extension/3.19.2/source/part-05.b64 \
+            staging/chrome-extension/3.19.2/source/part-06.b64 \
+            staging/chrome-extension/3.19.2/source/part-07.b64 \
+            | tr -d '\r\n\t ' > /tmp/patch.xz.b64
           echo "$B64_SHA  /tmp/patch.xz.b64" | sha256sum -c -
           base64 --decode /tmp/patch.xz.b64 | xz -d > /tmp/3192.patch
           echo "$PATCH_SHA  /tmp/3192.patch" | sha256sum -c -
@@ -118,6 +128,7 @@ jobs:
           set -euo pipefail
           rm -rf staging/chrome-extension/3.19.2/source
           rm -f .github/workflows/import-osminog-3192.yml
+          rm -f .github/workflows/diag-3192-parts.yml
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add -A
