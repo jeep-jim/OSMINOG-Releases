@@ -1,0 +1,18 @@
+{
+  "schema": "osminog-release/v2",
+  "product": "OSMINOG",
+  "platform": "chrome-extension",
+  "version": "3.19.2",
+  "codename": "GRAPHICS STUDIO UX CANVAS FIX",
+  "baseVersion": "3.18.1",
+  "package": "OSMINOG-Chrome-3.19.2-GRAPHICS-STUDIO-UX-CANVAS-FIX.zip",
+  "size": 607767,
+  "sha256": "779f4f0c35f137553a72fc7ace8e3b6fc34eb1e23150206407eb95d3f6ea6ea2",
+  "manifestVersion": "3.19.2",
+  "fixedExtensionKeyRequired": true,
+  "fixedIdentitySha256": "1ddb8d87f3a6f6cb38a229bd81ba8076d1d37d3ba6b8a15b2a91129d4904012e",
+  "minDevHubVersion": "2.0.0",
+  "runtimeVerified": false,
+  "notes": "Graphics Studio v2.1 UX recovery: compact bottom icon dock, left layer panel, right inspector, desktop-style zoom/pan, white/color/transparent document background, and a guarded atomic Canvas round-trip that fixes the На холст hang and caps pathological path complexity.",
+  "publishedAt": null
+}
