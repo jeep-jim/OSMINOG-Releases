@@ -1,0 +1,87 @@
+name: Import OSMINOG Chrome 3.19.3 package
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/import-osminog-3193.yml'
+
+permissions:
+  contents: write
+  actions: write
+
+env:
+  VERSION: '3.19.3'
+  PACKAGE: 'OSMINOG-Chrome-3.19.3-GRAPHICS-STABILITY-NATIVE-DROP.zip'
+  BASE_URL: 'https://github.com/jeep-jim/OSMINOG-Releases/releases/download/chrome-v3.19.2/OSMINOG-Chrome-3.19.2-GRAPHICS-STUDIO-UX-CANVAS-FIX.zip'
+
+jobs:
+  import:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout release registry
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Rebuild package from 3.19.2
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf /tmp/pkg && mkdir -p /tmp/pkg
+          curl -fL --retry 3 -o /tmp/base.zip "$BASE_URL"
+          unzip -q /tmp/base.zip -d /tmp/pkg
+          base_key=$(python - <<'PY'
+          import json,zipfile
+          with zipfile.ZipFile('/tmp/base.zip') as z: print(json.loads(z.read('manifest.json'))['key'])
+          PY
+          )
+          (cd /tmp/pkg && python "$GITHUB_WORKSPACE/staging/chrome-extension/3.19.3/hotfix.py")
+          test "$(python -c 'import json;print(json.load(open("/tmp/pkg/manifest.json"))["version"])')" = "$VERSION"
+          test "$(python -c 'import json;print(json.load(open("/tmp/pkg/manifest.json"))["version_name"])')" = "$VERSION"
+          test "$(python -c 'import json;print(json.load(open("/tmp/pkg/manifest.json"))["key"])')" = "$base_key"
+          for f in /tmp/pkg/osminog-graphics-studio.js /tmp/pkg/editor.js; do node --check "$f"; done
+          (cd /tmp/pkg && zip -qr "$GITHUB_WORKSPACE/$PACKAGE" .)
+          unzip -t "$PACKAGE" >/dev/null
+      - name: Register package
+        shell: bash
+        run: |
+          set -euo pipefail
+          release_dir="platforms/chrome-extension/releases/$VERSION"
+          mkdir -p "$release_dir"
+          cp "$PACKAGE" "$release_dir/$PACKAGE"
+          size=$(stat -c%s "$release_dir/$PACKAGE")
+          sha=$(sha256sum "$release_dir/$PACKAGE" | awk '{print $1}')
+          python - "$release_dir/release-v2.json" "$size" "$sha" <<'PY'
+          import json,pathlib,sys
+          out,size,sha=sys.argv[1:4]
+          meta={'schema':'osminog-release/v2','product':'OSMINOG','platform':'chrome-extension','version':'3.19.3','codename':'GRAPHICS STABILITY + NATIVE FILE DROP','baseVersion':'3.19.2','package':'OSMINOG-Chrome-3.19.3-GRAPHICS-STABILITY-NATIVE-DROP.zip','size':int(size),'sha256':sha,'manifestVersion':'3.19.3','fixedExtensionKeyRequired':True,'fixedIdentitySha256':'1ddb8d87f3a6f6cb38a229bd81ba8076d1d37d3ba6b8a15b2a91129d4904012e','minDevHubVersion':'2.0.0','runtimeVerified':False,'notes':'Graphics Studio stability hotfix: tools actually moved to compact bottom dock, layers moved left, both side panels resizable, resize/render loop guarded, and native PC file drag-drop restored to the main canvas.','publishedAt':None}
+          pathlib.Path(out).write_text(json.dumps(meta,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+          PY
+          cat > "$release_dir/README.md" <<'EOF'
+          # OSMINOG Chrome 3.19.3 — Graphics Stability + Native Drop
+
+          - tools are physically moved to a compact bottom dock;
+          - layers are on the left, properties on the right;
+          - both side panels are resizable with drag splitters;
+          - guarded/debounced Graphics Studio ResizeObserver prevents render-loop freezes;
+          - direct drag & drop of arbitrary files from the computer to the main canvas is restored.
+          EOF
+      - name: Commit registry and cleanup
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf staging/chrome-extension/3.19.3
+          rm -f .github/workflows/import-osminog-3193.yml
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git commit -m 'Import OSMINOG Chrome 3.19.3 package [skip ci]'
+          git push origin HEAD:main
+      - name: Dispatch publisher
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh workflow run publish-chrome-package-v2.yml --repo "$GITHUB_REPOSITORY" --ref main -f version="$VERSION"
