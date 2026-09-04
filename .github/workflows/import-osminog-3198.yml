@@ -48,16 +48,24 @@ jobs:
 
           c=root/'editor.css'
           s=c.read_text(encoding='utf-8')
-          assert '/* OSMINOG 3.19.7 · DOCKED CORE HERO */' in s
-          s=s.replace('/* OSMINOG 3.19.7 · DOCKED CORE HERO */','/* OSMINOG 3.19.8 · SOLID DOCKED HERO */',1)
-          s=s.replace('content:"";position:absolute;z-index:2;inset:0;border-radius:28px;','content:"";position:absolute;z-index:2;inset:-12px 0 0;border-radius:28px;',1)
-          old_title='''.core-hero-launch .hint-orb{margin-bottom:14px!important}\n.core-hero-launch .empty-kicker{letter-spacing:.16em!important}\n.core-hero-launch h2{max-width:590px!important;margin:12px auto 10px!important;font-size:clamp(30px,3.25vw,44px)!important;line-height:1.04!important}'''
-          new_title='''.core-hero-launch .hint-orb,.core-hero-launch .empty-kicker{display:none!important}\n.core-hero-launch h2.core-hero-title{max-width:590px!important;margin:50px auto 12px!important;font-size:0!important;line-height:1!important;color:var(--text)!important}\n.core-hero-launch h2.core-hero-title::before,.core-hero-launch h2.core-hero-title::after{display:block!important;font-size:clamp(30px,3.25vw,44px)!important;line-height:1.04!important;font-weight:800!important;letter-spacing:-.035em!important}\n.core-hero-launch h2.core-hero-title::before{content:"Build the project"}\n.core-hero-launch h2.core-hero-title::after{content:"with your AI team";margin-top:4px}'''
-          assert old_title in s, '3.19.7 title CSS block missing'
-          s=s.replace(old_title,new_title,1)
-          ocean='html[data-theme="ocean"] .core-hero-launch::after{background:#09577c!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important}'
-          if ocean not in s:
-              s=s.rstrip()+'\n\n'+ocean+'\n'
+          if '/* OSMINOG 3.19.7 · DOCKED CORE HERO */' in s:
+              s=s.replace('/* OSMINOG 3.19.7 · DOCKED CORE HERO */','/* OSMINOG 3.19.8 · SOLID DOCKED HERO */',1)
+          elif '/* OSMINOG 3.19.8 · SOLID DOCKED HERO */' not in s:
+              s=s.rstrip()+'\n\n/* OSMINOG 3.19.8 · SOLID DOCKED HERO */\n'
+
+          override=r'''
+          /* OSMINOG 3.19.8 · release-safe final welcome overrides */
+          .core-hero-launch::after{inset:-12px 0 0!important;box-shadow:none!important}
+          .core-hero-composite,.core-hero-composite-front{filter:none!important;animation:none!important;will-change:auto!important}
+          .core-hero-launch .hint-orb,.core-hero-launch .empty-kicker{display:none!important}
+          .core-hero-launch h2.core-hero-title{max-width:590px!important;margin:50px auto 12px!important;font-size:0!important;line-height:1!important;color:var(--text)!important}
+          .core-hero-launch h2.core-hero-title::before,.core-hero-launch h2.core-hero-title::after{display:block!important;font-size:clamp(30px,3.25vw,44px)!important;line-height:1.04!important;font-weight:800!important;letter-spacing:-.035em!important}
+          .core-hero-launch h2.core-hero-title::before{content:"Build the project"}
+          .core-hero-launch h2.core-hero-title::after{content:"with your AI team";margin-top:4px}
+          .core-hero-launch .empty-launch-actions>button,.core-hero-launch .empty-provider-row>button{box-shadow:none!important}
+          html[data-theme="ocean"] .core-hero-launch::after{background:#09577c!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+          '''
+          s=s.rstrip()+'\n\n'+override.strip()+'\n'
           c.write_text(s,encoding='utf-8')
 
           m=json.loads((root/'manifest.json').read_text(encoding='utf-8'))
@@ -85,7 +93,7 @@ jobs:
           grep -q 'with your AI team' /tmp/pkg/editor.html
           ! grep -q '<div class="hint-orb"><svg><use href="#i-logo"/></svg></div>' /tmp/pkg/editor.html
           ! grep -q '<small class="empty-kicker">OSMINOG · CORE</small>' /tmp/pkg/editor.html
-          grep -q 'inset:-12px 0 0' /tmp/pkg/editor.css
+          grep -q 'inset:-12px 0 0!important' /tmp/pkg/editor.css
           grep -q 'background:#09577c!important' /tmp/pkg/editor.css
           grep -q 'animation:none!important' /tmp/pkg/editor.css
           grep -q 'filter:none!important' /tmp/pkg/editor.css
