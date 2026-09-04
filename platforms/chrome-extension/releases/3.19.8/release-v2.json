@@ -14,5 +14,5 @@
   "minDevHubVersion": "2.0.0",
   "runtimeVerified": false,
   "notes": "Solid welcome card refinement: orb/kicker removed, title forced to two lines, card top raised 12px, Ocean background made opaque so the clipped hero back-layer cannot show through. Exact original hero PNG is preserved.",
-  "publishedAt": null
+  "publishedAt": "2026-09-04T09:34:18Z"
 }
