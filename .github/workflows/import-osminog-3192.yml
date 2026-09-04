@@ -1,3 +1,4 @@
+# rerun after all verified source parts were staged
 name: Import OSMINOG Chrome 3.19.2 package
 
 on:
