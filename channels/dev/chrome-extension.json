@@ -5,20 +5,20 @@
     "product": "OSMINOG",
     "platform": "chrome-extension",
     "channel": "dev",
-    "generatedAt": "2026-09-04T09:34:18Z",
+    "generatedAt": "2026-09-04T10:12:44Z",
     "status": "active",
     "latest": {
-      "version": "3.19.8",
+      "version": "3.19.9",
       "kind": "full-package",
-      "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/chrome-v3.19.8/OSMINOG-Chrome-3.19.8-SOLID-DOCKED-HERO.zip",
-      "size": 2497411,
-      "sha256": "3de59c3968e3d7884e1e3c588a6228216bc68bbb8abbc0c1f9a9536cd81eec28",
-      "manifestVersion": "3.19.8",
+      "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/chrome-v3.19.9/OSMINOG-Chrome-3.19.9-LANG-CANVAS-PROVIDERS-FIX.zip",
+      "size": 2498004,
+      "sha256": "4e75fd5e22da42cfb151416aa483eaec5f471bb68cc1b9eacac5264964f8c99f",
+      "manifestVersion": "3.19.9",
       "fixedExtensionKeyRequired": true,
       "minDevHubVersion": "2.0.0",
       "runtimeVerified": false,
-      "notesUrl": "https://raw.githubusercontent.com/jeep-jim/OSMINOG-Releases/main/platforms/chrome-extension/releases/3.19.8/README.md",
-      "publishedAt": "2026-09-04T09:34:18Z"
+      "notesUrl": "https://raw.githubusercontent.com/jeep-jim/OSMINOG-Releases/main/platforms/chrome-extension/releases/3.19.9/README.md",
+      "publishedAt": "2026-09-04T10:12:44Z"
     }
   },
   "signature": null
