@@ -1,0 +1,18 @@
+{
+  "schema": "osminog-release/v2",
+  "product": "OSMINOG",
+  "platform": "chrome-extension",
+  "version": "3.19.5",
+  "codename": "SPLIT CORE HERO",
+  "baseVersion": "3.19.3-public / 3.19.4-source",
+  "package": "OSMINOG-Chrome-3.19.5-SPLIT-CORE-HERO-NATIVE-DROP.zip",
+  "size": 701669,
+  "sha256": "f2372d12dbbbbb7c41b149ee16e48336c489d62a7bd83890cb571c50bde81505",
+  "manifestVersion": "3.19.5",
+  "fixedExtensionKeyRequired": true,
+  "fixedIdentitySha256": "1ddb8d87f3a6f6cb38a229bd81ba8076d1d37d3ba6b8a15b2a91129d4904012e",
+  "minDevHubVersion": "2.0.0",
+  "runtimeVerified": false,
+  "notes": "Split startup hero: approved human layer on the left and red OSMINOG/AI layer above-right of the real launch card. Decorative banana/stars and the duplicate capture-level file-drop runtime are removed; one guarded native viewport drop path is preserved.",
+  "publishedAt": null
+}
