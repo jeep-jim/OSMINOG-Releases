@@ -5,20 +5,20 @@
     "product": "OSMINOG",
     "platform": "chrome-extension",
     "channel": "dev",
-    "generatedAt": "2026-09-04T10:25:33Z",
+    "generatedAt": "2026-09-04T10:42:21Z",
     "status": "active",
     "latest": {
-      "version": "3.19.10",
+      "version": "3.19.11",
       "kind": "full-package",
-      "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/chrome-v3.19.10/OSMINOG-Chrome-3.19.10-HERO-TITLE-LIFT.zip",
-      "size": 2497985,
-      "sha256": "a6a80a1f293380a4f4f4524f9c2499a3ae179be027bc57977364431c4b0b3766",
-      "manifestVersion": "3.19.10",
+      "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/chrome-v3.19.11/OSMINOG-Chrome-3.19.11-LIGHT-HOVER-CLOSED-INSPECTOR.zip",
+      "size": 2498188,
+      "sha256": "aecb3b17a69b6502a3c3ec4159f2e5b6dbe6605e32c6460cb5dcb22764c18437",
+      "manifestVersion": "3.19.11",
       "fixedExtensionKeyRequired": true,
       "minDevHubVersion": "2.0.0",
       "runtimeVerified": false,
-      "notesUrl": "https://raw.githubusercontent.com/jeep-jim/OSMINOG-Releases/main/platforms/chrome-extension/releases/3.19.10/README.md",
-      "publishedAt": "2026-09-04T10:25:33Z"
+      "notesUrl": "https://raw.githubusercontent.com/jeep-jim/OSMINOG-Releases/main/platforms/chrome-extension/releases/3.19.11/README.md",
+      "publishedAt": "2026-09-04T10:42:21Z"
     }
   },
   "signature": null
