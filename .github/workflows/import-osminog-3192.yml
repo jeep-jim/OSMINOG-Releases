@@ -1,0 +1,133 @@
+name: Import OSMINOG Chrome 3.19.2 package
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/import-osminog-3192.yml'
+
+permissions:
+  contents: write
+  actions: write
+
+env:
+  VERSION: '3.19.2'
+  PACKAGE: 'OSMINOG-Chrome-3.19.2-GRAPHICS-STUDIO-UX-CANVAS-FIX.zip'
+  B64_SHA: 'a6b84cc50420f83456a44647e971bd35c738637c0383db348312de38e7ccde2f'
+  PATCH_SHA: '8b5086b483e26d757bc2a015b14e4d15b2838a5d53bfa4b633577e80f8139de2'
+  BASE_URL: 'https://github.com/jeep-jim/OSMINOG-Releases/releases/download/chrome-v3.18.1/OSMINOG-Chrome-3.18.1-POSEIDON-SOURCE-EXECUTOR-RECOVERY.zip'
+
+jobs:
+  import:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout release registry
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Reconstruct verified 3.19.2 patch
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat staging/chrome-extension/3.19.2/source/part-*.b64 > /tmp/patch.xz.b64
+          echo "$B64_SHA  /tmp/patch.xz.b64" | sha256sum -c -
+          base64 --decode /tmp/patch.xz.b64 | xz -d > /tmp/3192.patch
+          echo "$PATCH_SHA  /tmp/3192.patch" | sha256sum -c -
+
+      - name: Rebuild package from verified 3.18.1 base
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/pkg
+          curl -fL --retry 3 -o /tmp/base.zip "$BASE_URL"
+          unzip -q /tmp/base.zip -d /tmp/pkg
+          base_key=$(python - <<'PY'
+          import json, zipfile
+          with zipfile.ZipFile('/tmp/base.zip') as z:
+              print(json.loads(z.read('manifest.json'))['key'])
+          PY
+          )
+          cd /tmp/pkg
+          patch -p4 < /tmp/3192.patch
+          test "$(python -c 'import json;print(json.load(open("manifest.json"))["version"])')" = "$VERSION"
+          test "$(python -c 'import json;print(json.load(open("manifest.json"))["key"])')" = "$base_key"
+          python -m json.tool manifest.json >/dev/null
+          python -m json.tool OSMINOG_BUILD.json >/dev/null
+          test -f OSMINOG_ROADMAP_3.19.2_GRAPHICS_STUDIO_UX.md
+          for f in osminog-graphics-studio.js editor.js gpt-presence.js osminog-module-runtime.js; do
+            test -f "$f"
+            node --check "$f"
+          done
+          cd "$GITHUB_WORKSPACE"
+          (cd /tmp/pkg && zip -qr "$GITHUB_WORKSPACE/$PACKAGE" .)
+          unzip -t "$PACKAGE" >/dev/null
+
+      - name: Register immutable package and metadata
+        id: package
+        shell: bash
+        run: |
+          set -euo pipefail
+          release_dir="platforms/chrome-extension/releases/$VERSION"
+          mkdir -p "$release_dir"
+          cp "$PACKAGE" "$release_dir/$PACKAGE"
+          size=$(stat -c%s "$release_dir/$PACKAGE")
+          sha=$(sha256sum "$release_dir/$PACKAGE" | awk '{print $1}')
+          fixed_identity='1ddb8d87f3a6f6cb38a229bd81ba8076d1d37d3ba6b8a15b2a91129d4904012e'
+          python - "$release_dir/release-v2.json" "$size" "$sha" "$fixed_identity" <<'PY'
+          import json, pathlib, sys
+          out, size, sha, fixed_identity = sys.argv[1:5]
+          meta = {
+            'schema': 'osminog-release/v2',
+            'product': 'OSMINOG',
+            'platform': 'chrome-extension',
+            'version': '3.19.2',
+            'codename': 'GRAPHICS STUDIO UX CANVAS FIX',
+            'baseVersion': '3.18.1',
+            'package': 'OSMINOG-Chrome-3.19.2-GRAPHICS-STUDIO-UX-CANVAS-FIX.zip',
+            'size': int(size),
+            'sha256': sha,
+            'manifestVersion': '3.19.2',
+            'fixedExtensionKeyRequired': True,
+            'fixedIdentitySha256': fixed_identity,
+            'minDevHubVersion': '2.0.0',
+            'runtimeVerified': False,
+            'notes': 'Graphics Studio v2.1 UX recovery: compact bottom icon dock, left layer panel, right inspector, desktop-style zoom/pan, white/color/transparent document background, and a guarded atomic Canvas round-trip that fixes the На холст hang and caps pathological path complexity.',
+            'publishedAt': None,
+          }
+          pathlib.Path(out).write_text(json.dumps(meta, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+          PY
+          cat > "$release_dir/README.md" <<'EOF'
+          # OSMINOG Chrome 3.19.2 — Graphics Studio UX / Canvas Fix
+
+          - compact icon-only tool dock at the bottom with hover tooltips;
+          - layers moved to the left with visibility and lock controls;
+          - properties remain on the right;
+          - desktop-style zoom/pan plus Fit/100% controls;
+          - white default background with custom color or transparent checkerboard;
+          - fixed Graphics Studio → Canvas hang with guarded atomic transfer and bounded path complexity.
+          EOF
+          echo "size=$size" >> "$GITHUB_OUTPUT"
+          echo "sha=$sha" >> "$GITHUB_OUTPUT"
+
+      - name: Commit registry entry and cleanup importer
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf staging/chrome-extension/3.19.2/source
+          rm -f .github/workflows/import-osminog-3192.yml
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git commit -m 'Import OSMINOG Chrome 3.19.2 package [skip ci]'
+          git push origin HEAD:main
+
+      - name: Dispatch fail-closed publisher
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh workflow run publish-chrome-package-v2.yml --repo "$GITHUB_REPOSITORY" --ref main -f version="$VERSION"
+          echo "Dispatched verified publisher for $VERSION"
