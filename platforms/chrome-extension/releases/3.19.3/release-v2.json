@@ -1,0 +1,18 @@
+{
+  "schema": "osminog-release/v2",
+  "product": "OSMINOG",
+  "platform": "chrome-extension",
+  "version": "3.19.3",
+  "codename": "GRAPHICS STABILITY + NATIVE FILE DROP",
+  "baseVersion": "3.19.2",
+  "package": "OSMINOG-Chrome-3.19.3-GRAPHICS-STABILITY-NATIVE-DROP.zip",
+  "size": 610139,
+  "sha256": "80cabdf5611353d9422bab68d010af3dd45dfe134e1ddb4dba90a295442a14ef",
+  "manifestVersion": "3.19.3",
+  "fixedExtensionKeyRequired": true,
+  "fixedIdentitySha256": "1ddb8d87f3a6f6cb38a229bd81ba8076d1d37d3ba6b8a15b2a91129d4904012e",
+  "minDevHubVersion": "2.0.0",
+  "runtimeVerified": false,
+  "notes": "Graphics Studio stability hotfix: tools actually moved to compact bottom dock, layers moved left, both side panels resizable, resize/render loop guarded, and native PC file drag-drop restored to the main canvas.",
+  "publishedAt": null
+}
