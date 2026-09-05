@@ -1,0 +1,17 @@
+{
+  "schema": "osminog-release/v2",
+  "product": "OSMINOG",
+  "platform": "chrome-extension",
+  "version": "3.20.0",
+  "codename": "AI WORKSPACE CORE MERGE",
+  "baseVersion": "3.19.12",
+  "package": "OSMINOG-Chrome-3.20.0-AI-WORKSPACE-CORE-MERGE.zip",
+  "size": 2427782,
+  "sha256": "1f3c5687459732d4c47d42eab86b5f0350c290d07b707a65b3f3e28936254acc",
+  "manifestVersion": "3.20.0",
+  "fixedExtensionKeyRequired": true,
+  "fixedIdentitySha256": "1ddb8d87f3a6f6cb38a229bd81ba8076d1d37d3ba6b8a15b2a91129d4904012e",
+  "minDevHubVersion": "2.0.0",
+  "runtimeVerified": false,
+  "notes": "OSMINOG 3.20.0 consolidates the proven 3.11.26 chat execution contracts with 3.19.12 Shared Vision. Threads, agent drag-link, guarded native file drop, verified canvas patches, patch retry and bounded tool hops are preserved."
+}
