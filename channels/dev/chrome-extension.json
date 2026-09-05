@@ -5,20 +5,20 @@
     "product": "OSMINOG",
     "platform": "chrome-extension",
     "channel": "dev",
-    "generatedAt": "2026-09-05T04:54:04Z",
+    "generatedAt": "2026-09-05T04:58:15Z",
     "status": "active",
     "latest": {
-      "version": "3.20.0",
+      "version": "3.20.1",
       "kind": "full-package",
-      "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/chrome-v3.20.0/OSMINOG-Chrome-3.20.0-AI-WORKSPACE-CORE-MERGE.zip",
-      "size": 2427782,
-      "sha256": "1f3c5687459732d4c47d42eab86b5f0350c290d07b707a65b3f3e28936254acc",
-      "manifestVersion": "3.20.0",
+      "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/chrome-v3.20.1/OSMINOG-Chrome-3.20.1-LAYOUT-ROLLBACK-HOTFIX.zip",
+      "size": 2499173,
+      "sha256": "d173566992a207d6e224d3a89513633b086410f6162fa93d3e79c29f06c74ba0",
+      "manifestVersion": "3.20.1",
       "fixedExtensionKeyRequired": true,
       "minDevHubVersion": "2.0.0",
       "runtimeVerified": false,
-      "notesUrl": "https://raw.githubusercontent.com/jeep-jim/OSMINOG-Releases/main/platforms/chrome-extension/releases/3.20.0/README.md",
-      "publishedAt": "2026-09-05T04:54:04Z"
+      "notesUrl": "https://raw.githubusercontent.com/jeep-jim/OSMINOG-Releases/main/platforms/chrome-extension/releases/3.20.1/README.md",
+      "publishedAt": "2026-09-05T04:58:15Z"
     }
   },
   "signature": null

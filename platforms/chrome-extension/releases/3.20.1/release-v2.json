@@ -13,5 +13,6 @@
   "fixedIdentitySha256": "1ddb8d87f3a6f6cb38a229bd81ba8076d1d37d3ba6b8a15b2a91129d4904012e",
   "minDevHubVersion": "2.0.0",
   "runtimeVerified": false,
-  "notes": "Emergency forward-version recovery: restores the complete byte-verified OSMINOG 3.19.12 application shell and layout after the incomplete 3.20.0 package. Only manifest/build version metadata changed to 3.20.1 so Dev Hub can update forward safely."
+  "notes": "Emergency forward-version recovery: restores the complete byte-verified OSMINOG 3.19.12 application shell and layout after the incomplete 3.20.0 package. Only manifest/build version metadata changed to 3.20.1 so Dev Hub can update forward safely.",
+  "publishedAt": "2026-09-05T04:58:15Z"
 }
