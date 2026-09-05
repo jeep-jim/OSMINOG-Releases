@@ -1,0 +1,17 @@
+{
+  "schema": "osminog-release/v2",
+  "product": "OSMINOG",
+  "platform": "chrome-extension",
+  "version": "3.20.1",
+  "codename": "LAYOUT ROLLBACK HOTFIX",
+  "baseVersion": "3.20.0",
+  "package": "OSMINOG-Chrome-3.20.1-LAYOUT-ROLLBACK-HOTFIX.zip",
+  "size": 2499173,
+  "sha256": "d173566992a207d6e224d3a89513633b086410f6162fa93d3e79c29f06c74ba0",
+  "manifestVersion": "3.20.1",
+  "fixedExtensionKeyRequired": true,
+  "fixedIdentitySha256": "1ddb8d87f3a6f6cb38a229bd81ba8076d1d37d3ba6b8a15b2a91129d4904012e",
+  "minDevHubVersion": "2.0.0",
+  "runtimeVerified": false,
+  "notes": "Emergency forward-version recovery: restores the complete byte-verified OSMINOG 3.19.12 application shell and layout after the incomplete 3.20.0 package. Only manifest/build version metadata changed to 3.20.1 so Dev Hub can update forward safely."
+}
