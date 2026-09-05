@@ -5,20 +5,20 @@
     "product": "OSMINOG",
     "platform": "chrome-extension",
     "channel": "dev",
-    "generatedAt": "2026-09-04T11:15:30Z",
+    "generatedAt": "2026-09-05T04:54:04Z",
     "status": "active",
     "latest": {
-      "version": "3.19.12",
+      "version": "3.20.0",
       "kind": "full-package",
-      "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/chrome-v3.19.12/OSMINOG-Chrome-3.19.12-SEAMLESS-SHARED-VISION.zip",
-      "size": 2499285,
-      "sha256": "fc0fcf634ce7cb2731dbbd8ec9fabca78d433cb2b1ad24f5b47abc88a5558892",
-      "manifestVersion": "3.19.12",
+      "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/chrome-v3.20.0/OSMINOG-Chrome-3.20.0-AI-WORKSPACE-CORE-MERGE.zip",
+      "size": 2427782,
+      "sha256": "1f3c5687459732d4c47d42eab86b5f0350c290d07b707a65b3f3e28936254acc",
+      "manifestVersion": "3.20.0",
       "fixedExtensionKeyRequired": true,
       "minDevHubVersion": "2.0.0",
       "runtimeVerified": false,
-      "notesUrl": "https://raw.githubusercontent.com/jeep-jim/OSMINOG-Releases/main/platforms/chrome-extension/releases/3.19.12/README.md",
-      "publishedAt": "2026-09-04T11:15:30Z"
+      "notesUrl": "https://raw.githubusercontent.com/jeep-jim/OSMINOG-Releases/main/platforms/chrome-extension/releases/3.20.0/README.md",
+      "publishedAt": "2026-09-05T04:54:04Z"
     }
   },
   "signature": null

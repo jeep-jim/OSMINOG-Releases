@@ -13,5 +13,6 @@
   "fixedIdentitySha256": "1ddb8d87f3a6f6cb38a229bd81ba8076d1d37d3ba6b8a15b2a91129d4904012e",
   "minDevHubVersion": "2.0.0",
   "runtimeVerified": false,
-  "notes": "OSMINOG 3.20.0 consolidates the proven 3.11.26 chat execution contracts with 3.19.12 Shared Vision. Threads, agent drag-link, guarded native file drop, verified canvas patches, patch retry and bounded tool hops are preserved."
+  "notes": "OSMINOG 3.20.0 consolidates the proven 3.11.26 chat execution contracts with 3.19.12 Shared Vision. Threads, agent drag-link, guarded native file drop, verified canvas patches, patch retry and bounded tool hops are preserved.",
+  "publishedAt": "2026-09-05T04:54:04Z"
 }
