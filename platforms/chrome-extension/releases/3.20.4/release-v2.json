@@ -1,0 +1,28 @@
+{
+  "schema": "osminog-release/v2",
+  "product": "OSMINOG",
+  "platform": "chrome-extension",
+  "version": "3.20.4",
+  "codename": "DOCUMENTS AND CONTEXT CONTROL",
+  "baseVersion": "3.20.3",
+  "package": "OSMINOG-Chrome-3.20.4-DOCUMENTS-CONTEXT-CONTROL.zip",
+  "size": 4061366,
+  "sha256": "5f7a0e98acff7b982abdbeeed7cff21398422bafb94c22aafd5ab9b1a4047b9b",
+  "manifestVersion": "3.20.4",
+  "fixedExtensionKeyRequired": true,
+  "fixedIdentitySha256": "1ddb8d87f3a6f6cb38a229bd81ba8076d1d37d3ba6b8a15b2a91129d4904012e",
+  "minDevHubVersion": "2.0.0",
+  "runtimeVerified": false,
+  "sourceRepository": "jeep-jim/OSMINOG",
+  "sourceCommit": "0aecf842b11a120eec8d692de05828a7e4d5301b",
+  "sourcePullRequest": "https://github.com/jeep-jim/OSMINOG/pull/7",
+  "notes": "Снимаемый контекст приложения; удаление старых пользовательских модулей и объектов с подтверждением; редактируемые текст/записки для ИИ; PDF/text editor и общие document_read/edit/export. PDF: замена и добавление текста, удаление/перестановка/поворот страниц, сохранение реальных байтов; исходник сохраняется. Изменённые страницы растеризуются, нет OCR, полноценной правки DOCX/XLSX/произвольных бинарных форматов и интерактивных PDF-форм. Chromium/CSP, экспорт и регрессии проверены с подставными Chrome/provider APIs; живые провайдеры и Windows Dev Hub владельца ещё не проверены. runtimeVerified=false.",
+  "verification": {
+    "packageSourceParity": "104/104 files",
+    "chromium": "149; real DOM, events, PDF rendering, extension CSP; mocked Chrome storage/provider APIs",
+    "routing": "screenshot phrases passed",
+    "pdfExport": "Cyrillic text and rotation independently checked using pypdf; Poppler render visually inspected",
+    "regression3203": "passed",
+    "liveProvider": "pending"
+  }
+}
