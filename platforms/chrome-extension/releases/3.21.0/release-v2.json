@@ -23,5 +23,6 @@
     "browser": "onboarding, manual edit, exported DOM, project isolation passed",
     "privacy": "legacy mirroring rejected",
     "liveProvider": "unverified"
-  }
+  },
+  "publishedAt": "2026-09-06T14:43:35Z"
 }
