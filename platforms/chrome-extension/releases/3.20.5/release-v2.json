@@ -1,0 +1,30 @@
+{
+  "schema": "osminog-release/v2",
+  "product": "OSMINOG",
+  "platform": "chrome-extension",
+  "version": "3.20.5",
+  "codename": "TEXT AND GRAPHICS STUDIO",
+  "baseVersion": "3.20.4",
+  "package": "OSMINOG-Chrome-3.20.5-TEXT-GRAPHICS-STUDIO.zip",
+  "size": 4066856,
+  "sha256": "ea9a8320b8a75219cb7323fe3ec43e787c9ec4345aae3fa55b1286acca86cea9",
+  "manifestVersion": "3.20.5",
+  "fixedExtensionKeyRequired": true,
+  "fixedIdentitySha256": "1ddb8d87f3a6f6cb38a229bd81ba8076d1d37d3ba6b8a15b2a91129d4904012e",
+  "minDevHubVersion": "2.0.0",
+  "runtimeVerified": false,
+  "sourceRepository": "jeep-jim/OSMINOG",
+  "sourceCommit": "a1859766fdc14a77d24fc261fd408ff3747ad28c",
+  "sourcePullRequest": "https://github.com/jeep-jim/OSMINOG/pull/8",
+  "notes": "Заметный инструмент «Текст» в доке; инструменты графики под холстом; тёмная шахматная сетка прозрачности; прокручиваемые свойства и регулируемые панели. Настройки кисти/ластика, удаление светлого фона с возвратом исходника, оформление текста. PNG экспортирует весь рисунок и прозрачность; «На холст» создаёт отдельный объект с редактируемыми слоями в проекте OSMINOG. Скачанный PNG плоский. SVG с ластиком/Boolean требует PNG. Проверены Chromium/CSP, UI, пиксели, повторное редактирование и PDF-регрессии с подставными Chrome/provider APIs. Профиль владельца и живые провайдеры ещё не проверены: runtimeVerified=false.",
+  "verification": {
+    "packageSourceParity": "106/106 files",
+    "reproducibleBuild": "local and GitHub Actions ZIP size and SHA-256 match",
+    "chromium": "real DOM/events; Ocean theme; desktop and compact layouts; extension CSP; mocked Chrome/provider APIs",
+    "graphics": "text, brush, group/ungroup positions, undo, paper alpha/blue ink, eraser alpha, SVG rejection, full export at zoom/pan, editable layers roundtrip",
+    "documents3204": "passed: text/revisions/PDF export/pages/notes/legacy module",
+    "routingAndNullResponse": "passed",
+    "workflow": "https://github.com/jeep-jim/OSMINOG/actions/runs/34023839212",
+    "liveProvider": "pending"
+  }
+}
