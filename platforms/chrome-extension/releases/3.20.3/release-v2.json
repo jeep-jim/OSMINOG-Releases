@@ -22,5 +22,6 @@
     "chromium": "149; real DOM/events, mocked Chrome APIs and file handle",
     "teamNullResponse": "passed",
     "liveProvider": "pending"
-  }
+  },
+  "publishedAt": "2026-09-06T07:32:24Z"
 }

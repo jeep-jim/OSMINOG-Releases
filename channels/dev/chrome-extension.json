@@ -5,20 +5,20 @@
     "product": "OSMINOG",
     "platform": "chrome-extension",
     "channel": "dev",
-    "generatedAt": "2026-09-05T04:58:15Z",
+    "generatedAt": "2026-09-06T07:32:24Z",
     "status": "active",
     "latest": {
-      "version": "3.20.1",
+      "version": "3.20.3",
       "kind": "full-package",
-      "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/chrome-v3.20.1/OSMINOG-Chrome-3.20.1-LAYOUT-ROLLBACK-HOTFIX.zip",
-      "size": 2499173,
-      "sha256": "d173566992a207d6e224d3a89513633b086410f6162fa93d3e79c29f06c74ba0",
-      "manifestVersion": "3.20.1",
+      "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/chrome-v3.20.3/OSMINOG-Chrome-3.20.3-CANVAS-DROP-PRESENCE-RECOVERY.zip",
+      "size": 2492727,
+      "sha256": "145b2cad964dec2564d97bf5d9da9838f878fb424facab18074bff304c566be7",
+      "manifestVersion": "3.20.3",
       "fixedExtensionKeyRequired": true,
       "minDevHubVersion": "2.0.0",
       "runtimeVerified": false,
-      "notesUrl": "https://raw.githubusercontent.com/jeep-jim/OSMINOG-Releases/main/platforms/chrome-extension/releases/3.20.1/README.md",
-      "publishedAt": "2026-09-05T04:58:15Z"
+      "notesUrl": "https://raw.githubusercontent.com/jeep-jim/OSMINOG-Releases/main/platforms/chrome-extension/releases/3.20.3/README.md",
+      "publishedAt": "2026-09-06T07:32:24Z"
     }
   },
   "signature": null
