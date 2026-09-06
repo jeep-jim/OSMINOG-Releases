@@ -5,20 +5,20 @@
     "product": "OSMINOG",
     "platform": "chrome-extension",
     "channel": "dev",
-    "generatedAt": "2026-09-06T10:25:22Z",
+    "generatedAt": "2026-09-06T10:53:20Z",
     "status": "active",
     "latest": {
-      "version": "3.20.7",
+      "version": "3.20.8",
       "kind": "full-package",
-      "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/chrome-v3.20.7/OSMINOG-Chrome-3.20.7-ANIMATION-AGENT-MEDIA.zip",
-      "size": 4090859,
-      "sha256": "7b1e81f1bcb6a539f5083cf32de58c01bf594b0bf93a3841095c649ae6bb0aee",
-      "manifestVersion": "3.20.7",
+      "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/chrome-v3.20.8/OSMINOG-Chrome-3.20.8-CHAT-POLISH.zip",
+      "size": 4091363,
+      "sha256": "00e3e00b987fbeb07c085646ac234749b4ad1d84bcfc4830bdecfad0b116f06f",
+      "manifestVersion": "3.20.8",
       "fixedExtensionKeyRequired": true,
       "minDevHubVersion": "2.0.0",
       "runtimeVerified": false,
-      "notesUrl": "https://raw.githubusercontent.com/jeep-jim/OSMINOG-Releases/main/platforms/chrome-extension/releases/3.20.7/README.md",
-      "publishedAt": "2026-09-06T10:25:22Z"
+      "notesUrl": "https://raw.githubusercontent.com/jeep-jim/OSMINOG-Releases/main/platforms/chrome-extension/releases/3.20.8/README.md",
+      "publishedAt": "2026-09-06T10:53:20Z"
     }
   },
   "signature": null

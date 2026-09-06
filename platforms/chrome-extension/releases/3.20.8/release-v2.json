@@ -19,5 +19,6 @@
     "workflow": "https://github.com/jeep-jim/OSMINOG/actions/runs/34028553863",
     "chromium": "chat layout in three themes and two widths; graphics and documents regression passed",
     "liveProvider": "unverified; generation and live source edits failed in user's 3.20.7"
-  }
+  },
+  "publishedAt": "2026-09-06T10:53:20Z"
 }
