@@ -5,20 +5,20 @@
     "product": "OSMINOG",
     "platform": "chrome-extension",
     "channel": "dev",
-    "generatedAt": "2026-09-06T10:53:20Z",
+    "generatedAt": "2026-09-06T12:55:44Z",
     "status": "active",
     "latest": {
-      "version": "3.20.8",
+      "version": "3.20.9",
       "kind": "full-package",
-      "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/chrome-v3.20.8/OSMINOG-Chrome-3.20.8-CHAT-POLISH.zip",
-      "size": 4091363,
-      "sha256": "00e3e00b987fbeb07c085646ac234749b4ad1d84bcfc4830bdecfad0b116f06f",
-      "manifestVersion": "3.20.8",
+      "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/chrome-v3.20.9/OSMINOG-Chrome-3.20.9-PRIVACY-NO-MIRRORING.zip",
+      "size": 4092182,
+      "sha256": "61fbc183e12ccf52419b82f868be60809e91a3764791c4ea552bb52db2a025b5",
+      "manifestVersion": "3.20.9",
       "fixedExtensionKeyRequired": true,
       "minDevHubVersion": "2.0.0",
       "runtimeVerified": false,
-      "notesUrl": "https://raw.githubusercontent.com/jeep-jim/OSMINOG-Releases/main/platforms/chrome-extension/releases/3.20.8/README.md",
-      "publishedAt": "2026-09-06T10:53:20Z"
+      "notesUrl": "https://raw.githubusercontent.com/jeep-jim/OSMINOG-Releases/main/platforms/chrome-extension/releases/3.20.9/README.md",
+      "publishedAt": "2026-09-06T12:55:44Z"
     }
   },
   "signature": null
