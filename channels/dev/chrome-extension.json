@@ -5,20 +5,20 @@
     "product": "OSMINOG",
     "platform": "chrome-extension",
     "channel": "dev",
-    "generatedAt": "2026-09-06T07:32:24Z",
+    "generatedAt": "2026-09-06T08:19:21Z",
     "status": "active",
     "latest": {
-      "version": "3.20.3",
+      "version": "3.20.4",
       "kind": "full-package",
-      "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/chrome-v3.20.3/OSMINOG-Chrome-3.20.3-CANVAS-DROP-PRESENCE-RECOVERY.zip",
-      "size": 2492727,
-      "sha256": "145b2cad964dec2564d97bf5d9da9838f878fb424facab18074bff304c566be7",
-      "manifestVersion": "3.20.3",
+      "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/chrome-v3.20.4/OSMINOG-Chrome-3.20.4-DOCUMENTS-CONTEXT-CONTROL.zip",
+      "size": 4061366,
+      "sha256": "5f7a0e98acff7b982abdbeeed7cff21398422bafb94c22aafd5ab9b1a4047b9b",
+      "manifestVersion": "3.20.4",
       "fixedExtensionKeyRequired": true,
       "minDevHubVersion": "2.0.0",
       "runtimeVerified": false,
-      "notesUrl": "https://raw.githubusercontent.com/jeep-jim/OSMINOG-Releases/main/platforms/chrome-extension/releases/3.20.3/README.md",
-      "publishedAt": "2026-09-06T07:32:24Z"
+      "notesUrl": "https://raw.githubusercontent.com/jeep-jim/OSMINOG-Releases/main/platforms/chrome-extension/releases/3.20.4/README.md",
+      "publishedAt": "2026-09-06T08:19:21Z"
     }
   },
   "signature": null
