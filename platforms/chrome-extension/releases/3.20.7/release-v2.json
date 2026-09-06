@@ -1,0 +1,29 @@
+{
+  "schema": "osminog-release/v2",
+  "product": "OSMINOG",
+  "platform": "chrome-extension",
+  "version": "3.20.7",
+  "codename": "ANIMATION STUDIO + AGENT MEDIA RECOVERY",
+  "baseVersion": "3.20.5",
+  "package": "OSMINOG-Chrome-3.20.7-ANIMATION-AGENT-MEDIA.zip",
+  "size": 4090859,
+  "sha256": "7b1e81f1bcb6a539f5083cf32de58c01bf594b0bf93a3841095c649ae6bb0aee",
+  "manifestVersion": "3.20.7",
+  "fixedExtensionKeyRequired": true,
+  "fixedIdentitySha256": "1ddb8d87f3a6f6cb38a229bd81ba8076d1d37d3ba6b8a15b2a91129d4904012e",
+  "minDevHubVersion": "2.0.0",
+  "runtimeVerified": false,
+  "sourceRepository": "jeep-jim/OSMINOG",
+  "sourceCommit": "171c9fcd4ae4c06563ca888da2dd857b479d8131",
+  "sourcePullRequest": "https://github.com/jeep-jim/OSMINOG/pull/10",
+  "notes": "Включает всю неопубликованную 3.20.6: Animation Studio с таймлайном, keyframes, easing, loop preview и WebM/Lottie export. Внутренний чат снова направляет команды изменения интерфейса OSMINOG в source-edit; команды про поле ввода, время сообщений и аватары больше не уходят на холст. Восстановлены генерация изображений через подключённый ChatGPT с автоматическим asset_create на холсте и прямой web_image_search → asset_create. Исправлены положение нижней панели и время под аватарами. Graphics Studio и документы прошли регрессии. Live image generation зависит от доступности Image Generation в подключённой сессии; runtimeVerified=false.",
+  "verification": {
+    "combinedWorkflow": "https://github.com/jeep-jim/OSMINOG/actions/runs/34027200566",
+    "graphicsRegression": "https://github.com/jeep-jim/OSMINOG/actions/runs/34027114392",
+    "zipIntegrity": "passed",
+    "javascriptSyntax": "passed",
+    "routingAndMedia": "passed",
+    "animation": "passed",
+    "liveProvider": "pending"
+  }
+}
