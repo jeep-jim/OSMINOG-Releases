@@ -5,20 +5,20 @@
     "product": "OSMINOG",
     "platform": "chrome-extension",
     "channel": "dev",
-    "generatedAt": "2026-09-06T08:19:21Z",
+    "generatedAt": "2026-09-06T09:12:52Z",
     "status": "active",
     "latest": {
-      "version": "3.20.4",
+      "version": "3.20.5",
       "kind": "full-package",
-      "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/chrome-v3.20.4/OSMINOG-Chrome-3.20.4-DOCUMENTS-CONTEXT-CONTROL.zip",
-      "size": 4061366,
-      "sha256": "5f7a0e98acff7b982abdbeeed7cff21398422bafb94c22aafd5ab9b1a4047b9b",
-      "manifestVersion": "3.20.4",
+      "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/chrome-v3.20.5/OSMINOG-Chrome-3.20.5-TEXT-GRAPHICS-STUDIO.zip",
+      "size": 4066856,
+      "sha256": "ea9a8320b8a75219cb7323fe3ec43e787c9ec4345aae3fa55b1286acca86cea9",
+      "manifestVersion": "3.20.5",
       "fixedExtensionKeyRequired": true,
       "minDevHubVersion": "2.0.0",
       "runtimeVerified": false,
-      "notesUrl": "https://raw.githubusercontent.com/jeep-jim/OSMINOG-Releases/main/platforms/chrome-extension/releases/3.20.4/README.md",
-      "publishedAt": "2026-09-06T08:19:21Z"
+      "notesUrl": "https://raw.githubusercontent.com/jeep-jim/OSMINOG-Releases/main/platforms/chrome-extension/releases/3.20.5/README.md",
+      "publishedAt": "2026-09-06T09:12:52Z"
     }
   },
   "signature": null
