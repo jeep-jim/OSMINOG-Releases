@@ -1,0 +1,27 @@
+{
+  "schema": "osminog-release/v2",
+  "product": "OSMINOG",
+  "platform": "chrome-extension",
+  "version": "3.21.0",
+  "package": "OSMINOG-Chrome-3.21.0-LOCAL-MEMORY-ASSETS.zip",
+  "sha256": "7724209a986344b2201c1db11b9e956157575164b4547910d6b04513ac172c43",
+  "size": 4098566,
+  "manifestVersion": "3.21.0",
+  "fixedExtensionKeyRequired": true,
+  "fixedIdentitySha256": "1ddb8d87f3a6f6cb38a229bd81ba8076d1d37d3ba6b8a15b2a91129d4904012e",
+  "minDevHubVersion": "2.0.0",
+  "runtimeVerified": false,
+  "sourceRepository": "jeep-jim/OSMINOG",
+  "sourceCommit": "a517ca9076ab5d3a7fa2423682086ca1b38111d9",
+  "sourcePullRequest": "https://github.com/jeep-jim/OSMINOG/pull/13",
+  "notes": "Тестовая OSMINOG 3.21.0: выбор локальной папки при старте; сохранение проектов и истории без лимита 140 сообщений; автоматический контекст холста для внутренних агентов; инструменты пользовательского GitHub, Drive и узлов Figma; ручное редактирование HTML и экспорт в папку. Все 3 CI-процесса прошли, включая браузерный сценарий ручной правки и изоляцию проектов. ВАЖНО: внешний Live Presence ещё не восстановлен — адрес отдельного коннектора не настроен. Нужна настройка Google OAuth/Figma и живая проверка аккаунтов; runtimeVerified=false. Экспорт HTML не собирает внешние зависимости в offline-пакет.",
+  "verification": {
+    "workflow": "https://github.com/jeep-jim/OSMINOG/actions/runs/34039854776",
+    "graphics": "https://github.com/jeep-jim/OSMINOG/actions/runs/34039854814",
+    "animation": "passed",
+    "memory": "400-message retention, scoped merge, no credential keys, serialized writes, failure/retry",
+    "browser": "onboarding, manual edit, exported DOM, project isolation passed",
+    "privacy": "legacy mirroring rejected",
+    "liveProvider": "unverified"
+  }
+}
