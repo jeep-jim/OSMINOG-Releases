@@ -1,0 +1,25 @@
+{
+  "schema": "osminog-release/v2",
+  "product": "OSMINOG",
+  "platform": "chrome-extension",
+  "version": "3.20.9",
+  "package": "OSMINOG-Chrome-3.20.9-PRIVACY-NO-MIRRORING.zip",
+  "sha256": "61fbc183e12ccf52419b82f868be60809e91a3764791c4ea552bb52db2a025b5",
+  "size": 4092182,
+  "manifestVersion": "3.20.9",
+  "fixedExtensionKeyRequired": true,
+  "fixedIdentitySha256": "1ddb8d87f3a6f6cb38a229bd81ba8076d1d37d3ba6b8a15b2a91129d4904012e",
+  "minDevHubVersion": "2.0.0",
+  "runtimeVerified": false,
+  "sourceRepository": "jeep-jim/OSMINOG",
+  "sourceCommit": "a7eaab9d25bfbc8b65f38bb3c080c7fbf74884d9",
+  "sourcePullRequest": "https://github.com/jeep-jim/OSMINOG/pull/12",
+  "notes": "OSMINOG 3.20.9: аварийная изоляция переписки. Заблокирован ChatGPT DOM transport и перенос сообщений в обе стороны; отключён full-page fallback. Убрано лишнее левое Вы. Код отдельного коннектора холста сохранён. Live-проверка внутреннего ChatGPT не выполнена; runtimeVerified=false. Перед включением закрой старые вкладки ChatGPT.",
+  "verification": {
+    "workflow": "https://github.com/jeep-jim/OSMINOG/actions/runs/34034360685",
+    "privacy": "7 legacy messages rejected; syntax checked",
+    "graphics": "passed",
+    "animation": "passed",
+    "liveProvider": "unverified"
+  }
+}
