@@ -1,0 +1,23 @@
+{
+  "schema": "osminog-release/v2",
+  "product": "OSMINOG",
+  "platform": "chrome-extension",
+  "version": "3.20.8",
+  "package": "OSMINOG-Chrome-3.20.8-CHAT-POLISH.zip",
+  "sha256": "00e3e00b987fbeb07c085646ac234749b4ad1d84bcfc4830bdecfad0b116f06f",
+  "size": 4091363,
+  "manifestVersion": "3.20.8",
+  "fixedExtensionKeyRequired": true,
+  "fixedIdentitySha256": "1ddb8d87f3a6f6cb38a229bd81ba8076d1d37d3ba6b8a15b2a91129d4904012e",
+  "minDevHubVersion": "2.0.0",
+  "runtimeVerified": false,
+  "sourceRepository": "jeep-jim/OSMINOG",
+  "sourceCommit": "68c86e8160fda987a2506eef7a37f79016bc3da3",
+  "sourcePullRequest": "https://github.com/jeep-jim/OSMINOG/pull/11",
+  "notes": "Белое время пользователя; аватары без рамок; короткие пузыри по содержимому; разделитель над названием проекта; белая надпись «Удалить». Проверено Chromium в трёх темах и двух ширинах; графика, анимация и документы прошли регрессии. Исправлен порядок обработки возвращённого изображения, animation tools добавлены в контекст ИИ. ВАЖНО: работа генерации и правок живого интерфейса через подключённого ИИ не подтверждена. Эти проблемы записаны перед паузой проекта. runtimeVerified=false.",
+  "verification": {
+    "workflow": "https://github.com/jeep-jim/OSMINOG/actions/runs/34028553863",
+    "chromium": "chat layout in three themes and two widths; graphics and documents regression passed",
+    "liveProvider": "unverified; generation and live source edits failed in user's 3.20.7"
+  }
+}
