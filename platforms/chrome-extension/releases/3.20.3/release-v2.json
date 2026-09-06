@@ -1,0 +1,26 @@
+{
+  "schema": "osminog-release/v2",
+  "product": "OSMINOG",
+  "platform": "chrome-extension",
+  "version": "3.20.3",
+  "codename": "CANVAS DROP AND PRESENCE RECOVERY",
+  "baseVersion": "3.20.1",
+  "package": "OSMINOG-Chrome-3.20.3-CANVAS-DROP-PRESENCE-RECOVERY.zip",
+  "size": 2492727,
+  "sha256": "145b2cad964dec2564d97bf5d9da9838f878fb424facab18074bff304c566be7",
+  "manifestVersion": "3.20.3",
+  "fixedExtensionKeyRequired": true,
+  "fixedIdentitySha256": "1ddb8d87f3a6f6cb38a229bd81ba8076d1d37d3ba6b8a15b2a91129d4904012e",
+  "minDevHubVersion": "2.0.0",
+  "runtimeVerified": false,
+  "sourceRepository": "jeep-jim/OSMINOG",
+  "sourceCommit": "eb07c8be9897aedc3b6e8ae2985832ee50dd7b6e",
+  "sourcePullRequest": "https://github.com/jeep-jim/OSMINOG/pull/6",
+  "notes": "Fixes the graphics inspector feedback loop that froze image/text selection, duplicate native drop and blocked internal folder drags. Imports original project files without preview truncation; restores Access / Current ChatGPT / role / Connect; handles null Team retry responses. Built from the exact 3.20.1 interface. Chromium regression tests pass with mocked Chrome APIs; live ChatGPT, owner profile and Dev Hub verification remain pending.",
+  "verification": {
+    "packageSourceParity": "92/92 files",
+    "chromium": "149; real DOM/events, mocked Chrome APIs and file handle",
+    "teamNullResponse": "passed",
+    "liveProvider": "pending"
+  }
+}
