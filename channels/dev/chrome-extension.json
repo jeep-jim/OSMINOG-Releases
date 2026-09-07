@@ -5,20 +5,20 @@
     "product": "OSMINOG",
     "platform": "chrome-extension",
     "channel": "dev",
-    "generatedAt": "2026-09-07T02:39:25Z",
+    "generatedAt": "2026-09-07T03:22:32Z",
     "status": "active",
     "latest": {
-      "version": "3.21.4",
+      "version": "3.21.5",
       "kind": "full-package",
-      "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/chrome-v3.21.4/OSMINOG-Chrome-3.21.4-LINKS-IMAGE-INTENT.zip",
-      "size": 4093376,
-      "sha256": "b34f4d42898d82ca3243b480f46be7d0386022080a01bf3f6867558a8e58fc70",
-      "manifestVersion": "3.21.4",
+      "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/chrome-v3.21.5/OSMINOG-Chrome-3.21.5-NATIVE-CANVAS-PRESENCE.zip",
+      "size": 4103365,
+      "sha256": "87a7f4e0d5b2eb01c00de00142d83d0537cc12a5d529a518b1270d9ad2cc5171",
+      "manifestVersion": "3.21.5",
       "fixedExtensionKeyRequired": true,
       "minDevHubVersion": "2.0.0",
       "runtimeVerified": false,
-      "notesUrl": "https://raw.githubusercontent.com/jeep-jim/OSMINOG-Releases/main/platforms/chrome-extension/releases/3.21.4/README.md",
-      "publishedAt": "2026-09-07T02:39:25Z"
+      "notesUrl": "https://raw.githubusercontent.com/jeep-jim/OSMINOG-Releases/main/platforms/chrome-extension/releases/3.21.5/README.md",
+      "publishedAt": "2026-09-07T03:22:32Z"
     }
   },
   "signature": null
