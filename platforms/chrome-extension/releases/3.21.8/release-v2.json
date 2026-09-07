@@ -1,0 +1,26 @@
+{
+  "schema": "osminog-release/v2",
+  "product": "OSMINOG",
+  "platform": "chrome-extension",
+  "version": "3.21.8",
+  "package": "OSMINOG-Chrome-3.21.8-ISOLATED-PROVIDER-RUNTIME.zip",
+  "sha256": "ffa5ca1ab69c7fa6bfd89b00f50697a611c01976df648b858039842504f16bef",
+  "size": 4128539,
+  "manifestVersion": "3.21.8",
+  "fixedExtensionKeyRequired": true,
+  "fixedIdentitySha256": "1ddb8d87f3a6f6cb38a229bd81baa8076d1d37d3ba6b8a15b2a91129d4904012e",
+  "minDevHubVersion": "2.0.0",
+  "runtimeVerified": false,
+  "sourceRepository": "jeep-jim/OSMINOG",
+  "sourceCommit": "f5727a1e78a5d2714b36306c17901dbde2c8674a",
+  "notes": "OSMINOG 3.21.8: пользовательские вкладки провайдеров и фоновые agent-сессии разделены. Устаревшая привязка к обычному чату автоматически удаляется из служебного маршрута без закрытия пользовательской вкладки. Агентская отправка разрешена только во внутреннюю managed-сессию OSMINOG. Полный CI и Chromium DOM-набор прошёл; авторизованный аккаунт Алисы владельца требует проверки после обновления. runtimeVerified=false.",
+  "verification": {
+    "workflow": "https://github.com/jeep-jim/OSMINOG/actions/runs/34088086302",
+    "isolation": "passed: agent send requires managed link and exact managed session tab",
+    "migration": "passed: legacy external session record is discarded without closing the tab",
+    "chat": "passed plaintext and no-mirroring contracts",
+    "package": "Verified ZIP CRC, root manifest 3.21.8 and fixed extension identity.",
+    "liveProvider": "unverified: authenticated owner sessions unavailable"
+  },
+  "publishedAt": null
+}
