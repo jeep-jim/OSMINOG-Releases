@@ -5,20 +5,20 @@
     "product": "OSMINOG",
     "platform": "chrome-extension",
     "channel": "dev",
-    "generatedAt": "2026-09-07T05:52:51Z",
+    "generatedAt": "2026-09-07T10:43:39Z",
     "status": "active",
     "latest": {
-      "version": "3.21.8",
+      "version": "3.22.0",
       "kind": "full-package",
-      "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/chrome-v3.21.8/OSMINOG-Chrome-3.21.8-ISOLATED-PROVIDER-RUNTIME.zip",
-      "size": 4128539,
-      "sha256": "ffa5ca1ab69c7fa6bfd89b00f50697a611c01976df648b858039842504f16bef",
-      "manifestVersion": "3.21.8",
+      "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/chrome-v3.22.0/OSMINOG-Chrome-3.22.0-SCOPED-CANVAS-MEDIA.zip",
+      "size": 4129049,
+      "sha256": "7183f3853ccab618486e18c106095c21731db486967704f7a4f3696620ed446d",
+      "manifestVersion": "3.22.0",
       "fixedExtensionKeyRequired": true,
       "minDevHubVersion": "2.0.0",
       "runtimeVerified": false,
-      "notesUrl": "https://raw.githubusercontent.com/jeep-jim/OSMINOG-Releases/main/platforms/chrome-extension/releases/3.21.8/README.md",
-      "publishedAt": "2026-09-07T05:52:51Z"
+      "notesUrl": "https://raw.githubusercontent.com/jeep-jim/OSMINOG-Releases/main/platforms/chrome-extension/releases/3.22.0/README.md",
+      "publishedAt": "2026-09-07T10:43:39Z"
     }
   },
   "signature": null
