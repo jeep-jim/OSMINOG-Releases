@@ -5,20 +5,20 @@
     "product": "OSMINOG",
     "platform": "chrome-extension",
     "channel": "dev",
-    "generatedAt": "2026-09-07T03:22:32Z",
+    "generatedAt": "2026-09-07T03:50:22Z",
     "status": "active",
     "latest": {
-      "version": "3.21.5",
+      "version": "3.21.6",
       "kind": "full-package",
-      "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/chrome-v3.21.5/OSMINOG-Chrome-3.21.5-NATIVE-CANVAS-PRESENCE.zip",
-      "size": 4103365,
-      "sha256": "87a7f4e0d5b2eb01c00de00142d83d0537cc12a5d529a518b1270d9ad2cc5171",
-      "manifestVersion": "3.21.5",
+      "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/chrome-v3.21.6/OSMINOG-Chrome-3.21.6-BIDIRECTIONAL-CHAT-SYNC.zip",
+      "size": 4109266,
+      "sha256": "43ffee360915c0d51a952b6064cc7b6d834c957d6912f8067f15136bb6ff83c2",
+      "manifestVersion": "3.21.6",
       "fixedExtensionKeyRequired": true,
       "minDevHubVersion": "2.0.0",
       "runtimeVerified": false,
-      "notesUrl": "https://raw.githubusercontent.com/jeep-jim/OSMINOG-Releases/main/platforms/chrome-extension/releases/3.21.5/README.md",
-      "publishedAt": "2026-09-07T03:22:32Z"
+      "notesUrl": "https://raw.githubusercontent.com/jeep-jim/OSMINOG-Releases/main/platforms/chrome-extension/releases/3.21.6/README.md",
+      "publishedAt": "2026-09-07T03:50:22Z"
     }
   },
   "signature": null

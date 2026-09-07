@@ -23,5 +23,6 @@
     "privacy": "passed: current bound conversation only, no prior-history import, project/agent/epoch isolation",
     "module": "passed: exact legacy placeholder backup/removal; custom flags do not confer system protection",
     "liveProvider": "unverified: authenticated provider sessions unavailable"
-  }
+  },
+  "publishedAt": "2026-09-07T03:50:22Z"
 }
