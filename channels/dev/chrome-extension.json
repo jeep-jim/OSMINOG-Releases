@@ -5,20 +5,20 @@
     "product": "OSMINOG",
     "platform": "chrome-extension",
     "channel": "dev",
-    "generatedAt": "2026-09-06T15:25:38Z",
+    "generatedAt": "2026-09-07T00:20:28Z",
     "status": "active",
     "latest": {
-      "version": "3.21.1",
+      "version": "3.21.2",
       "kind": "full-package",
-      "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/chrome-v3.21.1/OSMINOG-Chrome-3.21.1-MEDIA-REFERENCE.zip",
-      "size": 4100747,
-      "sha256": "fe3909b5c7d13e5a7e8a7335309b9510c39a641d5e5d86d6b82632a4439ef77b",
-      "manifestVersion": "3.21.1",
+      "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/chrome-v3.21.2/OSMINOG-Chrome-3.21.2-FOLDERS-IMAGE-RESULTS.zip",
+      "size": 4104484,
+      "sha256": "2fed2bc6b8203398e8c11c18ec477b1b033d054084ec6f09b7216a8f6f1f0568",
+      "manifestVersion": "3.21.2",
       "fixedExtensionKeyRequired": true,
       "minDevHubVersion": "2.0.0",
       "runtimeVerified": false,
-      "notesUrl": "https://raw.githubusercontent.com/jeep-jim/OSMINOG-Releases/main/platforms/chrome-extension/releases/3.21.1/README.md",
-      "publishedAt": "2026-09-06T15:25:38Z"
+      "notesUrl": "https://raw.githubusercontent.com/jeep-jim/OSMINOG-Releases/main/platforms/chrome-extension/releases/3.21.2/README.md",
+      "publishedAt": "2026-09-07T00:20:28Z"
     }
   },
   "signature": null

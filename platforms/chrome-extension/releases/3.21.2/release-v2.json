@@ -23,5 +23,6 @@
     "folders": "Pointer drag; 8 object types; batch move; no duplicates; delete isolation; folder-to-folder; restore; undo/redo; migration; reload",
     "media": "Tool images; file pointers; SSE deltas; returned-ID download; uploaded reference exclusion; isolated generation prompt; import errors",
     "liveGeneration": "unverified"
-  }
+  },
+  "publishedAt": "2026-09-07T00:20:28Z"
 }
