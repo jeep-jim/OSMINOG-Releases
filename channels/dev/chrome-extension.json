@@ -5,20 +5,20 @@
     "product": "OSMINOG",
     "platform": "chrome-extension",
     "channel": "dev",
-    "generatedAt": "2026-09-07T03:50:22Z",
+    "generatedAt": "2026-09-07T05:18:05Z",
     "status": "active",
     "latest": {
-      "version": "3.21.6",
+      "version": "3.21.7",
       "kind": "full-package",
-      "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/chrome-v3.21.6/OSMINOG-Chrome-3.21.6-BIDIRECTIONAL-CHAT-SYNC.zip",
-      "size": 4109266,
-      "sha256": "43ffee360915c0d51a952b6064cc7b6d834c957d6912f8067f15136bb6ff83c2",
-      "manifestVersion": "3.21.6",
+      "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/chrome-v3.21.7/OSMINOG-Chrome-3.21.7-INTERNAL-PROVIDER-DOCK.zip",
+      "size": 4128158,
+      "sha256": "6bc0c656c504da859a27d86c84585f2e048e9fb3054d4864767b174dca17bf3b",
+      "manifestVersion": "3.21.7",
       "fixedExtensionKeyRequired": true,
       "minDevHubVersion": "2.0.0",
       "runtimeVerified": false,
-      "notesUrl": "https://raw.githubusercontent.com/jeep-jim/OSMINOG-Releases/main/platforms/chrome-extension/releases/3.21.6/README.md",
-      "publishedAt": "2026-09-07T03:50:22Z"
+      "notesUrl": "https://raw.githubusercontent.com/jeep-jim/OSMINOG-Releases/main/platforms/chrome-extension/releases/3.21.7/README.md",
+      "publishedAt": "2026-09-07T05:18:05Z"
     }
   },
   "signature": null
