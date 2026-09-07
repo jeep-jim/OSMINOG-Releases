@@ -1,0 +1,26 @@
+{
+  "schema": "osminog-release/v2",
+  "product": "OSMINOG",
+  "platform": "chrome-extension",
+  "version": "3.21.4",
+  "package": "OSMINOG-Chrome-3.21.4-LINKS-IMAGE-INTENT.zip",
+  "sha256": "b34f4d42898d82ca3243b480f46be7d0386022080a01bf3f6867558a8e58fc70",
+  "size": 4093376,
+  "manifestVersion": "3.21.4",
+  "fixedExtensionKeyRequired": true,
+  "fixedIdentitySha256": "1ddb8d87f3a6f6cb38a229bd81ba8076d1d37d3ba6b8a15b2a91129d4904012e",
+  "minDevHubVersion": "2.0.0",
+  "runtimeVerified": false,
+  "sourceRepository": "jeep-jim/OSMINOG",
+  "sourceCommit": "222275e0c098c65859873dd04aa46c1d84d5929d",
+  "notes": "OSMINOG 3.21.4: восстановлены кликабельные Markdown/HTTP(S)-ссылки и ссылки ChatGPT из метаданных, включая поток и сохранённую переписку. Исправлен запрос «сгенерируй мне такую же только чтобы он стоял с ноутбуком»: он включает режим генерации с визуальным контекстом. Уточнён протокол вызова команд агентов. Показывается сообщённая провайдером модель. Chromium и регрессионные тесты прошли; все 112 файлов пакета совпадают с проверенным исходным коммитом. Живая генерация в подписной сессии владельца не проверена; полного совпадения инструментов сайта ChatGPT и внутреннего API сборка не подтверждает. runtimeVerified=false.",
+  "verification": {
+    "workflow": "https://github.com/jeep-jim/OSMINOG/actions/runs/34076715173",
+    "chat": "Chromium: streamed links, Markdown emphasis, persisted links after reload, reference-only image intent and no-file failure; existing clear/stream tests passed",
+    "package": "112/112 file contents match verified source commit; locally assembled ZIP; CRC and fixed identity verified",
+    "folders": "passed",
+    "memory": "passed",
+    "privacy": "passed",
+    "liveGeneration": "unverified"
+  }
+}
