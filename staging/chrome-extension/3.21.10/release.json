@@ -1,0 +1,14 @@
+{
+  "platform": "chrome-extension",
+  "version": "3.21.10",
+  "package": "OSMINOG-Chrome-3.21.10-ONE-CLICK-MODULE-RECOVERY.zip",
+  "size": 4128647,
+  "sha256": "a2c2978bc0484e94390cb309603d790627a1fdb1d9f2a800d7643163c1798530",
+  "manifestVersion": "3.21.10",
+  "targetPath": "platforms/chrome-extension/releases/3.21.10/OSMINOG-Chrome-3.21.10-ONE-CLICK-MODULE-RECOVERY.zip",
+  "releaseTag": "chrome-v3.21.10",
+  "releaseTitle": "OSMINOG Chrome 3.21.10",
+  "feedPath": "channels/dev/chrome-extension.json",
+  "minUpdaterVersion": "3.21.10",
+  "notes": "Module creation recovery and one-click provider connection."
+}
