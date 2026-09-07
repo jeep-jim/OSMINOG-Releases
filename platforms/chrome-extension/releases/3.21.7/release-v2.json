@@ -1,0 +1,28 @@
+{
+  "schema": "osminog-release/v2",
+  "product": "OSMINOG",
+  "platform": "chrome-extension",
+  "version": "3.21.7",
+  "package": "OSMINOG-Chrome-3.21.7-INTERNAL-PROVIDER-DOCK.zip",
+  "sha256": "6bc0c656c504da859a27d86c84585f2e048e9fb3054d4864767b174dca17bf3b",
+  "size": 4128158,
+  "manifestVersion": "3.21.7",
+  "fixedExtensionKeyRequired": true,
+  "fixedIdentitySha256": "1ddb8d87f3a6f6cb38a229bd81baa8076d1d37d3ba6b8a15b2a91129d4904012e",
+  "minDevHubVersion": "2.0.0",
+  "runtimeVerified": false,
+  "sourceRepository": "jeep-jim/OSMINOG",
+  "sourceCommit": "c2e8d14d4f496fa21a2f3611853f52aa8f11bbe2",
+  "notes": "OSMINOG 3.21.7: фоновые web-сессии провайдеров представлены внутри OSMINOG значками в нижнем доке. Нажатие открывает единый центр подключений вместо служебного окна Chrome. Одна управляемая сессия переиспользуется для каждого провайдера и автоматически сворачивается после подключения; видимое окно используется только для ручной авторизации. Пользовательские оригинальные чаты отделены от фоновых agent-сессий и передают только чистый текст без JSON контекста, служебных инструкций и tool-result блоков. CI и Chromium DOM-сценарии семи маршрутов прошли; авторизованные аккаунты владельца требуют проверки после обновления. runtimeVerified=false.",
+  "verification": {
+    "workflow": "https://github.com/jeep-jim/OSMINOG/actions/runs/34085645199",
+    "chat": "Passed plaintext bidirectional sync, canonical routes, duplicate/epoch/project guards and seven provider DOM fixtures.",
+    "package": "Verified ZIP CRC, root manifest 3.21.7 and fixed extension identity.",
+    "dock": "Passed managed provider session registration, internal center routing and automatic host minimization.",
+    "memory": "passed",
+    "folders": "passed",
+    "privacy": "passed: no canvas JSON or tool-result blocks in bound user conversations",
+    "liveProvider": "unverified: authenticated owner sessions unavailable"
+  },
+  "publishedAt": null
+}
