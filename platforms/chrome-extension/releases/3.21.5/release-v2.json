@@ -1,0 +1,26 @@
+{
+  "schema": "osminog-release/v2",
+  "product": "OSMINOG",
+  "platform": "chrome-extension",
+  "version": "3.21.5",
+  "package": "OSMINOG-Chrome-3.21.5-NATIVE-CANVAS-PRESENCE.zip",
+  "sha256": "87a7f4e0d5b2eb01c00de00142d83d0537cc12a5d529a518b1270d9ad2cc5171",
+  "size": 4103365,
+  "manifestVersion": "3.21.5",
+  "fixedExtensionKeyRequired": true,
+  "fixedIdentitySha256": "1ddb8d87f3a6f6cb38a229bd81ba8076d1d37d3ba6b8a15b2a91129d4904012e",
+  "minDevHubVersion": "2.0.0",
+  "runtimeVerified": false,
+  "sourceRepository": "jeep-jim/OSMINOG",
+  "sourceCommit": "04e445e8c608970a2ad10d2661eff0503dcf91e9",
+  "notes": "# OSMINOG 3.21.5 — холст в оригинальных чатах\n\nПричина регрессии: кнопка Live Presence отправляла BC_EXTERNAL_CONNECT_CHATGPT, который был включён в общий запрет зеркалирования переписки. Отключение дублей заблокировало и подключение проекта.\n\nДобавлен отдельный канал BC_PRESENCE для данных текущего проекта, визуальных материалов и явных команд инструментов. Он не пересылает пользовательские сообщения или обычные ответы между оригинальным чатом и внутренней перепиской OSMINOG. Старые каналы зеркалирования остаются отключены.\n\nВ «Доступ» можно выбрать ChatGPT, Claude, Gemini, Google AI Studio или DeepSeek. Подключается уже открытая вкладка выбранного сервиса. Оригинальный чат получает актуальную карту проекта при отправке запроса; для визуального запроса добавляется выбранное изображение или рендер проекта. Модель и встроенные инструменты оригинального сайта не подменяются внутренним API OSMINOG. Снимки активной вкладки не используются для этого подключения.\n\nКоманды привязаны к вкладке, диалогу, проекту и текущему запросу. Роль просмотра не разрешает изменения и сообщения агентам. Смена проекта/диалога останавливает старые команды. Перезагрузка фонового процесса сохраняет подключение. Есть кнопка отключения; результаты инструментов не перезаписывают набираемый пользователем текст.\n\nИзображение, полученное от генератора оригинального чата в текущем запросе, может вернуться на холст при роли редактирования. Старые картинки и текст переписки не импортируются. Патчи по-прежнему проходят встроенную проверку и применение в OSMINOG.\n\nПроверки: отдельные тесты привязки/ролей/приватности/возврата изображения, Chromium-сценарии DOM пяти провайдеров, прежние проверки чата, памяти и папок. DOM-сценарии используют тестовые страницы, а не авторизованные аккаунты поставщиков. Работа в установленном браузере владельца и живая генерация остаются непроверенными: runtimeVerified=false.\n",
+  "verification": {
+    "workflow": "https://github.com/jeep-jim/OSMINOG/actions/runs/34079123374",
+    "chat": "Passed: native presence DOM fixtures for five providers, links, chat state, request binding, roles and generated image import.",
+    "package": "114/114 local source files match Git blob hashes at verified source commit; locally assembled ZIP, CRC and fixed identity verified.",
+    "memory": "passed",
+    "folders": "passed",
+    "privacy": "passed: no transcript mirroring; canvas-scoped tools only",
+    "liveGeneration": "unverified: authenticated provider sessions unavailable"
+  }
+}
