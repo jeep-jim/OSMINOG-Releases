@@ -1,0 +1,27 @@
+{
+  "schema": "osminog-release/v2",
+  "product": "OSMINOG",
+  "platform": "chrome-extension",
+  "version": "3.21.2",
+  "package": "OSMINOG-Chrome-3.21.2-FOLDERS-IMAGE-RESULTS.zip",
+  "sha256": "2fed2bc6b8203398e8c11c18ec477b1b033d054084ec6f09b7216a8f6f1f0568",
+  "size": 4104484,
+  "manifestVersion": "3.21.2",
+  "fixedExtensionKeyRequired": true,
+  "fixedIdentitySha256": "1ddb8d87f3a6f6cb38a229bd81ba8076d1d37d3ba6b8a15b2a91129d4904012e",
+  "minDevHubVersion": "2.0.0",
+  "runtimeVerified": false,
+  "sourceRepository": "jeep-jim/OSMINOG",
+  "sourceCommit": "b362f628a0a07f924730e57ea1863e1d0cb274cf",
+  "sourcePullRequest": "https://github.com/jeep-jim/OSMINOG/pull/15",
+  "notes": "OSMINOG 3.21.2: перенос в папки холста убирает объекты со стола без дублей, очищает выделение и скрывает связи. Содержимое папок не удаляется вместе с оставшимися объектами стола. Проверены восемь типов объектов, перенос между папками, возврат, Undo/Redo и сохранение после перезагрузки. Для генерации добавлены отдельный запрос с референсом, обработка изображений от инструмента, файловых указателей и SSE-изменений; сохраняется конкретная ошибка получения файла. Все 3 CI прошли. Живая генерация в установленном Chrome пользователя не проверена; runtimeVerified=false.",
+  "verification": {
+    "workflow": "https://github.com/jeep-jim/OSMINOG/actions/runs/34069331446",
+    "browser": "https://github.com/jeep-jim/OSMINOG/actions/runs/34069331523",
+    "animation": "passed",
+    "privacy": "passed",
+    "folders": "Pointer drag; 8 object types; batch move; no duplicates; delete isolation; folder-to-folder; restore; undo/redo; migration; reload",
+    "media": "Tool images; file pointers; SSE deltas; returned-ID download; uploaded reference exclusion; isolated generation prompt; import errors",
+    "liveGeneration": "unverified"
+  }
+}
