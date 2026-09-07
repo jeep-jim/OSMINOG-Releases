@@ -1,0 +1,30 @@
+{
+  "schema": "osminog-release/v2",
+  "product": "OSMINOG",
+  "platform": "chrome-extension",
+  "version": "3.21.3",
+  "package": "OSMINOG-Chrome-3.21.3-CHAT-CLEAR-STREAM.zip",
+  "sha256": "8fbd21c5d590a0a2c198e59ce31f7ddc21bb6dd05525735eae618314afa982f2",
+  "size": 4108869,
+  "manifestVersion": "3.21.3",
+  "fixedExtensionKeyRequired": true,
+  "fixedIdentitySha256": "1ddb8d87f3a6f6cb38a229bd81ba8076d1d37d3ba6b8a15b2a91129d4904012e",
+  "minDevHubVersion": "2.0.0",
+  "runtimeVerified": false,
+  "sourceRepository": "jeep-jim/OSMINOG",
+  "sourceCommit": "68ed8c146f98c8e4b94a6434487307c6aaf34d19",
+  "sourcePullRequest": "https://github.com/jeep-jim/OSMINOG/pull/16",
+  "notes": "OSMINOG 3.21.3: в настройках добавлена очистка переписки с подтверждением. Удаляются сообщения и вложения текущего чата, сбрасывается его контекст, поздние ответы отбрасываются. Объекты холста, другие чаты и подключения сохраняются. Старые сообщения не возвращаются из резервной копии. Главный чат и личные агенты показывают текст direct ChatGPT по мере получения. Проверены очистка во время ответа, ввод текста, новый диалог, перезагрузка, папки, графика и документы. Живой провайдер и генерация изображения в профиле владельца не проверены; runtimeVerified=false.",
+  "verification": {
+    "workflow": "https://github.com/jeep-jim/OSMINOG/actions/runs/34073491139",
+    "browser": "https://github.com/jeep-jim/OSMINOG/actions/runs/34073491172",
+    "chat": "400 messages; confirmation cancel/accept; streaming before EOF; cleanup during response; late reply discarded; fresh context; reload; canvas and other chat preserved",
+    "memory": "Bidirectional merge honors clear marker including legacy history; project-scoped reset",
+    "package": "111/111 package files match verified source tree",
+    "folders": "passed",
+    "graphics": "passed",
+    "documents": "passed",
+    "privacy": "passed",
+    "liveGeneration": "unverified"
+  }
+}
