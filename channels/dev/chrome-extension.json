@@ -5,20 +5,20 @@
     "product": "OSMINOG",
     "platform": "chrome-extension",
     "channel": "dev",
-    "generatedAt": "2026-09-07T01:38:40Z",
+    "generatedAt": "2026-09-07T02:39:25Z",
     "status": "active",
     "latest": {
-      "version": "3.21.3",
+      "version": "3.21.4",
       "kind": "full-package",
-      "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/chrome-v3.21.3/OSMINOG-Chrome-3.21.3-CHAT-CLEAR-STREAM.zip",
-      "size": 4108869,
-      "sha256": "8fbd21c5d590a0a2c198e59ce31f7ddc21bb6dd05525735eae618314afa982f2",
-      "manifestVersion": "3.21.3",
+      "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/chrome-v3.21.4/OSMINOG-Chrome-3.21.4-LINKS-IMAGE-INTENT.zip",
+      "size": 4093376,
+      "sha256": "b34f4d42898d82ca3243b480f46be7d0386022080a01bf3f6867558a8e58fc70",
+      "manifestVersion": "3.21.4",
       "fixedExtensionKeyRequired": true,
       "minDevHubVersion": "2.0.0",
       "runtimeVerified": false,
-      "notesUrl": "https://raw.githubusercontent.com/jeep-jim/OSMINOG-Releases/main/platforms/chrome-extension/releases/3.21.3/README.md",
-      "publishedAt": "2026-09-07T01:38:40Z"
+      "notesUrl": "https://raw.githubusercontent.com/jeep-jim/OSMINOG-Releases/main/platforms/chrome-extension/releases/3.21.4/README.md",
+      "publishedAt": "2026-09-07T02:39:25Z"
     }
   },
   "signature": null
