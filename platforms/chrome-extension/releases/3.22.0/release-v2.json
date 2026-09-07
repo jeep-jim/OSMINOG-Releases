@@ -1,0 +1,16 @@
+{
+  "schema": "osminog-release/v2",
+  "product": "OSMINOG",
+  "platform": "chrome-extension",
+  "version": "3.22.0",
+  "package": "OSMINOG-Chrome-3.22.0-SCOPED-CANVAS-MEDIA.zip",
+  "size": 4129049,
+  "sha256": "7183f3853ccab618486e18c106095c21731db486967704f7a4f3696620ed446d",
+  "manifestVersion": "3.22.0",
+  "fixedExtensionKeyRequired": true,
+  "minDevHubVersion": "2.0.0",
+  "runtimeVerified": false,
+  "sourceCommit": "ce497cfcb04a0d5ebcd1489b7e3f0d9552a79f57",
+  "verificationUrl": "https://github.com/jeep-jim/OSMINOG/actions/runs/34112549996",
+  "notes": "Исправлены повторяющиеся блоки контекста и автоматические скриншоты при подключенном чате. Полное содержимое холста запрашивается отдельно. Исправлен импорт изображений из повторно используемого контейнера ответа; временные ошибки повторяются до трёх попыток. Все CI-проверки прошли, включая браузерные сценарии пяти провайдеров. Совместимость с авторизованными сервисами изображений в живом чате отдельно не подтверждена. Это ремонтный релиз внешнего AI-моста; пять новых рабочих сценариев остаются в roadmap."
+}
