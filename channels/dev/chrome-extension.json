@@ -5,20 +5,20 @@
     "product": "OSMINOG",
     "platform": "chrome-extension",
     "channel": "dev",
-    "generatedAt": "2026-09-26T06:34:59Z",
+    "generatedAt": "2026-09-26T06:48:03Z",
     "status": "active",
     "latest": {
-      "version": "4.0.5",
+      "version": "4.0.6",
       "kind": "full-package",
-      "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/chrome-v4.0.5/OSMINOG-Chrome-4.0.5-PHOTO-FIX.zip",
-      "size": 4154080,
-      "sha256": "4997b8e93c765545b4e15986458ce53dffbb85f12c87e1abed9aebbb698121a2",
-      "manifestVersion": "4.0.5",
+      "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/chrome-v4.0.6/OSMINOG-Chrome-4.0.6-OWNER-ACCESS.zip",
+      "size": 4154929,
+      "sha256": "519e41d6d2a1e89837b61fd8fdbe1764bdb2082f497b557e5deb6e3002312ba0",
+      "manifestVersion": "4.0.6",
       "fixedExtensionKeyRequired": true,
       "minDevHubVersion": "2.0.0",
       "runtimeVerified": false,
-      "notesUrl": "https://raw.githubusercontent.com/jeep-jim/OSMINOG-Releases/main/platforms/chrome-extension/releases/4.0.5/README.md",
-      "publishedAt": "2026-09-26T06:34:59Z"
+      "notesUrl": "https://raw.githubusercontent.com/jeep-jim/OSMINOG-Releases/main/platforms/chrome-extension/releases/4.0.6/README.md",
+      "publishedAt": "2026-09-26T06:48:03Z"
     }
   },
   "signature": null
