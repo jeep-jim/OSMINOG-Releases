@@ -1,0 +1,16 @@
+{
+  "schema": "osminog-release/v2",
+  "product": "OSMINOG",
+  "platform": "chrome-extension",
+  "version": "4.0.6",
+  "package": "OSMINOG-Chrome-4.0.6-OWNER-ACCESS.zip",
+  "size": 4154929,
+  "sha256": "519e41d6d2a1e89837b61fd8fdbe1764bdb2082f497b557e5deb6e3002312ba0",
+  "manifestVersion": "4.0.6",
+  "fixedExtensionKeyRequired": true,
+  "minDevHubVersion": "2.0.0",
+  "runtimeVerified": false,
+  "sourceCommit": "63eed5d7538e797d7d43010d2edb8f3990250ba8",
+  "verificationUrl": "https://github.com/jeep-jim/OSMINOG/actions/runs/36224640539",
+  "notes": "# OSMINOG 4.0.6 — Owner Access\n\nПостоянная карточка «Подтверждение владельца» в разделе «Доступ». Открывает существующее окно Google Authenticator; показывает состояние и позволяет закрыть доступ. Срок подтверждения остаётся 15 минут в текущей вкладке. Проверка кода, первый вход и ограничения исходников сохранены.\n\nЭто доступ к изменению самого OSMINOG и его репозиториев, а не включатель фотографий или генерации. Исправление команд фотографий 4.0.5 сохранено. Реальный отказ провайдера у пользователя этим изменением не считается диагностированным или исправленным.\n"
+}
