@@ -5,20 +5,20 @@
     "product": "OSMINOG",
     "platform": "chrome-extension",
     "channel": "dev",
-    "generatedAt": "2026-09-26T02:00:22Z",
+    "generatedAt": "2026-09-26T03:52:24Z",
     "status": "active",
     "latest": {
-      "version": "4.0.0",
+      "version": "4.0.1",
       "kind": "full-package",
-      "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/chrome-v4.0.0/OSMINOG-Chrome-4.0.0-SHARED-BOARD.zip",
-      "size": 4141641,
-      "sha256": "8038725da681de18373deee5c799d889157f3ebb7352470c3145823c09e837b0",
-      "manifestVersion": "4.0.0",
+      "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/chrome-v4.0.1/OSMINOG-Chrome-4.0.1-HEADER-TOOLS.zip",
+      "size": 4143025,
+      "sha256": "052b9c9e2640da75b8ed50727623216ef99b828ef1abcced2709b862cb096b58",
+      "manifestVersion": "4.0.1",
       "fixedExtensionKeyRequired": true,
       "minDevHubVersion": "2.0.0",
       "runtimeVerified": false,
-      "notesUrl": "https://raw.githubusercontent.com/jeep-jim/OSMINOG-Releases/main/platforms/chrome-extension/releases/4.0.0/README.md",
-      "publishedAt": "2026-09-26T02:00:22Z"
+      "notesUrl": "https://raw.githubusercontent.com/jeep-jim/OSMINOG-Releases/main/platforms/chrome-extension/releases/4.0.1/README.md",
+      "publishedAt": "2026-09-26T03:52:24Z"
     }
   },
   "signature": null
