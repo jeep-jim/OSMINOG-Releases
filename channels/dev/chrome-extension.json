@@ -5,20 +5,20 @@
     "product": "OSMINOG",
     "platform": "chrome-extension",
     "channel": "dev",
-    "generatedAt": "2026-09-26T03:52:40Z",
+    "generatedAt": "2026-09-26T04:25:35Z",
     "status": "active",
     "latest": {
-      "version": "4.0.1",
+      "version": "4.0.2",
       "kind": "full-package",
-      "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/chrome-v4.0.1/OSMINOG-Chrome-4.0.1-HEADER-TOOLS.zip",
-      "size": 4143025,
-      "sha256": "052b9c9e2640da75b8ed50727623216ef99b828ef1abcced2709b862cb096b58",
-      "manifestVersion": "4.0.1",
+      "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/chrome-v4.0.2/OSMINOG-Chrome-4.0.2-VISUAL-RUNTIME.zip",
+      "size": 4144099,
+      "sha256": "a49f570f6bd52c207b0d126cec7dde9154eee1c76d5a77d78a7b1402cf22eaf2",
+      "manifestVersion": "4.0.2",
       "fixedExtensionKeyRequired": true,
       "minDevHubVersion": "2.0.0",
       "runtimeVerified": false,
-      "notesUrl": "https://raw.githubusercontent.com/jeep-jim/OSMINOG-Releases/main/platforms/chrome-extension/releases/4.0.1/README.md",
-      "publishedAt": "2026-09-26T03:52:40Z"
+      "notesUrl": "https://raw.githubusercontent.com/jeep-jim/OSMINOG-Releases/main/platforms/chrome-extension/releases/4.0.2/README.md",
+      "publishedAt": "2026-09-26T04:25:35Z"
     }
   },
   "signature": null
