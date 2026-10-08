@@ -5,20 +5,20 @@
     "product": "OSMINOG",
     "platform": "chrome-extension",
     "channel": "dev",
-    "generatedAt": "2026-10-06T02:44:49Z",
+    "generatedAt": "2026-10-08T04:45:28Z",
     "status": "active",
     "latest": {
-      "version": "4.0.7",
+      "version": "4.0.8",
       "kind": "full-package",
-      "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/chrome-v4.0.7/OSMINOG-Chrome-4.0.7-SCREENSHOT-CLIPBOARD.zip",
-      "size": 4155929,
-      "sha256": "b7db31e77790dd14c360658eda8d00e28d05e9e5d3a3b3ce0868de3c2deee253",
-      "manifestVersion": "4.0.7",
+      "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/chrome-v4.0.8/OSMINOG-Chrome-4.0.8-CANVAS-FOCUS.zip",
+      "size": 4148384,
+      "sha256": "84f3fd42a700e712b4c2fc303b50795757655266f3fad65084461039c2287cb1",
+      "manifestVersion": "4.0.8",
       "fixedExtensionKeyRequired": true,
       "minDevHubVersion": "2.0.0",
       "runtimeVerified": false,
-      "notesUrl": "https://raw.githubusercontent.com/jeep-jim/OSMINOG-Releases/main/platforms/chrome-extension/releases/4.0.7/README.md",
-      "publishedAt": "2026-10-06T02:44:49Z"
+      "notesUrl": "https://raw.githubusercontent.com/jeep-jim/OSMINOG-Releases/main/platforms/chrome-extension/releases/4.0.8/README.md",
+      "publishedAt": "2026-10-08T04:45:28Z"
     }
   },
   "signature": null
