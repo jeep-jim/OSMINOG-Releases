@@ -5,3 +5,4 @@ Baseline SHA-256 verified. All four overlay transfer parts match their local Git
 Reconstruction script passed locally: 124 extracted files byte-identical to the successful 4.0.8 CI package.
 Content digest: 1da18669e7b289a319aff76433d09fcac4dfa9612a6e1dce18b1fcdecfb645a2
 The existing publisher must verify the remote full-package asset before advancing the dev feed.
+Publication activation 2: resolve the changed marker through git diff-tree.
