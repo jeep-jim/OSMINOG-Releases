@@ -1,0 +1,83 @@
+name: Prepare verified Chrome overlay for one-click update
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'staging/chrome-extension/*/REBUILD-READY'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Version with a reviewed reconstruct.json and overlay parts
+        required: true
+        type: string
+
+permissions:
+  contents: write
+  actions: write
+
+concurrency:
+  group: osminog-chrome-registry-v2
+  cancel-in-progress: false
+
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      GH_TOKEN: ${{ github.token }}
+      REQUESTED_VERSION: ${{ inputs.version || '' }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 1
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Resolve explicitly requested version
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json, os, re
+          event = json.load(open(os.environ['GITHUB_EVENT_PATH']))
+          requested = os.environ.get('REQUESTED_VERSION', '')
+          if not requested:
+              paths = set()
+              for commit in event.get('commits', []) + [event.get('head_commit') or {}]:
+                  paths.update(commit.get('added', []))
+                  paths.update(commit.get('modified', []))
+              versions = {match.group(1) for path in paths if (match := re.fullmatch(r'staging/chrome-extension/(\d+(?:\.\d+){2,3})/REBUILD-READY', path))}
+              if len(versions) != 1:
+                  raise SystemExit('Exactly one release marker must be changed')
+              requested = versions.pop()
+          if not re.fullmatch(r'\d+(?:\.\d+){2,3}', requested):
+              raise SystemExit('Invalid release version')
+          with open(os.environ['GITHUB_ENV'], 'a') as out:
+              out.write('RELEASE_VERSION=' + requested + '\n')
+          PY
+      - name: Reconstruct and verify every file against the tested CI build
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat "staging/chrome-extension/$RELEASE_VERSION/parts/"overlay-*.b64 > "staging/chrome-extension/$RELEASE_VERSION/overlay.patch.gz.b64"
+          python3 tools/reconstruct_chrome_overlay.py "$RELEASE_VERSION"
+      - name: Archive verified complete package and release metadata
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add "platforms/chrome-extension/releases/$RELEASE_VERSION/"
+          if ! git diff --cached --quiet; then
+            git commit -m "Archive verified OSMINOG Chrome $RELEASE_VERSION full package [skip ci]"
+            git push origin HEAD:main
+          fi
+      - name: Use the existing publisher to verify the remote asset and advance the dev feed
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh workflow run publish-chrome-package-v2.yml --ref main -f "version=$RELEASE_VERSION"
+          echo "Full package verified; existing publisher requested for $RELEASE_VERSION"
+          echo "The feed is not changed by this preparation job. Publication must finish successfully."
