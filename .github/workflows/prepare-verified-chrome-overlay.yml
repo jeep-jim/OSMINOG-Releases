@@ -30,8 +30,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: main
-          fetch-depth: 1
+          ref: ${{ github.sha }}
+          fetch-depth: 2
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
@@ -40,14 +40,11 @@ jobs:
         run: |
           set -euo pipefail
           python3 - <<'PY'
-          import json, os, re
-          event = json.load(open(os.environ['GITHUB_EVENT_PATH']))
+          import os, re, subprocess
           requested = os.environ.get('REQUESTED_VERSION', '')
           if not requested:
-              paths = set()
-              for commit in event.get('commits', []) + [event.get('head_commit') or {}]:
-                  paths.update(commit.get('added', []))
-                  paths.update(commit.get('modified', []))
+              # Actions intentionally omits added/modified paths from the push payload.
+              paths = subprocess.check_output(['git', 'diff-tree', '--no-commit-id', '--name-only', '-r', 'HEAD'], text=True).splitlines()
               versions = {match.group(1) for path in paths if (match := re.fullmatch(r'staging/chrome-extension/(\d+(?:\.\d+){2,3})/REBUILD-READY', path))}
               if len(versions) != 1:
                   raise SystemExit('Exactly one release marker must be changed')
