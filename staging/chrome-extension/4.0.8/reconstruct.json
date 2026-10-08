@@ -1,0 +1,26 @@
+{
+  "schema": "osminog-verified-overlay/v1",
+  "version": "4.0.8",
+  "baseVersion": "4.0.7",
+  "baseSha256": "b7db31e77790dd14c360658eda8d00e28d05e9e5d3a3b3ce0868de3c2deee253",
+  "patchSha256": "9cbf30e104d4b6ac974e925fa1d5d3313195c449a405627fa483129bd7f655ca",
+  "contentSha256": "1da18669e7b289a319aff76433d09fcac4dfa9612a6e1dce18b1fcdecfb645a2",
+  "fileCount": 124,
+  "fixedIdentitySha256": "1ddb8d87f3a6f6cb38a229bd81ba8076d1d37d3ba6b8a15b2a91129d4904012e",
+  "release": {
+    "schema": "osminog-release/v2",
+    "product": "OSMINOG",
+    "platform": "chrome-extension",
+    "version": "4.0.8",
+    "package": "OSMINOG-Chrome-4.0.8-CANVAS-FOCUS.zip",
+    "manifestVersion": "4.0.8",
+    "fixedExtensionKeyRequired": true,
+    "minDevHubVersion": "2.0.0",
+    "runtimeVerified": false,
+    "sourceCommit": "bbd2abb5aac7f9388bb3ceb8395a5e500df6e600",
+    "mergedSourceCommit": "b6d0e851219a9093839158657a9acc1e622ac119",
+    "verificationUrl": "https://github.com/jeep-jim/OSMINOG/actions/runs/37726977016",
+    "additionalVerificationUrl": "https://github.com/jeep-jim/OSMINOG/actions/runs/37726976999",
+    "notes": "# OSMINOG 4.0.8 — чистый холст и прямой ввод текста\n\nОбновление через существующую кнопку: нажмите версию в шапке OSMINOG → «Обновить сейчас». Вручную скачивать архив, распаковывать файлы или удалять расширение не требуется.\n\n- Ctrl + \\ скрывает интерфейс; повторное нажатие возвращает панели.\n- T → клик по доске → сразу ввод текста; настройки справа.\n- Нижняя плавающая панель рисования, SVG-иконки, точки активного инструмента.\n- Масштаб 0,5–800%, расширенная плоскость доски.\n- Ластик штрихов, отмена и повтор.\n\nФормат досок, идентификатор расширения, разрешения и связь с ИИ сохранены. Проверенная сборка: 23 сценария Canvas UX и прежние регрессии в GitHub Actions."
+  }
+}
