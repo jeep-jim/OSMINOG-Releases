@@ -1,0 +1,9 @@
+4.0.9
+
+Owner requested delivery through the existing in-browser update button.
+Verified source: ba777727c9e69f1ee85f919a461e4fa38409c608; merged PR22 a8e840ca4345d4639cebceea6555c8fc4ab30113.
+All 124 reconstructed files equal the successful CI artifact from run 37907493542.
+Content SHA256: 709104a1d1d57ec822727ddd557812ad38f28918432695dc2ce5d81dd94ec388
+Expected deterministic full ZIP: 4152473 bytes; aec05d010ff058c6d807cc4700eadb3c5ced36c502e2b2560098ed7720835886.
+All 14 staged parts verified by Git blob SHA; fixed identity and permissions retained.
+Use the existing publisher; advance the feed only after remote asset verification.
