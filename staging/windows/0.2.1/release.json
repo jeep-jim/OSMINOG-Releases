@@ -1,10 +1,10 @@
 {
-  "appId": "com.osminog.desktop.preview",
-  "source": "e96cfaf8663484dac2390779335e883d6ae67eb3",
-  "builder": "26.15.3",
   "version": "0.2.1",
+  "appId": "com.osminog.desktop.preview",
   "electron": "44.5.0",
+  "source": "e8f68c2f20b8153cc21f7b9905deb844189c8703",
   "productName": "OSMINOG Preview",
-  "sha256": "b1d709e95ee56440badd19f63411196cdf3e48768ecd5f64c99948633745fb20",
-  "size": 4719908
+  "builder": "26.15.3",
+  "sha256": "d31221ad18d8dab223f8c20ae75862d4b057d1068388230f7db869ad0875fd14",
+  "size": 4720115
 }
