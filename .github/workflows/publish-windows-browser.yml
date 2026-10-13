@@ -1,0 +1,43 @@
+name: Build and publish verified Windows browser
+on:
+  push:
+    branches: [main]
+    paths: ['staging/windows/**/ASSEMBLE']
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: osminog-windows-release
+  cancel-in-progress: false
+jobs:
+  windows:
+    runs-on: windows-latest
+    timeout-minutes: 30
+    env:
+      GH_TOKEN: ${{ github.token }}
+      CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Assemble installer from the verified packaged runtime
+        shell: pwsh
+        run: ./tools/assemble-windows.ps1
+      - name: Verify real installed upgrade and retained local data
+        shell: pwsh
+        run: ./tools/test-windows-update.ps1
+      - name: Publish immutable installer, then advance Windows feed
+        shell: pwsh
+        run: ./tools/publish-windows.ps1
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: windows-release-verification
+          path: |
+            windows-build/*.log
+            windows-build/*.png
+            windows-build/dist/*.exe
+            windows-build/dist/*.yml
+            windows-build/dist/*.blockmap
+          retention-days: 14
