@@ -25,7 +25,8 @@ if ($LASTEXITCODE -ne 0) {
 gh release upload windows-preview (Join-Path $work 'latest.yml') --repo $repo --clobber
 if ($LASTEXITCODE -ne 0) { throw 'Update feed publication failed' }
 $feed=Invoke-WebRequest "https://github.com/$repo/releases/download/windows-preview/latest.yml"
-if (-not $feed.Content.Contains($url)) { throw 'Published updater feed does not reference the verified installer' }
+$feedText=if ($feed.Content -is [byte[]]) { [Text.Encoding]::UTF8.GetString($feed.Content) } else { [string]$feed.Content }
+if (-not $feedText.Contains($url)) { throw 'Published updater feed does not reference the verified installer' }
 $record=@{schema='osminog-update-feed/v2';product='OSMINOG';platform='windows';channel='dev';generatedAt=[DateTime]::UtcNow.ToString('o');status='active';latest=@{version=$version;packageName=$exe.Name;packageUrl=$url;sha256=$sha;size=$exe.Length;sourceCommit=$meta.source;notes=$notes}}
 $record | ConvertTo-Json -Depth 10 | Set-Content channels/dev/windows.json
 $releaseDir="platforms/windows/releases/$version";New-Item -ItemType Directory $releaseDir -Force | Out-Null
