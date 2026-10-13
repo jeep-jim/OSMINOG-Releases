@@ -1,21 +1,21 @@
 {
-  "channel": "dev",
-  "product": "OSMINOG",
   "status": "active",
   "latest": {
-    "size": 115169848,
     "kind": "full-package",
-    "sourceCommit": "43162321e0c945feff9aefddccd80b3cc817ea21",
-    "sha256": "0063056609312464f67101a32c9eeb189ab9822db26bd9288fedf7fc9f404e79",
+    "notes": "OSMINOG Windows Preview 0.3.1\n\nЕдиное рабочее пространство\n• Адрес внутри каждой области, иконки сайтов и прокручиваемая лента вкладок.\n• Холст, сайты и оригинальные чаты работают в одной оболочке.\n\nОформление и удобство\n• Светлая, тёмная и океанская темы. Отдельная палитра из восьми настраиваемых цветов.\n• Возвращено меню проекта, слоёв и файлов. Выделение активной области.\n\nСвойства и файлы\n• Панель свойств текущего инструмента или объекта в новой оболочке.\n• «Сохранить как…»: оригинал выбранного локального файла, PNG, SVG, PDF, HTML, MD, TXT и CSV. Имя и папка выбираются перед сохранением.\n\nСтабильность\n• Загрузка страниц больше не пересоздаёт сетку и холст.\n• Запоздавший ответ прежнего чата не переключает проект.\n\nКонтекст ИИ\n• По включению: свежий текст вкладок и холста для ChatGPT, Claude, Gemini и DeepSeek.\n• Другие чаты включаются отдельно. Кнопка остановки ответов.\n\nУправление вкладкой · экспериментально\n• Выберите оригинальный чат и задачу. ИИ получает снимок выбранной страницы.\n• Просмотр плана перед кликами, вводом и перетаскиваниями. Продолжение по свежему снимку и Стоп.\n• Совместимость конкретного сайта и модели требует проверки; это не обещание полной автоматизации Figma.\n\nОбновления\n• Описание версии, процент, объём и скорость загрузки.\n• Отдельная кнопка перезапуска после проверки установщика.\n\nПодключение\n• Системная сеть, прямое подключение или собственный HTTP/SOCKS5-прокси.\n• Встроенного VPN-сервера нет; вход в реальные аккаунты зависит от доступности сервиса.\n\nUnsigned preview. Source 79700fda156fc8e81de9c251c32b67c48759eb50. Windows tests cover installed paths, native panes, fixture provider replies, native input and canvas drag. Live provider accounts and Figma are not certified by fixture tests. SHA-256: 1e4523a2c9b520e9c3f9c0b6a9545e5ee11d8ddcc651a94a7b313dd9e353f4c6",
+    "publishedAt": "2026-10-13T19:59:29Z",
     "minDevHubVersion": "0.0.0",
-    "packageName": "OSMINOG-Preview-0.3.0-x64.exe",
-    "version": "0.3.0",
-    "manifestVersion": "0.3.0",
-    "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/windows-v0.3.0/OSMINOG-Preview-0.3.0-x64.exe",
-    "notes": "OSMINOG Windows Preview 0.3.0. Local native browser, canvas and provider DOM adapter. Unsigned preview. Source 43162321e0c945feff9aefddccd80b3cc817ea21. Windows tests cover installed paths, native panes, fixture provider replies and a real N -> N+1 update preserving a project and browser cookie. Live provider accounts are not certified by fixture tests. SHA-256: 0063056609312464f67101a32c9eeb189ab9822db26bd9288fedf7fc9f404e79",
-    "publishedAt": "2026-10-13T17:10:10Z"
+    "version": "0.3.1",
+    "manifestVersion": "0.3.1",
+    "sha256": "1e4523a2c9b520e9c3f9c0b6a9545e5ee11d8ddcc651a94a7b313dd9e353f4c6",
+    "sourceCommit": "79700fda156fc8e81de9c251c32b67c48759eb50",
+    "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/windows-v0.3.1/OSMINOG-Preview-0.3.1-x64.exe",
+    "size": 115188448,
+    "packageName": "OSMINOG-Preview-0.3.1-x64.exe"
   },
-  "platform": "windows",
+  "product": "OSMINOG",
+  "generatedAt": "2026-10-13T19:59:33.4249417Z",
   "schema": "osminog-update-feed/v2",
-  "generatedAt": "2026-10-13T17:10:13.2726250Z"
+  "channel": "dev",
+  "platform": "windows"
 }
