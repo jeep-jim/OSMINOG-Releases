@@ -1,0 +1,10 @@
+{
+  "appId": "com.osminog.desktop.preview",
+  "source": "e96cfaf8663484dac2390779335e883d6ae67eb3",
+  "builder": "26.15.3",
+  "version": "0.2.1",
+  "electron": "44.5.0",
+  "productName": "OSMINOG Preview",
+  "sha256": "b1d709e95ee56440badd19f63411196cdf3e48768ecd5f64c99948633745fb20",
+  "size": 4719908
+}
