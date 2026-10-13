@@ -1,21 +1,21 @@
 {
-  "status": "active",
-  "generatedAt": "2026-10-13T16:35:47.2100700Z",
-  "latest": {
-    "sourceCommit": "e8f68c2f20b8153cc21f7b9905deb844189c8703",
-    "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/windows-v0.2.1/OSMINOG-Preview-0.2.1-x64.exe",
-    "version": "0.2.1",
-    "sha256": "f06c9eec4da536afa0010587ea0c5269d7e22b8bc78952c9de9e2ce002169928",
-    "packageName": "OSMINOG-Preview-0.2.1-x64.exe",
-    "size": 115159713,
-    "notes": "OSMINOG Windows Preview 0.2.1. Local native browser, canvas and provider DOM adapter. Unsigned preview. Source e8f68c2f20b8153cc21f7b9905deb844189c8703. Windows tests cover installed paths, native panes, fixture provider replies and a real N -> N+1 update preserving a project and browser cookie. Live provider accounts are not certified by fixture tests. SHA-256: f06c9eec4da536afa0010587ea0c5269d7e22b8bc78952c9de9e2ce002169928",
-    "kind": "full-package",
-    "manifestVersion": "0.2.1",
-    "minDevHubVersion": "0.0.0",
-    "publishedAt": "2026-10-13T16:35:43Z"
-  },
   "channel": "dev",
   "product": "OSMINOG",
+  "status": "active",
+  "latest": {
+    "size": 115169848,
+    "kind": "full-package",
+    "sourceCommit": "43162321e0c945feff9aefddccd80b3cc817ea21",
+    "sha256": "0063056609312464f67101a32c9eeb189ab9822db26bd9288fedf7fc9f404e79",
+    "minDevHubVersion": "0.0.0",
+    "packageName": "OSMINOG-Preview-0.3.0-x64.exe",
+    "version": "0.3.0",
+    "manifestVersion": "0.3.0",
+    "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/windows-v0.3.0/OSMINOG-Preview-0.3.0-x64.exe",
+    "notes": "OSMINOG Windows Preview 0.3.0. Local native browser, canvas and provider DOM adapter. Unsigned preview. Source 43162321e0c945feff9aefddccd80b3cc817ea21. Windows tests cover installed paths, native panes, fixture provider replies and a real N -> N+1 update preserving a project and browser cookie. Live provider accounts are not certified by fixture tests. SHA-256: 0063056609312464f67101a32c9eeb189ab9822db26bd9288fedf7fc9f404e79",
+    "publishedAt": "2026-10-13T17:10:10Z"
+  },
   "platform": "windows",
-  "schema": "osminog-update-feed/v2"
+  "schema": "osminog-update-feed/v2",
+  "generatedAt": "2026-10-13T17:10:13.2726250Z"
 }
