@@ -31,7 +31,8 @@ const fs=require('node:fs');const asar=require('@electron/asar');
    if ($server.HasExited) { Get-Content update-server-errors.log; throw 'Update fixture server exited before readiness' }
    try {
     $probe = Invoke-WebRequest 'http://127.0.0.1:18891/latest.yml' -TimeoutSec 2
-    if ($probe.StatusCode -eq 200 -and [string]$probe.Content -match [regex]::Escape($nextVersion)) { $serverReady = $true; break }
+    $probeText = if ($probe.Content -is [byte[]]) { [Text.Encoding]::UTF8.GetString($probe.Content) } else { [string]$probe.Content }
+    if ($probe.StatusCode -eq 200 -and $probeText -match [regex]::Escape($nextVersion)) { $serverReady = $true; break }
    } catch { }
    Start-Sleep -Milliseconds 200
   } while ((Get-Date) -lt $serverDeadline)
