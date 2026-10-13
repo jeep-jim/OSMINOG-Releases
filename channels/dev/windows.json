@@ -8,7 +8,11 @@
     "sha256": "f06c9eec4da536afa0010587ea0c5269d7e22b8bc78952c9de9e2ce002169928",
     "packageName": "OSMINOG-Preview-0.2.1-x64.exe",
     "size": 115159713,
-    "notes": "OSMINOG Windows Preview 0.2.1. Local native browser, canvas and provider DOM adapter. Unsigned preview. Source e8f68c2f20b8153cc21f7b9905deb844189c8703. Windows tests cover installed paths, native panes, fixture provider replies and a real N -> N+1 update preserving a project and browser cookie. Live provider accounts are not certified by fixture tests. SHA-256: f06c9eec4da536afa0010587ea0c5269d7e22b8bc78952c9de9e2ce002169928"
+    "notes": "OSMINOG Windows Preview 0.2.1. Local native browser, canvas and provider DOM adapter. Unsigned preview. Source e8f68c2f20b8153cc21f7b9905deb844189c8703. Windows tests cover installed paths, native panes, fixture provider replies and a real N -> N+1 update preserving a project and browser cookie. Live provider accounts are not certified by fixture tests. SHA-256: f06c9eec4da536afa0010587ea0c5269d7e22b8bc78952c9de9e2ce002169928",
+    "kind": "full-package",
+    "manifestVersion": "0.2.1",
+    "minDevHubVersion": "0.0.0",
+    "publishedAt": "2026-10-13T16:35:43Z"
   },
   "channel": "dev",
   "product": "OSMINOG",

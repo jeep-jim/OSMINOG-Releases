@@ -24,6 +24,18 @@ const fs=require('node:fs');const asar=require('@electron/asar');
  # Python serves the full checked installer to the real electron-updater.
  $server=Start-Process python -ArgumentList '-m','http.server','18891','--bind','127.0.0.1','--directory','next-dist' -PassThru -RedirectStandardOutput update-server.log -RedirectStandardError update-server-errors.log
  try {
+  # The HTTP fixture must be accepting requests before Electron checks its feed.
+  $serverReady = $false
+  $serverDeadline = (Get-Date).AddSeconds(30)
+  do {
+   if ($server.HasExited) { Get-Content update-server-errors.log; throw 'Update fixture server exited before readiness' }
+   try {
+    $probe = Invoke-WebRequest 'http://127.0.0.1:18891/latest.yml' -TimeoutSec 2
+    if ($probe.StatusCode -eq 200 -and [string]$probe.Content -match [regex]::Escape($nextVersion)) { $serverReady = $true; break }
+   } catch { }
+   Start-Sleep -Milliseconds 200
+  } while ((Get-Date) -lt $serverDeadline)
+  if (-not $serverReady) { Get-Content update-server-errors.log; throw 'Update fixture feed did not become ready' }
   $p=Start-Process $exe -ArgumentList '--update-smoke','--test-feed=http://127.0.0.1:18891/' -PassThru -RedirectStandardOutput update.log -RedirectStandardError update-errors.log
   if (-not $p.WaitForExit(120000)) { $p.Kill(); throw 'Update button path timed out' }
   Get-Content update.log; Get-Content update-errors.log
