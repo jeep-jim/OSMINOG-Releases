@@ -1,0 +1,10 @@
+{
+  "builder": "26.15.3",
+  "source": "43162321e0c945feff9aefddccd80b3cc817ea21",
+  "electron": "44.5.0",
+  "version": "0.3.0",
+  "appId": "com.osminog.desktop.preview",
+  "productName": "OSMINOG Preview",
+  "sha256": "c0027d50d878ab297ccfdfc6a9c2c50d059207a260112c59610dee5587106b35",
+  "size": 4731132
+}
