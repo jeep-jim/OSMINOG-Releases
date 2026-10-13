@@ -5,7 +5,7 @@ $version=$meta.version;$tag="windows-v$version";$repo=$env:GITHUB_REPOSITORY
 $exe=Get-ChildItem (Join-Path $work 'dist/*.exe') | Select-Object -First 1
 $block=Get-ChildItem (Join-Path $work 'dist/*.blockmap') | Select-Object -First 1
 $sha=(Get-FileHash $exe.FullName -Algorithm SHA256).Hash.ToLower();$url="https://github.com/$repo/releases/download/$tag/$($exe.Name)"
-$notes="OSMINOG Windows Preview $version. Local native browser, canvas and provider DOM adapter. Unsigned preview. Source $($meta.source). Windows tests cover installed paths, native panes, fixture provider replies and a real N -> N+1 update preserving a project and browser cookie. Live provider accounts are not certified by fixture tests. SHA-256: $sha"
+$notes="OSMINOG Windows Preview $version`n`n$($meta.notes)`n`nUnsigned preview. Source $($meta.source). Windows tests cover installed paths, native panes, fixture provider replies, native input and canvas drag. Live provider accounts and Figma are not certified by fixture tests. SHA-256: $sha"
 $notes | Set-Content (Join-Path $work 'release-notes.txt')
 gh release view $tag --repo $repo *> $null
 if ($LASTEXITCODE -eq 0) { throw 'Immutable Windows release tag already exists; inspect it before retrying' }
@@ -41,3 +41,4 @@ git pull --rebase origin main
 if ($LASTEXITCODE -ne 0) { throw 'Registry update conflict' }
 git push origin HEAD:main
 if ($LASTEXITCODE -ne 0) { throw 'Registry push failed' }
+

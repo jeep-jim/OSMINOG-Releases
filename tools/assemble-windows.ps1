@@ -30,6 +30,7 @@ Rename-Item (Join-Path $work 'app/electron.exe') 'OSMINOG Preview.exe'
 $package = @{ name='osminog-desktop'; version=$meta.version; private=$true; description='OSMINOG local browser'; author='OSMINOG'; devDependencies=@{'electron-builder'=$meta.builder} }
 $package | ConvertTo-Json -Depth 10 | Set-Content (Join-Path $work 'package.json')
 $config = @{ appId=$info.appId; productName=$info.productName; electronVersion=$meta.electron; directories=@{output='dist'}; artifactName='OSMINOG-Preview-${version}-${arch}.${ext}'; win=@{target='nsis'}; nsis=@{oneClick=$false;perMachine=$false;allowToChangeInstallationDirectory=$true;deleteAppDataOnUninstall=$false}; publish=@(@{provider='generic';url='https://github.com/jeep-jim/OSMINOG-Releases/releases/download/windows-preview/'}) }
+$config.releaseInfo = @{releaseName="OSMINOG $($meta.version)";releaseNotes=[string]$meta.notes}
 $config | ConvertTo-Json -Depth 10 | Set-Content (Join-Path $work 'builder.json')
 $meta | Add-Member -NotePropertyName stage -NotePropertyValue $stage
 $meta | ConvertTo-Json -Depth 10 | Set-Content (Join-Path $work 'release.json')
@@ -39,10 +40,11 @@ try {
  if ($LASTEXITCODE -ne 0) { throw 'Builder installation failed' }
  npx electron-builder --prepackaged app --win nsis --x64 --config builder.json --publish never
  if ($LASTEXITCODE -ne 0) { throw 'Windows installer build failed' }
- foreach ($mode in @('smoke','browser-smoke','provider-smoke')) {
+ foreach ($mode in @('smoke','browser-smoke','provider-smoke','shell-smoke')) {
   $p = Start-Process -FilePath 'app/OSMINOG Preview.exe' -ArgumentList "--$mode" -PassThru -RedirectStandardOutput "release-$mode.log" -RedirectStandardError "release-$mode-errors.log"
   if (-not $p.WaitForExit(90000)) { $p.Kill(); throw "$mode timed out" }
   Get-Content "release-$mode.log"; Get-Content "release-$mode-errors.log"
   if ($p.ExitCode -ne 0 -or -not (Select-String -Path "release-$mode.log" -Pattern 'SMOKE_PASS' -Quiet)) { throw "$mode failed" }
  }
 } finally { Pop-Location }
+
