@@ -1,0 +1,1 @@
+Assemble 4.0.3 from the Windows-verified runtime; PR #37. Verify installed upgrade and retained project/cookie before publication.
