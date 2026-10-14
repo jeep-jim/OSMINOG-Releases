@@ -1,21 +1,21 @@
 {
-  "product": "OSMINOG",
-  "status": "active",
-  "generatedAt": "2026-10-14T05:24:19.1644584Z",
   "platform": "windows",
-  "channel": "dev",
+  "generatedAt": "2026-10-14T06:30:06.3271411Z",
   "latest": {
+    "notes": "OSMINOG Windows Preview 0.3.7\n\nНовое в 0.3.7\n• Убрана вертикальная полоска между холстом и свойствами. Переключатели свойств, холста и истории находятся вверху панели.\n• В верхней шапке восстановлены меню инструментов. Правая кнопка на пустом холсте создаёт текст, блокнот, Markdown и папки.\n• Убрана повторная надпись «Новая вкладка» слева.\n• Глаза прикрепляют контекст отдельным TXT-файлом, не добавляя JSON в ваше сообщение. Для выбранного видимого холста прикрепляется также снимок.\n• В контексте есть карта объектов холста, адреса, заголовки, выделение и элементы выбранных страниц.\n• Если чат не подтвердил вложение, сообщение остаётся в черновике с объяснением.\n\nПроекты остаются на устройстве. Выбранный контекст передаётся сервису ИИ при отправке сообщения.\n\nUnsigned preview. Source b953f946e225662fb1dadc83db73efd425822a2f. Windows tests cover installed paths, native panes, fixture provider replies, native input and canvas drag. Live provider accounts and Figma are not certified by fixture tests. SHA-256: 27671c2a501cc8ea40b36c2bdd7f7bab7a178effdced742ee67053e84d31e05c",
+    "publishedAt": "2026-10-14T06:30:02Z",
     "minDevHubVersion": "0.0.0",
-    "publishedAt": "2026-10-14T05:24:15Z",
-    "manifestVersion": "0.3.6",
-    "packageName": "OSMINOG-Preview-0.3.6-x64.exe",
-    "sha256": "df614c3c70c9498c5a8c8a2af6c4db22649962c065573ed91d82044f0c050cba",
-    "sourceCommit": "2e956b509829da5ef534e7edf6feb0e10d3d2fd4",
-    "notes": "OSMINOG Windows Preview 0.3.6\n\nНовое в 0.3.6\n• Инструменты в шапке снова без подписей, строго по центру. Названия остаются в подсказках.\n• Слои и файлы возвращены слева. Свойства, настройки холста и история — отдельными панелями справа от рабочего стола, за его границей.\n• Панели прокручиваются независимо и следуют за столом при перестановке.\n• Убраны старый интерфейс при запуске и кнопка «Открыть в редакторе» в свойствах.\n• Каждую плитку можно растягивать за правый край, нижний край или угол. У края она занимает всю доступную ширину или высоту; соседи переносятся ниже.\n• Вместо пустого выпадающего списка — читаемое меню выбора вкладки с названием, адресом и отметкой текущей.\n• Размеры плиток сохраняются. Выбор раскладки в меню «Вид» возвращает ровную сетку.\n\nПроекты и входы остаются на устройстве.\n\nUnsigned preview. Source 2e956b509829da5ef534e7edf6feb0e10d3d2fd4. Windows tests cover installed paths, native panes, fixture provider replies, native input and canvas drag. Live provider accounts and Figma are not certified by fixture tests. SHA-256: df614c3c70c9498c5a8c8a2af6c4db22649962c065573ed91d82044f0c050cba",
-    "size": 115180136,
-    "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/windows-v0.3.6/OSMINOG-Preview-0.3.6-x64.exe",
+    "sourceCommit": "b953f946e225662fb1dadc83db73efd425822a2f",
+    "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/windows-v0.3.7/OSMINOG-Preview-0.3.7-x64.exe",
+    "sha256": "27671c2a501cc8ea40b36c2bdd7f7bab7a178effdced742ee67053e84d31e05c",
+    "version": "0.3.7",
+    "size": 115183135,
     "kind": "full-package",
-    "version": "0.3.6"
+    "manifestVersion": "0.3.7",
+    "packageName": "OSMINOG-Preview-0.3.7-x64.exe"
   },
+  "product": "OSMINOG",
+  "channel": "dev",
+  "status": "active",
   "schema": "osminog-update-feed/v2"
 }
