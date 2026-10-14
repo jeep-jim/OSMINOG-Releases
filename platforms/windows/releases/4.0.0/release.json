@@ -1,0 +1,13 @@
+{
+  "sha256": "bdc261d1cff4ae7c5c8d2c40ccf0f52816b3b7e3c190859631a764a2f2cae8be",
+  "kind": "full-package",
+  "packageName": "OSMINOG-Preview-4.0.0-x64.exe",
+  "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/windows-v4.0.0/OSMINOG-Preview-4.0.0-x64.exe",
+  "size": 115190970,
+  "manifestVersion": "4.0.0",
+  "minDevHubVersion": "0.0.0",
+  "sourceCommit": "901fb68fb26aaa58c6eb64e4c4f7d2e88d6dfbc8",
+  "version": "4.0.0",
+  "publishedAt": "2026-10-14T13:35:22Z",
+  "notes": "OSMINOG Windows Preview 4.0.0\n\nНовое в 4.0.0\n• Внутренний чат ИИ снова получает контекст проекта и исполняет команды доски. ChatGPT использует транспорт сессии из расширения; DeepSeek — транспорт сессии либо API, Claude и Gemini — API либо отдельный служебный диалог.\n• Добавлены инструменты чтения и управления вкладками с проверкой актуальности страницы.\n• Обычные чаты на сайтах не перехватываются: автоматических TXT-вложений и дописывания контекста в них нет.\n• Правое меню вкладок: ссылки, копирование текста и изображений, сохранение файлов, вставка и навигация.\n• Повторный запуск показывает существующее окно. Ошибки старта выводятся явно и записываются в локальный startup.log; сбой значка трея не останавливает запуск.\n\nДля входа используются аккаунты в этом приложении. Реальные аккаунты провайдеров требуют проверки на вашем устройстве; работоспособность сервисов не гарантируется тестовыми страницами. Данные проекта сохраняются локально.\n\nUnsigned preview. Source 901fb68fb26aaa58c6eb64e4c4f7d2e88d6dfbc8. Windows tests cover installed paths, native panes, fixture provider replies, native input and canvas drag. Live provider accounts and Figma are not certified by fixture tests. SHA-256: bdc261d1cff4ae7c5c8d2c40ccf0f52816b3b7e3c190859631a764a2f2cae8be"
+}
