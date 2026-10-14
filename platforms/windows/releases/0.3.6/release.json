@@ -1,0 +1,13 @@
+{
+  "minDevHubVersion": "0.0.0",
+  "publishedAt": "2026-10-14T05:24:15Z",
+  "manifestVersion": "0.3.6",
+  "packageName": "OSMINOG-Preview-0.3.6-x64.exe",
+  "sha256": "df614c3c70c9498c5a8c8a2af6c4db22649962c065573ed91d82044f0c050cba",
+  "sourceCommit": "2e956b509829da5ef534e7edf6feb0e10d3d2fd4",
+  "notes": "OSMINOG Windows Preview 0.3.6\n\nНовое в 0.3.6\n• Инструменты в шапке снова без подписей, строго по центру. Названия остаются в подсказках.\n• Слои и файлы возвращены слева. Свойства, настройки холста и история — отдельными панелями справа от рабочего стола, за его границей.\n• Панели прокручиваются независимо и следуют за столом при перестановке.\n• Убраны старый интерфейс при запуске и кнопка «Открыть в редакторе» в свойствах.\n• Каждую плитку можно растягивать за правый край, нижний край или угол. У края она занимает всю доступную ширину или высоту; соседи переносятся ниже.\n• Вместо пустого выпадающего списка — читаемое меню выбора вкладки с названием, адресом и отметкой текущей.\n• Размеры плиток сохраняются. Выбор раскладки в меню «Вид» возвращает ровную сетку.\n\nПроекты и входы остаются на устройстве.\n\nUnsigned preview. Source 2e956b509829da5ef534e7edf6feb0e10d3d2fd4. Windows tests cover installed paths, native panes, fixture provider replies, native input and canvas drag. Live provider accounts and Figma are not certified by fixture tests. SHA-256: df614c3c70c9498c5a8c8a2af6c4db22649962c065573ed91d82044f0c050cba",
+  "size": 115180136,
+  "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/windows-v0.3.6/OSMINOG-Preview-0.3.6-x64.exe",
+  "kind": "full-package",
+  "version": "0.3.6"
+}
