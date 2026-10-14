@@ -1,0 +1,13 @@
+{
+  "kind": "full-package",
+  "manifestVersion": "0.3.8",
+  "version": "0.3.8",
+  "publishedAt": "2026-10-14T11:31:38Z",
+  "packageName": "OSMINOG-Preview-0.3.8-x64.exe",
+  "sourceCommit": "eb27f627884f8b74ceffc2004f49ef09028f1118",
+  "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/windows-v0.3.8/OSMINOG-Preview-0.3.8-x64.exe",
+  "sha256": "ffb3dc2ea028267baba4643b851197f67e1ca5d94edb6823458551165075e3b2",
+  "size": 115188055,
+  "minDevHubVersion": "0.0.0",
+  "notes": "OSMINOG Windows Preview 0.3.8\n\nНовое в 0.3.8\n• Пишите задачу прямо в привычном чате. Контекст рабочего стола и открытых страниц подключается автоматически при отправке.\n• Убраны глаза и отдельная форма «Поручить задачу».\n• Ответы с поддерживаемыми командами изменяют холст и управляют видимыми вкладками. Результат и свежие данные возвращаются в тот же чат автоматически.\n• Контекст остаётся вложением: текст вашего запроса не переписывается.\n• Исправлено закрытие меню инструментов после выбора, ухода мыши и потери фокуса.\n• Старые ответы, повторные действия и правки устаревшего холста не исполняются.\n\nДанные проекта хранятся на устройстве. При отправке сообщения контекст передаётся выбранному сервису ИИ. Стоп ИИ прекращает текущую задачу.\n\nUnsigned preview. Source eb27f627884f8b74ceffc2004f49ef09028f1118. Windows tests cover installed paths, native panes, fixture provider replies, native input and canvas drag. Live provider accounts and Figma are not certified by fixture tests. SHA-256: ffb3dc2ea028267baba4643b851197f67e1ca5d94edb6823458551165075e3b2"
+}

@@ -1,21 +1,21 @@
 {
-  "platform": "windows",
-  "generatedAt": "2026-10-14T06:30:06.3271411Z",
-  "latest": {
-    "notes": "OSMINOG Windows Preview 0.3.7\n\nНовое в 0.3.7\n• Убрана вертикальная полоска между холстом и свойствами. Переключатели свойств, холста и истории находятся вверху панели.\n• В верхней шапке восстановлены меню инструментов. Правая кнопка на пустом холсте создаёт текст, блокнот, Markdown и папки.\n• Убрана повторная надпись «Новая вкладка» слева.\n• Глаза прикрепляют контекст отдельным TXT-файлом, не добавляя JSON в ваше сообщение. Для выбранного видимого холста прикрепляется также снимок.\n• В контексте есть карта объектов холста, адреса, заголовки, выделение и элементы выбранных страниц.\n• Если чат не подтвердил вложение, сообщение остаётся в черновике с объяснением.\n\nПроекты остаются на устройстве. Выбранный контекст передаётся сервису ИИ при отправке сообщения.\n\nUnsigned preview. Source b953f946e225662fb1dadc83db73efd425822a2f. Windows tests cover installed paths, native panes, fixture provider replies, native input and canvas drag. Live provider accounts and Figma are not certified by fixture tests. SHA-256: 27671c2a501cc8ea40b36c2bdd7f7bab7a178effdced742ee67053e84d31e05c",
-    "publishedAt": "2026-10-14T06:30:02Z",
-    "minDevHubVersion": "0.0.0",
-    "sourceCommit": "b953f946e225662fb1dadc83db73efd425822a2f",
-    "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/windows-v0.3.7/OSMINOG-Preview-0.3.7-x64.exe",
-    "sha256": "27671c2a501cc8ea40b36c2bdd7f7bab7a178effdced742ee67053e84d31e05c",
-    "version": "0.3.7",
-    "size": 115183135,
-    "kind": "full-package",
-    "manifestVersion": "0.3.7",
-    "packageName": "OSMINOG-Preview-0.3.7-x64.exe"
-  },
-  "product": "OSMINOG",
   "channel": "dev",
+  "generatedAt": "2026-10-14T11:31:41.7334531Z",
+  "product": "OSMINOG",
+  "schema": "osminog-update-feed/v2",
+  "latest": {
+    "kind": "full-package",
+    "manifestVersion": "0.3.8",
+    "version": "0.3.8",
+    "publishedAt": "2026-10-14T11:31:38Z",
+    "packageName": "OSMINOG-Preview-0.3.8-x64.exe",
+    "sourceCommit": "eb27f627884f8b74ceffc2004f49ef09028f1118",
+    "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/windows-v0.3.8/OSMINOG-Preview-0.3.8-x64.exe",
+    "sha256": "ffb3dc2ea028267baba4643b851197f67e1ca5d94edb6823458551165075e3b2",
+    "size": 115188055,
+    "minDevHubVersion": "0.0.0",
+    "notes": "OSMINOG Windows Preview 0.3.8\n\nНовое в 0.3.8\n• Пишите задачу прямо в привычном чате. Контекст рабочего стола и открытых страниц подключается автоматически при отправке.\n• Убраны глаза и отдельная форма «Поручить задачу».\n• Ответы с поддерживаемыми командами изменяют холст и управляют видимыми вкладками. Результат и свежие данные возвращаются в тот же чат автоматически.\n• Контекст остаётся вложением: текст вашего запроса не переписывается.\n• Исправлено закрытие меню инструментов после выбора, ухода мыши и потери фокуса.\n• Старые ответы, повторные действия и правки устаревшего холста не исполняются.\n\nДанные проекта хранятся на устройстве. При отправке сообщения контекст передаётся выбранному сервису ИИ. Стоп ИИ прекращает текущую задачу.\n\nUnsigned preview. Source eb27f627884f8b74ceffc2004f49ef09028f1118. Windows tests cover installed paths, native panes, fixture provider replies, native input and canvas drag. Live provider accounts and Figma are not certified by fixture tests. SHA-256: ffb3dc2ea028267baba4643b851197f67e1ca5d94edb6823458551165075e3b2"
+  },
   "status": "active",
-  "schema": "osminog-update-feed/v2"
+  "platform": "windows"
 }
