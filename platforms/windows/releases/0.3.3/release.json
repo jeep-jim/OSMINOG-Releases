@@ -1,0 +1,13 @@
+{
+  "version": "0.3.3",
+  "notes": "OSMINOG Windows Preview 0.3.3\n\nНовое в 0.3.3\n• Управление ждёт законченный JSON-план; рассуждение больше не считается ответом. Повтор выполненного шага останавливается.\n• Глаз в заголовке выбирает источники контекста. Можно отметить несколько вкладок и рабочий стол.\n• Перетаскивание заголовков и вкладок из списка меняет их положение в плитках.\n• Центральные окна продолжаются вниз; список слева поддерживает миниатюры.\n• Прямой перенос изображения или выделенного текста из страницы на рабочий стол.\n• Красный глаз встроен в ресурс Windows EXE, используемый ярлыком.\n\nОбновление сохраняет проекты и профиль на устройстве. Управление внешними ИИ остаётся экспериментальным: совместимость конкретного аккаунта и сайта нужно проверять. Встроенный VPN не добавлен.\n\nUnsigned preview. Source 328ffc319105abeca013ec435d71b4696d0f961e. Windows tests cover installed paths, native panes, fixture provider replies, native input and canvas drag. Live provider accounts and Figma are not certified by fixture tests. SHA-256: c6515c48b349abc0c561233a370f903e6f70c5584f1b8a1f2c0e8844afb86491",
+  "minDevHubVersion": "0.0.0",
+  "sha256": "c6515c48b349abc0c561233a370f903e6f70c5584f1b8a1f2c0e8844afb86491",
+  "size": 115173208,
+  "kind": "full-package",
+  "sourceCommit": "328ffc319105abeca013ec435d71b4696d0f961e",
+  "publishedAt": "2026-10-14T02:41:35Z",
+  "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/windows-v0.3.3/OSMINOG-Preview-0.3.3-x64.exe",
+  "manifestVersion": "0.3.3",
+  "packageName": "OSMINOG-Preview-0.3.3-x64.exe"
+}
