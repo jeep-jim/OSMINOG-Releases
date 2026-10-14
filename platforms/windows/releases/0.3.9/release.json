@@ -1,0 +1,13 @@
+{
+  "minDevHubVersion": "0.0.0",
+  "packageName": "OSMINOG-Preview-0.3.9-x64.exe",
+  "sourceCommit": "d030e674ce2d8d870f03a527126ae49039d80cae",
+  "sha256": "9dd99c89435b4bfb6b370c633323ff6ee31c4b81429629c16f5ec594f9abb547",
+  "notes": "OSMINOG Windows Preview 0.3.9\n\nНовое в 0.3.9\n• Обычный чат отправляет только ваш текст и выбранные вами вложения.\n• Убраны автоматические TXT/PNG с контекстом, перехват отправки и дополнительные сообщения с результатами.\n• Внутренний чат больше не дописывает карту рабочего стола к вашему запросу.\n• Сохранены исправления меню инструментов и создание файлов правой кнопкой.\n\nАвтоматическое управление из обычного чата отключено вместе с пересылкой контекста. Отдельный канал инструментов для доступа модели к рабочему пространству пока не подключён. Данные проекта сохраняются на устройстве.\n\nUnsigned preview. Source d030e674ce2d8d870f03a527126ae49039d80cae. Windows tests cover installed paths, native panes, fixture provider replies, native input and canvas drag. Live provider accounts and Figma are not certified by fixture tests. SHA-256: 9dd99c89435b4bfb6b370c633323ff6ee31c4b81429629c16f5ec594f9abb547",
+  "size": 115185236,
+  "version": "0.3.9",
+  "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/windows-v0.3.9/OSMINOG-Preview-0.3.9-x64.exe",
+  "publishedAt": "2026-10-14T12:44:06Z",
+  "kind": "full-package",
+  "manifestVersion": "0.3.9"
+}

@@ -1,21 +1,21 @@
 {
-  "channel": "dev",
-  "generatedAt": "2026-10-14T11:31:41.7334531Z",
-  "product": "OSMINOG",
-  "schema": "osminog-update-feed/v2",
   "latest": {
-    "kind": "full-package",
-    "manifestVersion": "0.3.8",
-    "version": "0.3.8",
-    "publishedAt": "2026-10-14T11:31:38Z",
-    "packageName": "OSMINOG-Preview-0.3.8-x64.exe",
-    "sourceCommit": "eb27f627884f8b74ceffc2004f49ef09028f1118",
-    "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/windows-v0.3.8/OSMINOG-Preview-0.3.8-x64.exe",
-    "sha256": "ffb3dc2ea028267baba4643b851197f67e1ca5d94edb6823458551165075e3b2",
-    "size": 115188055,
     "minDevHubVersion": "0.0.0",
-    "notes": "OSMINOG Windows Preview 0.3.8\n\nНовое в 0.3.8\n• Пишите задачу прямо в привычном чате. Контекст рабочего стола и открытых страниц подключается автоматически при отправке.\n• Убраны глаза и отдельная форма «Поручить задачу».\n• Ответы с поддерживаемыми командами изменяют холст и управляют видимыми вкладками. Результат и свежие данные возвращаются в тот же чат автоматически.\n• Контекст остаётся вложением: текст вашего запроса не переписывается.\n• Исправлено закрытие меню инструментов после выбора, ухода мыши и потери фокуса.\n• Старые ответы, повторные действия и правки устаревшего холста не исполняются.\n\nДанные проекта хранятся на устройстве. При отправке сообщения контекст передаётся выбранному сервису ИИ. Стоп ИИ прекращает текущую задачу.\n\nUnsigned preview. Source eb27f627884f8b74ceffc2004f49ef09028f1118. Windows tests cover installed paths, native panes, fixture provider replies, native input and canvas drag. Live provider accounts and Figma are not certified by fixture tests. SHA-256: ffb3dc2ea028267baba4643b851197f67e1ca5d94edb6823458551165075e3b2"
+    "packageName": "OSMINOG-Preview-0.3.9-x64.exe",
+    "sourceCommit": "d030e674ce2d8d870f03a527126ae49039d80cae",
+    "sha256": "9dd99c89435b4bfb6b370c633323ff6ee31c4b81429629c16f5ec594f9abb547",
+    "notes": "OSMINOG Windows Preview 0.3.9\n\nНовое в 0.3.9\n• Обычный чат отправляет только ваш текст и выбранные вами вложения.\n• Убраны автоматические TXT/PNG с контекстом, перехват отправки и дополнительные сообщения с результатами.\n• Внутренний чат больше не дописывает карту рабочего стола к вашему запросу.\n• Сохранены исправления меню инструментов и создание файлов правой кнопкой.\n\nАвтоматическое управление из обычного чата отключено вместе с пересылкой контекста. Отдельный канал инструментов для доступа модели к рабочему пространству пока не подключён. Данные проекта сохраняются на устройстве.\n\nUnsigned preview. Source d030e674ce2d8d870f03a527126ae49039d80cae. Windows tests cover installed paths, native panes, fixture provider replies, native input and canvas drag. Live provider accounts and Figma are not certified by fixture tests. SHA-256: 9dd99c89435b4bfb6b370c633323ff6ee31c4b81429629c16f5ec594f9abb547",
+    "size": 115185236,
+    "version": "0.3.9",
+    "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/windows-v0.3.9/OSMINOG-Preview-0.3.9-x64.exe",
+    "publishedAt": "2026-10-14T12:44:06Z",
+    "kind": "full-package",
+    "manifestVersion": "0.3.9"
   },
   "status": "active",
-  "platform": "windows"
+  "channel": "dev",
+  "generatedAt": "2026-10-14T12:44:09.1142676Z",
+  "platform": "windows",
+  "product": "OSMINOG",
+  "schema": "osminog-update-feed/v2"
 }
