@@ -38,6 +38,15 @@ Push-Location $work
 try {
  npm install --ignore-scripts --no-audit --no-fund
  if ($LASTEXITCODE -ne 0) { throw 'Builder installation failed' }
+ if ([version]$meta.version -ge [version]'0.3.2') {
+  node -e "const fs=require('node:fs'),asar=require('@electron/asar');fs.writeFileSync('osminog-eye.ico',asar.extractFile('app/resources/app.asar','icons/osminog-eye.ico'))"
+  if ($LASTEXITCODE -ne 0) { throw 'Required OSMINOG eye icon missing from runtime' }
+  $config.win.icon='osminog-eye.ico'
+  $config.nsis.installerIcon='osminog-eye.ico'
+  $config.nsis.uninstallerIcon='osminog-eye.ico'
+  $config.nsis.installerHeaderIcon='osminog-eye.ico'
+  $config | ConvertTo-Json -Depth 10 | Set-Content builder.json
+ }
  npx electron-builder --prepackaged app --win nsis --x64 --config builder.json --publish never
  if ($LASTEXITCODE -ne 0) { throw 'Windows installer build failed' }
  foreach ($mode in @('smoke','browser-smoke','provider-smoke','shell-smoke')) {
