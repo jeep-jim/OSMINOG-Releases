@@ -1,0 +1,13 @@
+{
+  "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/windows-v4.0.2/OSMINOG-Preview-4.0.2-x64.exe",
+  "version": "4.0.2",
+  "kind": "full-package",
+  "packageName": "OSMINOG-Preview-4.0.2-x64.exe",
+  "sourceCommit": "fdd29122fb26bc6afc0a69d3e26cd7624b07f3b4",
+  "notes": "OSMINOG Windows Preview 4.0.2\n\nНовое в 4.0.2\n• Ctrl+C выбранных файлов на холсте копирует сами файлы в буфер Windows. Ctrl+V в чате вставляет файл с исходным именем и содержимым.\n• PDF открывается в редакторе документов. DOCX и XLSX показывают содержимое в отдельном окне; XLSX поддерживает переключение листов. Старые DOC/XLS и полное редактирование доступны через «Открыть в приложении».\n• Окна документов больше не перекрываются сайтами. Стрелка выбора вкладки заменена на чёткую SVG-иконку.\n• Общий BrowserContext автоматически обновляет карту доски и DOM вкладок. Встроенный «Чат ИИ» использует его для ChatGPT, DeepSeek, Claude и Gemini через настроенные транспорты. Изображение запрашивается по необходимости, без постоянной пересылки файлов.\n• Ошибка захвата снимка не обрывает доступное чтение DOM. «Стоп ИИ» не ждёт бесконечно недоступные сохранённые вкладки.\n• Прежнее чтение ответов и подтверждаемое исполнение команд обычных чатов сохранены. Обычное сообщение не изменяется и не отправляется повторно.\n\nПросмотр DOCX/XLSX не воспроизводит полную вёрстку Word и не пересчитывает формулы Excel. Общий контекст подключён к внутренним транспортам; сам факт открытия сайта ИИ не создаёт скрытый канал к его модели. Явный прежний запрос управления вкладкой сохранён. Браузерные аккаунты и доски остаются локальными.\n\n\nUnsigned preview. Source fdd29122fb26bc6afc0a69d3e26cd7624b07f3b4. Windows tests cover installed paths, native panes, fixture provider replies, native input and canvas drag. Live provider accounts and Figma are not certified by fixture tests. SHA-256: e75469f32f9c08fd54a43c5b51e298c0f0a5a31b6b73204767e839e6386527f0",
+  "manifestVersion": "4.0.2",
+  "minDevHubVersion": "0.0.0",
+  "publishedAt": "2026-10-14T16:37:35Z",
+  "sha256": "e75469f32f9c08fd54a43c5b51e298c0f0a5a31b6b73204767e839e6386527f0",
+  "size": 115199642
+}
