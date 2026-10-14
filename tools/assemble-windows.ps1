@@ -27,7 +27,7 @@ Expand-Archive (Join-Path $work $electronZip) (Join-Path $work 'app') -Force
 Remove-Item (Join-Path $work 'app/resources/default_app.asar') -ErrorAction SilentlyContinue
 Copy-Item (Join-Path $work 'runtime/resources/*') (Join-Path $work 'app/resources/') -Recurse -Force
 Rename-Item (Join-Path $work 'app/electron.exe') 'OSMINOG Preview.exe'
-$package = @{ name='osminog-desktop'; version=$meta.version; private=$true; description='OSMINOG local browser'; author='OSMINOG'; devDependencies=@{'electron-builder'=$meta.builder} }
+$package = @{ name='osminog-desktop'; version=$meta.version; private=$true; description='OSMINOG local browser'; author='OSMINOG'; devDependencies=@{'electron-builder'=$meta.builder;'rcedit'='5.0.2'} }
 $package | ConvertTo-Json -Depth 10 | Set-Content (Join-Path $work 'package.json')
 $config = @{ appId=$info.appId; productName=$info.productName; electronVersion=$meta.electron; directories=@{output='dist'}; artifactName='OSMINOG-Preview-${version}-${arch}.${ext}'; win=@{target='nsis'}; nsis=@{oneClick=$false;perMachine=$false;allowToChangeInstallationDirectory=$true;deleteAppDataOnUninstall=$false}; publish=@(@{provider='generic';url='https://github.com/jeep-jim/OSMINOG-Releases/releases/download/windows-preview/'}) }
 $config.releaseInfo = @{releaseName="OSMINOG $($meta.version)";releaseNotes=[string]$meta.notes}
@@ -41,6 +41,15 @@ try {
  if ([version]$meta.version -ge [version]'0.3.2') {
   node -e "const fs=require('node:fs'),asar=require('@electron/asar');fs.writeFileSync('osminog-eye.ico',asar.extractFile('app/resources/app.asar','icons/osminog-eye.ico'))"
   if ($LASTEXITCODE -ne 0) { throw 'Required OSMINOG eye icon missing from runtime' }
+  node -e "import('rcedit').then(({rcedit})=>rcedit('app/OSMINOG Preview.exe',{icon:'osminog-eye.ico'})).catch(e=>{console.error(e);process.exit(1)})"
+  if ($LASTEXITCODE -ne 0) { throw 'Executable icon patch failed' }
+  Add-Type -AssemblyName System.Drawing
+  $icon=[System.Drawing.Icon]::ExtractAssociatedIcon((Join-Path $PWD 'app/OSMINOG Preview.exe'))
+  $bitmap=$icon.ToBitmap();$red=0
+  for($y=0;$y -lt $bitmap.Height;$y++){for($x=0;$x -lt $bitmap.Width;$x++){$pixel=$bitmap.GetPixel($x,$y);if($pixel.R -gt 110 -and $pixel.R -gt $pixel.G*1.5 -and $pixel.R -gt $pixel.B*1.5){$red++}}}
+  $bitmap.Save((Join-Path $PWD 'executable-icon.png'));$bitmap.Dispose();$icon.Dispose()
+  if ($red -lt 20) { throw 'Executable still lacks the red eye icon' }
+  Write-Output 'EXECUTABLE_RED_EYE_ICON_PASS'
   $config.win.icon='osminog-eye.ico'
   $config.nsis.installerIcon='osminog-eye.ico'
   $config.nsis.uninstallerIcon='osminog-eye.ico'
