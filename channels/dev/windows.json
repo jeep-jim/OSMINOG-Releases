@@ -1,21 +1,21 @@
 {
-  "channel": "dev",
-  "platform": "windows",
-  "status": "active",
-  "schema": "osminog-update-feed/v2",
   "product": "OSMINOG",
   "latest": {
-    "minDevHubVersion": "0.0.0",
-    "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/windows-v0.3.4/OSMINOG-Preview-0.3.4-x64.exe",
-    "sha256": "f2409ddbea2964e10ff6059a699a76b3b5679fdb5646f3d8241b17d4cae195d8",
-    "version": "0.3.4",
+    "manifestVersion": "0.3.5",
+    "packageName": "OSMINOG-Preview-0.3.5-x64.exe",
+    "sha256": "b4915c745221aef1332375a91f28c19ea47ae77d2b6e178d40c022f05cad05a8",
+    "size": 115177374,
     "kind": "full-package",
-    "sourceCommit": "29533a3409dbcd805a147afef431bb6af511e87f",
-    "notes": "OSMINOG Windows Preview 0.3.4\n\nНовое в 0.3.4\n• Возвращено изменение ширины и высоты плиток перетягиванием, в том числе при прокрутке нескольких рядов. Размеры сохраняются.\n• Крестик в заголовке плитки и крестик слева закрывают одну вкладку. Оставшиеся плитки занимают освободившееся место.\n• Рабочий стол сворачивается кнопкой «−» и возвращается значком слева. Содержимое сохраняется.\n\nОбновление сохраняет проекты и входы на устройстве.\n\nUnsigned preview. Source 29533a3409dbcd805a147afef431bb6af511e87f. Windows tests cover installed paths, native panes, fixture provider replies, native input and canvas drag. Live provider accounts and Figma are not certified by fixture tests. SHA-256: f2409ddbea2964e10ff6059a699a76b3b5679fdb5646f3d8241b17d4cae195d8",
-    "manifestVersion": "0.3.4",
-    "size": 115174121,
-    "packageName": "OSMINOG-Preview-0.3.4-x64.exe",
-    "publishedAt": "2026-10-14T03:21:16Z"
+    "minDevHubVersion": "0.0.0",
+    "publishedAt": "2026-10-14T04:12:51Z",
+    "version": "0.3.5",
+    "notes": "OSMINOG Windows Preview 0.3.5\n\nНовое в 0.3.5\n• Пустые области закрываются крестиком и не появляются снова сами.\n• Спокойное серое выделение вкладок и чатов. Режимы сетки — с названиями и пояснениями.\n• Рабочий стол отмечен монитором. Развёрнутый стол снова показывает содержимое.\n• Свойства и слои открываются рядом справа от рабочего стола и перемещаются вместе с ним.\n• Инструменты получили подписи, подсказки и корректные палитры.\n• На главной странице больше не остаются объекты и связи с холста.\n• Обновлён значок Windows; обновляются принадлежащие этому браузеру ярлыки.\n• В окне обновления — мигающий глаз и анимация загрузки. Кнопки действий перенесены наверх.\n\nПроекты и входы остаются на устройстве.\n\nUnsigned preview. Source f4e18f484116ceb259a89800811a48a9c6619229. Windows tests cover installed paths, native panes, fixture provider replies, native input and canvas drag. Live provider accounts and Figma are not certified by fixture tests. SHA-256: b4915c745221aef1332375a91f28c19ea47ae77d2b6e178d40c022f05cad05a8",
+    "sourceCommit": "f4e18f484116ceb259a89800811a48a9c6619229",
+    "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/windows-v0.3.5/OSMINOG-Preview-0.3.5-x64.exe"
   },
-  "generatedAt": "2026-10-14T03:21:18.6509284Z"
+  "generatedAt": "2026-10-14T04:12:54.2219598Z",
+  "platform": "windows",
+  "schema": "osminog-update-feed/v2",
+  "status": "active",
+  "channel": "dev"
 }
