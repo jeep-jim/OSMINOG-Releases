@@ -1,21 +1,21 @@
 {
-  "latest": {
-    "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/windows-v4.0.2/OSMINOG-Preview-4.0.2-x64.exe",
-    "version": "4.0.2",
-    "kind": "full-package",
-    "packageName": "OSMINOG-Preview-4.0.2-x64.exe",
-    "sourceCommit": "fdd29122fb26bc6afc0a69d3e26cd7624b07f3b4",
-    "notes": "OSMINOG Windows Preview 4.0.2\n\nНовое в 4.0.2\n• Ctrl+C выбранных файлов на холсте копирует сами файлы в буфер Windows. Ctrl+V в чате вставляет файл с исходным именем и содержимым.\n• PDF открывается в редакторе документов. DOCX и XLSX показывают содержимое в отдельном окне; XLSX поддерживает переключение листов. Старые DOC/XLS и полное редактирование доступны через «Открыть в приложении».\n• Окна документов больше не перекрываются сайтами. Стрелка выбора вкладки заменена на чёткую SVG-иконку.\n• Общий BrowserContext автоматически обновляет карту доски и DOM вкладок. Встроенный «Чат ИИ» использует его для ChatGPT, DeepSeek, Claude и Gemini через настроенные транспорты. Изображение запрашивается по необходимости, без постоянной пересылки файлов.\n• Ошибка захвата снимка не обрывает доступное чтение DOM. «Стоп ИИ» не ждёт бесконечно недоступные сохранённые вкладки.\n• Прежнее чтение ответов и подтверждаемое исполнение команд обычных чатов сохранены. Обычное сообщение не изменяется и не отправляется повторно.\n\nПросмотр DOCX/XLSX не воспроизводит полную вёрстку Word и не пересчитывает формулы Excel. Общий контекст подключён к внутренним транспортам; сам факт открытия сайта ИИ не создаёт скрытый канал к его модели. Явный прежний запрос управления вкладкой сохранён. Браузерные аккаунты и доски остаются локальными.\n\n\nUnsigned preview. Source fdd29122fb26bc6afc0a69d3e26cd7624b07f3b4. Windows tests cover installed paths, native panes, fixture provider replies, native input and canvas drag. Live provider accounts and Figma are not certified by fixture tests. SHA-256: e75469f32f9c08fd54a43c5b51e298c0f0a5a31b6b73204767e839e6386527f0",
-    "manifestVersion": "4.0.2",
-    "minDevHubVersion": "0.0.0",
-    "publishedAt": "2026-10-14T16:37:35Z",
-    "sha256": "e75469f32f9c08fd54a43c5b51e298c0f0a5a31b6b73204767e839e6386527f0",
-    "size": 115199642
-  },
   "platform": "windows",
+  "schema": "osminog-update-feed/v2",
+  "latest": {
+    "notes": "OSMINOG Windows Preview 4.0.3\n\nНовое в 4.0.3\n• Сообщение в обычном чате запускает отдельный служебный цикл: свежий контекст → инструмент → результат → следующий шаг. Больше не требуется получать JSON с координатами в видимом ответе и подтверждать каждый шаг.\n• Исходный чат получает только ваш текст. Служебные снимки, контекст и результаты туда не дописываются. Ход выполнения отображается в строке состояния Осьминога.\n• Команды вкладке принимаются только после чтения её актуального размера и снимка. Ошибка возвращается исполнителю для исправления; старые координаты не масштабируются наугад.\n• Подключение находит уже открытые обычные вкладки DeepSeek. Служебные окна не переключают ваш интерфейс и закрываются после задачи.\n• Исполнитель поддерживает локальные правки доски, инструменты виджетов, браузерные клики, ввод, клавиши, прокрутку и перетаскивание. Stop ИИ и смена проекта прекращают выполнение.\n\nИспользуется отдельное служебное соединение выбранного провайдера. Видимый ответ сайта ИИ и результат исполнителя — разные потоки; служебный исполнитель не получает всю старую переписку сайта. Работа живого аккаунта зависит от доступности сессии провайдера. Автоматические проверки используют контролируемые ответы, а не аккаунт пользователя.\n\nUnsigned preview. Source ea699fa82346f816532f3c1caabb7bf4f0ed645e. Windows tests cover installed paths, native panes, fixture provider replies, native input and canvas drag. Live provider accounts and Figma are not certified by fixture tests. SHA-256: ee3c41c85c464ed6232d4015c2aa5483e5677fe2a3ee60d1cf737f491e88b4a7",
+    "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/windows-v4.0.3/OSMINOG-Preview-4.0.3-x64.exe",
+    "kind": "full-package",
+    "packageName": "OSMINOG-Preview-4.0.3-x64.exe",
+    "size": 115201976,
+    "sourceCommit": "ea699fa82346f816532f3c1caabb7bf4f0ed645e",
+    "publishedAt": "2026-10-14T17:14:38Z",
+    "sha256": "ee3c41c85c464ed6232d4015c2aa5483e5677fe2a3ee60d1cf737f491e88b4a7",
+    "manifestVersion": "4.0.3",
+    "minDevHubVersion": "0.0.0",
+    "version": "4.0.3"
+  },
   "status": "active",
-  "generatedAt": "2026-10-14T16:37:38.1842413Z",
-  "product": "OSMINOG",
   "channel": "dev",
-  "schema": "osminog-update-feed/v2"
+  "generatedAt": "2026-10-14T17:14:40.8033874Z",
+  "product": "OSMINOG"
 }
