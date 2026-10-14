@@ -1,0 +1,13 @@
+{
+  "minDevHubVersion": "0.0.0",
+  "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/windows-v0.3.4/OSMINOG-Preview-0.3.4-x64.exe",
+  "sha256": "f2409ddbea2964e10ff6059a699a76b3b5679fdb5646f3d8241b17d4cae195d8",
+  "version": "0.3.4",
+  "kind": "full-package",
+  "sourceCommit": "29533a3409dbcd805a147afef431bb6af511e87f",
+  "notes": "OSMINOG Windows Preview 0.3.4\n\nНовое в 0.3.4\n• Возвращено изменение ширины и высоты плиток перетягиванием, в том числе при прокрутке нескольких рядов. Размеры сохраняются.\n• Крестик в заголовке плитки и крестик слева закрывают одну вкладку. Оставшиеся плитки занимают освободившееся место.\n• Рабочий стол сворачивается кнопкой «−» и возвращается значком слева. Содержимое сохраняется.\n\nОбновление сохраняет проекты и входы на устройстве.\n\nUnsigned preview. Source 29533a3409dbcd805a147afef431bb6af511e87f. Windows tests cover installed paths, native panes, fixture provider replies, native input and canvas drag. Live provider accounts and Figma are not certified by fixture tests. SHA-256: f2409ddbea2964e10ff6059a699a76b3b5679fdb5646f3d8241b17d4cae195d8",
+  "manifestVersion": "0.3.4",
+  "size": 115174121,
+  "packageName": "OSMINOG-Preview-0.3.4-x64.exe",
+  "publishedAt": "2026-10-14T03:21:16Z"
+}
