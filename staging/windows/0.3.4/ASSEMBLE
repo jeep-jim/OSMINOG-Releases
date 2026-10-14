@@ -1,0 +1,1 @@
+Verified runtime from OSMINOG PR #28. Windows CI 38504690953 passed; remote reconstructed runtime SHA-256 verified. Assemble, test installed upgrade from 0.3.3, then publish 0.3.4.
