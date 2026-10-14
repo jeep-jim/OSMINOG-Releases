@@ -1,21 +1,21 @@
 {
-  "channel": "dev",
   "platform": "windows",
   "schema": "osminog-update-feed/v2",
   "product": "OSMINOG",
-  "status": "active",
-  "generatedAt": "2026-10-14T13:35:27.4669048Z",
+  "generatedAt": "2026-10-14T14:12:52.3443470Z",
+  "channel": "dev",
   "latest": {
-    "sha256": "bdc261d1cff4ae7c5c8d2c40ccf0f52816b3b7e3c190859631a764a2f2cae8be",
-    "kind": "full-package",
-    "packageName": "OSMINOG-Preview-4.0.0-x64.exe",
-    "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/windows-v4.0.0/OSMINOG-Preview-4.0.0-x64.exe",
-    "size": 115190970,
-    "manifestVersion": "4.0.0",
+    "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/windows-v4.0.1/OSMINOG-Preview-4.0.1-x64.exe",
+    "size": 115192779,
+    "packageName": "OSMINOG-Preview-4.0.1-x64.exe",
     "minDevHubVersion": "0.0.0",
-    "sourceCommit": "901fb68fb26aaa58c6eb64e4c4f7d2e88d6dfbc8",
-    "version": "4.0.0",
-    "publishedAt": "2026-10-14T13:35:22Z",
-    "notes": "OSMINOG Windows Preview 4.0.0\n\nНовое в 4.0.0\n• Внутренний чат ИИ снова получает контекст проекта и исполняет команды доски. ChatGPT использует транспорт сессии из расширения; DeepSeek — транспорт сессии либо API, Claude и Gemini — API либо отдельный служебный диалог.\n• Добавлены инструменты чтения и управления вкладками с проверкой актуальности страницы.\n• Обычные чаты на сайтах не перехватываются: автоматических TXT-вложений и дописывания контекста в них нет.\n• Правое меню вкладок: ссылки, копирование текста и изображений, сохранение файлов, вставка и навигация.\n• Повторный запуск показывает существующее окно. Ошибки старта выводятся явно и записываются в локальный startup.log; сбой значка трея не останавливает запуск.\n\nДля входа используются аккаунты в этом приложении. Реальные аккаунты провайдеров требуют проверки на вашем устройстве; работоспособность сервисов не гарантируется тестовыми страницами. Данные проекта сохраняются локально.\n\nUnsigned preview. Source 901fb68fb26aaa58c6eb64e4c4f7d2e88d6dfbc8. Windows tests cover installed paths, native panes, fixture provider replies, native input and canvas drag. Live provider accounts and Figma are not certified by fixture tests. SHA-256: bdc261d1cff4ae7c5c8d2c40ccf0f52816b3b7e3c190859631a764a2f2cae8be"
-  }
+    "sha256": "153204b337fc3bc0f4b061c3f377f3408450950b77ae5c8d8d413f067b7bb95a",
+    "notes": "OSMINOG Windows Preview 4.0.1\n\nНовое в 4.0.1\n• Новый ответ обычного чата с JSON-командами теперь вызывает одно подтверждение с выбором целевой вкладки. После подтверждения браузер выполняет поддерживаемые клики, ввод, клавиши, прокрутку и перетаскивание.\n• Исходное сообщение не изменяется и не отправляется повторно. Контекст, TXT/PNG и результаты в обычный чат не дописываются.\n• Старые ответы при загрузке переписки не запускаются. Отмена, Stop и смена проекта блокируют выполнение.\n• При недоступном снимке инструмент чтения возвращает DOM и явную ошибку изображения вместо остановки всего запроса.\n\nЭто восстановление подтверждаемого выполнения команд, а не постоянное невидимое зрение обычного сайта ИИ. Ответ без команд не выполняет действия. Для полного служебного цикла контекста остаётся встроенный Чат ИИ. Живые аккаунты провайдеров требуют отдельной проверки.\n\nUnsigned preview. Source 4b270b2816b423615a0e63f48372e336cef6b669. Windows tests cover installed paths, native panes, fixture provider replies, native input and canvas drag. Live provider accounts and Figma are not certified by fixture tests. SHA-256: 153204b337fc3bc0f4b061c3f377f3408450950b77ae5c8d8d413f067b7bb95a",
+    "sourceCommit": "4b270b2816b423615a0e63f48372e336cef6b669",
+    "manifestVersion": "4.0.1",
+    "kind": "full-package",
+    "version": "4.0.1",
+    "publishedAt": "2026-10-14T14:12:48Z"
+  },
+  "status": "active"
 }
