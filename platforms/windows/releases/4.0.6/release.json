@@ -1,0 +1,13 @@
+{
+  "sourceCommit": "67a9e910f932932ec0082efc3c9b39677b0c83c8",
+  "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/windows-v4.0.6/OSMINOG-Preview-4.0.6-x64.exe",
+  "manifestVersion": "4.0.6",
+  "packageName": "OSMINOG-Preview-4.0.6-x64.exe",
+  "notes": "OSMINOG Windows Preview 4.0.6\n\nДиагностика запросов ИИ: HTTP-статус, сетевая ошибка, время и источник запроса. Настройки подключения → Сохранить диагностику. Локальный отчёт без переписки, cookies и токенов. Причина сбоя рабочего ПК ещё исследуется.\n\nUnsigned preview. Source 67a9e910f932932ec0082efc3c9b39677b0c83c8. Windows tests cover installed paths, native panes, fixture provider replies, native input and canvas drag. Live provider accounts and Figma are not certified by fixture tests. SHA-256: cd2424215efe17621a7602eddca2aa707fe94c5df39bdc21e4e3ec34f77446e6",
+  "version": "4.0.6",
+  "size": 115203587,
+  "kind": "full-package",
+  "publishedAt": "2026-10-15T05:09:54Z",
+  "minDevHubVersion": "0.0.0",
+  "sha256": "cd2424215efe17621a7602eddca2aa707fe94c5df39bdc21e4e3ec34f77446e6"
+}
