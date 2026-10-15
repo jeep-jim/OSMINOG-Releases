@@ -1,21 +1,21 @@
 {
-  "latest": {
-    "size": 115201908,
-    "manifestVersion": "4.0.4",
-    "sha256": "87a3437ea3c78d754896c2adfcd94efe4082fda37c2badd8e1dff56362aad4b2",
-    "version": "4.0.4",
-    "kind": "full-package",
-    "packageName": "OSMINOG-Preview-4.0.4-x64.exe",
-    "minDevHubVersion": "0.0.0",
-    "notes": "OSMINOG Windows Preview 4.0.4\n\nИсправлен запуск исполнителя из видимых вкладок ИИ справа. Скрытые служебные сессии исключены. Доступность самого сайта DeepSeek этим обновлением не гарантируется.\n\nUnsigned preview. Source 84a71d8f8d7e86f6fe09cdc479fa9290da496a73. Windows tests cover installed paths, native panes, fixture provider replies, native input and canvas drag. Live provider accounts and Figma are not certified by fixture tests. SHA-256: 87a3437ea3c78d754896c2adfcd94efe4082fda37c2badd8e1dff56362aad4b2",
-    "publishedAt": "2026-10-15T03:55:36Z",
-    "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/windows-v4.0.4/OSMINOG-Preview-4.0.4-x64.exe",
-    "sourceCommit": "84a71d8f8d7e86f6fe09cdc479fa9290da496a73"
-  },
-  "generatedAt": "2026-10-15T03:55:39.1468922Z",
-  "status": "active",
-  "schema": "osminog-update-feed/v2",
-  "product": "OSMINOG",
+  "platform": "windows",
+  "generatedAt": "2026-10-15T04:47:50.6683358Z",
   "channel": "dev",
-  "platform": "windows"
+  "product": "OSMINOG",
+  "latest": {
+    "packageName": "OSMINOG-Preview-4.0.5-x64.exe",
+    "publishedAt": "2026-10-15T04:47:48Z",
+    "version": "4.0.5",
+    "size": 115202065,
+    "sourceCommit": "4ffc0d46756700aaf8b58db2c03fb394aaf089dd",
+    "sha256": "cd965e5b717715de0e1da3db47635083b512a40754612ee22c53f39da91f91a0",
+    "minDevHubVersion": "0.0.0",
+    "notes": "OSMINOG Windows Preview 4.0.5\n\nВосстановлена резервная проверка готовности через вкладку ИИ. Исполнитель ожидает принятия сообщения интерфейсом сайта. Сохранены команды из панели и отдельный служебный контекст.\n\nUnsigned preview. Source 4ffc0d46756700aaf8b58db2c03fb394aaf089dd. Windows tests cover installed paths, native panes, fixture provider replies, native input and canvas drag. Live provider accounts and Figma are not certified by fixture tests. SHA-256: cd965e5b717715de0e1da3db47635083b512a40754612ee22c53f39da91f91a0",
+    "kind": "full-package",
+    "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/windows-v4.0.5/OSMINOG-Preview-4.0.5-x64.exe",
+    "manifestVersion": "4.0.5"
+  },
+  "status": "active",
+  "schema": "osminog-update-feed/v2"
 }

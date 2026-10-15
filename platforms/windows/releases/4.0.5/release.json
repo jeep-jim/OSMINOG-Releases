@@ -1,0 +1,13 @@
+{
+  "packageName": "OSMINOG-Preview-4.0.5-x64.exe",
+  "publishedAt": "2026-10-15T04:47:48Z",
+  "version": "4.0.5",
+  "size": 115202065,
+  "sourceCommit": "4ffc0d46756700aaf8b58db2c03fb394aaf089dd",
+  "sha256": "cd965e5b717715de0e1da3db47635083b512a40754612ee22c53f39da91f91a0",
+  "minDevHubVersion": "0.0.0",
+  "notes": "OSMINOG Windows Preview 4.0.5\n\nВосстановлена резервная проверка готовности через вкладку ИИ. Исполнитель ожидает принятия сообщения интерфейсом сайта. Сохранены команды из панели и отдельный служебный контекст.\n\nUnsigned preview. Source 4ffc0d46756700aaf8b58db2c03fb394aaf089dd. Windows tests cover installed paths, native panes, fixture provider replies, native input and canvas drag. Live provider accounts and Figma are not certified by fixture tests. SHA-256: cd965e5b717715de0e1da3db47635083b512a40754612ee22c53f39da91f91a0",
+  "kind": "full-package",
+  "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/windows-v4.0.5/OSMINOG-Preview-4.0.5-x64.exe",
+  "manifestVersion": "4.0.5"
+}
