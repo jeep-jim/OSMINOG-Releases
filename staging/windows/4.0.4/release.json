@@ -1,0 +1,11 @@
+{
+  "source": "84a71d8f8d7e86f6fe09cdc479fa9290da496a73",
+  "electron": "44.5.0",
+  "productName": "OSMINOG Preview",
+  "appId": "com.osminog.desktop.preview",
+  "version": "4.0.4",
+  "builder": "26.15.3",
+  "size": 4808764,
+  "sha256": "03fb8ec139614c00c0f67291d0a8337427e7cf5b53bedb3adef42d04766daff8",
+  "notes": "Исправлен запуск исполнителя из видимых вкладок ИИ справа. Скрытые служебные сессии исключены. Доступность самого сайта DeepSeek этим обновлением не гарантируется."
+}
