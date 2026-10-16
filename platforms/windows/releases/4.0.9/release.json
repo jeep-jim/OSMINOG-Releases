@@ -1,0 +1,13 @@
+{
+  "sha256": "0e8533b52964631b89ad722bda2416fb75e7fa2edd2476b378d4da45ea479d6a",
+  "version": "4.0.9",
+  "size": 115204379,
+  "manifestVersion": "4.0.9",
+  "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/windows-v4.0.9/OSMINOG-Preview-4.0.9-x64.exe",
+  "minDevHubVersion": "0.0.0",
+  "notes": "OSMINOG Windows Preview 4.0.9\n\nУбраны глаза из вкладок и заголовков окон. Крестик закрытия отделён от иконки вкладки. Проверены отдельные области нажатия в узкой и развёрнутой панели.\n\nUnsigned preview. Source 6aefa13c0a61240c606360ccde12ebe9391d7b9f. Windows tests cover installed paths, native panes, fixture provider replies, native input and canvas drag. Live provider accounts and Figma are not certified by fixture tests. SHA-256: 0e8533b52964631b89ad722bda2416fb75e7fa2edd2476b378d4da45ea479d6a",
+  "kind": "full-package",
+  "sourceCommit": "6aefa13c0a61240c606360ccde12ebe9391d7b9f",
+  "packageName": "OSMINOG-Preview-4.0.9-x64.exe",
+  "publishedAt": "2026-10-16T02:19:02Z"
+}
