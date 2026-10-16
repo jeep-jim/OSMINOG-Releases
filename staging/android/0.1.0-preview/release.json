@@ -1,0 +1,8 @@
+{
+  "version": "0.1.0-preview",
+  "source": "a4cd480ea282f57366e626e2a4e5051e5e036799",
+  "size": 1725236,
+  "sha256": "a64b822df87695fe408ae1b8443b07941900223241bb3bfeb9e22fc057853820",
+  "ci": "https://github.com/jeep-jim/OSMINOG/actions/runs/38835905459",
+  "notes": "First Android preview (Android 8+). Phone interface with desks, browser tabs, local file import, move between desks, sharing and file attachment through AI website upload controls. Stable private release signing. Not full desktop editor parity; universal AI-chat browser control and in-app Android updates are not included."
+}

@@ -1,0 +1,51 @@
+name: Publish verified Android preview
+on:
+  push:
+    branches: [main]
+    paths: ['staging/android/**/ASSEMBLE']
+permissions:
+  contents: write
+concurrency:
+  group: osminog-android-preview-release
+  cancel-in-progress: false
+jobs:
+  android:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Reassemble and verify staged APK
+        run: python3 tools/assemble-android.py
+      - name: Verify Android package signature
+        run: |
+          verifier=$(find "$ANDROID_HOME/build-tools" -name apksigner | sort -V | tail -1)
+          test -n "$verifier"
+          "$verifier" verify --verbose android-build/*.apk
+      - name: Enable emulator acceleration
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 35
+          arch: x86_64
+          profile: pixel_6
+          working-directory: android-build
+          script: |
+            adb install *.apk
+            adb shell am start -W -n com.osminog.mobile.preview/com.osminog.mobile.MainActivity
+            sleep 3
+            adb shell pidof com.osminog.mobile.preview
+            adb shell screencap -p /sdcard/osminog-release.png
+            adb pull /sdcard/osminog-release.png osminog-release.png
+      - uses: actions/upload-artifact@v4
+        with:
+          name: android-signed-release-check
+          path: android-build/osminog-release.png
+      - name: Publish immutable preview
+        run: |
+          tag=$(cat android-build/tag.txt)
+          gh release create "$tag" android-build/*.apk android-build/SHA256SUMS.txt --prerelease --title "OSMINOG Android 0.1.0 Preview" --notes-file android-build/notes.txt
