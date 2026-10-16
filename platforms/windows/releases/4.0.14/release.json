@@ -1,0 +1,13 @@
+{
+  "kind": "full-package",
+  "sourceCommit": "ed08c5d8a59af183d07dae2aed0b0866ab16a639",
+  "publishedAt": "2026-10-16T07:44:24Z",
+  "version": "4.0.14",
+  "sha256": "5111d32a4e509750336f518ae6d0e664a7024d24f5fef8bdf4d1c39ecf150318",
+  "packageName": "OSMINOG-Preview-4.0.14-x64.exe",
+  "manifestVersion": "4.0.14",
+  "size": 115218993,
+  "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/windows-v4.0.14/OSMINOG-Preview-4.0.14-x64.exe",
+  "minDevHubVersion": "0.0.0",
+  "notes": "OSMINOG Windows Preview 4.0.14\n\nВосстановлен контекст последовательных команд исполнителя; добавлен перенос найденных изображений на холст по ссылке на локальный ресурс. Исправлены фоновая работа служебной вкладки и проверка загрузки снимков. 122 unit-теста и Windows-сценарии; живые аккаунты отдельно не проверены.\n\nUnsigned preview. Source ed08c5d8a59af183d07dae2aed0b0866ab16a639. Windows tests cover installed paths, native panes, fixture provider replies, native input and canvas drag. Live provider accounts and Figma are not certified by fixture tests. SHA-256: 5111d32a4e509750336f518ae6d0e664a7024d24f5fef8bdf4d1c39ecf150318"
+}
