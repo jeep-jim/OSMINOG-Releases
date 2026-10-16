@@ -1,21 +1,21 @@
 {
-  "product": "OSMINOG",
-  "platform": "windows",
-  "status": "active",
+  "latest": {
+    "sourceCommit": "b93a4ccf6cff62765e46919590f69e14d8c7b0a8",
+    "kind": "full-package",
+    "version": "4.0.8",
+    "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/windows-v4.0.8/OSMINOG-Preview-4.0.8-x64.exe",
+    "minDevHubVersion": "0.0.0",
+    "packageName": "OSMINOG-Preview-4.0.8-x64.exe",
+    "manifestVersion": "4.0.8",
+    "notes": "OSMINOG Windows Preview 4.0.8\n\nНовое в 4.0.8\n• Встроенный «Помощник проекта» убран из оболочки. Справа открываются обычные сайты чатов.\n• Вместо копирования контекста — выбор источников глазами и разрешение всех обычных вкладок и холста на сессию.\n• Выключение источника закрывает его чтение и действия; смена доступа отменяет старые снимки и задачи.\n• Сохранены инструменты холста, работа с файлами и отдельный исполнитель команд. Технические данные не вставляются в пользовательское сообщение.\n• Важно: отдельный исполнитель пока не равнозначен подключению инструментов к самому видимому диалогу ChatGPT, Gemini, Claude или DeepSeek. Универсальное подключение и редактирование исходников из обычного чата не завершены.\n\nUnsigned preview. Source b93a4ccf6cff62765e46919590f69e14d8c7b0a8. Windows tests cover installed paths, native panes, fixture provider replies, native input and canvas drag. Live provider accounts and Figma are not certified by fixture tests. SHA-256: db0cb269b009db25e242359117baf15d488acafe564fc7a866d6ef085bb21564",
+    "sha256": "db0cb269b009db25e242359117baf15d488acafe564fc7a866d6ef085bb21564",
+    "size": 115204593,
+    "publishedAt": "2026-10-16T01:30:59Z"
+  },
+  "generatedAt": "2026-10-16T01:31:03.2391679Z",
   "schema": "osminog-update-feed/v2",
   "channel": "dev",
-  "generatedAt": "2026-10-15T10:41:29.3390329Z",
-  "latest": {
-    "kind": "full-package",
-    "size": 115204430,
-    "version": "4.0.7",
-    "notes": "OSMINOG Windows Preview 4.0.7\n\nНовое в 4.0.7\n• Исправлен запрет интернет-доступа в адаптере внутреннего чата: он мешал добавлять фотографии на холст и включать поиск.\n• Помощник проекта доступен под этим именем; в новом проекте он открывается по умолчанию. Сохранённые вкладки и переписка остаются на месте.\n• Внутренний чат Windows использует вход в аккаунт сервиса; сохранённые отдельные API-ключи моделей больше не выбираются автоматически.\n• Контекст проекта остаётся во внутреннем запросе, без технических вставок в видимые сообщения.\n• Ошибка ChatGPT HTTP 403, показанная в Chrome, этим выпуском не объявляется устранённой. Подключение обычных внешних веб-чатов к холсту также не объявляется завершённым.\n\nUnsigned preview. Source 65aec471547a578e346f163904e78f75d304b145. Windows tests cover installed paths, native panes, fixture provider replies, native input and canvas drag. Live provider accounts and Figma are not certified by fixture tests. SHA-256: 9a251013b1c466db3897b19d632c664ab1a138358ee6d268bb8917a33815940b",
-    "packageName": "OSMINOG-Preview-4.0.7-x64.exe",
-    "sourceCommit": "65aec471547a578e346f163904e78f75d304b145",
-    "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/windows-v4.0.7/OSMINOG-Preview-4.0.7-x64.exe",
-    "sha256": "9a251013b1c466db3897b19d632c664ab1a138358ee6d268bb8917a33815940b",
-    "publishedAt": "2026-10-15T10:41:25Z",
-    "manifestVersion": "4.0.7",
-    "minDevHubVersion": "0.0.0"
-  }
+  "status": "active",
+  "product": "OSMINOG",
+  "platform": "windows"
 }
