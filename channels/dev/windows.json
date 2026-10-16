@@ -1,21 +1,21 @@
 {
-  "status": "active",
-  "generatedAt": "2026-10-16T09:07:44.3028002Z",
-  "platform": "windows",
-  "schema": "osminog-update-feed/v2",
-  "product": "OSMINOG",
   "channel": "dev",
   "latest": {
-    "version": "4.0.15",
-    "sourceCommit": "7c098bf15e4da7fa3c1f6c5a2cc2f889a4521007",
-    "packageName": "OSMINOG-Preview-4.0.15-x64.exe",
-    "manifestVersion": "4.0.15",
+    "manifestVersion": "4.0.16",
+    "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/windows-v4.0.16/OSMINOG-Preview-4.0.16-x64.exe",
     "kind": "full-package",
-    "sha256": "7683a944a78da45e6f5b416625ae41cd5800c4135f47f0ff7c1f3785d8b6c34b",
-    "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/windows-v4.0.15/OSMINOG-Preview-4.0.15-x64.exe",
-    "publishedAt": "2026-10-16T09:07:40Z",
-    "size": 115226188,
+    "publishedAt": "2026-10-16T14:51:26Z",
+    "sha256": "8fb3b7dea8dade7c9f8dff521511d1e887cb2739b9f0fbc40310f965fe5e6a7b",
+    "packageName": "OSMINOG-Preview-4.0.16-x64.exe",
+    "version": "4.0.16",
+    "notes": "OSMINOG Windows Preview 4.0.16\n\nИсправлено подтверждение вложений в служебном чате: ленивое поле загрузки, HTTPS-превью, ожидание завершения загрузки и обновлённое поле ввода. Старые изображения и история не подтверждают новое вложение. 126 unit-тестов и установленная Windows-копия проверены на контролируемых страницах; живые аккаунты отдельно не проверены.\n\nUnsigned preview. Source 4638361c3bbf72660a9567d24f2fecd00a317d3d. Windows tests cover installed paths, native panes, fixture provider replies, native input and canvas drag. Live provider accounts and Figma are not certified by fixture tests. SHA-256: 8fb3b7dea8dade7c9f8dff521511d1e887cb2739b9f0fbc40310f965fe5e6a7b",
     "minDevHubVersion": "0.0.0",
-    "notes": "OSMINOG Windows Preview 4.0.15\n\nСвободное размещение окон; инструменты на столе; выделение области для ИИ, снимок и запись окна. Исправлены обработка blocked и подтверждение служебной отправки. 126 unit-тестов и установленная Windows-копия проверены на контролируемых страницах; живые аккаунты отдельно не проверены.\n\nUnsigned preview. Source 7c098bf15e4da7fa3c1f6c5a2cc2f889a4521007. Windows tests cover installed paths, native panes, fixture provider replies, native input and canvas drag. Live provider accounts and Figma are not certified by fixture tests. SHA-256: 7683a944a78da45e6f5b416625ae41cd5800c4135f47f0ff7c1f3785d8b6c34b"
-  }
+    "sourceCommit": "4638361c3bbf72660a9567d24f2fecd00a317d3d",
+    "size": 115227134
+  },
+  "product": "OSMINOG",
+  "status": "active",
+  "platform": "windows",
+  "generatedAt": "2026-10-16T14:51:29.6692608Z",
+  "schema": "osminog-update-feed/v2"
 }
