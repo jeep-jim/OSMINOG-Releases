@@ -1,0 +1,13 @@
+{
+  "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/windows-v4.0.13/OSMINOG-Preview-4.0.13-x64.exe",
+  "packageName": "OSMINOG-Preview-4.0.13-x64.exe",
+  "version": "4.0.13",
+  "minDevHubVersion": "0.0.0",
+  "notes": "OSMINOG Windows Preview 4.0.13\n\nИсправлена потеря контекста DeepSeek между шагами, добавлена коррекция формата команд и остановка очереди после ошибки. Тёмная системная шапка и форма глаза из шапки. 116 unit-тестов и Windows-проверки; живые аккаунты не подтверждены, используется служебный исполнитель.\n\nUnsigned preview. Source 6bfcf4376750bf4f77981e677f17438fd8a6021f. Windows tests cover installed paths, native panes, fixture provider replies, native input and canvas drag. Live provider accounts and Figma are not certified by fixture tests. SHA-256: 69d1b3464fe456640b9fe7e57e401fe77f6e483628b5c5e144cc31a945e73337",
+  "sourceCommit": "6bfcf4376750bf4f77981e677f17438fd8a6021f",
+  "sha256": "69d1b3464fe456640b9fe7e57e401fe77f6e483628b5c5e144cc31a945e73337",
+  "manifestVersion": "4.0.13",
+  "size": 115217023,
+  "publishedAt": "2026-10-16T07:02:35Z",
+  "kind": "full-package"
+}
