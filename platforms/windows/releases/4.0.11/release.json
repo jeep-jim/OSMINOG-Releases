@@ -1,0 +1,13 @@
+{
+  "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/windows-v4.0.11/OSMINOG-Preview-4.0.11-x64.exe",
+  "manifestVersion": "4.0.11",
+  "notes": "OSMINOG Windows Preview 4.0.11\n\nАвтопилот выполняет одно действие и получает свежие DOM и снимок. Обычный ввод автоматический; отправка и неизвестные кнопки требуют подтверждения. Пароли, платежи и распознанное удаление блокируются. Ошибки возвращаются исполнителю для исправления. Подключение инструментов к исходным диалогам всех ИИ и живые аккаунты не подтверждены этим выпуском.\n\nUnsigned preview. Source d64a64db8b9050929a8f6fce384506c05e3aaf19. Windows tests cover installed paths, native panes, fixture provider replies, native input and canvas drag. Live provider accounts and Figma are not certified by fixture tests. SHA-256: d35affdafd0d90111e92d9a4c682b8829768031dd39824c5f829f1787f4cfe33",
+  "publishedAt": "2026-10-16T05:41:05Z",
+  "sha256": "d35affdafd0d90111e92d9a4c682b8829768031dd39824c5f829f1787f4cfe33",
+  "packageName": "OSMINOG-Preview-4.0.11-x64.exe",
+  "sourceCommit": "d64a64db8b9050929a8f6fce384506c05e3aaf19",
+  "minDevHubVersion": "0.0.0",
+  "version": "4.0.11",
+  "size": 115211756,
+  "kind": "full-package"
+}
