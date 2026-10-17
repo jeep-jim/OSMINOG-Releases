@@ -1,0 +1,13 @@
+{
+  "packageName": "OSMINOG-Preview-4.0.26-x64.exe",
+  "size": 115437891,
+  "notes": "OSMINOG Windows Preview 4.0.26\n\nНовое в 4.0.26\n• Обновлённая оболочка: графитовая и светлая палитры, единые контурные иконки, ровные панели и шапка.\n• Цветной редактор CodeMirror: HTML, CSS, JavaScript, TypeScript/JSX, Python и JSON.\n• Номера строк, поиск, сворачивание кода и сочетания клавиш редактора.\n• Вставка HTML из блока кода DeepSeek без служебных Markdown-кавычек.\n• Python больше не отображается как HTML: определяется язык и объясняется необходимая среда запуска.\n• Ошибки JavaScript видны рядом с предпросмотром; исходник скачивается с правильным расширением.\n• Открытие папки проекта целиком и исправление исчезающего чата сохранены.\n\nUnsigned preview. Source 47a156f0932a444fb07105cafaf9005939398471. Windows tests cover installed paths, native panes, fixture provider replies, native input and canvas drag. Live provider accounts and Figma are not certified by fixture tests. SHA-256: ab4abdcaf1802a9f29add65c9aca8a57bfd90357c8608b089e5f967f15fa6cef",
+  "manifestVersion": "4.0.26",
+  "version": "4.0.26",
+  "sourceCommit": "47a156f0932a444fb07105cafaf9005939398471",
+  "kind": "full-package",
+  "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/windows-v4.0.26/OSMINOG-Preview-4.0.26-x64.exe",
+  "publishedAt": "2026-10-17T14:24:45Z",
+  "minDevHubVersion": "0.0.0",
+  "sha256": "ab4abdcaf1802a9f29add65c9aca8a57bfd90357c8608b089e5f967f15fa6cef"
+}

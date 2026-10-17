@@ -1,21 +1,21 @@
 {
+  "schema": "osminog-update-feed/v2",
+  "status": "active",
+  "latest": {
+    "packageName": "OSMINOG-Preview-4.0.26-x64.exe",
+    "size": 115437891,
+    "notes": "OSMINOG Windows Preview 4.0.26\n\nНовое в 4.0.26\n• Обновлённая оболочка: графитовая и светлая палитры, единые контурные иконки, ровные панели и шапка.\n• Цветной редактор CodeMirror: HTML, CSS, JavaScript, TypeScript/JSX, Python и JSON.\n• Номера строк, поиск, сворачивание кода и сочетания клавиш редактора.\n• Вставка HTML из блока кода DeepSeek без служебных Markdown-кавычек.\n• Python больше не отображается как HTML: определяется язык и объясняется необходимая среда запуска.\n• Ошибки JavaScript видны рядом с предпросмотром; исходник скачивается с правильным расширением.\n• Открытие папки проекта целиком и исправление исчезающего чата сохранены.\n\nUnsigned preview. Source 47a156f0932a444fb07105cafaf9005939398471. Windows tests cover installed paths, native panes, fixture provider replies, native input and canvas drag. Live provider accounts and Figma are not certified by fixture tests. SHA-256: ab4abdcaf1802a9f29add65c9aca8a57bfd90357c8608b089e5f967f15fa6cef",
+    "manifestVersion": "4.0.26",
+    "version": "4.0.26",
+    "sourceCommit": "47a156f0932a444fb07105cafaf9005939398471",
+    "kind": "full-package",
+    "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/windows-v4.0.26/OSMINOG-Preview-4.0.26-x64.exe",
+    "publishedAt": "2026-10-17T14:24:45Z",
+    "minDevHubVersion": "0.0.0",
+    "sha256": "ab4abdcaf1802a9f29add65c9aca8a57bfd90357c8608b089e5f967f15fa6cef"
+  },
   "platform": "windows",
   "channel": "dev",
-  "schema": "osminog-update-feed/v2",
-  "product": "OSMINOG",
-  "latest": {
-    "sourceCommit": "4bd5cff94e8b02adf8ff220f0c5c0b4fbafed69a",
-    "minDevHubVersion": "0.0.0",
-    "size": 115252731,
-    "version": "4.0.25",
-    "notes": "OSMINOG Windows Preview 4.0.25\n\n4.0.25: папка проекта целиком, дерево файлов и вкладки редактора, сохранение на диск, локальный HTML/CSS/JS предпросмотр. Исправлено скрытие чата при загрузке предпросмотра.\n\nUnsigned preview. Source 4bd5cff94e8b02adf8ff220f0c5c0b4fbafed69a. Windows tests cover installed paths, native panes, fixture provider replies, native input and canvas drag. Live provider accounts and Figma are not certified by fixture tests. SHA-256: ca8987b44f98fbf8504b0fdad6c88e1307f6dbee67b600e9d95e5af6fc5c94ac",
-    "publishedAt": "2026-10-17T11:46:53Z",
-    "packageName": "OSMINOG-Preview-4.0.25-x64.exe",
-    "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/windows-v4.0.25/OSMINOG-Preview-4.0.25-x64.exe",
-    "manifestVersion": "4.0.25",
-    "kind": "full-package",
-    "sha256": "ca8987b44f98fbf8504b0fdad6c88e1307f6dbee67b600e9d95e5af6fc5c94ac"
-  },
-  "generatedAt": "2026-10-17T11:46:56.0553154Z",
-  "status": "active"
+  "generatedAt": "2026-10-17T14:24:47.5703719Z",
+  "product": "OSMINOG"
 }
