@@ -1,21 +1,21 @@
 {
-  "channel": "dev",
-  "latest": {
-    "manifestVersion": "4.0.16",
-    "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/windows-v4.0.16/OSMINOG-Preview-4.0.16-x64.exe",
-    "kind": "full-package",
-    "publishedAt": "2026-10-16T14:51:26Z",
-    "sha256": "8fb3b7dea8dade7c9f8dff521511d1e887cb2739b9f0fbc40310f965fe5e6a7b",
-    "packageName": "OSMINOG-Preview-4.0.16-x64.exe",
-    "version": "4.0.16",
-    "notes": "OSMINOG Windows Preview 4.0.16\n\nИсправлено подтверждение вложений в служебном чате: ленивое поле загрузки, HTTPS-превью, ожидание завершения загрузки и обновлённое поле ввода. Старые изображения и история не подтверждают новое вложение. 126 unit-тестов и установленная Windows-копия проверены на контролируемых страницах; живые аккаунты отдельно не проверены.\n\nUnsigned preview. Source 4638361c3bbf72660a9567d24f2fecd00a317d3d. Windows tests cover installed paths, native panes, fixture provider replies, native input and canvas drag. Live provider accounts and Figma are not certified by fixture tests. SHA-256: 8fb3b7dea8dade7c9f8dff521511d1e887cb2739b9f0fbc40310f965fe5e6a7b",
-    "minDevHubVersion": "0.0.0",
-    "sourceCommit": "4638361c3bbf72660a9567d24f2fecd00a317d3d",
-    "size": 115227134
-  },
   "product": "OSMINOG",
   "status": "active",
+  "channel": "dev",
+  "latest": {
+    "sha256": "bffc6710b1d7b53e197dcecc0abd824b240def7a6d8fdd984e67e0b8f8857aa1",
+    "kind": "full-package",
+    "minDevHubVersion": "0.0.0",
+    "notes": "OSMINOG Windows Preview 4.0.17\n\nУправление реальными DOM-элементами по ссылкам из свежего снимка. Проверки заменённых и перекрытых целей, фокуса и позиции перед вводом. 132 unit-теста и Windows-прогоны обычного чата, нативных действий, холста и установленной копии прошли на контролируемых страницах; живые аккаунты отдельно не проверены.\n\nUnsigned preview. Source 8e676d4cae7c150eb2484d95698406b05ada6d7f. Windows tests cover installed paths, native panes, fixture provider replies, native input and canvas drag. Live provider accounts and Figma are not certified by fixture tests. SHA-256: bffc6710b1d7b53e197dcecc0abd824b240def7a6d8fdd984e67e0b8f8857aa1",
+    "manifestVersion": "4.0.17",
+    "version": "4.0.17",
+    "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/windows-v4.0.17/OSMINOG-Preview-4.0.17-x64.exe",
+    "packageName": "OSMINOG-Preview-4.0.17-x64.exe",
+    "publishedAt": "2026-10-17T02:48:58Z",
+    "sourceCommit": "8e676d4cae7c150eb2484d95698406b05ada6d7f",
+    "size": 115228550
+  },
+  "schema": "osminog-update-feed/v2",
   "platform": "windows",
-  "generatedAt": "2026-10-16T14:51:29.6692608Z",
-  "schema": "osminog-update-feed/v2"
+  "generatedAt": "2026-10-17T02:49:02.1610234Z"
 }

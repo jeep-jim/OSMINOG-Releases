@@ -1,0 +1,13 @@
+{
+  "sha256": "bffc6710b1d7b53e197dcecc0abd824b240def7a6d8fdd984e67e0b8f8857aa1",
+  "kind": "full-package",
+  "minDevHubVersion": "0.0.0",
+  "notes": "OSMINOG Windows Preview 4.0.17\n\nУправление реальными DOM-элементами по ссылкам из свежего снимка. Проверки заменённых и перекрытых целей, фокуса и позиции перед вводом. 132 unit-теста и Windows-прогоны обычного чата, нативных действий, холста и установленной копии прошли на контролируемых страницах; живые аккаунты отдельно не проверены.\n\nUnsigned preview. Source 8e676d4cae7c150eb2484d95698406b05ada6d7f. Windows tests cover installed paths, native panes, fixture provider replies, native input and canvas drag. Live provider accounts and Figma are not certified by fixture tests. SHA-256: bffc6710b1d7b53e197dcecc0abd824b240def7a6d8fdd984e67e0b8f8857aa1",
+  "manifestVersion": "4.0.17",
+  "version": "4.0.17",
+  "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/windows-v4.0.17/OSMINOG-Preview-4.0.17-x64.exe",
+  "packageName": "OSMINOG-Preview-4.0.17-x64.exe",
+  "publishedAt": "2026-10-17T02:48:58Z",
+  "sourceCommit": "8e676d4cae7c150eb2484d95698406b05ada6d7f",
+  "size": 115228550
+}
