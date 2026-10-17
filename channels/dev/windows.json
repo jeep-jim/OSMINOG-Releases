@@ -1,21 +1,21 @@
 {
-  "channel": "dev",
-  "product": "OSMINOG",
-  "latest": {
-    "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/windows-v4.0.18/OSMINOG-Preview-4.0.18-x64.exe",
-    "publishedAt": "2026-10-17T03:17:05Z",
-    "minDevHubVersion": "0.0.0",
-    "kind": "full-package",
-    "notes": "OSMINOG Windows Preview 4.0.18\n\nОкна прилипают к границам без наложений; изменение размера останавливается у соседей. Старая раскладка исправляется автоматически. Убраны постоянное чтение DOM всех вкладок в простое и снимки страниц при каждой перерисовке. 137 unit-тестов и Windows-проверки установленной копии пройдены. Отдельная ошибка отправки ИИ SEND_NOT_CONFIRMED этим выпуском не исправлялась.\n\nUnsigned preview. Source f2123295265ac942abc8cebce884871face90ba1. Windows tests cover installed paths, native panes, fixture provider replies, native input and canvas drag. Live provider accounts and Figma are not certified by fixture tests. SHA-256: c85c283fe4d513dbc5bfb96682597a5a8a2208a5231f2782e25473682df427e8",
-    "size": 115229366,
-    "sourceCommit": "f2123295265ac942abc8cebce884871face90ba1",
-    "sha256": "c85c283fe4d513dbc5bfb96682597a5a8a2208a5231f2782e25473682df427e8",
-    "packageName": "OSMINOG-Preview-4.0.18-x64.exe",
-    "manifestVersion": "4.0.18",
-    "version": "4.0.18"
-  },
   "status": "active",
+  "channel": "dev",
   "schema": "osminog-update-feed/v2",
-  "generatedAt": "2026-10-17T03:17:08.8052560Z",
-  "platform": "windows"
+  "platform": "windows",
+  "product": "OSMINOG",
+  "generatedAt": "2026-10-17T04:14:52.1954006Z",
+  "latest": {
+    "sourceCommit": "fb4e92cc57c2d73792fd19e076a19179ef767a07",
+    "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/windows-v4.0.19/OSMINOG-Preview-4.0.19-x64.exe",
+    "size": 115231165,
+    "sha256": "53921a82e8b9103af8074fb29112662db7c0279113db1f0fc3167f2fe47476e1",
+    "manifestVersion": "4.0.19",
+    "packageName": "OSMINOG-Preview-4.0.19-x64.exe",
+    "minDevHubVersion": "0.0.0",
+    "version": "4.0.19",
+    "kind": "full-package",
+    "notes": "OSMINOG Windows Preview 4.0.19\n\nПоиск и распознанные жесты редактора выполняются без лишней плашки при включённом автопилоте. Добавлены копирование/вставка объектов холста и управление адресом и историей вкладки. Исполнитель получает реальные результаты и показывает отдельный итог. 145 тестов и проверки установленной Windows-копии пройдены. Отправка сообщений и публикации сохраняют подтверждение.\n\nUnsigned preview. Source fb4e92cc57c2d73792fd19e076a19179ef767a07. Windows tests cover installed paths, native panes, fixture provider replies, native input and canvas drag. Live provider accounts and Figma are not certified by fixture tests. SHA-256: 53921a82e8b9103af8074fb29112662db7c0279113db1f0fc3167f2fe47476e1",
+    "publishedAt": "2026-10-17T04:14:49Z"
+  }
 }
