@@ -1,0 +1,13 @@
+{
+  "sourceCommit": "4bd5cff94e8b02adf8ff220f0c5c0b4fbafed69a",
+  "minDevHubVersion": "0.0.0",
+  "size": 115252731,
+  "version": "4.0.25",
+  "notes": "OSMINOG Windows Preview 4.0.25\n\n4.0.25: папка проекта целиком, дерево файлов и вкладки редактора, сохранение на диск, локальный HTML/CSS/JS предпросмотр. Исправлено скрытие чата при загрузке предпросмотра.\n\nUnsigned preview. Source 4bd5cff94e8b02adf8ff220f0c5c0b4fbafed69a. Windows tests cover installed paths, native panes, fixture provider replies, native input and canvas drag. Live provider accounts and Figma are not certified by fixture tests. SHA-256: ca8987b44f98fbf8504b0fdad6c88e1307f6dbee67b600e9d95e5af6fc5c94ac",
+  "publishedAt": "2026-10-17T11:46:53Z",
+  "packageName": "OSMINOG-Preview-4.0.25-x64.exe",
+  "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/windows-v4.0.25/OSMINOG-Preview-4.0.25-x64.exe",
+  "manifestVersion": "4.0.25",
+  "kind": "full-package",
+  "sha256": "ca8987b44f98fbf8504b0fdad6c88e1307f6dbee67b600e9d95e5af6fc5c94ac"
+}

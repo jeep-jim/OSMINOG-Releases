@@ -1,21 +1,21 @@
 {
-  "status": "active",
+  "platform": "windows",
+  "channel": "dev",
+  "schema": "osminog-update-feed/v2",
   "product": "OSMINOG",
   "latest": {
-    "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/windows-v4.0.24/OSMINOG-Preview-4.0.24-x64.exe",
-    "publishedAt": "2026-10-17T11:20:00Z",
-    "kind": "full-package",
-    "version": "4.0.24",
-    "sourceCommit": "362cc708390091c71d181480e81f897ad2189c8a",
+    "sourceCommit": "4bd5cff94e8b02adf8ff220f0c5c0b4fbafed69a",
     "minDevHubVersion": "0.0.0",
-    "packageName": "OSMINOG-Preview-4.0.24-x64.exe",
-    "manifestVersion": "4.0.24",
-    "sha256": "248ea16470f5c5fceb0f2d28fa3a368e348273d30864732ab20ff513ce22b6fd",
-    "notes": "OSMINOG Windows Preview 4.0.24\n\n4.0.24: выбор ИИ с логотипами; локальный MCP для Codex и Claude Code; управление вкладками, DOM, холстом и файлами через инструменты. Однократная настройка клиента, доступ на сессию, фактический статус подключения.\n\nUnsigned preview. Source 362cc708390091c71d181480e81f897ad2189c8a. Windows tests cover installed paths, native panes, fixture provider replies, native input and canvas drag. Live provider accounts and Figma are not certified by fixture tests. SHA-256: 248ea16470f5c5fceb0f2d28fa3a368e348273d30864732ab20ff513ce22b6fd",
-    "size": 115248798
+    "size": 115252731,
+    "version": "4.0.25",
+    "notes": "OSMINOG Windows Preview 4.0.25\n\n4.0.25: папка проекта целиком, дерево файлов и вкладки редактора, сохранение на диск, локальный HTML/CSS/JS предпросмотр. Исправлено скрытие чата при загрузке предпросмотра.\n\nUnsigned preview. Source 4bd5cff94e8b02adf8ff220f0c5c0b4fbafed69a. Windows tests cover installed paths, native panes, fixture provider replies, native input and canvas drag. Live provider accounts and Figma are not certified by fixture tests. SHA-256: ca8987b44f98fbf8504b0fdad6c88e1307f6dbee67b600e9d95e5af6fc5c94ac",
+    "publishedAt": "2026-10-17T11:46:53Z",
+    "packageName": "OSMINOG-Preview-4.0.25-x64.exe",
+    "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/windows-v4.0.25/OSMINOG-Preview-4.0.25-x64.exe",
+    "manifestVersion": "4.0.25",
+    "kind": "full-package",
+    "sha256": "ca8987b44f98fbf8504b0fdad6c88e1307f6dbee67b600e9d95e5af6fc5c94ac"
   },
-  "schema": "osminog-update-feed/v2",
-  "channel": "dev",
-  "generatedAt": "2026-10-17T11:20:03.7773867Z",
-  "platform": "windows"
+  "generatedAt": "2026-10-17T11:46:56.0553154Z",
+  "status": "active"
 }
