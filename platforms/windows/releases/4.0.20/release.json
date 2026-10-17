@@ -1,0 +1,13 @@
+{
+  "publishedAt": "2026-10-17T04:36:46Z",
+  "version": "4.0.20",
+  "packageName": "OSMINOG-Preview-4.0.20-x64.exe",
+  "minDevHubVersion": "0.0.0",
+  "sha256": "03d669cae9cb4904556c974f4ae332e4fef04c70b6369223061c6bf6f8a499d7",
+  "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/windows-v4.0.20/OSMINOG-Preview-4.0.20-x64.exe",
+  "kind": "full-package",
+  "size": 115230575,
+  "sourceCommit": "fdd26a1a692aa2f645988b7cda27fa6c581fa05b",
+  "manifestVersion": "4.0.20",
+  "notes": "OSMINOG Windows Preview 4.0.20\n\nСтатус и результат исполнителя перенесены под вкладку ИИ. Плашка внутри сайта убрана и больше не перекрывает поле ввода. Длинный результат прокручивается в нижней строке.\n\nUnsigned preview. Source fdd26a1a692aa2f645988b7cda27fa6c581fa05b. Windows tests cover installed paths, native panes, fixture provider replies, native input and canvas drag. Live provider accounts and Figma are not certified by fixture tests. SHA-256: 03d669cae9cb4904556c974f4ae332e4fef04c70b6369223061c6bf6f8a499d7"
+}
