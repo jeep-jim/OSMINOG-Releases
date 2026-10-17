@@ -1,21 +1,21 @@
 {
-  "generatedAt": "2026-10-17T10:14:58.8979452Z",
-  "schema": "osminog-update-feed/v2",
-  "channel": "dev",
   "status": "active",
   "product": "OSMINOG",
-  "platform": "windows",
   "latest": {
-    "packageName": "OSMINOG-Preview-4.0.23-x64.exe",
-    "version": "4.0.23",
-    "sha256": "d50cb35f73b0f1a5f887c9f05ed24f973ce1399ab8364573ea7ca7fc691041bb",
-    "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/windows-v4.0.23/OSMINOG-Preview-4.0.23-x64.exe",
+    "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/windows-v4.0.24/OSMINOG-Preview-4.0.24-x64.exe",
+    "publishedAt": "2026-10-17T11:20:00Z",
     "kind": "full-package",
-    "publishedAt": "2026-10-17T10:14:54Z",
-    "manifestVersion": "4.0.23",
-    "sourceCommit": "83cf75b8da659c55a5fad84cd5e892110d5a635e",
-    "size": 115242371,
-    "notes": "OSMINOG Windows Preview 4.0.23\n\n4.0.23: оптимизация чтения настроек и загрузки PDF; отчёт по памяти; свежее состояние после открытия вкладки и более длинный цикл исполнения.\n\nUnsigned preview. Source 83cf75b8da659c55a5fad84cd5e892110d5a635e. Windows tests cover installed paths, native panes, fixture provider replies, native input and canvas drag. Live provider accounts and Figma are not certified by fixture tests. SHA-256: d50cb35f73b0f1a5f887c9f05ed24f973ce1399ab8364573ea7ca7fc691041bb",
-    "minDevHubVersion": "0.0.0"
-  }
+    "version": "4.0.24",
+    "sourceCommit": "362cc708390091c71d181480e81f897ad2189c8a",
+    "minDevHubVersion": "0.0.0",
+    "packageName": "OSMINOG-Preview-4.0.24-x64.exe",
+    "manifestVersion": "4.0.24",
+    "sha256": "248ea16470f5c5fceb0f2d28fa3a368e348273d30864732ab20ff513ce22b6fd",
+    "notes": "OSMINOG Windows Preview 4.0.24\n\n4.0.24: выбор ИИ с логотипами; локальный MCP для Codex и Claude Code; управление вкладками, DOM, холстом и файлами через инструменты. Однократная настройка клиента, доступ на сессию, фактический статус подключения.\n\nUnsigned preview. Source 362cc708390091c71d181480e81f897ad2189c8a. Windows tests cover installed paths, native panes, fixture provider replies, native input and canvas drag. Live provider accounts and Figma are not certified by fixture tests. SHA-256: 248ea16470f5c5fceb0f2d28fa3a368e348273d30864732ab20ff513ce22b6fd",
+    "size": 115248798
+  },
+  "schema": "osminog-update-feed/v2",
+  "channel": "dev",
+  "generatedAt": "2026-10-17T11:20:03.7773867Z",
+  "platform": "windows"
 }
