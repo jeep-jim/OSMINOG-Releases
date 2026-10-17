@@ -1,21 +1,21 @@
 {
-  "generatedAt": "2026-10-17T04:36:48.7484844Z",
-  "platform": "windows",
-  "channel": "dev",
-  "product": "OSMINOG",
-  "schema": "osminog-update-feed/v2",
+  "generatedAt": "2026-10-17T05:29:50.4243141Z",
   "status": "active",
   "latest": {
-    "publishedAt": "2026-10-17T04:36:46Z",
-    "version": "4.0.20",
-    "packageName": "OSMINOG-Preview-4.0.20-x64.exe",
-    "minDevHubVersion": "0.0.0",
-    "sha256": "03d669cae9cb4904556c974f4ae332e4fef04c70b6369223061c6bf6f8a499d7",
-    "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/windows-v4.0.20/OSMINOG-Preview-4.0.20-x64.exe",
+    "sourceCommit": "5f08d46952e36e5019c02a8af6b8ccaaf22924dd",
     "kind": "full-package",
-    "size": 115230575,
-    "sourceCommit": "fdd26a1a692aa2f645988b7cda27fa6c581fa05b",
-    "manifestVersion": "4.0.20",
-    "notes": "OSMINOG Windows Preview 4.0.20\n\nСтатус и результат исполнителя перенесены под вкладку ИИ. Плашка внутри сайта убрана и больше не перекрывает поле ввода. Длинный результат прокручивается в нижней строке.\n\nUnsigned preview. Source fdd26a1a692aa2f645988b7cda27fa6c581fa05b. Windows tests cover installed paths, native panes, fixture provider replies, native input and canvas drag. Live provider accounts and Figma are not certified by fixture tests. SHA-256: 03d669cae9cb4904556c974f4ae332e4fef04c70b6369223061c6bf6f8a499d7"
-  }
+    "manifestVersion": "4.0.21",
+    "size": 115239196,
+    "minDevHubVersion": "0.0.0",
+    "notes": "OSMINOG Windows Preview 4.0.21\n\nНовое в 4.0.21\n• Анимированная подводная заставка и выбор RU/EN при первом запуске, сохранение выбора между перезапусками.\n• Кнопка «Код»: редактирование HTML-проектов и модулей, предпросмотр HTML/CSS/JavaScript справа, сохранение и скачивание HTML. Это первый этап IDE, не универсальная среда выполнения всех языков.\n• Скриншот из шапки: выделение области, стрелки, маркер, текст, цвет и сохранение PNG. Снимок больше не добавляется на доску автоматически.\n• Закрытие вкладки подтягивает окно ниже. Центральные разделители ширины/высоты, плавное перетаскивание с фиксацией и переход к окну по нажатию слева.\n• Подсказки сайтов во всех адресных полях и сохранение ранее введённых адресов между перезапусками.\n\nUnsigned preview. Source 5f08d46952e36e5019c02a8af6b8ccaaf22924dd. Windows tests cover installed paths, native panes, fixture provider replies, native input and canvas drag. Live provider accounts and Figma are not certified by fixture tests. SHA-256: e9162117270d6a248137f9cc3f1a1727cbd2e357bcb6b0ba537b8828546f9dc7",
+    "sha256": "e9162117270d6a248137f9cc3f1a1727cbd2e357bcb6b0ba537b8828546f9dc7",
+    "publishedAt": "2026-10-17T05:29:47Z",
+    "packageName": "OSMINOG-Preview-4.0.21-x64.exe",
+    "version": "4.0.21",
+    "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/windows-v4.0.21/OSMINOG-Preview-4.0.21-x64.exe"
+  },
+  "product": "OSMINOG",
+  "channel": "dev",
+  "schema": "osminog-update-feed/v2",
+  "platform": "windows"
 }

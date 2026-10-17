@@ -1,0 +1,13 @@
+{
+  "sourceCommit": "5f08d46952e36e5019c02a8af6b8ccaaf22924dd",
+  "kind": "full-package",
+  "manifestVersion": "4.0.21",
+  "size": 115239196,
+  "minDevHubVersion": "0.0.0",
+  "notes": "OSMINOG Windows Preview 4.0.21\n\nНовое в 4.0.21\n• Анимированная подводная заставка и выбор RU/EN при первом запуске, сохранение выбора между перезапусками.\n• Кнопка «Код»: редактирование HTML-проектов и модулей, предпросмотр HTML/CSS/JavaScript справа, сохранение и скачивание HTML. Это первый этап IDE, не универсальная среда выполнения всех языков.\n• Скриншот из шапки: выделение области, стрелки, маркер, текст, цвет и сохранение PNG. Снимок больше не добавляется на доску автоматически.\n• Закрытие вкладки подтягивает окно ниже. Центральные разделители ширины/высоты, плавное перетаскивание с фиксацией и переход к окну по нажатию слева.\n• Подсказки сайтов во всех адресных полях и сохранение ранее введённых адресов между перезапусками.\n\nUnsigned preview. Source 5f08d46952e36e5019c02a8af6b8ccaaf22924dd. Windows tests cover installed paths, native panes, fixture provider replies, native input and canvas drag. Live provider accounts and Figma are not certified by fixture tests. SHA-256: e9162117270d6a248137f9cc3f1a1727cbd2e357bcb6b0ba537b8828546f9dc7",
+  "sha256": "e9162117270d6a248137f9cc3f1a1727cbd2e357bcb6b0ba537b8828546f9dc7",
+  "publishedAt": "2026-10-17T05:29:47Z",
+  "packageName": "OSMINOG-Preview-4.0.21-x64.exe",
+  "version": "4.0.21",
+  "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/windows-v4.0.21/OSMINOG-Preview-4.0.21-x64.exe"
+}
