@@ -1,21 +1,21 @@
 {
+  "generatedAt": "2026-10-17T10:14:58.8979452Z",
+  "schema": "osminog-update-feed/v2",
   "channel": "dev",
   "status": "active",
   "product": "OSMINOG",
-  "generatedAt": "2026-10-17T07:24:51.6064570Z",
-  "schema": "osminog-update-feed/v2",
   "platform": "windows",
   "latest": {
-    "notes": "OSMINOG Windows Preview 4.0.22\n\nНовое в 4.0.22\n• Выбор языка при первом запуске: отдельное поле на всю ширину, подпись и подсказка без наложений.\n• Ровная шапка «Кода»: команды на одной линии, свернуть и закрыть всегда справа.\n• Центральный разделитель кода и предпросмотра: мышь, клавиши, двойной щелчок для 50/50; размер запоминается.\n• Сворачивание сохраняет предпросмотр и черновик; повторное открытие возвращает рабочую область.\n\nUnsigned preview. Source 659f4f4f52003d26ea4afe49b589a47115bce423. Windows tests cover installed paths, native panes, fixture provider replies, native input and canvas drag. Live provider accounts and Figma are not certified by fixture tests. SHA-256: a421924f6ccd29662ed1ba52316306014bc417bd20780166eaab5d679f523178",
-    "sha256": "a421924f6ccd29662ed1ba52316306014bc417bd20780166eaab5d679f523178",
-    "version": "4.0.22",
-    "sourceCommit": "659f4f4f52003d26ea4afe49b589a47115bce423",
-    "packageName": "OSMINOG-Preview-4.0.22-x64.exe",
-    "minDevHubVersion": "0.0.0",
-    "size": 115240821,
-    "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/windows-v4.0.22/OSMINOG-Preview-4.0.22-x64.exe",
-    "publishedAt": "2026-10-17T07:24:47Z",
-    "manifestVersion": "4.0.22",
-    "kind": "full-package"
+    "packageName": "OSMINOG-Preview-4.0.23-x64.exe",
+    "version": "4.0.23",
+    "sha256": "d50cb35f73b0f1a5f887c9f05ed24f973ce1399ab8364573ea7ca7fc691041bb",
+    "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/windows-v4.0.23/OSMINOG-Preview-4.0.23-x64.exe",
+    "kind": "full-package",
+    "publishedAt": "2026-10-17T10:14:54Z",
+    "manifestVersion": "4.0.23",
+    "sourceCommit": "83cf75b8da659c55a5fad84cd5e892110d5a635e",
+    "size": 115242371,
+    "notes": "OSMINOG Windows Preview 4.0.23\n\n4.0.23: оптимизация чтения настроек и загрузки PDF; отчёт по памяти; свежее состояние после открытия вкладки и более длинный цикл исполнения.\n\nUnsigned preview. Source 83cf75b8da659c55a5fad84cd5e892110d5a635e. Windows tests cover installed paths, native panes, fixture provider replies, native input and canvas drag. Live provider accounts and Figma are not certified by fixture tests. SHA-256: d50cb35f73b0f1a5f887c9f05ed24f973ce1399ab8364573ea7ca7fc691041bb",
+    "minDevHubVersion": "0.0.0"
   }
 }
