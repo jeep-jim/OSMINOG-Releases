@@ -5,20 +5,20 @@
     "product": "OSMINOG",
     "platform": "chrome-extension",
     "channel": "dev",
-    "generatedAt": "2026-11-02T10:01:47Z",
+    "generatedAt": "2026-11-02T11:21:55Z",
     "status": "active",
     "latest": {
-      "version": "4.0.12",
+      "version": "4.0.13",
       "kind": "full-package",
-      "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/chrome-v4.0.12/OSMINOG-Chrome-4.0.12-SOURCE-ROUTING.zip",
-      "size": 4255579,
-      "sha256": "516c39c48d187fc0df8b0d2240f2e599940a1b483b8efb96af94468dcbd68aad",
-      "manifestVersion": "4.0.12",
+      "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/chrome-v4.0.13/OSMINOG-Chrome-4.0.13-CANVAS-AUTOSAVE.zip",
+      "size": 4255540,
+      "sha256": "66348c3f8c840f89c5dab0c3eb9e32b14d0a2a5dd8207d6056ff2fc9c0330d4d",
+      "manifestVersion": "4.0.13",
       "fixedExtensionKeyRequired": true,
       "minDevHubVersion": "2.0.0",
       "runtimeVerified": false,
-      "notesUrl": "https://raw.githubusercontent.com/jeep-jim/OSMINOG-Releases/main/platforms/chrome-extension/releases/4.0.12/README.md",
-      "publishedAt": "2026-11-02T10:01:47Z"
+      "notesUrl": "https://raw.githubusercontent.com/jeep-jim/OSMINOG-Releases/main/platforms/chrome-extension/releases/4.0.13/README.md",
+      "publishedAt": "2026-11-02T11:21:55Z"
     }
   },
   "signature": null
