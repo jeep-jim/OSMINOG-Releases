@@ -5,20 +5,20 @@
     "product": "OSMINOG",
     "platform": "chrome-extension",
     "channel": "dev",
-    "generatedAt": "2026-11-02T14:47:50Z",
+    "generatedAt": "2026-11-02T17:23:44Z",
     "status": "active",
     "latest": {
-      "version": "4.0.16",
+      "version": "4.0.17",
       "kind": "full-package",
-      "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/chrome-v4.0.16/OSMINOG-Chrome-4.0.16-QUICK-PHOTO.zip",
-      "size": 4262438,
-      "sha256": "19218c598f3dd851c1cfa9d016a895c5c0d208e4950175ded8616f30f710a313",
-      "manifestVersion": "4.0.16",
+      "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/chrome-v4.0.17/OSMINOG-Chrome-4.0.17-CANVAS-TOOLS.zip",
+      "size": 4250741,
+      "sha256": "f2d06f4bf94335517e27a09835dcfad8cc3fa924516250d9af2aa8a892dd5b76",
+      "manifestVersion": "4.0.17",
       "fixedExtensionKeyRequired": true,
       "minDevHubVersion": "2.0.0",
       "runtimeVerified": false,
-      "notesUrl": "https://raw.githubusercontent.com/jeep-jim/OSMINOG-Releases/main/platforms/chrome-extension/releases/4.0.16/README.md",
-      "publishedAt": "2026-11-02T14:47:50Z"
+      "notesUrl": "https://raw.githubusercontent.com/jeep-jim/OSMINOG-Releases/main/platforms/chrome-extension/releases/4.0.17/README.md",
+      "publishedAt": "2026-11-02T17:23:44Z"
     }
   },
   "signature": null
