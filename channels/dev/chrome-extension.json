@@ -5,20 +5,20 @@
     "product": "OSMINOG",
     "platform": "chrome-extension",
     "channel": "dev",
-    "generatedAt": "2026-11-02T05:45:24Z",
+    "generatedAt": "2026-11-02T09:20:19Z",
     "status": "active",
     "latest": {
-      "version": "4.0.10",
+      "version": "4.0.11",
       "kind": "full-package",
-      "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/chrome-v4.0.10/OSMINOG-Chrome-4.0.10-CANVAS-CHAT.zip",
-      "size": 4253099,
-      "sha256": "028b22b3d308b890c06ac0c407c22dec10cc7b2a951541b1118472ec72b4c1e0",
-      "manifestVersion": "4.0.10",
+      "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/chrome-v4.0.11/OSMINOG-Chrome-4.0.11-GITHUB-WORKSPACE.zip",
+      "size": 4255509,
+      "sha256": "99c280d60e635d0e72c901193b6914d1b58eea062e91dba98c84ae0bf26871ce",
+      "manifestVersion": "4.0.11",
       "fixedExtensionKeyRequired": true,
       "minDevHubVersion": "2.0.0",
       "runtimeVerified": false,
-      "notesUrl": "https://raw.githubusercontent.com/jeep-jim/OSMINOG-Releases/main/platforms/chrome-extension/releases/4.0.10/README.md",
-      "publishedAt": "2026-11-02T05:45:24Z"
+      "notesUrl": "https://raw.githubusercontent.com/jeep-jim/OSMINOG-Releases/main/platforms/chrome-extension/releases/4.0.11/README.md",
+      "publishedAt": "2026-11-02T09:20:19Z"
     }
   },
   "signature": null
