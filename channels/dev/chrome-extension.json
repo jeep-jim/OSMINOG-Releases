@@ -5,20 +5,20 @@
     "product": "OSMINOG",
     "platform": "chrome-extension",
     "channel": "dev",
-    "generatedAt": "2026-11-02T11:55:11Z",
+    "generatedAt": "2026-11-02T13:14:20Z",
     "status": "active",
     "latest": {
-      "version": "4.0.14",
+      "version": "4.0.15",
       "kind": "full-package",
-      "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/chrome-v4.0.14/OSMINOG-Chrome-4.0.14-SPACE-WORLDS.zip",
-      "size": 4268400,
-      "sha256": "9cc0d6630def0e97f81ac8a903e5818579f07ac531c5260948831e9e9f69d4fb",
-      "manifestVersion": "4.0.14",
+      "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/chrome-v4.0.15/OSMINOG-Chrome-4.0.15-CHARACTER-ROOM.zip",
+      "size": 4455717,
+      "sha256": "8a4ca3e0adcc9ccde3c6cded7c3b925bad1428e7b6e98e8050cd941c15095fdd",
+      "manifestVersion": "4.0.15",
       "fixedExtensionKeyRequired": true,
       "minDevHubVersion": "2.0.0",
       "runtimeVerified": false,
-      "notesUrl": "https://raw.githubusercontent.com/jeep-jim/OSMINOG-Releases/main/platforms/chrome-extension/releases/4.0.14/README.md",
-      "publishedAt": "2026-11-02T11:55:11Z"
+      "notesUrl": "https://raw.githubusercontent.com/jeep-jim/OSMINOG-Releases/main/platforms/chrome-extension/releases/4.0.15/README.md",
+      "publishedAt": "2026-11-02T13:14:20Z"
     }
   },
   "signature": null
