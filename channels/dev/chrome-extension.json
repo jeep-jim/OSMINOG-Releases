@@ -5,20 +5,20 @@
     "product": "OSMINOG",
     "platform": "chrome-extension",
     "channel": "dev",
-    "generatedAt": "2026-11-02T13:14:20Z",
+    "generatedAt": "2026-11-02T14:47:50Z",
     "status": "active",
     "latest": {
-      "version": "4.0.15",
+      "version": "4.0.16",
       "kind": "full-package",
-      "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/chrome-v4.0.15/OSMINOG-Chrome-4.0.15-CHARACTER-ROOM.zip",
-      "size": 4455717,
-      "sha256": "8a4ca3e0adcc9ccde3c6cded7c3b925bad1428e7b6e98e8050cd941c15095fdd",
-      "manifestVersion": "4.0.15",
+      "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/chrome-v4.0.16/OSMINOG-Chrome-4.0.16-QUICK-PHOTO.zip",
+      "size": 4262438,
+      "sha256": "19218c598f3dd851c1cfa9d016a895c5c0d208e4950175ded8616f30f710a313",
+      "manifestVersion": "4.0.16",
       "fixedExtensionKeyRequired": true,
       "minDevHubVersion": "2.0.0",
       "runtimeVerified": false,
-      "notesUrl": "https://raw.githubusercontent.com/jeep-jim/OSMINOG-Releases/main/platforms/chrome-extension/releases/4.0.15/README.md",
-      "publishedAt": "2026-11-02T13:14:20Z"
+      "notesUrl": "https://raw.githubusercontent.com/jeep-jim/OSMINOG-Releases/main/platforms/chrome-extension/releases/4.0.16/README.md",
+      "publishedAt": "2026-11-02T14:47:50Z"
     }
   },
   "signature": null
