@@ -1,0 +1,17 @@
+{
+  "schema": "osminog-release/v2",
+  "product": "OSMINOG",
+  "platform": "chrome-extension",
+  "version": "4.0.13",
+  "package": "OSMINOG-Chrome-4.0.13-CANVAS-AUTOSAVE.zip",
+  "size": 4255540,
+  "sha256": "66348c3f8c840f89c5dab0c3eb9e32b14d0a2a5dd8207d6056ff2fc9c0330d4d",
+  "manifestVersion": "4.0.13",
+  "fixedExtensionKeyRequired": true,
+  "minDevHubVersion": "2.0.0",
+  "runtimeVerified": false,
+  "sourceCommit": "b02b1f880c6210aa6cbbaa4593eed5e028aeb629",
+  "mergedSourceCommit": "3f09baf0998c6f9e0adbf0d95db8ec1a96db95ec",
+  "verificationUrl": "https://github.com/jeep-jim/OSMINOG/actions/runs/41435560813",
+  "notes": "# OSMINOG 4.0.13\n\nУдалена кнопка Save из верхней панели. Автосохранение сохранено: браузерный тест проверяет создание объекта и восстановление после перезагрузки без ручного сохранения. Все CI проверки прошли. Обновление через кнопку версии.\n"
+}
