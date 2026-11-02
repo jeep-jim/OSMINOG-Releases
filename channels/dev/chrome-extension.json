@@ -5,20 +5,20 @@
     "product": "OSMINOG",
     "platform": "chrome-extension",
     "channel": "dev",
-    "generatedAt": "2026-11-02T11:21:55Z",
+    "generatedAt": "2026-11-02T11:55:11Z",
     "status": "active",
     "latest": {
-      "version": "4.0.13",
+      "version": "4.0.14",
       "kind": "full-package",
-      "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/chrome-v4.0.13/OSMINOG-Chrome-4.0.13-CANVAS-AUTOSAVE.zip",
-      "size": 4255540,
-      "sha256": "66348c3f8c840f89c5dab0c3eb9e32b14d0a2a5dd8207d6056ff2fc9c0330d4d",
-      "manifestVersion": "4.0.13",
+      "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/chrome-v4.0.14/OSMINOG-Chrome-4.0.14-SPACE-WORLDS.zip",
+      "size": 4268400,
+      "sha256": "9cc0d6630def0e97f81ac8a903e5818579f07ac531c5260948831e9e9f69d4fb",
+      "manifestVersion": "4.0.14",
       "fixedExtensionKeyRequired": true,
       "minDevHubVersion": "2.0.0",
       "runtimeVerified": false,
-      "notesUrl": "https://raw.githubusercontent.com/jeep-jim/OSMINOG-Releases/main/platforms/chrome-extension/releases/4.0.13/README.md",
-      "publishedAt": "2026-11-02T11:21:55Z"
+      "notesUrl": "https://raw.githubusercontent.com/jeep-jim/OSMINOG-Releases/main/platforms/chrome-extension/releases/4.0.14/README.md",
+      "publishedAt": "2026-11-02T11:55:11Z"
     }
   },
   "signature": null
