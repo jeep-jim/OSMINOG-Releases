@@ -1,0 +1,18 @@
+{
+  "schema": "osminog-release/v2",
+  "product": "OSMINOG",
+  "platform": "chrome-extension",
+  "version": "4.0.18",
+  "size": 4251272,
+  "sha256": "2765745a58ec2e4e090f0fc6262a3634c1397dfa14234c051a4c716a676273de",
+  "package": "OSMINOG-Chrome-4.0.18-CANVAS-TOOLS.zip",
+  "manifestVersion": "4.0.18",
+  "fixedExtensionKeyRequired": true,
+  "minDevHubVersion": "2.0.0",
+  "runtimeVerified": false,
+  "sourceCommit": "b066e0c5f0d3640ea6e89fd356d6b4d9cfca58af",
+  "mergedSourceCommit": "f335c322d0ed142c055a372a255e1ba161b6711a",
+  "verificationUrl": "https://github.com/jeep-jim/OSMINOG/actions/runs/41568163069",
+  "notes": "# OSMINOG 4.0.18 — Inspector visibility\n\nИсправлена постоянно открытая правая панель свойств. Кнопка настроек в шапке переключает её видимость; во время обработки фото это также делает нажатие на шляпу. Кнопка закрытия в самой панели снова доступна.\n\nСкрытая панель освобождает место холсту, не перекрывает его и не появляется снова при перерисовке. Инструмент, выделение и изменения фото сохраняются; чат остаётся на своём месте. Выбор другого инструмента обработки открывает его настройки. Состояние видимости запоминается локально.\n",
+  "publishedAt": "2026-11-03T02:51:18.860Z"
+}
