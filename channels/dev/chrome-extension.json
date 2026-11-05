@@ -5,20 +5,20 @@
     "product": "OSMINOG",
     "platform": "chrome-extension",
     "channel": "dev",
-    "generatedAt": "2026-11-05T10:05:34Z",
+    "generatedAt": "2026-11-05T13:03:19Z",
     "status": "active",
     "latest": {
-      "version": "4.0.21",
+      "version": "4.0.22",
       "kind": "full-package",
-      "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/chrome-v4.0.21/OSMINOG-Chrome-4.0.21-CLIPBOARD-FIX.zip",
-      "size": 9400407,
-      "sha256": "f0872c6f35f128956f9a55571cd0541cc86195bb152560b6a7b165919e7c2a1a",
-      "manifestVersion": "4.0.21",
+      "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/chrome-v4.0.22/OSMINOG-Chrome-4.0.22-WORKSPACE-FIX.zip",
+      "size": 9412525,
+      "sha256": "4ccbb48acf1202f6ad380119ca08e8f1533982eae2788844fa2f3935cbf888a3",
+      "manifestVersion": "4.0.22",
       "fixedExtensionKeyRequired": true,
       "minDevHubVersion": "2.0.0",
       "runtimeVerified": false,
-      "notesUrl": "https://raw.githubusercontent.com/jeep-jim/OSMINOG-Releases/main/platforms/chrome-extension/releases/4.0.21/README.md",
-      "publishedAt": "2026-11-05T10:05:34Z"
+      "notesUrl": "https://raw.githubusercontent.com/jeep-jim/OSMINOG-Releases/main/platforms/chrome-extension/releases/4.0.22/README.md",
+      "publishedAt": "2026-11-05T13:03:19Z"
     }
   },
   "signature": null
