@@ -1,0 +1,19 @@
+{
+  "schema": "osminog-release/v2",
+  "product": "OSMINOG",
+  "platform": "chrome-extension",
+  "version": "4.0.21",
+  "size": 9400407,
+  "sha256": "f0872c6f35f128956f9a55571cd0541cc86195bb152560b6a7b165919e7c2a1a",
+  "package": "OSMINOG-Chrome-4.0.21-CLIPBOARD-FIX.zip",
+  "manifestVersion": "4.0.21",
+  "fixedExtensionKeyRequired": true,
+  "minDevHubVersion": "2.0.0",
+  "runtimeVerified": false,
+  "sourceCommit": "fbb2e1416dbf05c407ee83cb31589dae8c71581c",
+  "mergedSourceCommit": "5aeb71b3a56258d34dbdbc488a042b65360135d2",
+  "verificationUrl": "https://github.com/jeep-jim/OSMINOG/actions/runs/42006617269",
+  "sourceWorkflowRun": 42006617269,
+  "sourceArtifactId": 13405301415,
+  "notes": "Исправлены автосохранение скриншотов в выбранную папку или на стол OSMINOG, ручная вставка Ctrl+V и чтение сохранённых проектов после перезагрузки. Ошибочные материалы не блокируют следующие копирования; временные ошибки сохраняют повторную доставку. Полная автоматическая проверка в Chrome 151 на Linux подтвердила реальный буфер, фоновый сбор, сохранение и перезапуск браузера. Проверка на Windows владельца отдельно не заявляется."
+}
