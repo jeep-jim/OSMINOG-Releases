@@ -13,8 +13,10 @@ import zipfile
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 SOURCE = 'jeep-jim/OSMINOG'
-REQUIRED = {'OSMINOG 4.0.22 workspace unification', 'Windows desktop compatibility candidate',
-            'Workdesk and retained document regression', 'Retired studio compatibility'}
+# Stable GitHub workflow identities: Chrome, Windows, documents, retained compatibility.
+# Versioned display titles may change; none of the required checks can be omitted.
+CHROME_WORKFLOW = 351479698
+REQUIRED_WORKFLOWS = {CHROME_WORKFLOW, 370781122, 351443074, 351468502}
 IDENTITY = '1ddb8d87f3a6f6cb38a229bd81ba8076d1d37d3ba6b8a15b2a91129d4904012e'
 LIMIT = 64 * 1024 * 1024
 
@@ -55,7 +57,7 @@ def main(version):
     if not re.fullmatch(r'[a-f0-9]{40}', head):
         raise ValueError('Invalid source commit')
     runs = [api(f'actions/runs/{int(run_id)}') for run_id in request['verificationRuns']]
-    if {r['name'] for r in runs} != REQUIRED or len(runs) != len(REQUIRED):
+    if {r['workflow_id'] for r in runs} != REQUIRED_WORKFLOWS or len(runs) != len(REQUIRED_WORKFLOWS):
         raise ValueError('Missing required verification')
     for run in runs:
         if run['head_sha'] != head or run['status'] != 'completed' or run['conclusion'] != 'success':
@@ -68,7 +70,7 @@ def main(version):
     run_id = int(request['sourceWorkflowRun'])
     if artifact['expired'] or artifact['workflow_run']['id'] != run_id or artifact['workflow_run']['head_sha'] != head:
         raise ValueError('Wrong source artifact')
-    if not any(r['id'] == run_id and r['name'] == 'OSMINOG 4.0.22 workspace unification' for r in runs):
+    if not any(r['id'] == run_id and r['workflow_id'] == CHROME_WORKFLOW for r in runs):
         raise ValueError('Artifact did not come from the Chrome gate')
     outer = api(f'actions/artifacts/{artifact_id}/zip', binary=True)
     if artifact.get('digest') and artifact['digest'] != 'sha256:'+digest(outer):
