@@ -1,0 +1,7 @@
+OSMINOG Chrome 4.0.22
+Approved source: 3e24004c8dc0cca29201c9ca6ff9604cef65c715
+Merged source: 59ed085cc17eba8cd4b933baade26bdb3b6ac52c
+All required workflows successful: 42031379514 42031379401 42031379664 42031380350
+Artifact: 13416252612
+ZIP SHA-256: 4ccbb48acf1202f6ad380119ca08e8f1533982eae2788844fa2f3935cbf888a3
+Import exact tested bytes; advance the dev feed only after the existing publisher verifies the remote release asset.
