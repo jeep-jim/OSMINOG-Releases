@@ -1,0 +1,63 @@
+name: Import verified Chrome CI archive
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'staging/chrome-extension/*/IMPORT-CI-READY'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Version with a reviewed import-ci.json
+        required: true
+        type: string
+permissions:
+  contents: write
+  actions: write
+concurrency:
+  group: osminog-chrome-registry-v2
+  cancel-in-progress: false
+jobs:
+  import:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      GH_TOKEN: ${{ github.token }}
+      REQUESTED_VERSION: ${{ inputs.version || '' }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 2
+      - name: Resolve the explicitly requested version
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import os,re,subprocess
+          value=os.environ['REQUESTED_VERSION']
+          if not value:
+              paths=subprocess.check_output(['git','diff-tree','--no-commit-id','--name-only','-r',os.environ['GITHUB_SHA']],text=True).splitlines()
+              versions={m.group(1) for path in paths if (m:=re.fullmatch(r'staging/chrome-extension/(\d+(?:\.\d+){2,3})/IMPORT-CI-READY',path))}
+              if len(versions)!=1:
+                  raise SystemExit('Exactly one release import marker must change')
+              value=versions.pop()
+          if not re.fullmatch(r'\d+(?:\.\d+){2,3}',value):
+              raise SystemExit('Invalid version')
+          with open(os.environ['GITHUB_ENV'],'a') as out:
+              out.write('RELEASE_VERSION='+value+'\n')
+          PY
+      - name: Verify all required checks, merged source, identity and exact archive bytes
+        run: python3 tools/import_verified_chrome_ci.py "$RELEASE_VERSION"
+      - name: Archive the immutable verified package
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add "platforms/chrome-extension/releases/$RELEASE_VERSION/"
+          if ! git diff --cached --quiet; then
+            git commit -m "Archive tested OSMINOG Chrome $RELEASE_VERSION CI package [skip ci]"
+            git push origin HEAD:main
+          fi
+      - name: Publish through the existing remote-asset verification and feed gates
+        run: gh workflow run publish-chrome-package-v2.yml --ref main -f "version=$RELEASE_VERSION"
