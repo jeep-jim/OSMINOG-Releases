@@ -1,0 +1,9 @@
+OSMINOG Chrome 4.0.23
+Approved source: 38c0cea7942a96db57adc1d6d5b095d049bfdb41
+Merged source: f62841d28c02f2cf8dbe0ff317665e64d33a63e2
+All required workflows successful: 42051342452 42051342337 42051342467 42051342192
+Artifact: 13426054022
+ZIP size: 9411086 bytes
+ZIP SHA-256: 0822c40228d1a150d3bf2bf539a5e652685b032c23f65015804f6e97dc44dca5
+Actual light/dark/mobile screenshots, centered editor and packaged entry-point references inspected.
+Import exact tested ZIP bytes; advance the dev feed only after remote release asset verification. Do not replace 4.0.22.
