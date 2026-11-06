@@ -142,6 +142,7 @@ jobs:
           git commit -m "Publish OSMINOG Vision Android ${{ steps.package.outputs.version }} dev feed"
           git push
           rm -rf '${{ steps.package.outputs.stage }}'
+          rm -rf work source-artifact.zip
           git add -A
           git commit -m "Clear published OSMINOG Vision Android staging payload"
           git push
