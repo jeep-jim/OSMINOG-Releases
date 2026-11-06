@@ -1,0 +1,19 @@
+{
+  "verificationUrl": "https://github.com/jeep-jim/OSMINOG-Releases/actions/runs/42165188818",
+  "unitTests": 14,
+  "legacyOwnerAccess": "pass",
+  "realChrome": "pass",
+  "changedFiles": [
+    "OSMINOG_BUILD.json",
+    "manifest.json",
+    "osminog-owner-guard.js"
+  ],
+  "unchangedFileCount": 145,
+  "manifestIdentityAndPermissionsPreserved": true,
+  "ownerDeviceTested": false,
+  "changedFileSha256": {
+    "OSMINOG_BUILD.json": "5c90043814c126548d70afd59a52789b869640ed66ba213f78d3c351e2e1cf74",
+    "manifest.json": "9e11ac7963a4403e0140bfe7c897f4a41a529b9c06a73159b7793a5b4ee6be48",
+    "osminog-owner-guard.js": "90dc411113966db05adc323c56d5311aa830af8c11c4d6dcf959aa32008dab41"
+  }
+}

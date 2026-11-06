@@ -1,0 +1,24 @@
+{
+  "schema": "osminog-release/v2",
+  "product": "OSMINOG",
+  "platform": "chrome-extension",
+  "version": "4.0.25.1",
+  "package": "OSMINOG-Chrome-4.0.25.1-OWNER-AUTH-FIX.zip",
+  "size": 9354946,
+  "sha256": "dba42180425300c5a07d33c1d7d70db82118a529140e33d9c88c63535b7060ea",
+  "manifestVersion": "4.0.25.1",
+  "fixedExtensionKeyRequired": true,
+  "minDevHubVersion": "2.0.0",
+  "runtimeVerified": false,
+  "ciVerified": true,
+  "baseVersion": "4.0.25",
+  "baseSha256": "9df95f731f5f073de69ce4e35b5f4acac0a58c7846da2854ec77c37ef95fa0e3",
+  "authSourceCommit": "04e02d6dab70294bbfa5dc7cb4dc09753c876d59",
+  "verificationUrl": "https://github.com/jeep-jim/OSMINOG-Releases/actions/runs/42165188818",
+  "changedFiles": [
+    "OSMINOG_BUILD.json",
+    "manifest.json",
+    "osminog-owner-guard.js"
+  ],
+  "notes": "Исправлена привязка Google Authenticator: ключ незавершённой настройки сохраняется при закрытии и перезагрузке; повторные запросы входа и вкладки используют одну настройку; исправлена вставка кода с пробелом. Готовая привязка не сбрасывается. Проверка GitHub и шестизначного кода сохранена. Основа — опубликованная Chrome 4.0.25; рабочий стол, папки, оформление и остальные функции побайтово сохранены. Обновление устанавливается штатной кнопкой «Обновить»."
+}
