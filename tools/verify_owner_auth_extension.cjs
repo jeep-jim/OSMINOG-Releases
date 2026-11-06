@@ -1,6 +1,5 @@
 'use strict';
-// Runs against the unpacked release package in an isolated Chrome profile.
-// GitHub responses and tokens are fixtures; no owner credentials are used.
+// Tests the actual unpacked release using synthetic credentials only.
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const os = require('node:os');
@@ -17,12 +16,13 @@ function otp(secret, time = Date.now()) {
   const mac = createHmac('sha1', key).update(counter).digest();
   return String((mac.readUInt32BE(mac[19] & 15) & 0x7fffffff) % 1000000).padStart(6, '0');
 }
+const wait = (p, fn) => p.waitForFunction(fn, null, {polling: 50, timeout: 15000});
 (async () => {
   const profile = fs.mkdtempSync(path.join(os.tmpdir(), 'osminog-owner-auth-'));
-  // Temporary test harness only; it is deleted before packaging.
   const harness = path.join(root, 'owner-auth-ci.html');
-  fs.writeFileSync(harness, '<!doctype html><html><body><script src="osminog-owner-guard.js"></script></body></html>');
-  let context;
+  // Match the real editor's UTF-8 encoding. The harness is never shipped.
+  fs.writeFileSync(harness, '<!doctype html><html><head><meta charset="utf-8"></head><body><script src="osminog-owner-guard.js"></script></body></html>');
+  let context, page;
   try {
     context = await chromium.launchPersistentContext(profile, {
       headless: false,
@@ -30,9 +30,10 @@ function otp(secret, time = Date.now()) {
     });
     const worker = context.serviceWorkers()[0] || await context.waitForEvent('serviceworker');
     const id = new URL(worker.url()).host;
-    const page = await context.newPage();
+    page = await context.newPage();
     async function open(p) {
       await p.goto(`chrome-extension://${id}/owner-auth-ci.html`);
+      assert.equal(await p.evaluate(() => document.characterSet), 'UTF-8');
       await p.evaluate(() => {
         globalThis.__ownerReject = false;
         chrome.runtime.sendMessage = async message => {
@@ -43,16 +44,18 @@ function otp(secret, time = Date.now()) {
       });
     }
     async function start(p) {
+      await p.bringToFront();
       await p.evaluate(() => {
         globalThis.__ownerResult = 'pending';
         OSMINOGOwnerGuard.require('CI owner auth').then(value => globalThis.__ownerResult = value);
       });
-      await p.waitForFunction(() => {
+      await wait(p, () => {
         const m = document.querySelector('#osminogOwnerGate');
         return m && !m.hidden && !m.querySelector('[data-owner-submit]').disabled;
       });
     }
     async function input(p, code) {
+      await p.bringToFront();
       await p.locator('[data-owner-code]').fill(code);
       await p.locator('[data-owner-submit]').click();
     }
@@ -65,32 +68,29 @@ function otp(secret, time = Date.now()) {
     const secret = await page.locator('[data-owner-secret]').textContent();
     assert.match(secret, /^[A-Z2-7]{32}$/);
     await page.locator('[data-owner-cancel]').click();
-    await page.waitForFunction(() => __ownerResult === false);
+    await wait(page, () => __ownerResult === false);
     await start(page);
     assert.equal(await page.locator('[data-owner-secret]').textContent(), secret);
-    // A complete page reload uses the same previously displayed key.
     await open(page);
     await start(page);
     assert.equal(await page.locator('[data-owner-secret]').textContent(), secret);
-    // Two callers receive one promise; neither can silently replace the key.
     assert.equal(await page.evaluate(() => OSMINOGOwnerGuard.require('a') === OSMINOGOwnerGuard.require('b')), true);
     const second = await context.newPage();
     await open(second);
     await start(second);
     assert.equal(await second.locator('[data-owner-secret]').textContent(), secret);
-    // Guaranteed stale fixture code is outside the preserved +/-30 s window.
+    console.log('PASS browser: stable setup key across reopen/reload/two tabs');
     await input(page, otp(secret, Date.now() - 600000));
-    await page.waitForFunction(() => document.querySelector('[data-owner-error]').textContent.includes('Неверный код'));
+    await wait(page, () => document.querySelector('[data-owner-error]').textContent.includes('Неверный код'));
     assert.equal(await page.evaluate(() => OSMINOGOwnerGuard.isUnlocked()), false);
     assert.equal(await page.evaluate(async () => !!(await chrome.storage.local.get('osminogOwnerAuthV1')).osminogOwnerAuthV1), false);
-    // A valid OTP must not enroll when GitHub rejects the owner.
     await page.evaluate(() => globalThis.__ownerReject = true);
     await input(page, otp(secret));
-    await page.waitForFunction(() => document.querySelector('[data-owner-error]').textContent.includes('write-доступ'));
+    await wait(page, () => document.querySelector('[data-owner-error]').textContent.includes('write-доступ'));
     assert.equal(await page.evaluate(() => OSMINOGOwnerGuard.isUnlocked()), false);
     assert.equal(await page.evaluate(async () => !!(await chrome.storage.local.get('osminogOwnerAuthV1')).osminogOwnerAuthV1), false);
+    console.log('PASS browser: invalid OTP and rejected GitHub cannot enroll or unlock');
     await page.evaluate(() => globalThis.__ownerReject = false);
-    // Real DOM paste handler strips the Authenticator grouping space before maxlength.
     const currentCode = otp(secret);
     await page.evaluate(code => {
       const data = new DataTransfer();
@@ -99,18 +99,30 @@ function otp(secret, time = Date.now()) {
     }, currentCode);
     assert.equal(await page.locator('[data-owner-code]').inputValue(), currentCode);
     await page.locator('[data-owner-submit]').click();
-    await page.waitForFunction(() => __ownerResult === true);
+    await wait(page, () => __ownerResult === true);
     assert.equal(await page.evaluate(() => OSMINOGOwnerGuard.isUnlocked()), true);
-    // The other open tab still accepts the same key, now committed by the first tab.
     await input(second, otp(secret));
-    await second.waitForFunction(() => __ownerResult === true);
+    await wait(second, () => __ownerResult === true);
     await open(page);
     await start(page);
     assert.equal(await page.locator('[data-owner-setup-step]').evaluate(el => el.hidden), true);
     await input(page, otp(secret));
-    await page.waitForFunction(() => __ownerResult === true);
+    await wait(page, () => __ownerResult === true);
     assert.equal(await page.evaluate(async () => (await chrome.storage.local.get('osminogOwnerAuthV1')).osminogOwnerAuthV1.totpSecret), secret);
     console.log('OWNER_AUTH_REAL_CHROME_PASS: stable key, reload, shared requests/tabs, invalid code, GitHub rejection, grouped paste, enrollment and subsequent login');
+  } catch (error) {
+    if (page && !page.isClosed()) {
+      // No secret, token or OTP is logged, even for synthetic test identities.
+      console.error('Owner test state:', await page.evaluate(() => ({
+        charset: document.characterSet,
+        error: document.querySelector('[data-owner-error]')?.textContent,
+        title: document.querySelector('[data-owner-title]')?.textContent,
+        disabled: document.querySelector('[data-owner-submit]')?.disabled,
+        result: globalThis.__ownerResult,
+        unlocked: globalThis.OSMINOGOwnerGuard?.isUnlocked()
+      })).catch(() => ({pageUnavailable: true})));
+    }
+    throw error;
   } finally {
     if (context) await context.close();
     fs.rmSync(harness, {force: true});
