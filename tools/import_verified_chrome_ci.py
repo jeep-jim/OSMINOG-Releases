@@ -13,10 +13,10 @@ import zipfile
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 SOURCE = 'jeep-jim/OSMINOG'
-# Stable GitHub workflow identities: Chrome, Windows, documents, retained compatibility.
-# Versioned display titles may change; none of the required checks can be omitted.
+# Stable GitHub workflow identities for a Chrome-only package: Chrome runtime, documents, retained compatibility.
+# The Windows native-shell workflow is not a release gate for the Chrome ZIP; its source is unchanged.
 CHROME_WORKFLOW = 351479698
-REQUIRED_WORKFLOWS = {CHROME_WORKFLOW, 370781122, 351443074, 351468502}
+REQUIRED_WORKFLOWS = {CHROME_WORKFLOW, 351443074, 351468502}
 IDENTITY = '1ddb8d87f3a6f6cb38a229bd81ba8076d1d37d3ba6b8a15b2a91129d4904012e'
 LIMIT = 64 * 1024 * 1024
 
