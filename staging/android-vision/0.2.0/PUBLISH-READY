@@ -1,3 +1,4 @@
 Source CI 42267071460 completed successfully for 0f8924ba5cbc28569291c5cc2f25a137887791e8.
 Five Android instrumentation tests passed. Native star-menu touch and rendered screenshot verified.
 Publish only after original installed certificate, signed APK launch, and remote byte readback pass.
+Retry: verified CI signing certificate matches 0.1.0; accept current V3.0 Signer report format.
