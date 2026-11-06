@@ -1,0 +1,8 @@
+OSMINOG Chrome 4.0.24 performance hotfix
+Verified head: 59f12a84725d6c73ece2eec96e416ba97951fa49
+Merged source: ac2f7f8900161757b9ce91e02f373eb3b11cc561
+Successful required runs: 42137549767 42137549753 42137549760 42137549889
+Artifact: 13465458668
+Package size: 9414118 bytes
+SHA-256: 938dd29b8852199fb3971656ebe3a240081305a898ce46627efab7c96cd336cc
+Import exact CI bytes and advance the existing dev feed only after remote asset verification.
