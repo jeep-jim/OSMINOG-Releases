@@ -105,8 +105,9 @@ jobs:
           python3 - <<'PY'
           import hashlib,json,pathlib,re
           p=pathlib.Path('vision-release');m=json.loads((p/'meta.json').read_text())
-          certs=re.findall(r'Signer #\d+ certificate SHA-256 digest: ([0-9a-f]+)',(p/'signature.txt').read_text())
-          assert certs==[m['signerSha256']], 'Signing identity differs from installed 0.1.0'
+          report=(p/'signature.txt').read_text()
+          certs=set(re.findall(r'(?m)^(?:Signer #\d+ |V\d+(?:\.\d+)* Signer: )certificate SHA-256 digest: ([0-9a-f]{64})\s*$',report))
+          assert certs=={m['signerSha256']}, 'Signing identity differs from installed 0.1.0'
           b=(p/'badging.txt').read_text()
           for token in [f"name='{m['applicationId']}'",f"versionCode='{m['versionCode']}'",f"versionName='{m['versionName']}'","sdkVersion:'26'"]:
               assert token in b, token
