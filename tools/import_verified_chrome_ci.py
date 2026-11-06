@@ -62,9 +62,24 @@ def main(version):
     for run in runs:
         if run['head_sha'] != head or run['status'] != 'completed' or run['conclusion'] != 'success':
             raise ValueError('Source verification has not passed')
-    comparison = api(f'compare/{head}...main')
+    # Normal merge commits make the tested source head an ancestor of main.
+    # Squash merges do not preserve that ancestry, so bind the tested head to the
+    # explicitly merged PR and independently verify that its merge commit is on main.
+    merge_commit = request.get('sourceMergeCommit')
+    if merge_commit:
+        pr_number = int(request['pullRequestNumber'])
+        pr = api(f'pulls/{pr_number}')
+        if not pr.get('merged') or pr.get('state') != 'closed':
+            raise ValueError('Source pull request is not merged')
+        if pr.get('base', {}).get('ref') != 'main' or pr.get('head', {}).get('sha') != head:
+            raise ValueError('Merged pull request does not match verified source head')
+        if pr.get('merge_commit_sha') != merge_commit:
+            raise ValueError('Unexpected squash/merge commit')
+        comparison = api(f'compare/{merge_commit}...main')
+    else:
+        comparison = api(f'compare/{head}...main')
     if comparison['status'] not in ('ahead', 'identical') or comparison['behind_by'] != 0:
-        raise ValueError('Verified source is not merged into main')
+        raise ValueError('Verified source/merge commit is not merged into main')
     artifact_id = int(request['artifactId'])
     artifact = api(f'actions/artifacts/{artifact_id}')
     run_id = int(request['sourceWorkflowRun'])
