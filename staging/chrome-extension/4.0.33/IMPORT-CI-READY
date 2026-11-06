@@ -1,0 +1,12 @@
+Version: 4.0.33
+Tested source head: ed57b8c7c8e4dc3da01eaf89c368acfd1b8e9b0f
+Merged PR: #88
+Merge commit: 446ab3591dc1ab4a3cdddc08edfe89b1093d23b4
+Full Chrome CI: 42236154441
+All five candidate workflows passed. The three mandatory importer runs are pinned in import-ci.json.
+Artifact: 13511282045
+Package size: 9460424 bytes
+Package SHA-256: 3b2f77dab9060f6b99580077a08b3730b1ab570b07e93c1124630d03a148ea37
+OwnerGuard SHA-256: 90dc411113966db05adc323c56d5311aa830af8c11c4d6dcf959aa32008dab41
+The Browser App header and dead Open/Layout buttons are removed. The native Chrome titlebar is reserved inside the frame. Switching the parent Chrome tab no longer auto-minimizes the site popup.
+The popup is still a separate OS window; Chrome/OS may place it behind the parent, and always-on-top is not guaranteed. Preserve these limitations in release notes.
