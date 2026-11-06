@@ -1,0 +1,154 @@
+name: Publish Chrome 4.0.25.1 owner-auth hotfix
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/publish-owner-auth-hotfix.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: osminog-chrome-registry-v2
+  cancel-in-progress: false
+
+jobs:
+  owner-auth-hotfix:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - name: Checkout release registry
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - name: Checkout only the reviewed owner-auth source and tests
+        uses: actions/checkout@v4
+        with:
+          repository: jeep-jim/OSMINOG
+          ref: 04e02d6dab70294bbfa5dc7cb4dc09753c876d59
+          path: work/source
+          persist-credentials: false
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /osminog-owner-guard.js
+            /tests/owner-access-411.cjs
+            /tests/owner-totp-enrollment.cjs
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Obtain exact published baseline and reject a channel downgrade
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 tools/release_owner_auth_hotfix.py guard
+          folder='platforms/chrome-extension/releases/4.0.25'
+          package=$(jq -r '.package' "$folder/release-v2.json")
+          if [ ! -f "$folder/$package" ]; then
+            gh release download chrome-v4.0.25 --repo "$GITHUB_REPOSITORY" --pattern "$package" --dir "$folder"
+          fi
+          python3 tools/release_owner_auth_hotfix.py prepare
+      - name: Validate syntax and independent owner-auth regressions
+        working-directory: work/package
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check osminog-owner-guard.js
+          node --test tests/owner-totp-enrollment.cjs | tee ../owner-auth-unit.log
+          node tests/owner-access-411.cjs | tee ../owner-auth-legacy.log
+      - name: Install isolated browser verification dependency
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm install --no-save --package-lock=false playwright@1.62.1
+          npx playwright install --with-deps chromium
+      - name: Verify enrollment and subsequent login in real Chrome extension
+        shell: bash
+        run: |
+          set -euo pipefail
+          timeout 180s xvfb-run -a node tools/verify_owner_auth_extension.cjs work/package | tee work/owner-auth-browser.log
+          grep -q OWNER_AUTH_REAL_CHROME_PASS work/owner-auth-browser.log
+      - name: Enforce auth-only scope and build immutable full package
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 tools/release_owner_auth_hotfix.py archive
+          unzip -t platforms/chrome-extension/releases/4.0.25.1/OSMINOG-Chrome-4.0.25.1-OWNER-AUTH-FIX.zip
+      - name: Retain verification evidence
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: OSMINOG-Chrome-4.0.25.1-owner-auth-verification
+          path: |
+            work/owner-auth-*.log
+            platforms/chrome-extension/releases/4.0.25.1/
+          if-no-files-found: ignore
+          retention-days: 14
+      - name: Archive verified release without overwriting concurrent commits
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add platforms/chrome-extension/releases/4.0.25.1/
+          if ! git diff --cached --quiet; then
+            git commit -m 'Archive auth-only Chrome 4.0.25.1 with real extension proof [skip ci]'
+          fi
+          git pull --rebase origin main
+          python3 tools/release_owner_auth_hotfix.py guard
+          git push origin HEAD:main
+      - name: Publish immutable asset and verify downloaded remote bytes
+        shell: bash
+        run: |
+          set -euo pipefail
+          folder='platforms/chrome-extension/releases/4.0.25.1'
+          meta="$folder/release-v2.json"
+          package=$(jq -r '.package' "$meta")
+          expected_sha=$(jq -r '.sha256' "$meta")
+          expected_size=$(jq -r '.size' "$meta")
+          tag='chrome-v4.0.25.1'
+          if ! gh release view "$tag" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release create "$tag" --repo "$GITHUB_REPOSITORY" --target "$(git rev-parse HEAD)" --title 'OSMINOG Chrome 4.0.25.1 · Owner Authenticator Fix' --prerelease --notes-file "$folder/README.md"
+          fi
+          existing=$(gh api "repos/$GITHUB_REPOSITORY/releases/tags/$tag" --jq ".assets[] | select(.name == \"$package\") | .name")
+          if [ -z "$existing" ]; then
+            gh release upload "$tag" "$folder/$package" --repo "$GITHUB_REPOSITORY"
+          fi
+          mkdir -p work/remote
+          gh release download "$tag" --repo "$GITHUB_REPOSITORY" --pattern "$package" --dir work/remote --clobber
+          test "$(stat -c%s "work/remote/$package")" = "$expected_size"
+          test "$(sha256sum "work/remote/$package" | awk '{print $1}')" = "$expected_sha"
+          echo 'REMOTE_PACKAGE_BYTES_VERIFIED'
+      - name: Advance the button feed only after all verification
+        shell: bash
+        run: |
+          set -euo pipefail
+          git pull --rebase origin main
+          python3 tools/release_owner_auth_hotfix.py advance
+          git add channels/dev/chrome-extension.json platforms/chrome-extension/releases/4.0.25.1/release-v2.json
+          if ! git diff --cached --quiet; then
+            git commit -m 'Activate auth-only Chrome 4.0.25.1 for the update button [skip ci]'
+            git push origin HEAD:main
+          fi
+      - name: Verify the actual public update feed
+        shell: bash
+        run: |
+          set -euo pipefail
+          expected_sha=$(jq -r '.sha256' platforms/chrome-extension/releases/4.0.25.1/release-v2.json)
+          for attempt in $(seq 1 30); do
+            if curl -fsSL --max-time 15 "https://raw.githubusercontent.com/$GITHUB_REPOSITORY/main/channels/dev/chrome-extension.json?t=$GITHUB_RUN_ID-$attempt" > work/public-feed.json; then
+              version=$(jq -r '.signed.latest.version' work/public-feed.json)
+              digest=$(jq -r '.signed.latest.sha256' work/public-feed.json)
+              if [ "$version" = '4.0.25.1' ] && [ "$digest" = "$expected_sha" ]; then
+                echo 'OWNER_AUTH_HOTFIX_PUBLISHED_AND_PUBLIC_FEED_VERIFIED 4.0.25.1'
+                exit 0
+              fi
+            fi
+            sleep 5
+          done
+          echo 'Public feed propagation not verified' >&2
+          exit 1
