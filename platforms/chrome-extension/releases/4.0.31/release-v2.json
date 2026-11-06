@@ -1,0 +1,24 @@
+{
+  "schema": "osminog-release/v2",
+  "product": "OSMINOG",
+  "platform": "chrome-extension",
+  "version": "4.0.31",
+  "size": 9454937,
+  "sha256": "70b74edcb53403390e6496af071b28a6fa3519870425b5eba71d612aac59bfd2",
+  "package": "OSMINOG-Chrome-4.0.31.zip",
+  "manifestVersion": "4.0.31",
+  "fixedExtensionKeyRequired": true,
+  "minDevHubVersion": "2.0.0",
+  "runtimeVerified": false,
+  "ciVerified": true,
+  "sourceCommit": "0fdccfb976de56165e09c5c2ea2bf7fec73685d4",
+  "verificationUrl": "https://github.com/jeep-jim/OSMINOG/actions/runs/42206618389",
+  "sourceWorkflowRun": 42206618389,
+  "sourceArtifactId": 13496887384,
+  "verificationRuns": [
+    42206618389,
+    42206618269,
+    42206618225
+  ],
+  "notes": "OSMINOG 4.0.31. Восстановлен штатный Browser App вместо упрощённой iframe-панели. Компактные вкладки с плюсом после вкладок, короткая адресная строка. Браузер пристыкован к рабочей области, разделяется со столом перетаскиваемым разделителем и занимает всю ширину после закрытия чата. ChatGPT и Figma открываются через управляемые вкладки Chrome того же профиля, с VPN и расширениями; ограничения CSP/X-Frame-Options не обходятся. Добавлен перенос выбранных изображений, видео, аудио и CSS background-image на стол через Project API из редактируемой копии страницы. Защищённые вкладки не имитируют доступ к DOM. Authenticator сохранён побайтово; ключ расширения прежний."
+}
