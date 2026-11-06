@@ -1,0 +1,10 @@
+{
+  "sourceRunId": 42245384100,
+  "sourceCommit": "7e0da6c6b3784dab75d1025df31c8b7498e6dd5e",
+  "artifactName": "OSMINOG-Vision-Android-0.1.0-verification",
+  "versionName": "0.1.0",
+  "versionCode": 1,
+  "applicationId": "com.osminog.vision",
+  "minSdk": 26,
+  "notes": "Первый экспериментальный выпуск OSMINOG Vision: ИИ-чат, голосовой разговор, камера и передача выбранного кадра в существующий чат. Камера и микрофон отключаются при сворачивании приложения."
+}
