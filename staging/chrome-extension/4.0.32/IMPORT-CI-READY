@@ -1,0 +1,11 @@
+Version: 4.0.32
+Tested source head: 1bd37ef322ac7464f18b9e8206d9d3968797fac9
+Merged PR: #87
+Merge commit: 7e019f3ec3c2433b63f358d2a5507d324a764aa3
+Full Chrome CI: 42227241758
+All five candidate workflows passed. The three mandatory importer runs are pinned in import-ci.json.
+Artifact: 13506517723
+Package size: 9460228 bytes
+Package SHA-256: e990841a1726ad87b97986b9a5fdbd8bd0402d4167d8930aab3fb606e92a2331
+OwnerGuard SHA-256: 90dc411113966db05adc323c56d5311aa830af8c11c4d6dcf959aa32008dab41
+Experimental independent Chrome popup windows; no always-on-top guarantee. Preserve the limitations in release notes.
