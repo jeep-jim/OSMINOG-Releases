@@ -43,6 +43,7 @@ jobs:
           test -f "$meta"
           source_run=$(jq -r '.sourceRunId' "$meta")
           artifact_name=$(jq -r '.artifactName' "$meta")
+          source_apk_path=$(jq -r '.sourceApkPath // "dist/OSMINOG-Vision-0.1.0-unsigned.apk"' "$meta")
           version=$(jq -r '.versionName' "$meta")
           version_code=$(jq -r '.versionCode' "$meta")
           app_id=$(jq -r '.applicationId' "$meta")
@@ -57,7 +58,7 @@ jobs:
           test -n "$artifact_id" && test "$artifact_id" != "null"
           gh api -H 'Accept: application/vnd.github+json' "repos/jeep-jim/OSMINOG/actions/artifacts/$artifact_id/zip" > source-artifact.zip
           mkdir -p work
-          unzip -p source-artifact.zip dist/OSMINOG-Vision-0.1.0-unsigned.apk > work/unsigned.apk
+          unzip -p source-artifact.zip "$source_apk_path" > work/unsigned.apk
           test -s work/unsigned.apk
           printf '%s' "$KEYSTORE_B64" | base64 --decode > work/release.jks
           apksigner=$(find "$ANDROID_HOME/build-tools" -name apksigner | sort -V | tail -n1)
