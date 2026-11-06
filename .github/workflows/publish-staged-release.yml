@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths:
       - 'staging/**/PUBLISH-READY'
+      - '!staging/android-vision/**'
   workflow_dispatch:
     inputs:
       staged_release:
@@ -38,7 +39,7 @@ jobs:
           if [ -n "$requested" ]; then
             stage="staging/$requested"
           else
-            marker=$(find staging -mindepth 3 -maxdepth 3 -type f -name PUBLISH-READY | sort -V | tail -n 1)
+            marker=$(find staging -mindepth 3 -maxdepth 3 -type f -name PUBLISH-READY ! -path 'staging/android-vision/*' | sort -V | tail -n 1)
             test -n "$marker"
             stage=$(dirname "$marker")
           fi
