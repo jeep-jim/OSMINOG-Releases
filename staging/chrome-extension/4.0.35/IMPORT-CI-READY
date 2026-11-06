@@ -1,0 +1,10 @@
+Owner requested publication in the current conversation.
+Version: 4.0.35
+Source PR: jeep-jim/OSMINOG#91 (merged)
+Verified source: e72095ea5b79342a64e268c65830f33dccfc68ce
+Source merge: f65609d1e3b34fefce421fa8c517c5c37f79faf3
+Successful Chrome CI: 42262510688
+Artifact: 13526565189
+Package SHA-256: c55453ee45dec64a66ef0987ca59002f0f5e2a31419f7a4e0ab91be9610f6743
+Package size: 9512278 bytes
+Import only the exact checksum-pinned CI archive; publish through the existing asset and feed verification gates.
