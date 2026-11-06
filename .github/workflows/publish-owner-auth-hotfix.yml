@@ -5,6 +5,8 @@ on:
     branches: [main]
     paths:
       - '.github/workflows/publish-owner-auth-hotfix.yml'
+      - 'tools/verify_owner_auth_extension.cjs'
+      - 'tools/release_owner_auth_hotfix.py'
   workflow_dispatch:
 
 permissions:
@@ -70,7 +72,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          timeout 180s xvfb-run -a node tools/verify_owner_auth_extension.cjs work/package | tee work/owner-auth-browser.log
+          timeout 180s xvfb-run -a node tools/verify_owner_auth_extension.cjs work/package 2>&1 | tee work/owner-auth-browser.log
           grep -q OWNER_AUTH_REAL_CHROME_PASS work/owner-auth-browser.log
       - name: Enforce auth-only scope and build immutable full package
         shell: bash
