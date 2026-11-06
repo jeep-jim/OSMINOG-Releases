@@ -1,0 +1,11 @@
+Version: 4.0.34
+Tested source head: a4edd47faef4d2e62cc02e5c2dc833599833a471
+Merged PR: #89
+Merge commit: e0b87a452e10244ada0ed3ad1c97178022124393
+Full Chrome CI: 42253794118
+Required verification runs all passed: 42253794118, 42253794218, 42253794123
+Artifact: 13521269373
+Package size: 9504641 bytes
+Package SHA-256: 6e23d1403a2c288297b03c04851870ac971d9205d8d8306ca3ca0b4a42725e11
+OwnerGuard SHA-256: 90dc411113966db05adc323c56d5311aa830af8c11c4d6dcf959aa32008dab41
+The Figma-like workspace update is verified. Keyboard arrow focus in the delete confirmation dialog is fixed and the complete workspace diagnostics pass.
