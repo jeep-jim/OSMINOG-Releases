@@ -2,14 +2,11 @@
 
 The Vision package ID is `com.osminog.vision`. Android only accepts in-place updates when every APK is signed by the same private key as the installed package.
 
-The private keystore is intentionally not committed to this public repository. Store these four repository Actions secrets in `jeep-jim/OSMINOG-Releases`:
+The private keystore is intentionally not committed to this public repository. Add one repository Actions secret in `jeep-jim/OSMINOG-Releases`:
 
-- `OSMINOG_ANDROID_SIGNING_KEYSTORE_B64`
-- `OSMINOG_ANDROID_SIGNING_STORE_PASSWORD`
-- `OSMINOG_ANDROID_SIGNING_KEY_ALIAS`
-- `OSMINOG_ANDROID_SIGNING_KEY_PASSWORD`
+- `OSMINOG_ANDROID_SIGNING_BUNDLE_B64` — complete contents of `OSMINOG_ANDROID_SIGNING_BUNDLE_B64.txt` from the private signing archive.
 
-The private signing archive generated for the initial Vision release contains the keystore and the exact values for those secrets. Keep an offline backup and never commit the archive, JKS, base64 value, or passwords.
+The bundle contains the JKS, alias and passwords. Keep the private signing archive and an offline backup. Never commit the archive, JKS, base64 value, or passwords.
 
 ## Release flow
 
