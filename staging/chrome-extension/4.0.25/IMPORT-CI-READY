@@ -1,0 +1,9 @@
+OSMINOG Chrome 4.0.25
+Approved source: 7c49453cc354be4277a6057407761827297e70f9
+Merged source: 517ae8ae350d31426368147afdb6f1fce2de4f1b
+Required successful workflows: 42144879486 42144879560 42144879624 42144879582
+Artifact: 13468849716
+Package: OSMINOG-Chrome-4.0.25-IO-RECOVERY.zip
+Size: 9417551 bytes
+SHA-256: 9df95f731f5f073de69ce4e35b5f4acac0a58c7846da2854ec77c37ef95fa0e3
+Import the exact tested archive. Advance the dev feed only after existing remote release verification succeeds. No owner-device crash reproduction claimed.
