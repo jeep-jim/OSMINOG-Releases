@@ -15,10 +15,7 @@ jobs:
     timeout-minutes: 35
     env:
       GH_TOKEN: ${{ github.token }}
-      KEYSTORE_B64: ${{ secrets.OSMINOG_ANDROID_SIGNING_KEYSTORE_B64 }}
-      STORE_PASSWORD: ${{ secrets.OSMINOG_ANDROID_SIGNING_STORE_PASSWORD }}
-      KEY_ALIAS: ${{ secrets.OSMINOG_ANDROID_SIGNING_KEY_ALIAS }}
-      KEY_PASSWORD: ${{ secrets.OSMINOG_ANDROID_SIGNING_KEY_PASSWORD }}
+      SIGNING_BUNDLE_B64: ${{ secrets.OSMINOG_ANDROID_SIGNING_BUNDLE_B64 }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-java@v4
@@ -27,10 +24,7 @@ jobs:
           java-version: '17'
       - name: Validate signing configuration
         run: |
-          test -n "$KEYSTORE_B64" || { echo 'Missing secret: OSMINOG_ANDROID_SIGNING_KEYSTORE_B64'; exit 1; }
-          test -n "$STORE_PASSWORD" || { echo 'Missing secret: OSMINOG_ANDROID_SIGNING_STORE_PASSWORD'; exit 1; }
-          test -n "$KEY_ALIAS" || { echo 'Missing secret: OSMINOG_ANDROID_SIGNING_KEY_ALIAS'; exit 1; }
-          test -n "$KEY_PASSWORD" || { echo 'Missing secret: OSMINOG_ANDROID_SIGNING_KEY_PASSWORD'; exit 1; }
+          test -n "$SIGNING_BUNDLE_B64" || { echo 'Missing secret: OSMINOG_ANDROID_SIGNING_BUNDLE_B64'; exit 1; }
       - name: Reconstruct source APK and sign it
         id: package
         shell: bash
@@ -60,11 +54,17 @@ jobs:
           mkdir -p work
           unzip -p source-artifact.zip "$source_apk_path" > work/unsigned.apk
           test -s work/unsigned.apk
-          printf '%s' "$KEYSTORE_B64" | base64 --decode > work/release.jks
+          printf '%s' "$SIGNING_BUNDLE_B64" | base64 --decode > work/signing-bundle.zip
+          mkdir -p work/signing
+          unzip -q work/signing-bundle.zip -d work/signing
+          STORE_PASSWORD=$(cat work/signing/STORE_PASSWORD.txt)
+          KEY_ALIAS=$(cat work/signing/KEY_ALIAS.txt)
+          KEY_PASSWORD=$(cat work/signing/KEY_PASSWORD.txt)
+          KEYSTORE=work/signing/OSMINOG-Vision-release.jks
           apksigner=$(find "$ANDROID_HOME/build-tools" -name apksigner | sort -V | tail -n1)
           aapt=$(find "$ANDROID_HOME/build-tools" -name aapt | sort -V | tail -n1)
           test -n "$apksigner" && test -n "$aapt"
-          "$apksigner" sign --ks work/release.jks --ks-key-alias "$KEY_ALIAS" --ks-pass env:STORE_PASSWORD --key-pass env:KEY_PASSWORD --out "work/$package" work/unsigned.apk
+          "$apksigner" sign --ks "$KEYSTORE" --ks-key-alias "$KEY_ALIAS" --ks-pass "pass:$STORE_PASSWORD" --key-pass "pass:$KEY_PASSWORD" --out "work/$package" work/unsigned.apk
           "$apksigner" verify --verbose "work/$package"
           badging=$("$aapt" dump badging "work/$package")
           printf '%s\n' "$badging" | grep -F "name='$app_id'"
