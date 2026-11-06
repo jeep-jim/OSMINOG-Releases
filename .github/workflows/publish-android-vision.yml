@@ -1,0 +1,147 @@
+name: Publish OSMINOG Vision Android
+on:
+  push:
+    branches: [main]
+    paths: ['staging/android-vision/**/PUBLISH-READY']
+permissions:
+  contents: write
+  actions: read
+concurrency:
+  group: osminog-vision-android-release
+  cancel-in-progress: false
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    env:
+      GH_TOKEN: ${{ github.token }}
+      KEYSTORE_B64: ${{ secrets.OSMINOG_ANDROID_SIGNING_KEYSTORE_B64 }}
+      STORE_PASSWORD: ${{ secrets.OSMINOG_ANDROID_SIGNING_STORE_PASSWORD }}
+      KEY_ALIAS: ${{ secrets.OSMINOG_ANDROID_SIGNING_KEY_ALIAS }}
+      KEY_PASSWORD: ${{ secrets.OSMINOG_ANDROID_SIGNING_KEY_PASSWORD }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Validate signing configuration
+        run: |
+          test -n "$KEYSTORE_B64" || { echo 'Missing secret: OSMINOG_ANDROID_SIGNING_KEYSTORE_B64'; exit 1; }
+          test -n "$STORE_PASSWORD" || { echo 'Missing secret: OSMINOG_ANDROID_SIGNING_STORE_PASSWORD'; exit 1; }
+          test -n "$KEY_ALIAS" || { echo 'Missing secret: OSMINOG_ANDROID_SIGNING_KEY_ALIAS'; exit 1; }
+          test -n "$KEY_PASSWORD" || { echo 'Missing secret: OSMINOG_ANDROID_SIGNING_KEY_PASSWORD'; exit 1; }
+      - name: Reconstruct source APK and sign it
+        id: package
+        shell: bash
+        run: |
+          set -euo pipefail
+          marker=$(find staging/android-vision -mindepth 2 -maxdepth 2 -type f -name PUBLISH-READY | sort -V | tail -n 1)
+          test -n "$marker"
+          stage=$(dirname "$marker")
+          meta="$stage/release.json"
+          test -f "$meta"
+          source_run=$(jq -r '.sourceRunId' "$meta")
+          artifact_name=$(jq -r '.artifactName' "$meta")
+          version=$(jq -r '.versionName' "$meta")
+          version_code=$(jq -r '.versionCode' "$meta")
+          app_id=$(jq -r '.applicationId' "$meta")
+          min_sdk=$(jq -r '.minSdk' "$meta")
+          tag="vision-android-v$version"
+          package="OSMINOG-Vision-$version.apk"
+          test "$app_id" = 'com.osminog.vision'
+          test "$version_code" -ge 1
+          test "$min_sdk" -ge 26
+          artifacts=$(gh api "repos/jeep-jim/OSMINOG/actions/runs/$source_run/artifacts")
+          artifact_id=$(printf '%s' "$artifacts" | jq -r --arg name "$artifact_name" '.artifacts[] | select(.name==$name and .expired==false) | .id' | head -n1)
+          test -n "$artifact_id" && test "$artifact_id" != "null"
+          gh api -H 'Accept: application/vnd.github+json' "repos/jeep-jim/OSMINOG/actions/artifacts/$artifact_id/zip" > source-artifact.zip
+          mkdir -p work
+          unzip -p source-artifact.zip dist/OSMINOG-Vision-0.1.0-unsigned.apk > work/unsigned.apk
+          test -s work/unsigned.apk
+          printf '%s' "$KEYSTORE_B64" | base64 --decode > work/release.jks
+          apksigner=$(find "$ANDROID_HOME/build-tools" -name apksigner | sort -V | tail -n1)
+          aapt=$(find "$ANDROID_HOME/build-tools" -name aapt | sort -V | tail -n1)
+          test -n "$apksigner" && test -n "$aapt"
+          "$apksigner" sign --ks work/release.jks --ks-key-alias "$KEY_ALIAS" --ks-pass env:STORE_PASSWORD --key-pass env:KEY_PASSWORD --out "work/$package" work/unsigned.apk
+          "$apksigner" verify --verbose "work/$package"
+          badging=$("$aapt" dump badging "work/$package")
+          printf '%s\n' "$badging" | grep -F "name='$app_id'"
+          printf '%s\n' "$badging" | grep -F "versionCode='$version_code'"
+          printf '%s\n' "$badging" | grep -F "versionName='$version'"
+          size=$(stat -c%s "work/$package")
+          sha=$(sha256sum "work/$package" | awk '{print $1}')
+          printf '%s  %s\n' "$sha" "$package" > work/SHA256SUMS.txt
+          echo "stage=$stage" >> "$GITHUB_OUTPUT"
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+          echo "package=$package" >> "$GITHUB_OUTPUT"
+          echo "size=$size" >> "$GITHUB_OUTPUT"
+          echo "sha=$sha" >> "$GITHUB_OUTPUT"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "version_code=$version_code" >> "$GITHUB_OUTPUT"
+          echo "app_id=$app_id" >> "$GITHUB_OUTPUT"
+          echo "min_sdk=$min_sdk" >> "$GITHUB_OUTPUT"
+      - uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 35
+          arch: x86_64
+          profile: pixel_6
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back emulated -camera-front emulated
+          working-directory: .
+          script: |
+            adb install work/${{ steps.package.outputs.package }}
+            adb shell am start -S -W -n com.osminog.vision/.MainActivity
+            ready=0; for attempt in $(seq 1 30); do adb shell uiautomator dump /sdcard/window.xml >/dev/null 2>&1 || true; if adb shell cat /sdcard/window.xml 2>/dev/null | grep -q 'Я рядом'; then ready=1; break; fi; sleep 1; done; test "$ready" -eq 1
+            mkdir -p work
+            adb shell screencap -p /sdcard/vision-release.png
+            adb pull /sdcard/vision-release.png work/vision-release.png
+      - uses: actions/upload-artifact@v4
+        with:
+          name: osminog-vision-android-release-verification
+          path: work/vision-release.png
+          retention-days: 14
+      - name: Publish immutable APK and advance update feed
+        shell: bash
+        run: |
+          set -euo pipefail
+          tag='${{ steps.package.outputs.tag }}'
+          package='${{ steps.package.outputs.package }}'
+          test -f "work/$package"
+          if gh release view "$tag" >/dev/null 2>&1; then
+            echo "Release tag already exists: $tag"
+            exit 1
+          fi
+          gh release create "$tag" "work/$package" work/SHA256SUMS.txt --prerelease --title "OSMINOG Vision Android ${{ steps.package.outputs.version }}" --notes "OSMINOG Vision Android preview. Package SHA-256: ${{ steps.package.outputs.sha }}."
+          remote=$(gh api "repos/${GITHUB_REPOSITORY}/releases/tags/$tag")
+          remote_size=$(printf '%s' "$remote" | jq -r --arg name "$package" '.assets[] | select(.name==$name) | .size')
+          remote_digest=$(printf '%s' "$remote" | jq -r --arg name "$package" '.assets[] | select(.name==$name) | .digest // empty')
+          test "$remote_size" = '${{ steps.package.outputs.size }}'
+          if [ -n "$remote_digest" ]; then test "$remote_digest" = 'sha256:${{ steps.package.outputs.sha }}'; fi
+          python3 - '${{ steps.package.outputs.version }}' '${{ steps.package.outputs.version_code }}' '${{ steps.package.outputs.app_id }}' '${{ steps.package.outputs.min_sdk }}' "$tag" "$package" '${{ steps.package.outputs.size }}' '${{ steps.package.outputs.sha }}' <<'PY'
+          import json,sys,datetime
+          version,code,app_id,min_sdk,tag,name,size,sha=sys.argv[1:]
+          feed={
+            "schema":"osminog-android-update/v1",
+            "applicationId":app_id,
+            "status":"active",
+            "versionCode":int(code),
+            "versionName":version,
+            "apkUrl":f"https://github.com/jeep-jim/OSMINOG-Releases/releases/download/{tag}/{name}",
+            "size":int(size),
+            "sha256":sha,
+            "minSdk":int(min_sdk),
+            "notes":"OSMINOG Vision: чат, голос, камера и передача выбранного кадра в существующий ИИ-чат.",
+            "publishedAt":datetime.datetime.now(datetime.timezone.utc).isoformat()
+          }
+          with open("channels/android-vision/dev.json","w",encoding="utf-8") as f:
+            json.dump(feed,f,ensure_ascii=False,indent=2); f.write("\n")
+          PY
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add channels/android-vision/dev.json
+          git commit -m "Publish OSMINOG Vision Android ${{ steps.package.outputs.version }} dev feed"
+          git push
+          rm -rf '${{ steps.package.outputs.stage }}'
+          git add -A
+          git commit -m "Clear published OSMINOG Vision Android staging payload"
+          git push
