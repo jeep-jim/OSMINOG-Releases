@@ -1,0 +1,10 @@
+Version: 4.0.31
+Source head: 0fdccfb976de56165e09c5c2ea2bf7fec73685d4
+Merged PR: #86
+Merge commit: efb8e7c87b3200098451aedfaf318f4bc082a751
+Chrome CI run: 42206618389
+Required Chrome/document/compatibility workflows passed.
+Verified package SHA-256: 70b74edcb53403390e6496af071b28a6fa3519870425b5eba71d612aac59bfd2
+Package size: 9454937 bytes
+Owner Authenticator unchanged: 90dc411113966db05adc323c56d5311aa830af8c11c4d6dcf959aa32008dab41
+Native Windows source is unchanged and is not a gate for this Chrome-only package.
