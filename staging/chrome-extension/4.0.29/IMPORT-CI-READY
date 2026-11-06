@@ -1,0 +1,8 @@
+Version: 4.0.29
+Source head: f2b25a22123ac93f041f60624e53bd225944de3a
+Merged main: 743090b2cfd2e5439e3b7a683426c0f194887d13
+All six PR workflows succeeded. The four mandatory importer gates are pinned in import-ci.json.
+Verified package SHA-256: f7c9a9ca77b79ae5fc34c43080aefd3d899cefc9d030ea4085f3d63804c51082
+Size: 9448663 bytes
+Owner authentication unchanged: 90dc411113966db05adc323c56d5311aa830af8c11c4d6dcf959aa32008dab41
+Preserve framing restrictions and explicit limitations; no claim of native VK/Figma embedding in Chrome.
