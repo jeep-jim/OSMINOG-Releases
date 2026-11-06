@@ -5,20 +5,20 @@
     "product": "OSMINOG",
     "platform": "chrome-extension",
     "channel": "dev",
-    "generatedAt": "2026-11-06T07:04:53Z",
+    "generatedAt": "2026-11-06T11:32:00Z",
     "status": "active",
     "latest": {
-      "version": "4.0.29",
+      "version": "4.0.31",
       "kind": "full-package",
-      "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/chrome-v4.0.29/OSMINOG-Chrome-4.0.29.zip",
-      "size": 9448663,
-      "sha256": "f7c9a9ca77b79ae5fc34c43080aefd3d899cefc9d030ea4085f3d63804c51082",
-      "manifestVersion": "4.0.29",
+      "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/chrome-v4.0.31/OSMINOG-Chrome-4.0.31.zip",
+      "size": 9454937,
+      "sha256": "70b74edcb53403390e6496af071b28a6fa3519870425b5eba71d612aac59bfd2",
+      "manifestVersion": "4.0.31",
       "fixedExtensionKeyRequired": true,
       "minDevHubVersion": "2.0.0",
       "runtimeVerified": false,
-      "notesUrl": "https://raw.githubusercontent.com/jeep-jim/OSMINOG-Releases/main/platforms/chrome-extension/releases/4.0.29/README.md",
-      "publishedAt": "2026-11-06T07:04:53Z"
+      "notesUrl": "https://raw.githubusercontent.com/jeep-jim/OSMINOG-Releases/main/platforms/chrome-extension/releases/4.0.31/README.md",
+      "publishedAt": "2026-11-06T11:32:00Z"
     }
   },
   "signature": null
