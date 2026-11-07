@@ -1,6 +1,0 @@
-OSMINOG Vision Android 0.2.3
-Owner explicitly authorized fixing and publishing this release.
-Source commit: 711b8589c700335999096fdac45040ba7af666ac
-Successful source CI: https://github.com/jeep-jim/OSMINOG/actions/runs/42341404226
-Keep the original signing certificate, complete instrumentation suite, signed APK cold-start verification, remote APK hash/size readback and final Android feed readback mandatory.
-No changes to Chrome or other platform channels.
