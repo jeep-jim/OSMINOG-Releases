@@ -3,6 +3,8 @@ set -euo pipefail
 source_dir=$(realpath "$1")
 output_dir=$(realpath "$2")
 version=$3
+verifier_dir=$(dirname "$(realpath "$0")")
+launcher_repaired=0
 [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]
 cd "$source_dir/android-vision"
 mkdir -p dist "$output_dir"
@@ -28,7 +30,7 @@ for report in reports:
     assert int(root.get('failures','0'))==0 and int(root.get('errors','0'))==0, str(report)
     assert int(root.get('skipped','0'))==0, 'Skipped Android tests'
     tests+=int(root.get('tests','0'))
-minimum=14 if tuple(map(int,sys.argv[1].split('.'))) >= (0,2,4) else 7
+minimum=15 if tuple(map(int,sys.argv[1].split('.'))) >= (0,2,4) else 7
 assert tests>=minimum, f'Incomplete Android suite: {tests} < {minimum}'
 print(f'ANDROID_INSTRUMENTATION_PASS {tests}')
 PY
@@ -56,10 +58,33 @@ except (OSError, ET.ParseError):
 sys.exit(0 if ready else 1)
 PY
     then ready=1; cp "$local_xml" "$output_dir/vision-${label}.xml"; break; fi
+    # Two preserved failed runs showed a boot-time Quickstep ANR, unrelated to
+    # the tested package. Recover only that exact dialog, once per whole job.
+    # Never dismiss an OSMINOG ANR/crash or accept a dialog as a passing launch.
+    if [[ "$launcher_repaired" == 0 && -s "$local_xml" ]]; then
+      timeout 12s adb logcat -d > "$output_dir/launcher-recovery-logcat.txt"
+      if python3 "$verifier_dir/recognize-quickstep-anr.py" "$local_xml" "$output_dir/launcher-recovery-logcat.txt" > "$output_dir/launcher-recovery-target.txt"; then
+        cp "$local_xml" "$output_dir/launcher-recovery-dialog.xml"
+        timeout 12s adb shell screencap -p /sdcard/launcher-recovery.png
+        timeout 12s adb pull /sdcard/launcher-recovery.png "$output_dir/launcher-recovery.png"
+        read -r tap_x tap_y < "$output_dir/launcher-recovery-target.txt"
+        timeout 8s adb shell input tap "$tap_x" "$tap_y"
+        launcher_repaired=1
+        printf '%s\n' 'Recovered one verified com.android.launcher3 ANR; OSMINOG startup must still pass.' | tee "$output_dir/launcher-recovery.txt"
+        sleep 1
+        timeout 20s adb shell am start -S -W -n com.osminog.vision/.MainActivity
+      fi
+    fi
     sleep 1
   done
   timeout 12s adb shell screencap -p "/sdcard/vision-${label}.png"
   timeout 12s adb pull "/sdcard/vision-${label}.png" "$output_dir/vision-${label}.png"
+  timeout 12s adb logcat -d > "$output_dir/vision-${label}-logcat.txt"
+  python3 - "$output_dir/vision-${label}-logcat.txt" <<'PY'
+import pathlib,re,sys
+log=pathlib.Path(sys.argv[1]).read_text()
+assert not re.search(r'(?:ANR in |Process: )com\.osminog\.vision\b',log), 'OSMINOG ANR/crash: refusing publication'
+PY
   if [[ "$ready" != 1 ]]; then
     echo "Android $label cold start did not expose the OSMINOG menu; inspect preserved UI XML/logs" >&2
     return 1
