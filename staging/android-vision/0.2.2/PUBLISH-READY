@@ -1,0 +1,5 @@
+OSMINOG Vision Android 0.2.2
+Owner explicitly authorized publication.
+Verified source commit: 5e2e54c9e77d86b93bfc224dea6ca045b531d751
+Successful source CI: https://github.com/jeep-jim/OSMINOG/actions/runs/42336228965
+Publish through the existing signing, emulator verification and update-feed readback gates.
