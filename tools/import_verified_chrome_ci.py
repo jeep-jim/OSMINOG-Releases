@@ -2,6 +2,7 @@
 No code from the artifact is executed. Publication/feed changes remain the job
 of the existing publisher after it verifies the uploaded release asset.
 """
+import base64
 import hashlib
 import io
 import json
@@ -19,9 +20,79 @@ CHROME_WORKFLOW = 351479698
 REQUIRED_WORKFLOWS = {CHROME_WORKFLOW, 351443074, 351468502}
 IDENTITY = '1ddb8d87f3a6f6cb38a229bd81ba8076d1d37d3ba6b8a15b2a91129d4904012e'
 LIMIT = 64 * 1024 * 1024
+RECOVERY_LIMIT = 2 * 1024 * 1024
+SAFE_UPDATER_RELEASE = (4, 0, 37, 0)
 
 def digest(data):
     return hashlib.sha256(data).hexdigest()
+
+def version_tuple(value):
+    if not isinstance(value, str) or not re.fullmatch(r'\d+(?:\.\d+){2,3}', value):
+        raise ValueError('Invalid version')
+    parts = tuple(map(int, value.split('.')))
+    return parts + (0,) * (4-len(parts))
+
+def minimum_updater(metadata, version):
+    value = metadata.get('minUpdaterVersion', '1.0.0')
+    parsed = version_tuple(value)
+    if version_tuple(version) >= SAFE_UPDATER_RELEASE and parsed < (2, 0, 0, 0):
+        raise ValueError('This release requires the safe updater version 2.0.0 or newer')
+    return value
+
+def validate_build(build, version, name):
+    if build.get('version') != version or build.get('manifestVersion') != version or build.get('artifact') != name:
+        raise ValueError('Wrong build metadata')
+    if version_tuple(version) >= SAFE_UPDATER_RELEASE:
+        # CI is not an observation of the owner's installed Windows/Chrome.
+        if build.get('ciVerified') is not True or build.get('runtimeVerified') is not False:
+            raise ValueError('New packages must distinguish CI verification from owner runtime verification')
+    elif build.get('runtimeVerified') is not True:
+        # Preserve the historical import contract for immutable older artifacts.
+        raise ValueError('Unverified legacy build metadata')
+
+def artifact_member(archive, name, limit=LIMIT):
+    candidates = [item for item in archive.infolist() if item.filename in (name, 'artifacts/'+name)]
+    if len(candidates) != 1 or candidates[0].is_dir() or candidates[0].file_size > limit:
+        raise ValueError('Expected artifact missing, duplicated or oversized: '+name)
+    return archive.read(candidates[0])
+
+def validate_recovery_request(value):
+    if not isinstance(value, dict) or set(value) != {'filename', 'size', 'sha256'}:
+        raise ValueError('Invalid recovery artifact request')
+    name = value['filename']
+    if not isinstance(name, str) or not re.fullmatch(r'OSMINOG-[A-Za-z0-9._-]+\.html', name):
+        raise ValueError('Invalid recovery artifact filename')
+    if type(value['size']) is not int or not 0 < value['size'] <= RECOVERY_LIMIT:
+        raise ValueError('Invalid recovery artifact size')
+    if not isinstance(value['sha256'], str) or not re.fullmatch(r'[a-f0-9]{64}', value['sha256']):
+        raise ValueError('Invalid recovery artifact digest')
+    return dict(value)
+
+def validate_recovery_page(data, expected, version, manifest, payload):
+    expected = validate_recovery_request(expected)
+    if len(data) != expected['size'] or digest(data) != expected['sha256']:
+        raise ValueError('Recovery artifact byte size / SHA-256 mismatch')
+    text = data.decode('utf-8')
+    match = re.search(r'const configuration = (\{[^\n]*\});', text)
+    if not match:
+        raise ValueError('Recovery configuration is missing')
+    config = json.loads(match.group(1))
+    updater = payload.get('osminog-folder-updater.js')
+    if (config.get('schema') != 'osminog-updater-recovery/v1' or
+            config.get('product') != 'OSMINOG' or config.get('manifestVersion') != 3 or
+            config.get('minimumPackageVersion') != version or
+            config.get('manifestKey') != manifest.get('key') or
+            version_tuple(config.get('minimumUpdaterVersion')) < (2, 0, 0, 0) or
+            updater is None or config.get('updaterSha256') != digest(updater) or
+            updater.decode('utf-8') not in text):
+        raise ValueError('Recovery page does not match the verified package and updater')
+    scripts = re.findall(r'<script>([\s\S]*?)</script>', text)
+    if len(scripts) != 1 or len(re.findall(r'<script\b', text, re.I)) != 1:
+        raise ValueError('Recovery page must have exactly one embedded script')
+    script_hash = base64.b64encode(hashlib.sha256(scripts[0].encode('utf-8')).digest()).decode('ascii')
+    if "script-src 'sha256-"+script_hash+"'" not in text:
+        raise ValueError('Recovery script CSP digest mismatch')
+    return expected
 
 def api(path, binary=False):
     data = subprocess.check_output(['gh', 'api', f'repos/{SOURCE}/{path}'])
@@ -48,11 +119,12 @@ def files(data):
         return result
 
 def main(version):
-    if not re.fullmatch(r'\d+(?:\.\d+){2,3}', version):
-        raise ValueError('Invalid version')
+    version_tuple(version)
     request = json.loads((ROOT/f'staging/chrome-extension/{version}/import-ci.json').read_text())
     if request['version'] != version or request['sourceRepository'] != SOURCE:
         raise ValueError('Wrong import request')
+    min_updater = minimum_updater(request, version)
+    recovery_request = validate_recovery_request(request['recovery']) if 'recovery' in request else None
     head = request['sourceCommit']
     if not re.fullmatch(r'[a-f0-9]{40}', head):
         raise ValueError('Invalid source commit')
@@ -94,10 +166,8 @@ def main(version):
     if pathlib.PurePosixPath(name).name != name or not name.endswith('.zip'):
         raise ValueError('Invalid package name')
     with zipfile.ZipFile(io.BytesIO(outer)) as z:
-        candidates = [i for i in z.infolist() if i.filename in (name, 'artifacts/'+name)]
-        if len(candidates) != 1 or candidates[0].file_size > LIMIT:
-            raise ValueError('Expected package missing or oversized')
-        data = z.read(candidates[0])
+        data = artifact_member(z, name)
+        recovery_data = artifact_member(z, recovery_request['filename'], RECOVERY_LIMIT) if recovery_request else None
     if len(data) != request['size'] or digest(data) != request['sha256']:
         raise ValueError('Tested ZIP byte size / SHA-256 mismatch')
     payload = files(data)
@@ -107,31 +177,43 @@ def main(version):
         raise ValueError('Wrong product / manifest')
     if digest(manifest.get('key', '').encode()) != IDENTITY:
         raise ValueError('Fixed extension identity changed')
-    if build['version'] != version or build['manifestVersion'] != version or build['artifact'] != name or build['runtimeVerified'] is not True:
-        raise ValueError('Wrong or unverified build metadata')
+    validate_build(build, version, name)
+    if recovery_request:
+        validate_recovery_page(recovery_data, recovery_request, version, manifest, payload)
     if any(n.startswith(('logs/', 'desktop/', 'node_modules/')) or n.endswith('.log') for n in payload):
         raise ValueError('Unexpected build debris')
     feed = json.loads((ROOT/'channels/dev/chrome-extension.json').read_text())
     current = feed.get('signed', feed).get('latest', {}).get('version', '0.0.0')
-    if tuple(map(int, current.split('.'))) > tuple(map(int, version.split('.'))):
+    if version_tuple(current) > version_tuple(version):
         raise ValueError('Refusing a version downgrade')
     directory = ROOT/f'platforms/chrome-extension/releases/{version}'
     directory.mkdir(parents=True, exist_ok=True)
     package = directory/name
     if package.exists() and package.read_bytes() != data:
         raise ValueError('Refusing to replace immutable release bytes')
+    recovery_path = directory/recovery_request['filename'] if recovery_request else None
+    if recovery_path and recovery_path.exists() and recovery_path.read_bytes() != recovery_data:
+        raise ValueError('Refusing to replace immutable recovery bytes')
     package.write_bytes(data)
+    if recovery_path:
+        recovery_path.write_bytes(recovery_data)
     metadata = dict(schema='osminog-release/v2', product='OSMINOG', platform='chrome-extension',
         version=version, size=len(data), sha256=digest(data), package=name, manifestVersion=version,
-        fixedExtensionKeyRequired=True, minDevHubVersion='2.0.0', runtimeVerified=False, ciVerified=True,
+        fixedExtensionKeyRequired=True, minDevHubVersion='2.0.0', minUpdaterVersion=min_updater, runtimeVerified=False, ciVerified=True,
         sourceCommit=head, verificationUrl=f'https://github.com/{SOURCE}/actions/runs/{run_id}',
         sourceWorkflowRun=run_id, sourceArtifactId=artifact_id, verificationRuns=request['verificationRuns'], notes=request['notes'])
+    if recovery_request:
+        metadata['recovery'] = recovery_request
     (directory/'release-v2.json').write_text(json.dumps(metadata, ensure_ascii=False, indent=2)+'\n')
     (directory/'README.md').write_text(f"# OSMINOG Chrome {version}\n\n{request['notes']}\n\n"
         f"SHA-256: `{digest(data)}`\nРазмер: {len(data)} байт.\n\n"
         f"Проверенная сборка: {metadata['verificationUrl']}\n\n"
-        'Архив побайтово совпадает с артефактом CI. Проверка на личном устройстве владельца отдельно не заявляется.\n')
-    print(json.dumps({'version': version, 'size': len(data), 'sha256': digest(data)}))
+        'Архив побайтово совпадает с артефактом CI. Проверка на личном устройстве владельца отдельно не заявляется.\n'+
+        (f"\nРазовый помощник восстановления: `{recovery_request['filename']}`; "
+         f"SHA-256 `{recovery_request['sha256']}`, {recovery_request['size']} байт. "
+         'Получен из того же проверенного CI-артефакта.\n' if recovery_request else ''))
+    print(json.dumps({'version': version, 'size': len(data), 'sha256': digest(data),
+        'minUpdaterVersion': min_updater, 'recovery': recovery_request}))
 
 if __name__ == '__main__':
     if len(sys.argv) != 2:

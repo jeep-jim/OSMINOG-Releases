@@ -32,6 +32,9 @@ jobs:
           fetch-depth: 0
           ref: main
 
+      - name: Verify import and recovery contracts
+        run: python3 -m unittest discover -s tests -p 'test_chrome_import_contract.py'
+
       - name: Resolve release and verify immutable package
         id: release
         shell: bash
@@ -79,9 +82,14 @@ jobs:
           test "$actual_size" = "$expected_size"
           test "$actual_sha" = "$expected_sha"
 
-          python - "$package_path" "$expected_manifest" <<'PY'
-          import json, sys, zipfile
-          path, expected = sys.argv[1], sys.argv[2]
+          python - "$package_path" "$expected_manifest" "$meta" <<'PY'
+          import json, os, pathlib, sys, zipfile
+          sys.path.insert(0, 'tools')
+          from import_verified_chrome_ci import minimum_updater, validate_build, validate_recovery_page, version_tuple, SAFE_UPDATER_RELEASE
+          path, expected, meta_path = sys.argv[1:4]
+          meta = json.loads(pathlib.Path(meta_path).read_text(encoding='utf-8'))
+          min_updater = minimum_updater(meta, expected)
+          recovery_outputs = {}
           with zipfile.ZipFile(path) as z:
               names = z.namelist()
               if 'manifest.json' not in names:
@@ -95,6 +103,24 @@ jobs:
                   raise SystemExit('fixed Chrome extension key is missing')
               if any(name.startswith('/') or '..' in name.split('/') for name in names):
                   raise SystemExit('unsafe ZIP path detected')
+              if version_tuple(expected) >= SAFE_UPDATER_RELEASE:
+                  validate_build(json.loads(z.read('OSMINOG_BUILD.json')), expected, pathlib.Path(path).name)
+                  if meta.get('runtimeVerified') is not False or meta.get('ciVerified') is not True:
+                      raise SystemExit('release metadata confuses CI with owner runtime verification')
+              if meta.get('recovery'):
+                  recovery = meta['recovery']
+                  # Validate the requested filename before using it as a path.
+                  from import_verified_chrome_ci import validate_recovery_request
+                  validate_recovery_request(recovery)
+                  recovery_path = pathlib.Path(meta_path).parent/recovery['filename']
+                  validate_recovery_page(recovery_path.read_bytes(), recovery, expected, manifest,
+                      {'osminog-folder-updater.js': z.read('osminog-folder-updater.js')})
+                  recovery_outputs = {'recovery_filename': recovery['filename'], 'recovery_path': str(recovery_path),
+                      'recovery_size': str(recovery['size']), 'recovery_sha256': recovery['sha256']}
+          with open(os.environ['GITHUB_OUTPUT'], 'a', encoding='utf-8') as output:
+              output.write('min_updater='+min_updater+'\n')
+              for key, value in recovery_outputs.items():
+                  output.write(key+'='+value+'\n')
           PY
 
           echo "version=$version" >> "$GITHUB_OUTPUT"
@@ -149,6 +175,22 @@ jobs:
             test "$remote_digest" = 'sha256:${{ steps.release.outputs.sha256 }}'
           fi
 
+          recovery='${{ steps.release.outputs.recovery_filename }}'
+          if [ -n "$recovery" ]; then
+            gh release upload "$tag" '${{ steps.release.outputs.recovery_path }}' --clobber
+            recovery_asset=$(gh api "repos/${GITHUB_REPOSITORY}/releases/tags/$tag" \
+              | jq --arg name "$recovery" -c '[.assets[] | select(.name == $name)] | if length == 1 then .[0] else error("missing/duplicate recovery asset") end')
+            test "$(printf '%s' "$recovery_asset" | jq -r '.size')" = '${{ steps.release.outputs.recovery_size }}'
+            recovery_digest=$(printf '%s' "$recovery_asset" | jq -r '.digest // empty')
+            if [ -n "$recovery_digest" ]; then
+              test "$recovery_digest" = 'sha256:${{ steps.release.outputs.recovery_sha256 }}'
+            else
+              verification_dir=$(mktemp -d)
+              gh release download "$tag" --pattern "$recovery" --dir "$verification_dir"
+              test "$(sha256sum "$verification_dir/$recovery" | awk '{print $1}')" = '${{ steps.release.outputs.recovery_sha256 }}'
+            fi
+          fi
+
       - name: Advance dev feed only after remote verification
         shell: bash
         run: |
@@ -161,7 +203,9 @@ jobs:
           mkdir -p channels/dev
 
           python - "$version" "$package_url" "$notes_url" <<'PY'
-          import json, pathlib, sys
+          import json, pathlib, sys, urllib.parse
+          sys.path.insert(0, 'tools')
+          from import_verified_chrome_ci import minimum_updater, validate_recovery_request
           from datetime import datetime, timezone
           version, package_url, notes_url = sys.argv[1:4]
           meta_path = pathlib.Path(f'platforms/chrome-extension/releases/{version}/release-v2.json')
@@ -187,13 +231,19 @@ jobs:
                       'manifestVersion': meta['manifestVersion'],
                       'fixedExtensionKeyRequired': True,
                       'minDevHubVersion': meta['minDevHubVersion'],
+                      'minUpdaterVersion': minimum_updater(meta, version),
                       'runtimeVerified': meta.get('runtimeVerified', False),
+                      'ciVerified': meta.get('ciVerified', False),
                       'notesUrl': notes_url,
                       'publishedAt': now,
                   }
               },
               'signature': None
           }
+          if meta.get('recovery'):
+              recovery = validate_recovery_request(meta['recovery'])
+              recovery['url'] = package_url.rsplit('/', 1)[0]+'/'+urllib.parse.quote(recovery['filename'])
+              feed['signed']['latest']['recovery'] = recovery
           pathlib.Path('channels/dev/chrome-extension.json').write_text(
               json.dumps(feed, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
           PY
@@ -216,7 +266,11 @@ jobs:
             if payload=$(curl -fsSL --max-time 15 "$raw"); then
               latest=$(printf '%s' "$payload" | jq -r '.signed.latest.version')
               sha=$(printf '%s' "$payload" | jq -r '.signed.latest.sha256')
-              if [ "$latest" = '${{ steps.release.outputs.version }}' ] && [ "$sha" = '${{ steps.release.outputs.sha256 }}' ]; then
+              min_updater=$(printf '%s' "$payload" | jq -r '.signed.latest.minUpdaterVersion // "1.0.0"')
+              recovery_sha=$(printf '%s' "$payload" | jq -r '.signed.latest.recovery.sha256 // empty')
+              if [ "$latest" = '${{ steps.release.outputs.version }}' ] && [ "$sha" = '${{ steps.release.outputs.sha256 }}' ] \
+                && [ "$min_updater" = '${{ steps.release.outputs.min_updater }}' ] \
+                && [ "$recovery_sha" = '${{ steps.release.outputs.recovery_sha256 }}' ]; then
                 verified=true
                 break
               fi

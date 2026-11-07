@@ -46,6 +46,8 @@ jobs:
           with open(os.environ['GITHUB_ENV'],'a') as out:
               out.write('RELEASE_VERSION='+value+'\n')
           PY
+      - name: Verify import and recovery contracts
+        run: python3 -m unittest discover -s tests -p 'test_chrome_import_contract.py'
       - name: Verify all required checks, merged source, identity and exact archive bytes
         run: python3 tools/import_verified_chrome_ci.py "$RELEASE_VERSION"
       - name: Archive the immutable verified package

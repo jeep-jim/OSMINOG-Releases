@@ -14,6 +14,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Verify Chrome update import and recovery contracts
+        run: python3 -m unittest discover -s tests -p 'test_chrome_import_contract.py'
       - name: Validate JSON, feeds and published artifacts
         shell: bash
         run: |
