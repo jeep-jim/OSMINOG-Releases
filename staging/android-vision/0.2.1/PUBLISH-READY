@@ -1,3 +1,4 @@
 Source CI 42312217165 completed successfully for 1d6bb68ef76c83c3da929890698b13b2e3c81e49.
 Six Android instrumentation tests passed. Full-width scene, focus outline, star menu, background provider warmup, chat transport and camera lifecycle were verified in emulator CI.
 Publish only after original installed certificate, signed APK launch, remote APK byte readback and update-feed readback pass.
+Release workflow path correction: emulator verification now uses absolute GITHUB_WORKSPACE paths for the signed APK and screenshot.
