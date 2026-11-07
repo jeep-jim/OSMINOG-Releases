@@ -1,0 +1,26 @@
+{
+  "version": "4.0.41",
+  "sourceRepository": "jeep-jim/OSMINOG",
+  "sourceCommit": "5c079a8884372fa1502ac6f0ab871c8a513dc6c5",
+  "sourceMergeCommit": "4d918e225b699af71046576c72e82ee8db7e1691",
+  "pullRequestNumber": 104,
+  "sourceWorkflowRun": 42369592735,
+  "artifactId": 13573332519,
+  "package": "OSMINOG-Chrome-4.0.41.zip",
+  "size": 9333446,
+  "sha256": "7ec7167c24d49528548e2e243427e0c4fe245e369ae30c5b58cc9350fb0e8f4b",
+  "verificationRuns": [
+    42369592735,
+    42369592868,
+    42369592853
+  ],
+  "baseVersion": "4.0.40",
+  "ownerAuthSha256": "90dc411113966db05adc323c56d5311aa830af8c11c4d6dcf959aa32008dab41",
+  "minUpdaterVersion": "2.0.0",
+  "recovery": {
+    "filename": "OSMINOG-Update-Recovery.html",
+    "size": 65468,
+    "sha256": "c553126f125ad2a5ec9b7746ec471a2e802b5353a2e316c02d700b11f894e6a7"
+  },
+  "notes": "При перетаскивании границы меню и чата движется только линия; ширина применяется один раз после отпускания мыши. Отмена жеста не меняет размеры. Полный Linux Chromium CI и перетаскивания на столе с 2400 объектами прошли; устранение закрытия браузера на Windows владельца пока не подтверждено."
+}
