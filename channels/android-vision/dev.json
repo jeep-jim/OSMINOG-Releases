@@ -2,14 +2,14 @@
   "schema": "osminog-android-update/v1",
   "applicationId": "com.osminog.vision",
   "status": "active",
-  "versionCode": 3,
-  "versionName": "0.2.1",
-  "apkUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/vision-android-v0.2.1/OSMINOG-Vision-0.2.1.apk",
-  "size": 88516,
-  "sha256": "a258b5362a17a96fb0763c7eddcbaf2b80eece29db9c6c788c0d5c0c31640d11",
+  "versionCode": 4,
+  "versionName": "0.2.2",
+  "apkUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/vision-android-v0.2.2/OSMINOG-Vision-0.2.2.apk",
+  "size": 92612,
+  "sha256": "30762b01de937bdfc137830e393c4ed6e31a99dd0effceeb57c47bdb292ad72f",
   "minSdk": 26,
-  "notes": "OSMINOG Vision 0.2.1: исправлено фоновое подключение ИИ без необходимости нажимать глаз; океан занимает полную ширину окна Android, WebView корректно получает размеры после обработки системных inset; улучшена работа при открытии клавиатуры; планктон движется независимо по хаотичным траекториям; убраны системные белые рамки фокуса; камера проверяет фактическое принятие кадра сервисом и не отправляет вопрос при неподтверждённом вложении. Проверено на Android 15 эмуляторе: 6 instrumentation tests, build, lint и чистый запуск.",
+  "notes": "OSMINOG Vision 0.2.2 — предварительный выпуск. Исправлено растягивание SVG-фона: фон больше не сохраняет узкие пропорции макета. Системные уведомления, выбор ИИ, согласие на голос/камеру и форма обновления оформлены в океаническом стиле. Обновлены состояния глаза и независимое движение планктона. Переработаны отправка через форму сайта и обработка готовности фонового WebView. История и постоянная подпись приложения сохраняются. Проверки Android-эмулятора и контролируемых страниц не подтверждают работу с личными аккаунтами ChatGPT/DeepSeek: это остаётся проверкой на устройстве.",
   "signerSha256": "d0f552cda0525bb67de53c8dabd5452f3ad84afe5f0bc2746d506f310f4497bf",
-  "sourceCommit": "1d6bb68ef76c83c3da929890698b13b2e3c81e49",
-  "publishedAt": "2026-11-07T01:39:54Z"
+  "sourceCommit": "5e2e54c9e77d86b93bfc224dea6ca045b531d751",
+  "publishedAt": "2026-11-07T04:12:34Z"
 }
