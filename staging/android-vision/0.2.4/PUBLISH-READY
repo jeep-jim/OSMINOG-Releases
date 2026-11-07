@@ -1,9 +1,0 @@
-OSMINOG Vision Android 0.2.4
-Owner requested repair and publication after 0.2.3 failed on the phone.
-Pinned source: be9cc5b96239e6f276b9af8d5fac2430a4a78d1b
-Successful Android CI: https://github.com/jeep-jim/OSMINOG/actions/runs/42350689899
-Downloaded artifact 13565592457: 15 tests, 0 failures, 0 errors, 0 skipped; source archive and ordinary cold launch verified.
-Two publisher attempts passed all fifteen tests, then encountered the same independently recorded boot-time com.android.launcher3 Quickstep ANR dialog. Verifier 89b4e8a2c21dfa8450462433d3b752c4cb6fd7d4 may close exactly that dialog once, only with matching launcher ANR logs and no OSMINOG ANR/crash. It must then independently verify each OSMINOG startup. Dialog XML, screenshot and logs are retained. Other dialogs and application failures remain blocking.
-Preserve signing identity and all release gates, including signed upgrade from 0.2.3 without clearing between installations, and APK/feed readback.
-Live personal accounts remain unverified. During each exchange the provider website is visible, and the ocean returns after completion. Public-site read-only probe did not reach an editor; do not claim it proves account connectivity.
-Publish only the Android Vision channel; leave Chrome channels unchanged.
