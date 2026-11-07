@@ -2,4 +2,6 @@ OSMINOG Vision Android 0.2.2
 Owner explicitly authorized publication.
 Verified source commit: 5e2e54c9e77d86b93bfc224dea6ca045b531d751
 Successful source CI: https://github.com/jeep-jim/OSMINOG/actions/runs/42336228965
-Publish through the existing signing, emulator verification and update-feed readback gates.
+Retry publication with release verifier commit 2acb1408ef0f36cfe0f0b15a2040398d164f991f.
+The initial release job passed all seven instrumentation tests and signing, but its streaming XML smoke check did not confirm readiness.
+Keep all seven tests, fresh debug and exact signed-APK cold-start checks, signature/hash validation and feed readback mandatory. Preserve complete UI XML and logs for diagnosis.
