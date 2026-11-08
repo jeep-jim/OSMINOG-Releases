@@ -10,7 +10,7 @@ mkdir -p dist "$output_dir"
 cleanup() {
   timeout 12s adb logcat -d > "$output_dir/release-logcat.txt" || true
   timeout 12s adb shell dumpsys activity activities > "$output_dir/release-activity.txt" || true
-  for name in vision-home vision-menu vision-conversation vision-notice vision-update; do
+  for name in vision-home vision-menu vision-conversation vision-notice vision-update vision-ocean vision-ocean-card vision-ocean-thread; do
     timeout 12s adb pull "/sdcard/$name.png" "dist/$name.png" || true
   done
 }
@@ -29,7 +29,8 @@ for report in reports:
     assert int(root.get('failures','0'))==0 and int(root.get('errors','0'))==0, str(report)
     assert int(root.get('skipped','0'))==0, 'Skipped Android tests'
     tests+=int(root.get('tests','0'))
-minimum=15 if tuple(map(int,sys.argv[1].split('.'))) >= (0,2,4) else 7
+v=tuple(map(int,sys.argv[1].split('.')))
+minimum=28 if v >= (0,2,6) else 15 if v >= (0,2,4) else 7
 assert tests>=minimum, f'Incomplete Android suite: {tests} < {minimum}'
 print(f'ANDROID_INSTRUMENTATION_PASS {tests}')
 PY
