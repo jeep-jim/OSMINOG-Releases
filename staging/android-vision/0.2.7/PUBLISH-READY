@@ -1,1 +1,0 @@
-Source CI 42486887970 SUCCESS, 40/40 Android tests, build/lint/cold launch. Visual review complete. APK must pass original signer and 0.2.6 to 0.2.7 in-place upgrade gates before publication and feed update.
