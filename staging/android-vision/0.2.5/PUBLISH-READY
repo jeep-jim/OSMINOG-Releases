@@ -1,5 +1,0 @@
-Approved release candidate. Source CI 42451792356 completed successfully for 14305342c2ef6efa75c5add1046ef452140317e5. Release must still pass original signing certificate, Android 0.2.4 -> 0.2.5 in-place upgrade, emulator, immutable APK readback and update-feed readback gates.
-
-Verifier fix: parse versionCode from combined dumpsys metadata line; rerun signed upgrade verification after source CI 42451792356.
-
-Cold-start verifier bounded to six attempts per launch; verified Quickstep recovery resets for each install/upgrade launch.
