@@ -4,7 +4,6 @@ source_dir=$(realpath "$1")
 output_dir=$(realpath "$2")
 version=$3
 verifier_dir=$(dirname "$(realpath "$0")")
-launcher_repaired=0
 [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]
 cd "$source_dir/android-vision"
 mkdir -p dist "$output_dir"
@@ -36,12 +35,12 @@ print(f'ANDROID_INSTRUMENTATION_PASS {tests}')
 PY
 
 assert_cold_launch() {
-  local label=$1 ready=0 local_xml remote_xml preserve=${2:-0}
+  local label=$1 ready=0 local_xml remote_xml preserve=${2:-0} launcher_repaired=0
   remote_xml="/sdcard/vision-${label}.xml"
   timeout 12s adb shell am force-stop com.osminog.vision
   if [[ "$preserve" != 1 ]]; then timeout 12s adb shell pm clear com.osminog.vision; fi
   timeout 20s adb shell am start -S -W -n com.osminog.vision/.MainActivity
-  for attempt in $(seq 1 12); do
+  for attempt in $(seq 1 6); do
     local_xml="$output_dir/vision-${label}-${attempt}.xml"
     timeout 8s adb shell rm -f "$remote_xml" || true
     # Consume the complete XML through adb pull. grep -q on an adb pipe can
