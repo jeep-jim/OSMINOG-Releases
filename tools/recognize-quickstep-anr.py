@@ -22,7 +22,7 @@ def close_target(xml: str, log: str) -> tuple[int, int] | None:
         "Quickstep isn't responding", "Quickstep isn’t responding"
     ):
         return None
-    buttons = [n for n in nodes if n.get('resource-id') == 'android:id/aerr_close'
+    buttons = [n for n in nodes if n.get('resource-id') == 'android:id/aerr_wait'
                and n.get('clickable') == 'true' and n.get('enabled') == 'true']
     if len(buttons) != 1:
         return None
