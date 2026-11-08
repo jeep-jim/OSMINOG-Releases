@@ -30,7 +30,7 @@ for report in reports:
     assert int(root.get('skipped','0'))==0, 'Skipped Android tests'
     tests+=int(root.get('tests','0'))
 v=tuple(map(int,sys.argv[1].split('.')))
-minimum=28 if v >= (0,2,6) else 15 if v >= (0,2,4) else 7
+minimum=29 if v >= (0,2,6) else 15 if v >= (0,2,4) else 7
 assert tests>=minimum, f'Incomplete Android suite: {tests} < {minimum}'
 print(f'ANDROID_INSTRUMENTATION_PASS {tests}')
 PY
