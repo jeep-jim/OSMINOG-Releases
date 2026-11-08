@@ -38,42 +38,7 @@ def token(text,name):
 assert field(before,'firstInstallTime')==field(after,'firstInstallTime'),'Installation identity changed'
 def app_identity(text):
     # Android 15 dumpsys uses appId; older builds use userId for this field.
-    values=re.findall(r'(?m)^\s*(?:appId|userId)=(\d+)\s*
-assert token(before,'versionCode')=='7' and token(after,'versionCode')=='8'
-assert token(before,'versionName')=='0.2.5' and token(after,'versionName')=='0.2.6'
-(p/'intent-upgrade-verification.json').write_text(json.dumps({'from':'0.2.5','to':'0.2.6','sameFirstInstallTime':True,'sameUid':True,'inPlaceInstall':True,'historyContentIndependentlyChecked':False},indent=2)+'\n')
-print('SIGNED_025_TO_026_IN_PLACE_INSTALL_PASS; history content covered separately by local migration tests')
-PY
-ready=0
-repaired=0
-for attempt in 1 2 3 4 5 6; do
-  xml="$output_dir/intent-upgraded-$attempt.xml"
-  timeout 4s adb shell rm -f /sdcard/intent-upgraded.xml || true
-  if timeout 10s adb shell uiautomator dump /sdcard/intent-upgraded.xml > "$output_dir/intent-upgraded-$attempt.log" 2>&1 && timeout 4s adb pull /sdcard/intent-upgraded.xml "$xml" >> "$output_dir/intent-upgraded-$attempt.log" 2>&1; then
-    if python3 - "$xml" <<'PY'
-import sys,xml.etree.ElementTree as ET
-root=ET.parse(sys.argv[1]).getroot();nodes=list(root.iter('node'))
-text=' '.join(n.get('text','') for n in nodes)
-ready=any(n.get('package')=='com.osminog.vision' for n in nodes) and "isn't responding" not in text
-sys.exit(0 if ready else 1)
-PY
-    then ready=1; cp "$xml" "$output_dir/intent-upgraded.xml"; break; fi
-    if [[ "$repaired" == 0 ]]; then
-      timeout 12s adb logcat -d > "$output_dir/intent-upgrade-logcat.txt"
-      if python3 "$verifier_dir/recognize-quickstep-anr.py" "$xml" "$output_dir/intent-upgrade-logcat.txt" > "$output_dir/intent-upgrade-quickstep.txt"; then
-        read -r x y < "$output_dir/intent-upgrade-quickstep.txt"
-        timeout 6s adb shell input tap "$x" "$y"
-        repaired=1
-      fi
-    fi
-  fi
-  sleep 1
-done
-timeout 12s adb shell screencap -p /sdcard/intent-upgraded.png
-timeout 12s adb pull /sdcard/intent-upgraded.png "$output_dir/intent-upgraded.png"
-[[ "$ready" == 1 ]] || { echo 'Upgraded OSMINOG window not visible' >&2; exit 1; }
-echo 'SIGNED_025_TO_026_COLD_LAUNCH_PASS'
-,text)
+    values=re.findall(r'(?m)^\s*(?:appId|userId)=(\d+)\s*$',text)
     assert values and len(set(values))==1,'Missing or ambiguous application identity'
     return values[0]
 assert app_identity(before)==app_identity(after),'Application identity changed'
