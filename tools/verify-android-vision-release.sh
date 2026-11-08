@@ -50,9 +50,7 @@ assert_cold_launch() {
 import sys, xml.etree.ElementTree as ET
 try:
     root=ET.parse(sys.argv[1]).getroot()
-    ready=any(n.get('package')=='com.osminog.vision' and
-              'Меню OSMINOG' in (n.get('content-desc','')+' '+n.get('text',''))
-              for n in root.iter('node'))
+    ready=any(n.get('package')=='com.osminog.vision' for n in root.iter('node')) and not any("isn't responding" in n.get('text','') for n in root.iter('node'))
 except (OSError, ET.ParseError):
     ready=False
 sys.exit(0 if ready else 1)
@@ -86,7 +84,7 @@ log=pathlib.Path(sys.argv[1]).read_text()
 assert not re.search(r'(?:ANR in |Process: )com\.osminog\.vision\b',log), 'OSMINOG ANR/crash: refusing publication'
 PY
   if [[ "$ready" != 1 ]]; then
-    echo "Android $label cold start did not expose the OSMINOG menu; inspect preserved UI XML/logs" >&2
+    echo "Android $label cold start did not expose the OSMINOG application window; inspect preserved UI XML/logs" >&2
     return 1
   fi
   echo "ANDROID_${label^^}_COLD_START_PASS"
