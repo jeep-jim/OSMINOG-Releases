@@ -106,7 +106,8 @@ import pathlib,sys
 p=pathlib.Path(sys.argv[1]);before=(p/'package-before-upgrade.txt').read_text();after=(p/'package-after-upgrade.txt').read_text()
 def field(data,name):
     for line in data.splitlines():
-        if line.strip().startswith(name+"="): return line.split("=",1)[1].strip()
+        for token in line.strip().split():
+            if token.startswith(name+"="): return token.split("=",1)[1].strip()
     raise AssertionError("Missing "+name)
 assert field(before,'firstInstallTime')==field(after,'firstInstallTime'),'Application was reinstalled, not upgraded'
 assert field(before,'versionName')=='0.2.4' and field(after,'versionName')=='0.2.5'
