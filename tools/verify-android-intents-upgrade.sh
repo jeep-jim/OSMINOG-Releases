@@ -2,20 +2,20 @@
 set -euo pipefail
 output_dir=$(realpath "$1")
 version=$2
-[[ "$version" == 0.2.6 ]] || exit 0
+[[ "$version" == 0.2.7 ]] || exit 0
 verifier_dir=$(dirname "$(realpath "$0")")
-mkdir -p "$output_dir/previous-025"
-gh release download vision-android-v0.2.5 --repo jeep-jim/OSMINOG-Releases --pattern OSMINOG-Vision-0.2.5.apk --dir "$output_dir/previous-025"
-python3 - "$output_dir/previous-025/OSMINOG-Vision-0.2.5.apk" <<'PY'
+mkdir -p "$output_dir/previous-026"
+gh release download vision-android-v0.2.6 --repo jeep-jim/OSMINOG-Releases --pattern OSMINOG-Vision-0.2.6.apk --dir "$output_dir/previous-026"
+python3 - "$output_dir/previous-026/OSMINOG-Vision-0.2.6.apk" <<'PY'
 import hashlib,pathlib,sys
 raw=pathlib.Path(sys.argv[1]).read_bytes()
-assert len(raw)==109068
-assert hashlib.sha256(raw).hexdigest()=='886b56b98e50d5a9053781aee85616e8391bf89c10ae4be8dd71a98b3a330d28'
+assert len(raw)==88854
+assert hashlib.sha256(raw).hexdigest()=='b196e1cec6dd1824be75a64f02f523ea3baea093c4ebed52253bf8034c0bb570'
 PY
 # This is a disposable CI emulator, not the user's device. Establish the previous
 # signed installation ONCE; never uninstall or clear data between it and upgrade.
 timeout 20s adb uninstall com.osminog.vision
-timeout 30s adb install "$output_dir/previous-025/OSMINOG-Vision-0.2.5.apk"
+timeout 30s adb install "$output_dir/previous-026/OSMINOG-Vision-0.2.6.apk"
 timeout 20s adb shell am start -S -W -n com.osminog.vision/.MainActivity
 sleep 2
 timeout 12s adb shell dumpsys package com.osminog.vision > "$output_dir/intent-upgrade-before.txt"
@@ -42,10 +42,10 @@ def app_identity(text):
     assert values and len(set(values))==1,'Missing or ambiguous application identity'
     return values[0]
 assert app_identity(before)==app_identity(after),'Application identity changed'
-assert token(before,'versionCode')=='7' and token(after,'versionCode')=='8'
-assert token(before,'versionName')=='0.2.5' and token(after,'versionName')=='0.2.6'
-(p/'intent-upgrade-verification.json').write_text(json.dumps({'from':'0.2.5','to':'0.2.6','sameFirstInstallTime':True,'sameUid':True,'inPlaceInstall':True,'historyContentIndependentlyChecked':False},indent=2)+'\n')
-print('SIGNED_025_TO_026_IN_PLACE_INSTALL_PASS; history content covered separately by local migration tests')
+assert token(before,'versionCode')=='8' and token(after,'versionCode')=='9'
+assert token(before,'versionName')=='0.2.6' and token(after,'versionName')=='0.2.7'
+(p/'intent-upgrade-verification.json').write_text(json.dumps({'from':'0.2.6','to':'0.2.7','sameFirstInstallTime':True,'sameUid':True,'inPlaceInstall':True,'historyContentIndependentlyChecked':False},indent=2)+'\n')
+print('SIGNED_026_TO_027_IN_PLACE_INSTALL_PASS; history content covered separately by local migration tests')
 PY
 ready=0
 repaired=0
@@ -75,4 +75,4 @@ done
 timeout 12s adb shell screencap -p /sdcard/intent-upgraded.png
 timeout 12s adb pull /sdcard/intent-upgraded.png "$output_dir/intent-upgraded.png"
 [[ "$ready" == 1 ]] || { echo 'Upgraded OSMINOG window not visible' >&2; exit 1; }
-echo 'SIGNED_025_TO_026_COLD_LAUNCH_PASS'
+echo 'SIGNED_026_TO_027_COLD_LAUNCH_PASS'

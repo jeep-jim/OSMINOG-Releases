@@ -69,6 +69,7 @@ jobs:
           set -euo pipefail
           node --check vision-source/android-vision/app/src/main/assets/app.js
           node --check vision-source/android-vision/app/src/main/assets/ocean.js
+          node --check vision-source/android-vision/app/src/main/assets/media.js
           if test -f vision-source/android-vision/app/src/main/assets/provider.js; then node --check vision-source/android-vision/app/src/main/assets/provider.js; fi
           if test -f vision-source/android-vision/app/src/main/assets/ambience.js; then node --check vision-source/android-vision/app/src/main/assets/ambience.js; fi
           python3 vision-source/android-vision/tools/check-assets.py
@@ -155,7 +156,7 @@ jobs:
           import json,pathlib
           p=pathlib.Path('vision-release');m=json.loads((p/'verification.json').read_text())
           notes=m['notes']+'\n\nSource: https://github.com/jeep-jim/OSMINOG/commit/'+m['sourceCommit']+'\nSource tests: https://github.com/jeep-jim/OSMINOG/actions/runs/'+str(m['sourceRunId'])+'\nAPK SHA-256: '+m['sha256']+'\nSigner SHA-256: '+m['signerSha256']+'\n\nAutomated Android checks do not certify an external model connection or live human-ocean publication. Consult the version notes for unavailable backend features.'
-          if m['versionName']=='0.2.6':
+          if tuple(map(int,m['versionName'].split('.'))) >= (0,2,6):
               upgrade=json.loads((p/'intent-upgrade-verification.json').read_text())
               assert upgrade['inPlaceInstall'] and upgrade['sameFirstInstallTime'] and upgrade['sameUid']
           (p/'notes.md').write_text(notes)
