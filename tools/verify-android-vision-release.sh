@@ -16,24 +16,6 @@ cleanup() {
 }
 trap cleanup EXIT
 
-# Run the complete pinned test suite. The publisher owns the cold-start checks
-# below; do not make publication depend on the source helper's streaming grep.
-timeout --kill-after=20s 360s gradle :app:connectedDebugAndroidTest
-python3 - "$version" <<'PY'
-import pathlib, sys, xml.etree.ElementTree as ET
-reports=list(pathlib.Path('app/build/outputs/androidTest-results/connected/debug').glob('TEST-*.xml'))
-assert reports, 'No Android instrumentation results'
-tests=0
-for report in reports:
-    root=ET.parse(report).getroot()
-    assert int(root.get('failures','0'))==0 and int(root.get('errors','0'))==0, str(report)
-    assert int(root.get('skipped','0'))==0, 'Skipped Android tests'
-    tests+=int(root.get('tests','0'))
-v=tuple(map(int,sys.argv[1].split('.')))
-minimum=29 if v >= (0,2,6) else 15 if v >= (0,2,4) else 7
-assert tests>=minimum, f'Incomplete Android suite: {tests} < {minimum}'
-print(f'ANDROID_INSTRUMENTATION_PASS {tests}')
-PY
 
 assert_cold_launch() {
   local label=$1 ready=0 local_xml remote_xml preserve=${2:-0} launcher_repaired=0
@@ -82,6 +64,31 @@ PY
   fi
   echo "ANDROID_${label^^}_COLD_START_PASS"
 }
+
+# Ensure the test window is reachable before injecting real touch events.
+# Recover only the independently identified Quickstep ANR using the same strict
+# XML + log recognizer as signed cold-launch checks; never suppress OSMINOG ANR.
+timeout 30s adb install -r app/build/outputs/apk/debug/app-debug.apk
+assert_cold_launch instrumentation-bootstrap
+
+# Run the complete pinned test suite. The publisher owns the cold-start checks
+# below; do not make publication depend on the source helper's streaming grep.
+timeout --kill-after=20s 360s gradle :app:connectedDebugAndroidTest
+python3 - "$version" <<'PY'
+import pathlib, sys, xml.etree.ElementTree as ET
+reports=list(pathlib.Path('app/build/outputs/androidTest-results/connected/debug').glob('TEST-*.xml'))
+assert reports, 'No Android instrumentation results'
+tests=0
+for report in reports:
+    root=ET.parse(report).getroot()
+    assert int(root.get('failures','0'))==0 and int(root.get('errors','0'))==0, str(report)
+    assert int(root.get('skipped','0'))==0, 'Skipped Android tests'
+    tests+=int(root.get('tests','0'))
+v=tuple(map(int,sys.argv[1].split('.')))
+minimum=29 if v >= (0,2,6) else 15 if v >= (0,2,4) else 7
+assert tests>=minimum, f'Incomplete Android suite: {tests} < {minimum}'
+print(f'ANDROID_INSTRUMENTATION_PASS {tests}')
+PY
 
 # Check both ordinary animated debug startup and the exact signed release APK.
 timeout 30s adb install -r app/build/outputs/apk/debug/app-debug.apk
