@@ -95,7 +95,65 @@ PY
 timeout 30s adb install -r app/build/outputs/apk/debug/app-debug.apk
 assert_cold_launch clean-launch
 timeout 20s adb uninstall com.osminog.vision
-if [[ "$version" == 0.2.4 ]]; then
+if [[ "$version" == 0.2.5 ]]; then
+  mkdir -p "$output_dir/previous"
+  gh release download vision-android-v0.2.4 --repo jeep-jim/OSMINOG-Releases --pattern OSMINOG-Vision-0.2.4.apk --dir "$output_dir/previous"
+  python3 - "$output_dir/previous/OSMINOG-Vision-0.2.4.apk" <<'PY'
+import hashlib,pathlib,sys
+p=pathlib.Path(sys.argv[1]);data=p.read_bytes()
+assert len(data)==104972 and hashlib.sha256(data).hexdigest()=='620f0dd9fef96954c51a91475d510d125c91e10798875deafbe7aa606df2073d'
+PY
+  timeout 30s adb install "$output_dir/previous/OSMINOG-Vision-0.2.4.apk"
+  assert_cold_launch previous
+  timeout 12s adb shell dumpsys package com.osminog.vision > "$output_dir/package-before-upgrade.txt"
+  # Install in place: no uninstall and no pm clear between 0.2.4 and 0.2.5.
+  timeout 30s adb install -r "$output_dir/OSMINOG-Vision-$version.apk"
+  assert_cold_launch upgraded 1
+  timeout 12s adb shell dumpsys package com.osminog.vision > "$output_dir/package-after-upgrade.txt"
+  python3 - "$output_dir" <<'PY'
+import pathlib,re,sys
+p=pathlib.Path(sys.argv[1])
+before=(p/'package-before-upgrade.txt').read_text();after=(p/'package-after-upgrade.txt').read_text()
+def field(text,name):
+    m=re.search(r'(?m)^\s*'+re.escape(name)+r'=(.+)
+  mkdir -p "$output_dir/previous"
+  gh release download vision-android-v0.2.3 --repo jeep-jim/OSMINOG-Releases --pattern OSMINOG-Vision-0.2.3.apk --dir "$output_dir/previous"
+  python3 - "$output_dir/previous/OSMINOG-Vision-0.2.3.apk" <<'PY'
+import hashlib,pathlib,sys
+assert hashlib.sha256(pathlib.Path(sys.argv[1]).read_bytes()).hexdigest()=='e2a8f3c8a03bae4e4bdfb51660a57af2d4e9be884e5768eeaeebd59a5f796fde'
+PY
+  timeout 30s adb install "$output_dir/previous/OSMINOG-Vision-0.2.3.apk"
+  assert_cold_launch previous
+  timeout 12s adb shell dumpsys package com.osminog.vision > "$output_dir/package-before-upgrade.txt"
+  # No uninstall, no pm clear between the previous release and this startup.
+  timeout 30s adb install -r "$output_dir/OSMINOG-Vision-$version.apk"
+  assert_cold_launch upgraded 1
+  timeout 12s adb shell dumpsys package com.osminog.vision > "$output_dir/package-after-upgrade.txt"
+  python3 - "$output_dir" <<'PY'
+import pathlib,re,sys
+p=pathlib.Path(sys.argv[1])
+before=(p/'package-before-upgrade.txt').read_text();after=(p/'package-after-upgrade.txt').read_text()
+def installed(text):
+    match=re.search(r'firstInstallTime=(.+)',text)
+    assert match, 'Missing firstInstallTime'
+    return match.group(1).strip()
+assert installed(before)==installed(after), 'Install identity changed'
+assert 'versionName=0.2.3' in before and 'versionName=0.2.4' in after
+print('ANDROID_SIGNED_UPGRADE_023_TO_024_PASS; no account/history fixture is implied')
+PY
+else
+  timeout 30s adb install "$output_dir/OSMINOG-Vision-$version.apk"
+fi
+assert_cold_launch release
+,text)
+    assert m,'Missing '+name
+    return m.group(1).strip()
+assert field(before,'firstInstallTime')==field(after,'firstInstallTime'),'Application was reinstalled, not upgraded'
+assert 'versionName=0.2.4' in before and 'versionName=0.2.5' in after
+assert re.search(r'versionCode=6\b',before) and re.search(r'versionCode=7\b',after)
+print('ANDROID_SIGNED_UPGRADE_024_TO_025_PASS; package data directory retained')
+PY
+elif [[ "$version" == 0.2.4 ]]; then
   mkdir -p "$output_dir/previous"
   gh release download vision-android-v0.2.3 --repo jeep-jim/OSMINOG-Releases --pattern OSMINOG-Vision-0.2.3.apk --dir "$output_dir/previous"
   python3 - "$output_dir/previous/OSMINOG-Vision-0.2.3.apk" <<'PY'
