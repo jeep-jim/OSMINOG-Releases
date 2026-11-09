@@ -1,3 +1,0 @@
-Authorized by owner: publish Vision 0.2.9 through existing in-app update channel.
-Source eaf53043b520571d3adcefb0c947511222e3dd1b; CI 42544855589 SUCCESS, 63/63 tests, artifact digest verified.
-Preserve installed signing identity; require signed 0.2.8 to 0.2.9 in-place upgrade verification.
