@@ -2,20 +2,24 @@
 set -euo pipefail
 output_dir=$(realpath "$1")
 version=$2
-[[ "$version" == 0.2.10 ]] || exit 0
+case "$version" in
+  0.2.10) previous=0.2.9; previous_code=11; next_code=12; previous_size=470580; previous_hash=14aaa7a20a125e2493090774ea792f577e8e25d810bda9e674bdbe2537c4b9bc; label=029_TO_0210 ;;
+  0.2.11) previous=0.2.10; previous_code=12; next_code=13; previous_size=511600; previous_hash=547d078ad1c34526d7f7ea821ddc6aec9f281c2785cf29a511950bcdd2eea4c7; label=0210_TO_0211 ;;
+  *) exit 0 ;;
+esac
 verifier_dir=$(dirname "$(realpath "$0")")
-mkdir -p "$output_dir/previous-029"
-gh release download vision-android-v0.2.9 --repo jeep-jim/OSMINOG-Releases --pattern OSMINOG-Vision-0.2.9.apk --dir "$output_dir/previous-029"
-python3 - "$output_dir/previous-029/OSMINOG-Vision-0.2.9.apk" <<'PY'
+mkdir -p "$output_dir/previous-intents"
+gh release download "vision-android-v$previous" --repo jeep-jim/OSMINOG-Releases --pattern "OSMINOG-Vision-$previous.apk" --dir "$output_dir/previous-intents"
+python3 - "$output_dir/previous-intents/OSMINOG-Vision-$previous.apk" "$previous_size" "$previous_hash" <<'PYVERIFY'
 import hashlib,pathlib,sys
 raw=pathlib.Path(sys.argv[1]).read_bytes()
-assert len(raw)==470580
-assert hashlib.sha256(raw).hexdigest()=='14aaa7a20a125e2493090774ea792f577e8e25d810bda9e674bdbe2537c4b9bc'
-PY
+assert len(raw)==int(sys.argv[2])
+assert hashlib.sha256(raw).hexdigest()==sys.argv[3]
+PYVERIFY
 # This is a disposable CI emulator, not the user's device. Establish the previous
 # signed installation ONCE; never uninstall or clear data between it and upgrade.
 timeout 20s adb uninstall com.osminog.vision
-timeout 30s adb install "$output_dir/previous-029/OSMINOG-Vision-0.2.9.apk"
+timeout 30s adb install "$output_dir/previous-intents/OSMINOG-Vision-$previous.apk"
 timeout 20s adb shell am start -S -W -n com.osminog.vision/.MainActivity
 sleep 2
 timeout 12s adb shell dumpsys package com.osminog.vision > "$output_dir/intent-upgrade-before.txt"
@@ -23,7 +27,7 @@ timeout 30s adb install -r "$output_dir/OSMINOG-Vision-$version.apk"
 timeout 20s adb shell am start -S -W -n com.osminog.vision/.MainActivity
 sleep 2
 timeout 12s adb shell dumpsys package com.osminog.vision > "$output_dir/intent-upgrade-after.txt"
-python3 - "$output_dir" <<'PY'
+python3 - "$output_dir" "$previous" "$version" "$previous_code" "$next_code" "$label" <<'PY'
 import json,pathlib,re,sys
 p=pathlib.Path(sys.argv[1]);before=(p/'intent-upgrade-before.txt').read_text();after=(p/'intent-upgrade-after.txt').read_text()
 def field(text,name):
@@ -42,10 +46,10 @@ def app_identity(text):
     assert values and len(set(values))==1,'Missing or ambiguous application identity'
     return values[0]
 assert app_identity(before)==app_identity(after),'Application identity changed'
-assert token(before,'versionCode')=='11' and token(after,'versionCode')=='12'
-assert token(before,'versionName')=='0.2.9' and token(after,'versionName')=='0.2.10'
-(p/'intent-upgrade-verification.json').write_text(json.dumps({'from':'0.2.9','to':'0.2.10','sameFirstInstallTime':True,'sameUid':True,'inPlaceInstall':True,'historyContentIndependentlyChecked':False},indent=2)+'\n')
-print('SIGNED_029_TO_0210_IN_PLACE_INSTALL_PASS; history content covered separately by local migration tests')
+assert token(before,'versionCode')==sys.argv[4] and token(after,'versionCode')==sys.argv[5]
+assert token(before,'versionName')==sys.argv[2] and token(after,'versionName')==sys.argv[3]
+(p/'intent-upgrade-verification.json').write_text(json.dumps({'from':sys.argv[2],'to':sys.argv[3],'sameFirstInstallTime':True,'sameUid':True,'inPlaceInstall':True,'historyContentIndependentlyChecked':False},indent=2)+'\n')
+print('SIGNED_'+sys.argv[6]+'_IN_PLACE_INSTALL_PASS; history content covered separately by local migration tests')
 PY
 ready=0
 repaired=0
@@ -75,4 +79,4 @@ done
 timeout 12s adb shell screencap -p /sdcard/intent-upgraded.png
 timeout 12s adb pull /sdcard/intent-upgraded.png "$output_dir/intent-upgraded.png"
 [[ "$ready" == 1 ]] || { echo 'Upgraded OSMINOG window not visible' >&2; exit 1; }
-echo 'SIGNED_029_TO_0210_COLD_LAUNCH_PASS'
+echo "SIGNED_${label}_COLD_LAUNCH_PASS"
