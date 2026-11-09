@@ -7,6 +7,7 @@ case "$version" in
   0.2.11) previous=0.2.10; previous_code=12; next_code=13; previous_size=511600; previous_hash=547d078ad1c34526d7f7ea821ddc6aec9f281c2785cf29a511950bcdd2eea4c7; label=0210_TO_0211 ;;
   0.2.12) previous=0.2.11; previous_code=13; next_code=14; previous_size=515783; previous_hash=15caddbff706b783b3874285a64cc00a22e1b192b6b103b6ede67bd78e707ce8; label=0211_TO_0212 ;;
   0.2.13) previous=0.2.12; previous_code=14; next_code=15; previous_size=519879; previous_hash=c04b7180270540452b16bb202af919ac1bb851206d708f85380740e996e5aa61; label=0212_TO_0213 ;;
+  0.2.14) previous=0.2.13; previous_code=15; next_code=16; previous_size=536450; previous_hash=e449c891fab5822bf5880f06823d9f4d660e8e0e50397d973840b2560e6605c3; label=0213_TO_0214 ;;
   *) exit 0 ;;
 esac
 verifier_dir=$(dirname "$(realpath "$0")")
