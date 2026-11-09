@@ -67,6 +67,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          if test -f vision-source/android-vision/app/src/main/assets/character.js; then node --check vision-source/android-vision/app/src/main/assets/character.js; fi
           node --check vision-source/android-vision/app/src/main/assets/app.js
           node --check vision-source/android-vision/app/src/main/assets/ocean.js
           node --check vision-source/android-vision/app/src/main/assets/media.js
