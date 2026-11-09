@@ -70,6 +70,7 @@ jobs:
           node --check vision-source/android-vision/app/src/main/assets/app.js
           node --check vision-source/android-vision/app/src/main/assets/ocean.js
           node --check vision-source/android-vision/app/src/main/assets/media.js
+          if test -f vision-source/android-vision/app/src/main/assets/experience.js; then node --check vision-source/android-vision/app/src/main/assets/experience.js; fi
           if test -f vision-source/android-vision/app/src/main/assets/provider.js; then node --check vision-source/android-vision/app/src/main/assets/provider.js; fi
           if test -f vision-source/android-vision/app/src/main/assets/ambience.js; then node --check vision-source/android-vision/app/src/main/assets/ambience.js; fi
           python3 vision-source/android-vision/tools/check-assets.py
