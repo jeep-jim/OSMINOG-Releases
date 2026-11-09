@@ -10,7 +10,7 @@ mkdir -p dist "$output_dir"
 cleanup() {
   timeout 12s adb logcat -d > "$output_dir/release-logcat.txt" || true
   timeout 12s adb shell dumpsys activity activities > "$output_dir/release-activity.txt" || true
-  for name in vision-home vision-menu vision-conversation vision-notice vision-update vision-ocean vision-ocean-card vision-ocean-thread vision-classic vision-welcome-replay vision-profile vision-message-photo; do
+  for name in vision-home vision-menu vision-conversation vision-notice vision-update vision-ocean vision-ocean-card vision-ocean-thread vision-classic vision-language-english vision-language-arabic vision-welcome-replay vision-profile vision-message-photo; do
     timeout 12s adb pull "/sdcard/$name.png" "dist/$name.png" || true
   done
 }
@@ -73,7 +73,7 @@ assert_cold_launch instrumentation-bootstrap
 
 # Run the complete pinned test suite. The publisher owns the cold-start checks
 # below; do not make publication depend on the source helper's streaming grep.
-timeout --kill-after=20s 360s gradle :app:connectedDebugAndroidTest
+timeout --kill-after=20s 900s gradle :app:connectedDebugAndroidTest
 python3 - "$version" <<'PY'
 import pathlib, sys, xml.etree.ElementTree as ET
 reports=list(pathlib.Path('app/build/outputs/androidTest-results/connected/debug').glob('TEST-*.xml'))
@@ -85,7 +85,7 @@ for report in reports:
     assert int(root.get('skipped','0'))==0, 'Skipped Android tests'
     tests+=int(root.get('tests','0'))
 v=tuple(map(int,sys.argv[1].split('.')))
-minimum=63 if v >= (0,2,9) else 53 if v >= (0,2,8) else 40 if v >= (0,2,7) else 29 if v >= (0,2,6) else 15 if v >= (0,2,4) else 7
+minimum=71 if v >= (0,2,10) else 63 if v >= (0,2,9) else 53 if v >= (0,2,8) else 40 if v >= (0,2,7) else 29 if v >= (0,2,6) else 15 if v >= (0,2,4) else 7
 assert tests>=minimum, f'Incomplete Android suite: {tests} < {minimum}'
 print(f'ANDROID_INSTRUMENTATION_PASS {tests}')
 PY
