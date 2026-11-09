@@ -74,6 +74,8 @@ jobs:
           if test -f vision-source/android-vision/app/src/main/assets/provider.js; then node --check vision-source/android-vision/app/src/main/assets/provider.js; fi
           if test -f vision-source/android-vision/app/src/main/assets/ambience.js; then node --check vision-source/android-vision/app/src/main/assets/ambience.js; fi
           if test -f vision-source/android-vision/tools/build-i18n.py; then python3 vision-source/android-vision/tools/build-i18n.py; git -C vision-source diff --exit-code -- android-vision/app/src/main/assets/i18n.js; node --check vision-source/android-vision/app/src/main/assets/i18n.js; fi
+          python3 vision-source/android-vision/tools/test-quickstep-recovery.py
+          cmp tools/recognize-quickstep-anr.py vision-source/android-vision/tools/recognize-quickstep-anr.py
           python3 vision-source/android-vision/tools/check-assets.py
           gradle -p vision-source/android-vision :app:assembleDebug :app:assembleRelease :app:lintDebug :app:assembleDebugAndroidTest
       - name: Sign with the installed application's certificate
