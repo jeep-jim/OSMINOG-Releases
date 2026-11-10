@@ -1,0 +1,13 @@
+{
+  "minDevHubVersion": "0.0.0",
+  "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/windows-v5.0.1/Trader-OS-5.0.1-x64.exe",
+  "packageName": "Trader-OS-5.0.1-x64.exe",
+  "publishedAt": "2026-11-10T08:28:31Z",
+  "version": "5.0.1",
+  "manifestVersion": "5.0.1",
+  "sourceCommit": "a4153eebd91f48a21ea39e957d1eb5155cefbce4",
+  "notes": "Trader OS for Windows 5.0.1\n\nОдин логотип и компактная системная шапка; версия под логотипом стала кнопкой обновления. Добавлены светлая тема, выбор из 54 языковых регионов, переводы основного интерфейса на 10 языков и встроенная инструкция. Исправлена огромная пустая область Web3-панели; наблюдение за публичными EVM-адресами теперь объяснено прямо в интерфейсе без seed-фраз и приватных ключей.\n\nUnsigned preview. Verified source a4153eebd91f48a21ea39e957d1eb5155cefbce4, Windows workflow 42781046917, artifact 13745748744. The release gate covers the real installed OSMINOG Preview → Trader OS upgrade, retained local profile/cookie, packaged smoke and installed restart. SHA-256: 0bf8a7a9490f05a2e5d1d62a18ddbffcb61032904fa665ef048c1b0bc625eb74",
+  "kind": "full-package",
+  "sha256": "0bf8a7a9490f05a2e5d1d62a18ddbffcb61032904fa665ef048c1b0bc625eb74",
+  "size": 111609261
+}
