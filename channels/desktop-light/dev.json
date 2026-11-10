@@ -1,0 +1,37 @@
+{
+  "schema": "osminog-desktop-light/v1",
+  "version": "5.0.0",
+  "status": "preview-unsigned",
+  "sourceCommit": "f752dd6fe83c5ee4888b4c91444cdd2cc9caa719",
+  "sourceWorkflowRun": 42754855715,
+  "releaseUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/tag/desktop-light-v5.0.0",
+  "artifacts": [
+    {
+      "platform": "Windows",
+      "file": "OSMINOG-Light-5.0.0-win-x64.exe",
+      "size": 111232723,
+      "sha256": "15b861262f939cbe415bfc7c9b22b9385f683b9934c820bf90d7cf4585d661e6",
+      "url": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/desktop-light-v5.0.0/OSMINOG-Light-5.0.0-win-x64.exe",
+      "signed": false,
+      "notarized": false
+    },
+    {
+      "platform": "macOS",
+      "file": "OSMINOG-Light-5.0.0-mac-universal.zip",
+      "size": 227507426,
+      "sha256": "ac7120956f8ef5611de3f35548b3a9413c51f22a37bb0a2dfb7bd6ba2f6753bc",
+      "url": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/desktop-light-v5.0.0/OSMINOG-Light-5.0.0-mac-universal.zip",
+      "signed": false,
+      "notarized": false
+    },
+    {
+      "platform": "macOS",
+      "file": "OSMINOG-Light-5.0.0-mac-universal.dmg",
+      "size": 227429572,
+      "sha256": "07e3e8fb07a70904cb247480863aabcd2fe1e00d9940d63897e6eee225e97f0c",
+      "url": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/desktop-light-v5.0.0/OSMINOG-Light-5.0.0-mac-universal.dmg",
+      "signed": false,
+      "notarized": false
+    }
+  ]
+}
