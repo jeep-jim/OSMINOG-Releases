@@ -1,4 +1,5 @@
 approved source a4153eebd91f48a21ea39e957d1eb5155cefbce4
 workflow 42781046917
 artifact 13745748744
-runtime metadata, workflow head and direct main ancestor are the same SHA; installed 5.0.0 upgrade is release-gated
+runtime metadata, workflow head and direct main ancestor are the same SHA
+retry with TRADER_UPDATE_HARNESS_V2 for the already-published 5.0.0 test-only module
