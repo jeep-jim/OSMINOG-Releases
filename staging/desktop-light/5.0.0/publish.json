@@ -1,0 +1,9 @@
+{
+  "version": "5.0.0",
+  "sourceCommit": "f752dd6fe83c5ee4888b4c91444cdd2cc9caa719",
+  "sourceWorkflowRun": 42754855715,
+  "artifacts": {
+    "Windows": 13735845107,
+    "macOS": 13735615993
+  }
+}
