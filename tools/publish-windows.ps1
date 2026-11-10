@@ -5,11 +5,11 @@ $version=$meta.version;$tag="windows-v$version";$repo=$env:GITHUB_REPOSITORY
 $exe=Get-ChildItem (Join-Path $work 'dist/*.exe') | Select-Object -First 1
 $block=Get-ChildItem (Join-Path $work 'dist/*.blockmap') | Select-Object -First 1
 $sha=(Get-FileHash $exe.FullName -Algorithm SHA256).Hash.ToLower();$url="https://github.com/$repo/releases/download/$tag/$($exe.Name)"
-$notes="OSMINOG Windows Preview $version`n`n$($meta.notes)`n`nUnsigned preview. Source $($meta.source). Windows tests cover installed paths, native panes, fixture provider replies, native input and canvas drag. Live provider accounts and Figma are not certified by fixture tests. SHA-256: $sha"
+$notes="Trader OS for Windows $version`n`n$($meta.notes)`n`nUnsigned preview. Verified source $($meta.source), Windows workflow $($meta.sourceRun), artifact $($meta.sourceArtifact). The release gate covers the real installed OSMINOG Preview → Trader OS upgrade, retained local profile/cookie, packaged smoke and installed restart. SHA-256: $sha"
 $notes | Set-Content (Join-Path $work 'release-notes.txt')
 gh release view $tag --repo $repo *> $null
 if ($LASTEXITCODE -eq 0) { throw 'Immutable Windows release tag already exists; inspect it before retrying' }
-gh release create $tag $exe.FullName $block.FullName --repo $repo --title "OSMINOG Windows $version" --prerelease --notes-file (Join-Path $work 'release-notes.txt')
+gh release create $tag $exe.FullName $block.FullName --repo $repo --title "Trader OS Windows $version" --prerelease --notes-file (Join-Path $work 'release-notes.txt')
 if ($LASTEXITCODE -ne 0) { throw 'Release upload failed' }
 $remote=gh api "repos/$repo/releases/tags/$tag" | ConvertFrom-Json
 $asset=$remote.assets | Where-Object name -eq $exe.Name
@@ -19,26 +19,24 @@ $yaml=$yaml.Replace($exe.Name,$url)
 $yaml | Set-Content (Join-Path $work 'latest.yml') -Encoding utf8
 gh release view windows-preview --repo $repo *> $null
 if ($LASTEXITCODE -ne 0) {
- gh release create windows-preview --repo $repo --title 'OSMINOG Windows Preview update channel' --prerelease --notes 'Mutable latest.yml only. Installers use immutable windows-vVERSION releases.'
+ gh release create windows-preview --repo $repo --title 'Trader OS Windows update channel' --prerelease --notes 'Mutable latest.yml only. Installers use immutable windows-vVERSION releases.'
  if ($LASTEXITCODE -ne 0) { throw 'Windows channel creation failed' }
 }
 gh release upload windows-preview (Join-Path $work 'latest.yml') --repo $repo --clobber
 if ($LASTEXITCODE -ne 0) { throw 'Update feed publication failed' }
 $feed=Invoke-WebRequest "https://github.com/$repo/releases/download/windows-preview/latest.yml"
-$feedText=if ($feed.Content -is [byte[]]) { [Text.Encoding]::UTF8.GetString($feed.Content) } else { [string]$feed.Content }
+$feedText=if($feed.Content -is [byte[]]){[Text.Encoding]::UTF8.GetString($feed.Content)}else{[string]$feed.Content}
 if (-not $feedText.Contains($url)) { throw 'Published updater feed does not reference the verified installer' }
-# Desktop updates have no DevHub dependency; 0.0.0 means no minimum. Manifest version is the packaged app version.
-$record=@{schema='osminog-update-feed/v2';product='OSMINOG';platform='windows';channel='dev';generatedAt=[DateTime]::UtcNow.ToString('o');status='active';latest=@{version=$version;kind='full-package';manifestVersion=$version;minDevHubVersion='0.0.0';publishedAt=$remote.published_at;packageName=$exe.Name;packageUrl=$url;sha256=$sha;size=$exe.Length;sourceCommit=$meta.source;notes=$notes}}
+$record=@{schema='osminog-update-feed/v2';product='Trader OS';platform='windows';channel='dev';generatedAt=[DateTime]::UtcNow.ToString('o');status='active';latest=@{version=$version;kind='full-package';manifestVersion=$version;minDevHubVersion='0.0.0';publishedAt=$remote.published_at;packageName=$exe.Name;packageUrl=$url;sha256=$sha;size=$exe.Length;sourceCommit=$meta.source;notes=$notes}}
 $record | ConvertTo-Json -Depth 10 | Set-Content channels/dev/windows.json
 $releaseDir="platforms/windows/releases/$version";New-Item -ItemType Directory $releaseDir -Force | Out-Null
 $record.latest | ConvertTo-Json -Depth 10 | Set-Content "$releaseDir/release.json"
 Remove-Item (Join-Path $meta.stage 'ASSEMBLE')
 git config user.name 'github-actions[bot]';git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
 git add channels/dev/windows.json $releaseDir $meta.stage
-git commit -m "Publish verified Windows browser $version and activate button update channel"
+git commit -m "Publish verified Trader OS $version and activate button update channel"
 if ($LASTEXITCODE -ne 0) { throw 'Registry commit failed' }
 git pull --rebase origin main
 if ($LASTEXITCODE -ne 0) { throw 'Registry update conflict' }
 git push origin HEAD:main
 if ($LASTEXITCODE -ne 0) { throw 'Registry push failed' }
-
