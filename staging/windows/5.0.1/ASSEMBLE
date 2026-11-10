@@ -1,4 +1,4 @@
-approved source 57e4e3b920e364f35e59d0e3d65c4af14f1cd0ea
-workflow 42777908287
-artifact 13745160600
-retry after previous Trader OS executable detection fix
+approved source 1d767c21f2d939bea5b8ee34c456061d826389de
+workflow 42779397201
+artifact 13745261981
+release gate drives installed Trader OS 5.0.0 controls and verifies retained profile data
