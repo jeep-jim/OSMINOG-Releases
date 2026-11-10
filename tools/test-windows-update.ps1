@@ -13,6 +13,19 @@ try {
  if ($setup.ExitCode -ne 0) { throw 'Initial installation failed' }
  $oldExe=@((Join-Path $destination 'Trader OS.exe'),(Join-Path $destination 'OSMINOG Preview.exe')) | Where-Object { Test-Path $_ } | Select-Object -First 1
  if (-not $oldExe) { throw 'Previous installed browser not found' }
+ # The public 5.0.0 package contains a legacy test-only harness that still targets
+ # the removed canvas. Patch only that harness; the installed UI/updater/profile
+ # remain the exact published 5.0.0 code exercised below.
+ $appAsar=Join-Path $destination 'resources/app.asar'
+ $harness=(Resolve-Path '../tools/trader-update-smoke.cjs').Path
+ $asarDir=Join-Path $PWD 'previous-app-asar'
+ $patchedAsar=Join-Path $PWD 'previous-app-patched.asar'
+ if (-not (Test-Path $appAsar)) { throw 'Previous installed app.asar not found' }
+ node -e "const fs=require('node:fs'),path=require('node:path'),asar=require('@electron/asar');(async()=>{const [archive,dir,harness,out]=process.argv.slice(1);fs.rmSync(dir,{recursive:true,force:true});fs.rmSync(out,{force:true});asar.extractAll(archive,dir);fs.copyFileSync(harness,path.join(dir,'update-smoke.cjs'));await asar.createPackage(dir,out)})().catch(e=>{console.error(e);process.exit(1)})" $appAsar $asarDir $harness $patchedAsar
+ if ($LASTEXITCODE -ne 0 -or -not (Test-Path $patchedAsar)) { throw 'Previous update harness patch failed' }
+ Copy-Item $patchedAsar $appAsar -Force
+ node -e "const asar=require('@electron/asar'),s=asar.extractFile(process.argv[1],'update-smoke.cjs').toString();if(!s.includes('TRADER_UPDATE_HARNESS_V2'))process.exit(1)" $appAsar
+ if ($LASTEXITCODE -ne 0) { throw 'Previous update harness verification failed' }
  $server=Start-Process python -ArgumentList '-m','http.server','18891','--bind','127.0.0.1','--directory','dist' -PassThru -RedirectStandardOutput update-server.log -RedirectStandardError update-server-errors.log
  try {
   $serverReady = $false;$serverDeadline = (Get-Date).AddSeconds(30)
