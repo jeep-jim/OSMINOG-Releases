@@ -1,4 +1,4 @@
-approved source 83047d553b13587e49d9a747afc0e4e211e769fe
-workflow 42780316907
-artifact 13746090994
-source SHA is a direct ancestor of main; installed 5.0.0 controls and retained profile data are release-gated
+approved source a4153eebd91f48a21ea39e957d1eb5155cefbce4
+workflow 42781046917
+artifact 13745748744
+runtime metadata, workflow head and direct main ancestor are the same SHA; installed 5.0.0 upgrade is release-gated
