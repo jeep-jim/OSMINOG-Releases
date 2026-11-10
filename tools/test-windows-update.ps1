@@ -11,8 +11,8 @@ try {
  if ((Get-FileHash $baseInstaller -Algorithm SHA256).Hash.ToLower() -ne $previous.sha256 -or (Get-Item $baseInstaller).Length -ne $previous.size) { throw 'Previous published installer digest/size mismatch' }
  $setup=Start-Process $baseInstaller -ArgumentList '/S','/currentuser',('/D='+$destination) -PassThru -Wait
  if ($setup.ExitCode -ne 0) { throw 'Initial installation failed' }
- $oldExe=Join-Path $destination 'OSMINOG Preview.exe'
- if (-not (Test-Path $oldExe)) { throw 'Previous installed browser not found' }
+ $oldExe=@((Join-Path $destination 'Trader OS.exe'),(Join-Path $destination 'OSMINOG Preview.exe')) | Where-Object { Test-Path $_ } | Select-Object -First 1
+ if (-not $oldExe) { throw 'Previous installed browser not found' }
  $server=Start-Process python -ArgumentList '-m','http.server','18891','--bind','127.0.0.1','--directory','dist' -PassThru -RedirectStandardOutput update-server.log -RedirectStandardError update-server-errors.log
  try {
   $serverReady = $false;$serverDeadline = (Get-Date).AddSeconds(30)
