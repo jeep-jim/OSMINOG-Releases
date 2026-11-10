@@ -1,0 +1,13 @@
+{
+  "size": 111609509,
+  "notes": "Trader OS for Windows 5.0.2\n\nИсправлена критическая блокировка интерфейса: TradingView, Binance и другие нативные веб-вкладки больше не перекрывают окна Trader OS. Перед показом помощи, выбора языка, новой вкладки или обновления сайты временно скрываются, а после закрытия окна автоматически возвращаются в свои области. Переключатель темы, Web3 и обновление под логотипом сохранены.\n\nUnsigned preview. Verified source 018bba98a546866953d2448ace692298f2641211, Windows workflow 42805500363, artifact 13758292475. The release gate covers the real installed OSMINOG Preview → Trader OS upgrade, retained local profile/cookie, packaged smoke and installed restart. SHA-256: d693d620478f8b08b38ff2948efddcdb6d861d321c2b2af4759d254ab1128d48",
+  "version": "5.0.2",
+  "manifestVersion": "5.0.2",
+  "kind": "full-package",
+  "sourceCommit": "018bba98a546866953d2448ace692298f2641211",
+  "minDevHubVersion": "0.0.0",
+  "packageUrl": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/windows-v5.0.2/Trader-OS-5.0.2-x64.exe",
+  "publishedAt": "2026-11-10T11:20:08Z",
+  "sha256": "d693d620478f8b08b38ff2948efddcdb6d861d321c2b2af4759d254ab1128d48",
+  "packageName": "Trader-OS-5.0.2-x64.exe"
+}
