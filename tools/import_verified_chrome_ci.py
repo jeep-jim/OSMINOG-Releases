@@ -18,6 +18,12 @@ SOURCE = 'jeep-jim/OSMINOG'
 # The Windows native-shell workflow is not a release gate for the Chrome ZIP; its source is unchanged.
 CHROME_WORKFLOW = 351479698
 REQUIRED_WORKFLOWS = {CHROME_WORKFLOW, 351443074, 351468502}
+LIGHT_WORKFLOW = 412858774
+
+def required_workflows(profile):
+    if profile not in (None, 'full-workspace', 'light-storage'):
+        raise ValueError('Unknown release profile')
+    return REQUIRED_WORKFLOWS | ({LIGHT_WORKFLOW} if profile == 'light-storage' else set())
 IDENTITY = '1ddb8d87f3a6f6cb38a229bd81ba8076d1d37d3ba6b8a15b2a91129d4904012e'
 LIMIT = 64 * 1024 * 1024
 RECOVERY_LIMIT = 2 * 1024 * 1024
@@ -129,7 +135,8 @@ def main(version):
     if not re.fullmatch(r'[a-f0-9]{40}', head):
         raise ValueError('Invalid source commit')
     runs = [api(f'actions/runs/{int(run_id)}') for run_id in request['verificationRuns']]
-    if {r['workflow_id'] for r in runs} != REQUIRED_WORKFLOWS or len(runs) != len(REQUIRED_WORKFLOWS):
+    required = required_workflows(request.get('profile'))
+    if {r['workflow_id'] for r in runs} != required or len(runs) != len(required):
         raise ValueError('Missing required verification')
     for run in runs:
         if run['head_sha'] != head or run['status'] != 'completed' or run['conclusion'] != 'success':
@@ -157,7 +164,8 @@ def main(version):
     run_id = int(request['sourceWorkflowRun'])
     if artifact['expired'] or artifact['workflow_run']['id'] != run_id or artifact['workflow_run']['head_sha'] != head:
         raise ValueError('Wrong source artifact')
-    if not any(r['id'] == run_id and r['workflow_id'] == CHROME_WORKFLOW for r in runs):
+    package_workflow = LIGHT_WORKFLOW if request.get('profile') == 'light-storage' else CHROME_WORKFLOW
+    if not any(r['id'] == run_id and r['workflow_id'] == package_workflow for r in runs):
         raise ValueError('Artifact did not come from the Chrome gate')
     outer = api(f'actions/artifacts/{artifact_id}/zip', binary=True)
     if artifact.get('digest') and artifact['digest'] != 'sha256:'+digest(outer):
@@ -178,6 +186,19 @@ def main(version):
     if digest(manifest.get('key', '').encode()) != IDENTITY:
         raise ValueError('Fixed extension identity changed')
     validate_build(build, version, name)
+    if request.get('profile') == 'light-storage':
+        if build.get('profile') != 'light-storage' or build.get('sourceHeadCommit') != head:
+            raise ValueError('Light profile/source mismatch')
+        if manifest.get('background', {}).get('service_worker') != 'light/background.js':
+            raise ValueError('Old background in light package')
+        if manifest.get('optional_host_permissions') != ['https://api.openai.com/*', 'https://api.deepseek.com/*']:
+            raise ValueError('Unexpected light AI providers')
+        if any(n in payload for n in ['editor.js', 'background.js', 'module-frame.html']):
+            raise ValueError('Legacy heavy runtime in light package')
+        with zipfile.ZipFile(io.BytesIO(outer)) as z:
+            report = json.loads(artifact_member(z, 'light-browser-results.json'))
+        if report.get('ok') is not True or report.get('crashes') or report.get('errors'):
+            raise ValueError('Light native browser report failed')
     if recovery_request:
         validate_recovery_page(recovery_data, recovery_request, version, manifest, payload)
     if any(n.startswith(('logs/', 'desktop/', 'node_modules/')) or n.endswith('.log') for n in payload):
