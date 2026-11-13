@@ -1,0 +1,4 @@
+Owner requested native macOS installer for M1 Pro on 2026-11-13.
+Publish only after import gate verifies exact successful source run and merged PR #128.
+Separate macos-v5.0.2-arm64 prerelease; never modify Windows latest.yml, Chrome or Android.
+Ad-hoc signing only; Apple notarization is NOT present.
