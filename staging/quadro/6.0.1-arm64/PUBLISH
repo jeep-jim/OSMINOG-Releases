@@ -1,0 +1,4 @@
+Owner requested one-row Quadro Browser UI, hover controls, bottom settings and clean fullscreen close.
+Publish only after exact successful source run and merged PR131, then actual installed-DMG tests.
+Separate Quadro Mac prerelease; preserve Windows/Chrome/Android feeds and user data.
+Ad-hoc signature only, no Developer ID/notarization. Update button downloads/verifies/opens DMG; application replacement remains manual.
