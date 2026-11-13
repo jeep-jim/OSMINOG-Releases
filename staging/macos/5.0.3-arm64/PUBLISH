@@ -1,0 +1,4 @@
+2026-11-13: Owner requested working Mac M1 Pro browser plus full-width tabs after closing AI.
+Requires exact successful Mac source run and merged source PR129; verify actual installed DMG again.
+Publish separate macos-v5.0.3-arm64 prerelease; do not change any Windows/Chrome/Android channel.
+Ad-hoc signing, no Developer ID/notarization. Do not publish or overwrite old5.0.2 draft.
