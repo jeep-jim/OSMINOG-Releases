@@ -2,7 +2,7 @@ name: Publish verified macOS Apple Silicon preview
 on:
   push:
     branches: [main]
-    paths: ['staging/macos/5.0.2-arm64/PUBLISH']
+    paths: ['staging/macos/5.0.3-arm64/PUBLISH']
   workflow_dispatch:
 permissions:
   contents: write
@@ -26,37 +26,20 @@ jobs:
           test "$(uname -m)" = arm64
           MOUNT="$RUNNER_TEMP/trader-mac-dmg"
           mkdir -p "$MOUNT"
-          hdiutil attach macos-release/Trader-OS-5.0.2-mac-arm64.dmg -nobrowse -readonly -mountpoint "$MOUNT"
+          hdiutil attach macos-release/Trader-OS-5.0.3-mac-arm64.dmg -nobrowse -readonly -mountpoint "$MOUNT"
           trap 'hdiutil detach "$MOUNT" || true' EXIT
           APP="$RUNNER_TEMP/Установка Trader OS/Trader OS.app"
           mkdir -p "$(dirname "$APP")"
           ditto "$MOUNT/Trader OS.app" "$APP"
           codesign --verify --deep --strict --verbose=2 "$APP"
           test "$(lipo -archs "$APP/Contents/MacOS/Trader OS")" = arm64
-          ditto -x -k macos-release/Trader-OS-5.0.2-mac-arm64.zip "$RUNNER_TEMP/zip-verify"
+          ditto -x -k macos-release/Trader-OS-5.0.3-mac-arm64.zip "$RUNNER_TEMP/zip-verify"
           codesign --verify --deep --strict "$RUNNER_TEMP/zip-verify/Trader OS.app"
           cmp "$APP/Contents/Resources/app.asar" "$RUNNER_TEMP/zip-verify/Trader OS.app/Contents/Resources/app.asar"
           cd macos-release
           python3 verify-macos.py "$APP/Contents/MacOS/Trader OS"
-      - name: Upload as draft, verify remote asset digests, then publish
-        shell: bash
-        run: |
-          set -euo pipefail
-          TAG=macos-v5.0.2-arm64
-          gh release create "$TAG" macos-release/*.dmg macos-release/*.zip macos-release/SHA256SUMS.txt macos-release/macos-build.json --draft --prerelease --latest=false --title "Trader OS 5.0.2 — Mac Apple Silicon" --notes-file macos-release/RELEASE_NOTES.md
-          gh api "repos/$GITHUB_REPOSITORY/releases/tags/$TAG" > macos-release/remote-release.json
-          python3 - <<'PY'
-          import hashlib,json,pathlib
-          root=pathlib.Path('macos-release')
-          release=json.loads((root/'remote-release.json').read_text())
-          assets={x['name']:x for x in release['assets']}
-          for name in ['Trader-OS-5.0.2-mac-arm64.dmg','Trader-OS-5.0.2-mac-arm64.zip','SHA256SUMS.txt','macos-build.json']:
-              file=root/name;asset=assets[name]
-              assert asset['state']=='uploaded' and asset['size']==file.stat().st_size
-              assert asset['digest']=='sha256:'+hashlib.sha256(file.read_bytes()).hexdigest(),name
-          print('MAC_RELEASE_REMOTE_DIGESTS_PASS')
-          PY
-          gh release edit "$TAG" --draft=false --prerelease --latest=false
+      - name: Upload draft by numeric ID, verify remote digests, then publish
+        run: python3 tools/publish-macos-preview.py
       - uses: actions/upload-artifact@v4
         if: always()
         with:
