@@ -2,7 +2,7 @@ name: Publish verified Quadro Browser for Mac
 on:
   push:
     branches: [main]
-    paths: ['staging/quadro/6.0.1-arm64/PUBLISH']
+    paths: ['staging/quadro/6.0.2-arm64/PUBLISH']
   workflow_dispatch:
 permissions:
   contents: write
@@ -26,26 +26,26 @@ jobs:
           test "$(uname -m)" = arm64
           MOUNT="$RUNNER_TEMP/quadro-dmg"
           mkdir -p "$MOUNT"
-          hdiutil attach quadro-release/Quadro-Browser-6.0.1-mac-arm64.dmg -nobrowse -readonly -mountpoint "$MOUNT"
+          hdiutil attach quadro-release/Quadro-Browser-6.0.2-mac-arm64.dmg -nobrowse -readonly -mountpoint "$MOUNT"
           trap 'hdiutil detach "$MOUNT" || true' EXIT
           APP="$RUNNER_TEMP/Установка Quadro/Quadro Browser.app"
           mkdir -p "$(dirname "$APP")"
           ditto "$MOUNT/Quadro Browser.app" "$APP"
           test "$(lipo -archs "$APP/Contents/MacOS/Quadro Browser")" = arm64
           codesign --verify --deep --strict "$APP"
-          ditto -x -k quadro-release/Quadro-Browser-6.0.1-mac-arm64.zip "$RUNNER_TEMP/quadro-zip"
+          ditto -x -k quadro-release/Quadro-Browser-6.0.2-mac-arm64.zip "$RUNNER_TEMP/quadro-zip"
           codesign --verify --deep --strict "$RUNNER_TEMP/quadro-zip/Quadro Browser.app"
           cmp "$APP/Contents/Resources/app.asar" "$RUNNER_TEMP/quadro-zip/Quadro Browser.app/Contents/Resources/app.asar"
           cd quadro-release
           env -u GH_TOKEN python3 quadro-verify.py "$APP/Contents/MacOS/Quadro Browser"
       - name: Publish by numeric release ID after remote checksum verification
         run: python3 tools/publish-quadro.py
-      - name: Verify public update discovery from version 6.0.0
+      - name: Verify public update discovery from version 6.0.1
         run: |
           env -u GH_TOKEN node - <<'NODE'
           const {QuadroUpdates}=require('./quadro-release/quadro-update.cjs');
-          const updater=new QuadroUpdates({app:{getVersion:()=> '6.0.0'},shell:{},emit:()=>{}});
-          updater.run('check').then(result=>{if(result.phase!=='available'||result.latestVersion!=='6.0.1')throw Error('6.0.0 update discovery failed');console.log('QUADRO_600_DISCOVERS_601_PASS')}).catch(error=>{console.error(error);process.exit(1)});
+          const updater=new QuadroUpdates({app:{getVersion:()=> '6.0.1'},shell:{},emit:()=>{}});
+          updater.run('check').then(result=>{if(result.phase!=='available'||result.latestVersion!=='6.0.2')throw Error('6.0.1 update discovery failed');console.log('QUADRO_601_DISCOVERS_602_PASS')}).catch(error=>{console.error(error);process.exit(1)});
           NODE
       - uses: actions/upload-artifact@v4
         if: always()
