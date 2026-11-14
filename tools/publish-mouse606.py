@@ -4,6 +4,10 @@ REPO='jeep-jim/OSMINOG-Releases';TAG='quadro-macos-v6.0.6-arm64';root=pathlib.Pa
 names=['Mouse-Browser-6.0.6-mac-arm64.dmg','Mouse-Browser-6.0.6-mac-arm64.zip','Quadro-Browser-6.0.6-mac-arm64.dmg','SHA256SUMS.txt','quadro-build.json']
 local={n:{'size':(root/n).stat().st_size,'digest':'sha256:'+hashlib.sha256((root/n).read_bytes()).hexdigest()} for n in names}
 assert local[names[0]]==local[names[2]],'Legacy alias must have identical bytes'
+notes=(root/'RELEASE_NOTES.md').read_text()
+notes=notes.replace('Убрана лишняя собственная полоса/titlebar; место под настоящее меню определяется его видимостью и измеренной геометрией, не фиксированным пустым отступом.','Убран прежний фиксированный отступ; место под настоящее меню определяется его видимостью и измеренной геометрией. Полное устранение дополнительной нативной полосы при раскрытии меню пока не подтверждено: на проверочном кадре она ещё видна над вкладками.')
+notes+='\n\n## Незакрытые замечания этого preview\n\n- Задача #138 о favicon во всех строках истории/закладок/загрузок и после перезапуска остаётся открытой. Нынешняя сборка не выдаётся за её полную реализацию.\n- Настоящее меню Apple снова доступно, однако на тестовом снимке mouse-606-system-menu.png видна дополнительная нативная полоса. Проверка menuVisible=true доказывает доступность меню, а не отсутствие любой перекрывающей полосы во время раскрытия. Этот визуальный дефект остаётся на доработке.\n- HTTP 403 при проверке обновлений наблюдался у владельца. Причина на его Mac не установлена; этот выпуск не содержит подтверждённого исправления доступности GitHub API. Прямая ссылка на DMG не использует кнопку обновления.\n'
+(root/'RELEASE_NOTES.md').write_text(notes)
 def api(p,method='GET',payload=None):
  cmd=['gh','api',f'repos/{REPO}/{p}','--method',method]
  if payload is not None:cmd+=['--input','-']
@@ -16,7 +20,7 @@ def verify(release):
  return assets
 existing=[x for x in api('releases?per_page=100') if x['tag_name']==TAG]
 if len(existing)>1:raise ValueError('Ambiguous release')
-release=api('releases/'+str(existing[0]['id'])) if existing else api('releases','POST',{'tag_name':TAG,'target_commitish':os.environ['GITHUB_SHA'],'name':'Mouse Browser 6.0.6 — Mac Apple Silicon','body':(root/'RELEASE_NOTES.md').read_text(),'draft':True,'prerelease':True,'make_latest':'false'})
+release=api('releases/'+str(existing[0]['id'])) if existing else api('releases','POST',{'tag_name':TAG,'target_commitish':os.environ['GITHUB_SHA'],'name':'Mouse Browser 6.0.6 — Mac Apple Silicon','body':notes,'draft':True,'prerelease':True,'make_latest':'false'})
 rid=release['id']
 if release['draft']:
  assets={x['name']:x for x in release['assets']}
@@ -28,7 +32,7 @@ if release['draft']:
   req=urllib.request.Request(url,data=(root/n).read_bytes(),method='POST',headers={'Authorization':'Bearer '+os.environ['GH_TOKEN'],'Content-Type':'application/octet-stream','Accept':'application/vnd.github+json','X-GitHub-Api-Version':'2022-11-28'})
   with urllib.request.urlopen(req,timeout=180) as response:json.load(response)
  release=api('releases/'+str(rid));verify(release);print('MOUSE_REMOTE_DIGESTS_AND_LEGACY_ALIAS_PASS',flush=True)
- release=api('releases/'+str(rid),'PATCH',{'draft':False,'prerelease':True,'make_latest':'false','body':(root/'RELEASE_NOTES.md').read_text()})
+ release=api('releases/'+str(rid),'PATCH',{'draft':False,'prerelease':True,'make_latest':'false','body':notes})
 release=api('releases/'+str(rid));assets=verify(release)
 if release['draft'] or not release['published_at']:raise ValueError('Release not public')
 result={'id':rid,'url':release['html_url'],'publishedAt':release['published_at'],'assets':[{k:a[k] for k in ['name','size','digest','browser_download_url']} for a in assets.values()]}
