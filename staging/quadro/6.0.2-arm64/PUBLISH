@@ -1,0 +1,3 @@
+Owner requested original icon, permanent glass controls, compact per-pane bars, favicons and local screenshot annotations on Control+A.
+Publish only after source PR132 exact head/native checks, copied DMG tests and remote checksums pass.
+Separate Quadro macOS arm64 preview; no other platform feed changes.
