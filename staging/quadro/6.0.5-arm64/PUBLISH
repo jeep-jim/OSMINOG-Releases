@@ -1,0 +1,4 @@
+Owner requested Mac UI/sidebar refinement, integrated experimental wallet and global Control+A screenshot.
+Publish only after exact native candidate succeeds and source PR136 is merged.
+Quаdro channel only; no Windows/Chrome/Android/AvtoCena publication.
+Wallet Sepolia-only, unaudited; no mainnet money. Global screen capture requires user macOS permission and running Quadro.
