@@ -1,4 +1,4 @@
-name: Publish verified Mouse 6.0.7 icon correction
+name: Publish verified Mouse 6.0.7 artwork correction
 on:
   push:
     branches: [main]
@@ -17,7 +17,7 @@ jobs:
       GH_TOKEN: ${{ github.token }}
     steps:
       - uses: actions/checkout@v4
-      - name: Import exact successful merged icon-correction candidate
+      - name: Import exact successful merged artwork-correction candidate
         run: |
           python3 tools/mouse607-release.py import
           cat staging/quadro/6.0.7-arm64/ARTWORK_NOTE.md >> mouse607-release/RELEASE_NOTES.md
@@ -42,6 +42,8 @@ jobs:
           cd mouse607-release
           env -u GH_TOKEN python3 quadro-verify.py "$APP/Contents/MacOS/Mouse Browser"
           grep -q MOUSE_607_INSTALLED_ICNS_DOCK_UI_PRIVATE_TAIL_LEFT_PASS quadro-smoke-write.log
+          grep -q MOUSE_607_GRAY_REFERENCE_GLASSES_AND_MATCHING_DOCK_THEME_PASS quadro-smoke-write.log
+          test -s mouse-607-incognito-artwork.png
       - name: Publish only after installed checks and remote checksum verification
         run: python3 tools/mouse607-release.py publish
       - uses: actions/upload-artifact@v4
