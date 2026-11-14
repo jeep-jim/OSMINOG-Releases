@@ -1,4 +1,4 @@
-"""Import only a successful exact-source Mouse candidate; preserve legacy update discovery."""
+"""Import successful exact-source Mouse bytes; never release an untested candidate."""
 import base64,hashlib,io,json,os,pathlib,re,shutil,subprocess,zipfile
 ROOT=pathlib.Path(__file__).resolve().parents[1];SOURCE='jeep-jim/OSMINOG';VERSION='6.0.6'
 r=json.loads((ROOT/'staging/quadro/6.0.6-arm64/import.json').read_text());head=r['sourceCommit'];run_id=int(r['runId'])
@@ -24,6 +24,9 @@ with zipfile.ZipFile(io.BytesIO(archive)) as z:
   (out/item.filename).write_bytes(z.read(item))
 b=json.loads((out/'quadro-build.json').read_text())
 if b['source']!=head or int(b['runId'])!=run_id or b['version']!=VERSION or b['productName']!='Mouse Browser' or b['platform']!='darwin' or b['arch']!='arm64' or b['signing']!='ad-hoc' or b['notarized'] is not False:raise ValueError('Wrong package provenance')
+required={'private-memory-isolation','private-cleanup-disk-scan','private-mascot-glasses','start-control-contrast','capture-success-feedback','native-apple-menu-preserved'}
+if not required.issubset(set(b['tests'])):raise ValueError('Missing final owner test scope')
+if b['wallet']['network']!='sepolia-only' or b['wallet']['audited'] is not False or b['globalCapture']['requiresScreenPermission'] is not True:raise ValueError('Wrong feature boundaries')
 checks={}
 for line in (out/'SHA256SUMS.txt').read_text().splitlines():
  value,name=line.split(maxsplit=1)
@@ -31,30 +34,38 @@ for line in (out/'SHA256SUMS.txt').read_text().splitlines():
  if hashlib.sha256((out/name).read_bytes()).hexdigest()!=value:raise ValueError('Package digest mismatch')
  checks[name]=value
 if len(checks)!=2:raise ValueError('Missing checksum')
-# A byte-for-byte alias allows the already-installed 6.0.5 updater to find the rebrand.
 alias='Quadro-Browser-6.0.6-mac-arm64.dmg';shutil.copyfile(out/'Mouse-Browser-6.0.6-mac-arm64.dmg',out/alias)
 checks[alias]=checks['Mouse-Browser-6.0.6-mac-arm64.dmg']
 (out/'SHA256SUMS.txt').write_text(''.join(f'{digest}  {name}\n' for name,digest in sorted(checks.items())))
 for remote,local,ref in [('tools/quadro-verify.py','quadro-verify.py',head),('desktop/quadro-update.cjs','quadro-update.cjs',head),('desktop/quadro-update.cjs','legacy-update.cjs','4ac132e85a466b3b01d6503c01ed5707875793ee')]:
  data=api(f'contents/{remote}?ref={ref}');(out/local).write_bytes(base64.b64decode(data['content']))
-notes=f'''# Mouse Browser 6.0.6 — мышь, меню Apple и компактный ИИ
+notes=f'''# Mouse Browser 6.0.6 — настоящий Mac-выпуск
 
-Реальное приложение для Mac Apple Silicon, включая M1 Pro, macOS 13+. Название выбрано владельцем: **Mouse Browser**. Использован его исходный pixel mouse.png без перерисовки; старый крестик убран из распространяемой Mac-иконки и интерфейса. Чёрная/белая мышь адаптируется к теме браузера, иконка запущенного приложения — к системной теме. Макс также появляется в существующих состояниях загрузки и обновления, без выдуманного прогресса.
+Mac Apple Silicon, включая M1 Pro; macOS 13+. Точное имя владельца — **Mouse Browser**. Иконка — его исходная пиксельная мышь, без перерисовки. Старый крестик больше не используется в Mac-приложении. Мышь — маскот, отдельного имени у неё нет. Чёрный/белый вариант интерфейса следует теме браузера, иконка запущенного приложения следует системной теме.
 
-## Настоящая строка macOS
-Не удаляются Apple menu, время, батарея, Wi-Fi и другие системные значки. Модуль использует публичные Cocoa API для раскрытия настоящего системного меню у верхнего края полноэкранного окна. Убрана прежняя предположительная пустая полоса64–88px. Место под меню учитывается по его фактической видимости/высоте и геометрии окна. Системные настройки, глобальные defaults и состав меню macOS не меняются; фальшивых часов/Wi-Fi нет.
+## Системное меню и ИИ
+Настоящая строка Apple с часами, батареей и Wi-Fi остаётся доступной у верхнего края в полном экране. Исправлено превращение приложения в accessory-процесс после системного скриншота. Убрана лишняя собственная полоса/titlebar; место под настоящее меню определяется его видимостью и измеренной геометрией, не фиксированным пустым отступом. Глобальные настройки macOS не меняются.
 
-## ИИ
-Отдельная строка «ИИ-чат» удалена. Осталась одна компактная строка: иконка перед названием выбранного сервиса, добавление ссылки, обновление и закрытие. Такой же порядок icon+name в выборе провайдера. Иконки берутся из favicon самих выбранных сайтов; при недоступной иконке используется нейтральный globe, а не чужой/выдуманный логотип. Содержимое сайтов и их собственные заголовки не редактируется.
+У ИИ одна компактная строка: favicon перед названием, ссылка, обновление и закрытие. Отдельной строки «ИИ-чат» нет. Логотипы берутся с выбранных сервисов; при недоступности — нейтральный значок, не выдуманный логотип. Сами сайты не перерисовываются.
 
-## Переход с Quadro
-Полностью завершите Quadro через Cmd+Q. Откройте DMG и скопируйте **Mouse Browser.app** в «Программы». Запустите именно Mouse Browser. Из-за нового имени это не автоматическая замена файла Quadro Browser.app; старое приложение можно удалить отдельно после проверки. **Не удаляйте `~/Library/Application Support/Trader OS`**: тот же профиль, cookie/история/закладки/раскладки продолжают использоваться. Не запускайте старый и новый браузер одновременно.
+## Контраст и скриншот
+Стрелка поиска и меню плиток на новой вкладке имеют явно заданные контрастные цвета в обеих темах. После успешного получения снимка появляется короткая вспышка и надпись «Снимок готов». Эффект не рисуется в итоговом PNG; при ошибке захвата успех не показывается. Учитывается режим уменьшения движения.
 
-Технический release tag и дополнительный файл Quadro-Browser-6.0.6-mac-arm64.dmg сохранены только для перехода старого updater. Этот файл побайтово совпадает с Mouse DMG и устанавливает именно Mouse Browser. Основная пользовательская ссылка — Mouse-Browser-6.0.6-mac-arm64.dmg. Замена приложения остаётся ручной. Доступность анонимного GitHub API проверяется отдельным шагом workflow; прошлые HTTP403 не объявляются навсегда устранёнными.
+Control+A вызывает системный скриншот, пока браузер запущен, в том числе из другой программы. Нужны разрешение записи экрана macOS и свободное сочетание. Cmd+Q освобождает сочетание; скрытый агент/автозапуск не добавлены. Камера браузера сохраняет отдельный режим снимка его окон. После переименования приложения проверьте разрешение снова. Все раскладки и сторонние приложения на Mac владельца не проверялись.
 
-Многооконность, боковая библиотека, глобальный Control+A/локальная камера и профиль сохранены. Системный скриншот требует разрешения macOS и запущенного приложения; после смены приложения разрешение может потребоваться проверить снова. Кошелёк остаётся экспериментальным **Sepolia-only**, без аудита и не для настоящих средств; его возможности не расширялись. Другие платформы и АвтоЦена не публиковались.
+## Инкогнито с маскотом в пиксельных очках
+Кнопка очков внизу или Cmd+Shift+N переключает текущее окно в отдельную временную сессию. Обычные страницы остаются отдельно и возвращаются при выходе. Новая приватная вкладка показывает исходный маскот в чёрных мемных очках. История посещений, запросы и закрытые вкладки не записываются в обычный профиль. Cookie и хранилища сайтов изолированы в непостоянной Chromium session с выключенным дисковым cache; при выходе приватные страницы закрываются, данные сессии очищаются. Настройки и временные закладки этого режима остаются только в MemoryStore. Обычные cookie, закладки и раскладка не очищаются.
 
-Сборка предварительная, ad-hoc подпись, **нет Developer ID и нотариализации Apple**. Нативные тесты на CI Mac и повторная установка из DMG не являются проверкой физического наведения на M1 Pro владельца, всех настроек выреза/экранов, аккаунтов сайтов или всех favicon. В журнале source/release отдельно указаны фактические native menu assertions и снимок системного экрана, когда разрешение доступно.
+Это приватность локального браузера, **не анонимность в интернете и не гарантия обнуления RAM/swap/системных журналов**. Сайты, провайдер и администратор сети могут видеть активность. Файлы, которые пользователь явно скачал или сохранил, скриншоты и буфер обмена остаются. В инкогнито кошелёк и обновление отключены; нельзя сохранять собственный фон в обычный профиль. Выйти из режима можно той же кнопкой/сочетанием или завершить приложение.
+
+## Установка с Quadro
+Полностью завершите Quadro через Cmd+Q. Откройте DMG и скопируйте **Mouse Browser.app** в «Программы». Запустите именно Mouse Browser. Из-за нового имени это не автоматическая замена Quadro Browser.app; старое приложение можно убрать отдельно после проверки. **Не удаляйте `~/Library/Application Support/Trader OS`**. Не запускайте обе версии одновременно.
+
+Технический quadro release tag и Quadro-Browser-6.0.6-mac-arm64.dmg оставлены только для совместимости старой кнопки обновления. Alias побайтово равен Mouse DMG. Замена приложения остаётся ручной, доступность GitHub API проверяется отдельно.
+
+Предварительная сборка: ad-hoc, **без Developer ID и нотариализации Apple**. Кошелёк остаётся экспериментальным Sepolia-only, без независимого аудита и не для настоящих средств. Другие платформы и АвтоЦена не публикуются.
+
+Проверки выполняются на CI Mac Apple Silicon и повторяются после копирования из настоящего DMG: системное меню, мышь/ИИ, старые функции, контраст, скриншот, изоляция приватных cookie/localStorage/IndexedDB, повторный вход с пустой сессией, обычные вкладки без перезагрузки, выход процесса и отсутствие тестового приватного маркера в workspace.json. Это не forensic-аудит всего диска и не проверка физического наведения/выреза/всех экранов на M1 Pro владельца.
 
 Source: https://github.com/{SOURCE}/commit/{head}
 Source native tests: https://github.com/{SOURCE}/actions/runs/{run_id}
