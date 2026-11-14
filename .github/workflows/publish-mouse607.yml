@@ -18,7 +18,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Import exact successful merged icon-correction candidate
-        run: python3 tools/mouse607-release.py import
+        run: |
+          python3 tools/mouse607-release.py import
+          cat staging/quadro/6.0.7-arm64/ARTWORK_NOTE.md >> mouse607-release/RELEASE_NOTES.md
       - name: Install actual DMG and verify real icon plus existing runtime
         shell: bash
         run: |
