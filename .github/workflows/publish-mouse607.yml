@@ -1,0 +1,55 @@
+name: Publish verified Mouse 6.0.7 icon correction
+on:
+  push:
+    branches: [main]
+    paths: ['staging/quadro/6.0.7-arm64/PUBLISH']
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: quadro-macos-release
+  cancel-in-progress: false
+jobs:
+  mouse-release:
+    runs-on: macos-15
+    timeout-minutes: 20
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Import exact successful merged icon-correction candidate
+        run: python3 tools/mouse607-release.py import
+      - name: Install actual DMG and verify real icon plus existing runtime
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(uname -m)" = arm64
+          cmp mouse607-release/Mouse-Browser-6.0.7-mac-arm64.dmg mouse607-release/Quadro-Browser-6.0.7-mac-arm64.dmg
+          MOUNT="$RUNNER_TEMP/mouse607-dmg"
+          mkdir -p "$MOUNT"
+          hdiutil attach mouse607-release/Mouse-Browser-6.0.7-mac-arm64.dmg -nobrowse -readonly -mountpoint "$MOUNT"
+          trap 'hdiutil detach "$MOUNT" || true' EXIT
+          APP="$RUNNER_TEMP/Установка Mouse/Mouse Browser.app"
+          mkdir -p "$(dirname "$APP")"
+          ditto "$MOUNT/Mouse Browser.app" "$APP"
+          test "$(lipo -archs "$APP/Contents/MacOS/Mouse Browser")" = arm64
+          codesign --verify --deep --strict "$APP"
+          ditto -x -k mouse607-release/Mouse-Browser-6.0.7-mac-arm64.zip "$RUNNER_TEMP/mouse607-zip"
+          codesign --verify --deep --strict "$RUNNER_TEMP/mouse607-zip/Mouse Browser.app"
+          cmp "$APP/Contents/Resources/app.asar" "$RUNNER_TEMP/mouse607-zip/Mouse Browser.app/Contents/Resources/app.asar"
+          cd mouse607-release
+          env -u GH_TOKEN python3 quadro-verify.py "$APP/Contents/MacOS/Mouse Browser"
+          grep -q MOUSE_607_INSTALLED_ICNS_DOCK_UI_PRIVATE_TAIL_LEFT_PASS quadro-smoke-write.log
+      - name: Publish only after installed checks and remote checksum verification
+        run: python3 tools/mouse607-release.py publish
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: mouse607-release-verification
+          path: |
+            mouse607-release/*.log
+            mouse607-release/*.png
+            mouse607-release/*.json
+            mouse607-release/*.md
+            mouse607-release/SHA256SUMS.txt
+          retention-days: 14
