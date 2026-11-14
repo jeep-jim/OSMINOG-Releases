@@ -1,0 +1,3 @@
+Owner requested Quadro 6.0.3 browser basics and targeted controls corrections on 2026-11-14.
+Publish only after exact successful source run, merged source PR133, artifact/provenance/hash and installed-DMG verification.
+Separate Quadro preview channel, no Windows/Chrome/Android/AvtoCena changes. Ad-hoc signature; no Apple notarization. Preserve original icon/profile.

@@ -1,7 +1,7 @@
 """Publish only verified Quadro release bytes; never replace a published asset."""
 import hashlib,json,os,pathlib,subprocess,urllib.parse,urllib.request
-REPO='jeep-jim/OSMINOG-Releases';TAG='quadro-macos-v6.0.2-arm64';root=pathlib.Path('quadro-release')
-names=['Quadro-Browser-6.0.2-mac-arm64.dmg','Quadro-Browser-6.0.2-mac-arm64.zip','SHA256SUMS.txt','quadro-build.json']
+REPO='jeep-jim/OSMINOG-Releases';TAG='quadro-macos-v6.0.3-arm64';root=pathlib.Path('quadro-release')
+names=['Quadro-Browser-6.0.3-mac-arm64.dmg','Quadro-Browser-6.0.3-mac-arm64.zip','SHA256SUMS.txt','quadro-build.json']
 local={n:{'size':(root/n).stat().st_size,'digest':'sha256:'+hashlib.sha256((root/n).read_bytes()).hexdigest()} for n in names}
 def api(p,method='GET',payload=None):
  cmd=['gh','api',f'repos/{REPO}/{p}','--method',method]
@@ -15,7 +15,7 @@ def verify(release):
  return assets
 existing=[x for x in api('releases?per_page=100') if x['tag_name']==TAG]
 if len(existing)>1:raise ValueError('Ambiguous release')
-release=api('releases/'+str(existing[0]['id'])) if existing else api('releases','POST',{'tag_name':TAG,'target_commitish':os.environ['GITHUB_SHA'],'name':'Quadro Browser 6.0.2 — Mac Apple Silicon','body':(root/'RELEASE_NOTES.md').read_text(),'draft':True,'prerelease':True,'make_latest':'false'})
+release=api('releases/'+str(existing[0]['id'])) if existing else api('releases','POST',{'tag_name':TAG,'target_commitish':os.environ['GITHUB_SHA'],'name':'Quadro Browser 6.0.3 — Mac Apple Silicon','body':(root/'RELEASE_NOTES.md').read_text(),'draft':True,'prerelease':True,'make_latest':'false'})
 rid=release['id']
 if release['draft']:
  assets={x['name']:x for x in release['assets']}
