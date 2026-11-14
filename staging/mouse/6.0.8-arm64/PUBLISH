@@ -1,0 +1,1 @@
+Publish only d76c837311c1691fcc4e0e3af311b9905fc7e37e from successful native run43607404904 after merged sourcePR140 and repeated real-DMG/runtime/replacement checks. Publish static channel only after public package hash verification. Owner authorized actual release.

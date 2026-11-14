@@ -1,0 +1,82 @@
+name: Publish verified Mouse Browser 6.0.8
+on:
+  push:
+    branches: [main]
+    paths: ['staging/mouse/6.0.8-arm64/PUBLISH']
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: quadro-macos-release
+  cancel-in-progress: false
+jobs:
+  mouse-release:
+    runs-on: macos-15
+    timeout-minutes: 25
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Import exact merged and native-tested source
+        run: python3 tools/mouse608-release.py import
+      - name: Install real DMG, repeat runtime and actual old-app replacement checks
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(uname -m)" = arm64
+          cmp mouse608-release/Mouse-Browser-6.0.8-mac-arm64.dmg mouse608-release/Quadro-Browser-6.0.8-mac-arm64.dmg
+          MOUNT="$RUNNER_TEMP/mouse608-dmg"
+          mkdir -p "$MOUNT"
+          hdiutil attach mouse608-release/Mouse-Browser-6.0.8-mac-arm64.dmg -nobrowse -readonly -mountpoint "$MOUNT"
+          trap 'hdiutil detach "$MOUNT" || true' EXIT
+          APP="$RUNNER_TEMP/Установка Mouse/Mouse Browser.app"
+          mkdir -p "$(dirname "$APP")"
+          ditto "$MOUNT/Mouse Browser.app" "$APP"
+          test "$(lipo -archs "$APP/Contents/MacOS/Mouse Browser")" = arm64
+          codesign --verify --deep --strict "$APP"
+          ditto -x -k mouse608-release/Mouse-Browser-6.0.8-mac-arm64.zip "$RUNNER_TEMP/mouse608-zip"
+          codesign --verify --deep --strict "$RUNNER_TEMP/mouse608-zip/Mouse Browser.app"
+          cmp "$APP/Contents/Resources/app.asar" "$RUNNER_TEMP/mouse608-zip/Mouse Browser.app/Contents/Resources/app.asar"
+          cd mouse608-release
+          env -u GH_TOKEN python3 quadro-verify.py "$APP/Contents/MacOS/Mouse Browser"
+          grep -q MOUSE_608_REAL_607_TO_608_REPLACE_RELAUNCH_PROFILE_PASS mouse-update-roundtrip.log
+      - name: Publish only checksum-verified tested packages
+        run: python3 tools/mouse608-release.py publish
+      - name: Publish dedicated static channel after public asset verification
+        run: python3 tools/mouse608-release.py channel
+      - name: Verify anonymous static-channel discovery and real package download
+        shell: bash
+        run: |
+          env -u GH_TOKEN node - <<'NODE'
+          const assert=require('node:assert/strict'),fs=require('node:fs/promises'),os=require('node:os');
+          const {QuadroUpdates,CHANNEL}=require('./mouse608-release/quadro-update.cjs');
+          const fetcher=(url,options)=>{assert.equal(new URL(url).hostname==='api.github.com',false,'primary static channel must work without API fallback');return fetch(url,options)};
+          const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+          (async()=>{
+            let u,error;
+            for(let i=0;i<12;i++){
+              try{u=new QuadroUpdates({app:{getVersion:()=> '6.0.7',getPath:()=>os.tmpdir()},shell:{},fetcher});const s=await u.run('check');assert.equal(s.phase,'available');assert.equal(s.channel,'static');assert.equal(s.latestVersion,'6.0.8');error=null;break;}catch(e){error=e;await sleep(5000)}
+            }
+            if(error)throw error;
+            assert.equal(u.candidate.hash,'bdf75806471b5f86c3bbf69593edcd1de9640f5627033a20f485003289908f1f');
+            assert.equal((await u.run('download')).phase,'ready');await u.verified();
+            const current=new QuadroUpdates({app:{getVersion:()=> '6.0.8'},shell:{},fetcher});
+            assert.equal((await current.run('check')).phase,'current');assert.equal(current.state.channel,'static');
+            await fs.writeFile('mouse608-release/channel-verification.json',JSON.stringify({channel:CHANNEL,availableFrom:'6.0.7',version:'6.0.8',hash:u.candidate.hash,size:u.candidate.size,anonymousDiscovery:true,verifiedDownload:true,currentVersionCheck:true,oldBinaryUpgraded:false},null,2));
+            console.log('MOUSE608_ANONYMOUS_STATIC_DISCOVERY_DOWNLOAD_CURRENT_PASS');
+          })().catch(e=>{console.error(e);process.exit(1)});
+          NODE
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: mouse608-release-verification
+          path: |
+            mouse608-release/*.log
+            mouse608-release/*.png
+            mouse608-release/*.json
+            mouse608-release/*.md
+            mouse608-release/SHA256SUMS.txt
+          retention-days: 14
