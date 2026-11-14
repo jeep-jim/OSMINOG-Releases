@@ -1,0 +1,6 @@
+Owner requested bottom menu layering fix and visual Mac-style start page.
+Native source run43549921164 passed for exact source821005fc15a28e650e2982209f225338cbb565aa.
+Publish only after source PR135 is merged, provenance/checksums and installed-DMG native tests pass.
+Separate Quadro macOS arm64 prerelease, never common latest or other platform feeds.
+Ad-hoc signature, no Developer ID/notarization; manual application replacement.
+Record updater discovery separately; prior anonymous GitHub HTTP403 is not claimed fixed.
