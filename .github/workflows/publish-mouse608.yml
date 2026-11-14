@@ -40,6 +40,10 @@ jobs:
           ditto -x -k mouse608-release/Mouse-Browser-6.0.8-mac-arm64.zip "$RUNNER_TEMP/mouse608-zip"
           codesign --verify --deep --strict "$RUNNER_TEMP/mouse608-zip/Mouse Browser.app"
           cmp "$APP/Contents/Resources/app.asar" "$RUNNER_TEMP/mouse608-zip/Mouse Browser.app/Contents/Resources/app.asar"
+          # The application has been copied and verified. Release this mount before
+          # testing the actual updater, which must mount the same DMG itself.
+          hdiutil detach "$MOUNT"
+          trap - EXIT
           cd mouse608-release
           env -u GH_TOKEN python3 quadro-verify.py "$APP/Contents/MacOS/Mouse Browser"
           grep -q MOUSE_608_REAL_607_TO_608_REPLACE_RELAUNCH_PROFILE_PASS mouse-update-roundtrip.log
