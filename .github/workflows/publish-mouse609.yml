@@ -61,8 +61,8 @@ jobs:
           const sleep=ms=>new Promise(r=>setTimeout(r,ms));
           (async()=>{
             let u,error;
-            for(let i=0;i<12;i++){
-              try{u=new Old({app:{getVersion:()=> '6.0.8',getPath:()=>os.tmpdir()},shell:{},fetcher});const s=await u.run('check');assert.equal(s.phase,'available');assert.equal(s.channel,'static');assert.equal(s.latestVersion,'6.0.9');error=null;break;}catch(e){error=e;await sleep(5000)}
+            for(let i=0;i<84;i++){
+              try{u=new Old({app:{getVersion:()=> '6.0.8',getPath:()=>os.tmpdir()},shell:{},fetcher});const s=await u.run('check');assert.equal(s.phase,'available');assert.equal(s.channel,'static');assert.equal(s.latestVersion,'6.0.9');error=null;break;}catch(e){error=e;if(i%12===0)console.log('Static channel propagation check',i,e.message);await sleep(5000)}
             }
             if(error)throw error;
             assert.equal(u.candidate.hash,pin.packages['Mouse-Browser-6.0.9-mac-arm64.dmg'].sha256);
