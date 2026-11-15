@@ -1,0 +1,6 @@
+Owner requested real publication through the existing update button.
+Version 6.0.11; exact source a1d99edec218e9e3e0868b1c4dd84bf887d58e7d.
+Source PR143 merged as 31e108c64063367b162a2accd0dcbe61461419f4.
+Native run43685754485/job132725765068 SUCCESS; candidate14150920390 and verification14149997073 downloaded and SHA256 checked.
+Actual light/dark private screenshots inspected. Theme-specific mouse body and tab/pane icons verified with unchanged purple glasses, white highlights and silhouette. Retain all private isolation/profile/native tests.
+Publish only after actual installed DMG and 610-to-611 profile-preserving replacement pass. Validate public assets before static-channel update; verify the shipped 610 updater against the new release. No overwrite of earlier versions, no security bypass, no other product publication.
