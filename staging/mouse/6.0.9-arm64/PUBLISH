@@ -1,0 +1,7 @@
+Mouse Browser 6.0.9 — owner-authorized actual Mac release.
+Exact source ccb83f3ed5fb9b4c62d818c1582eeaf08f477ecd / native run43668886097 SUCCESS.
+Source PR141 merged as7a003e308bbf524507d42858c19e5c733ae68856.
+Candidate14143028108 and verification14143302661 downloaded and SHA256-verified; actual UI screenshots inspected.
+Repeat all actual installed-DMG and608-to-609 replacement tests before publishing exact pinned bytes.
+Verify remote hashes before updating static channel, then test shipped608 updater discovery/download anonymously.
+No profile deletion or security bypass. No other platform or AvtoCena publication.
