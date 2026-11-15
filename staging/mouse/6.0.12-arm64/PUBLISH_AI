@@ -1,0 +1,5 @@
+Owner explicitly requests the new version.
+Source PR145 merged cafaff3dae64d335bb395e1d50e2c597088dbabf.
+Exact source 4f0bee5ac4c2740e03cbd6a253cf7f99fdae2bd0, native run 43700611446.
+Repeat installed DMG and profile-preserving 611-to-612 replacement before public release.
+Publish only the packages pinned in pin.json, then verify actual 611 static updater.
