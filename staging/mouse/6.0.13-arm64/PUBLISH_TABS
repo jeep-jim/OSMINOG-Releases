@@ -1,0 +1,7 @@
+Owner requested publication of the completed Mouse Browser update.
+Source PR147 merged as 1ebf56f3314ad7c9e50a624604892c8fb86947c7.
+Exact tested head b3666e88a131e9b88d49caee3531350a47058222.
+Successful native arm64 run43717440354, candidate14161924995; archive and package hashes in pin.json independently verified.
+Repeat installed-DMG tests, tab shrink/regrowth and swaps, native capture and privacy/profile checks, then real6.0.12→6.0.13 replacement.
+Publish only these bytes, then existing static macOS arm64 channel, and verify the actual released6.0.12 updater download/hash.
+Do not overwrite any previous release assets, remove profiles or alter other products.
