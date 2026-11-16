@@ -1,0 +1,5 @@
+Owner requested publication of Mouse Browser 6.0.14: AI fullscreen/restore, mouse-hole new tab, green verified-update badge, safe Mac source branding for mouse.black.
+Source a1ced2b21e9fae9be7f3c6eb80c02cffbc827b80 merged via source PR148, merge61aa559004d3a2625e9c3a21a93781fca7ae94b2.
+Native arm64 run43795316364 succeeded. Final candidate14194034147 archive and package hashes verified. Use pin.json exact bytes only.
+Repeat real installed DMG checks and613-to-614 replacement, then publish packages/static channel and verify actual shipped613 updater anonymous discovery and full download.
+No older package overwrite, profile deletion, macOS security bypass, unrelated platform release or DNS changes.
