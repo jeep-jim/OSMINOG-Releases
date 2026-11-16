@@ -1,0 +1,37 @@
+name: Verify Mouse 617 publisher gates
+on:
+  push:
+    branches: ['release/mouse-617-owner-chrome']
+    paths: ['tools/mouse617-owner-release.py', '.github/workflows/verify-mouse617-publisher.yml']
+  pull_request:
+    paths: ['tools/mouse617-owner-release.py', '.github/workflows/publish-mouse617-owner.yml', '.github/workflows/verify-mouse617-publisher.yml', 'staging/mouse/6.0.17-arm64/**']
+permissions:
+  contents: read
+jobs:
+  publisher-contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Render nested publisher without running GitHub requests or publishing
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import builtins,pathlib
+          rendered=[]
+          def capture(source,namespace):
+              if "SOURCE='jeep-jim/OSMINOG';REPO=" in source:
+                  rendered.append(source)
+                  return
+              builtins.exec(source,namespace)
+          file=pathlib.Path('tools/mouse617-owner-release.py').resolve()
+          namespace={'__file__':str(file),'__name__':'publisher_contract_test','exec':capture,'compile':lambda source,*args:source}
+          builtins.exec(file.read_text(),namespace)
+          assert len(rendered)==1,'Expected one final publisher'
+          code=rendered[0]
+          builtins.compile(code,str(file),'exec')
+          for required in ["V='6.0.17'","PR=151","(419668574,HEAD,'completed','success')","a['name']=='mouse-arm64-candidate'","pr['head']['sha']!=HEAD","c['behind_by']!=0","sha(archive)!=ARCHIVE_HASH","a.get('digest')!='sha256:'+ARCHIVE_HASH","Refusing to overwrite different existing bytes","Refusing channel downgrade","MOUSE_617_NATIVE_ADDRESS_CLICKS_HEAD_10PX_FOOTER_PASS","MOUSE_617_REAL_616_TO_617_REPLACE_RELAUNCH_PROFILE_PASS","MOUSE_PROFILE_COOKIE_RESTART_PASS","MOUSE_614_AI_FULLSCREEN_RESTORE_PRIVATE_PASS","mouse-617-chrome-light.png","mouse-617-chrome-dark.png","legacy616-update.cjs","ref=de787c71fdfd64f7b9a5a45f7c55b7c4a2bbae2b","owner-exact-128-pixel-small-head","real-616-to-617-profile-preserving-install"]:
+              assert required in code,required
+          assert "V='6.0.16'" not in code
+          print('MOUSE617_PUBLISHER_SOURCE_HASHES_AND_ALL_RELEASE_GATES_PASS')
+          PY
