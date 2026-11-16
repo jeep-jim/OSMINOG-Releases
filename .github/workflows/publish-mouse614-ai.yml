@@ -1,4 +1,4 @@
-name: Publish verified Mouse Browser 6.0.14 AI fullscreen
+name: Publish verified Mouse Browser 6.0.14
 on:
   push:
     branches: [main]
@@ -22,7 +22,7 @@ jobs:
           node-version: '22'
       - name: Import exact merged native-tested bytes
         run: python3 tools/mouse614-ai-release.py import
-      - name: Verify installed DMG, AI fullscreen, private mode and 613-to-614 replacement
+      - name: Verify installed DMG, burrow, update badge, AI fullscreen and 613-to-614 replacement
         shell: bash
         run: |
           set -euo pipefail
@@ -43,14 +43,15 @@ jobs:
           hdiutil detach "$MOUNT"
           trap - EXIT
           cd mouse614-release
-          env -u GH_TOKEN python3 quadro-verify.py "$APP/Contents/MacOS/Mouse Browser"
+          env -u GH_TOKEN python3 mouse-verify.py "$APP/Contents/MacOS/Mouse Browser"
           grep -q MOUSE_614_REAL_613_TO_614_REPLACE_RELAUNCH_PROFILE_PASS mouse-update-roundtrip.log
-          grep -q MOUSE_614_AI_FULLSCREEN_RESTORE_NORMAL_PASS quadro-smoke-write.log
-          grep -q MOUSE_614_AI_FULLSCREEN_RESTORE_PRIVATE_PASS quadro-mouse-private-smoke.log
-          grep -q MOUSE_611_PRIVATE_THEME_ASSETS_AND_LIVE_SWITCH_PASS quadro-mouse-private-smoke.log
-          grep -q MOUSE_612_AI_LOGOS_NAV_ACTIVE_AND_ADJACENT_PLUS_PASS quadro-smoke-write.log
-          grep -q MOUSE_612_DESTROYED_GUESTS_DISPOSE_AND_SHELL_RECOVERY_PASS quadro-smoke-write.log
-          grep -q MOUSE_613_TABS_SWAP_ADDRESS_AI_CHROME_PASS quadro-smoke-write.log
+          grep -q MOUSE_614_AI_FULLSCREEN_RESTORE_NORMAL_PASS mouse-smoke-write.log
+          grep -q MOUSE_614_REAL_UPDATE_BADGE_BOTH_THEMES_AND_BURROW_CLICK_PASS mouse-smoke-write.log
+          grep -q MOUSE_614_AI_FULLSCREEN_RESTORE_PRIVATE_PASS mouse-mouse-private-smoke.log
+          grep -q MOUSE_611_PRIVATE_THEME_ASSETS_AND_LIVE_SWITCH_PASS mouse-mouse-private-smoke.log
+          grep -q MOUSE_612_AI_LOGOS_NAV_ACTIVE_AND_ADJACENT_PLUS_PASS mouse-smoke-write.log
+          grep -q MOUSE_612_DESTROYED_GUESTS_DISPOSE_AND_SHELL_RECOVERY_PASS mouse-smoke-write.log
+          grep -q MOUSE_613_TABS_SWAP_ADDRESS_AI_CHROME_PASS mouse-smoke-write.log
       - name: Publish immutable verified packages
         run: python3 tools/mouse614-ai-release.py publish
       - name: Publish existing static channel after verifying public packages
@@ -61,7 +62,7 @@ jobs:
           env -u GH_TOKEN node - <<'NODE'
           const assert=require('node:assert/strict'),fs=require('node:fs/promises'),os=require('node:os');
           const {QuadroUpdates:Old}=require('./mouse614-release/legacy613-update.cjs');
-          const {QuadroUpdates,CHANNEL}=require('./mouse614-release/quadro-update.cjs');
+          const {MouseUpdates,CHANNEL}=require('./mouse614-release/mouse-update.cjs');
           const pin=require('./staging/mouse/6.0.14-arm64/pin.json');
           const fetcher=(url,options)=>{assert.notEqual(new URL(url).hostname,'api.github.com','Static channel must work without GitHub API');return fetch(url,options)};
           const sleep=ms=>new Promise(r=>setTimeout(r,ms));
@@ -73,9 +74,11 @@ jobs:
             if(error)throw error;
             assert.equal(u.candidate.hash,pin.packages['Mouse-Browser-6.0.14-mac-arm64.dmg'].sha256);
             assert.equal((await u.run('download')).phase,'ready');await u.verified();
-            const current=new QuadroUpdates({app:{getVersion:()=> '6.0.14'},shell:{},fetcher});
-            assert.equal((await current.run('check')).phase,'current');assert.equal(current.state.channel,'static');
-            await fs.writeFile('mouse614-release/channel-verification.json',JSON.stringify({channel:CHANNEL,actualOldModuleVersion:'6.0.13',version:'6.0.14',hash:u.candidate.hash,size:u.candidate.size,anonymousDiscovery:true,verifiedDownload:true,currentVersionCheck:true},null,2));
+            const current=new MouseUpdates({app:{getVersion:()=> '6.0.14'},shell:{},fetcher});
+            assert.equal((await current.run('check')).phase,'current');assert.equal(current.state.channel,'static');assert.equal(current.state.availableVersion,'');
+            const fresh=new MouseUpdates({app:{getVersion:()=> '6.0.13'},shell:{},fetcher});
+            assert.equal((await fresh.run('check')).availableVersion,'6.0.14');
+            await fs.writeFile('mouse614-release/channel-verification.json',JSON.stringify({channel:CHANNEL,actualOldModuleVersion:'6.0.13',version:'6.0.14',hash:u.candidate.hash,size:u.candidate.size,anonymousDiscovery:true,verifiedDownload:true,currentVersionCheck:true,realMetadataBadgeState:true},null,2));
             console.log('MOUSE614_ACTUAL_613_UPDATER_STATIC_DISCOVERY_DOWNLOAD_PASS');
           })().catch(e=>{console.error(e);process.exit(1)});
           NODE
