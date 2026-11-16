@@ -1,0 +1,5 @@
+Owner authorized Mouse Browser 6.0.16 publication.
+Exact source de787c71fdfd64f7b9a5a45f7c55b7c4a2bbae2b / PR150 merged; native run43817742120 SUCCESS.
+Candidate14203685849 and verification14203107319 independently downloaded and checked.
+Repeat installed DMG/ZIP native tests and actual615-to-616 profile-preserving replacement; publish only pinned bytes, then verify genuine old615 updater against public channel.
+No unrelated release, user-data deletion or security bypass.
