@@ -1,0 +1,3 @@
+Owner authorized publication in the current conversation on 2026-11-16.
+Publish only the immutable packages pinned in pin.json after all existing native and publication gates pass.
+Keep the footer and original owner small head. Do not rebuild or replace previous releases.
