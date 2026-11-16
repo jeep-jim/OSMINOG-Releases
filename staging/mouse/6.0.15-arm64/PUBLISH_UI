@@ -1,0 +1,6 @@
+Owner approved publication of Mouse Browser 6.0.15.
+Source PR149 merged as 0fbf6fb38e379d0cefde8426c9a7f86c1472136d.
+Exact source a0ae116da02ea6d45720acb01121a9a3736e5d3e.
+Native successful run 43802691947, candidate artifact 14196628048.
+Require installed-DMG verification, real 614-to-615 replacement, and existing static updater channel verification.
+No rebuild, old asset overwrite, profile deletion or security bypass.
