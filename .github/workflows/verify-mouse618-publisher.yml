@@ -1,0 +1,32 @@
+name: Verify Mouse618 publisher gates
+on:
+  pull_request:
+    paths: ['tools/mouse618-burrow-release.py','.github/workflows/publish-mouse618-burrow.yml','.github/workflows/verify-mouse618-publisher.yml','staging/mouse/6.0.18-arm64/**']
+permissions:
+  contents: read
+jobs:
+  publisher-contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check rendered publisher without network calls or publication
+        run: |
+          python3 - <<'PY'
+          import builtins,pathlib
+          rendered=[]
+          def capture(source,namespace):
+              if "SOURCE='jeep-jim/OSMINOG';REPO=" in source:
+                  rendered.append(source)
+                  return
+              builtins.exec(source,namespace)
+          file=pathlib.Path('tools/mouse618-burrow-release.py').resolve()
+          namespace={'__file__':str(file),'__name__':'publisher_contract_test','exec':capture,'compile':lambda source,*args:source}
+          builtins.exec(file.read_text(),namespace)
+          assert len(rendered)==1
+          code=rendered[0];builtins.compile(code,str(file),'exec')
+          for text in ["V='6.0.18'","PR=152","(419668574,HEAD,'completed','success')","a['name']=='mouse-arm64-candidate'","pr['head']['sha']!=HEAD","c['behind_by']!=0","sha(archive)!=ARCHIVE_HASH","a.get('digest')!='sha256:'+ARCHIVE_HASH","Refusing to overwrite different existing bytes","Refusing channel downgrade","MOUSE_618_BURROW_DOWN1_SHORTER3_BOTH_THEMES_PASS","MOUSE_618_REAL_617_TO_618_REPLACE_RELAUNCH_PROFILE_PASS","MOUSE_617_NATIVE_ADDRESS_CLICKS_HEAD_10PX_FOOTER_PASS","MOUSE_PROFILE_COOKIE_RESTART_PASS","MOUSE_614_AI_FULLSCREEN_RESTORE_PRIVATE_PASS","mouse-618-burrow-light.png","mouse-618-burrow-dark.png","legacy617-update.cjs","ref=6cee99f1a69454720ec9b23d7835d597d7b8bd6e","real-617-to-618-profile-preserving-install","burrow-down1-height-minus3-width-preserved"]:
+              assert text in code,text
+          assert "V='6.0.17'" not in code
+          print('MOUSE618_PUBLISHER_ALL_RELEASE_GATES_PASS')
+          PY

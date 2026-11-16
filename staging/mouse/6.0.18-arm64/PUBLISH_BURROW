@@ -1,0 +1,6 @@
+Owner explicitly and repeatedly authorized publication of the burrow-only hotfix on2026-11-16.
+SourcePR152 merged f1198920dd52f7a33d773862feeeea8bf36b779c with exact tested ec8054399238fc38bf7df02b5b4996250d1fd2f5 ancestry preserved.
+Native Mouse run43885263986 attempt3/job133382966624 SUCCESS; previous attempts ended before running steps and are not verification evidence.
+Candidate14238075926 and native-verification14237676133 downloaded, independent SHA256 checks passed. Both actual native close-up screenshots reviewed.
+Both themes confirm height-3px, baseline+1px, top+4px, unchanged width and divider delta0. Actual617-to-618 profile-preserving replacement, native clicks, private-mode and cookie restart tests passed.
+Publish only the exact pin.json bytes after the existing reinstalled-DMG and publication gates pass. Keep prior releases, profile, footer, owner logo,12px plus and all unrelated UI unchanged.
