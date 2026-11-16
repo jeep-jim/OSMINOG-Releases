@@ -2,9 +2,9 @@
   "schema": 1,
   "platform": "darwin",
   "arch": "arm64",
-  "version": "6.0.17",
-  "url": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/quadro-macos-v6.0.17-arm64/Mouse-Browser-6.0.17-mac-arm64.dmg",
-  "size": 128519822,
-  "digest": "sha256:a565253cb6443659b85b06558de4cba8f212917b04b6b8d5acc9f5af35e4a0d0",
-  "publishedAt": "2026-11-16T11:38:43Z"
+  "version": "6.0.18",
+  "url": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/quadro-macos-v6.0.18-arm64/Mouse-Browser-6.0.18-mac-arm64.dmg",
+  "size": 128520335,
+  "digest": "sha256:511d06203048526c8ceb4a772ce22ffa899bea20fcb05da949be7e345561b151",
+  "publishedAt": "2026-11-16T15:13:00Z"
 }
