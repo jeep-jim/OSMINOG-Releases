@@ -1,0 +1,4 @@
+Owner explicitly authorized publication on 2026-11-16; resume existing PR34 after interrupted chat.
+Exact tested source6cee99f1a69454720ec9b23d7835d597d7b8bd6e/run43853980665 SUCCESS; PR151 merged63302b03cac6749c309435a1c5bbdaf0ea87cdec with ancestry preserved.
+Candidate14220877911 and verification14220982847 independently downloaded and checksums verified; native screenshots and logs reviewed, including actual616-to-617 profile-preserving installation.
+Publish only pin.json bytes after all existing publication gates pass. Do not rebuild or replace old packages. Footer preserved; owner compact head,10px corners and12px hover plus retained.
