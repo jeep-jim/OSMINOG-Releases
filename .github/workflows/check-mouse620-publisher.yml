@@ -1,0 +1,13 @@
+name: Verify Mouse620 publication guards
+on:
+  pull_request:
+    paths: ['tools/mouse620-release.py','tools/check-mouse620-publisher.py','.github/workflows/publish-mouse620.yml','.github/workflows/check-mouse620-publisher.yml','staging/mouse/6.0.20-arm64/**']
+permissions:
+  contents: read
+jobs:
+  contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@v4
+      - run: python3 tools/check-mouse620-publisher.py
