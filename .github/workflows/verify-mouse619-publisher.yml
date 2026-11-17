@@ -1,0 +1,32 @@
+name: Verify Mouse619 publisher gates
+on:
+  pull_request:
+    paths: ['tools/mouse619-emoji-release.py','.github/workflows/publish-mouse619-emoji.yml','.github/workflows/verify-mouse619-publisher.yml','staging/mouse/6.0.19-arm64/**']
+permissions:
+  contents: read
+jobs:
+  publisher-contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check rendered publisher without network calls or publication
+        run: |
+          python3 - <<'PY'
+          import builtins,pathlib
+          rendered=[]
+          def capture(source,namespace):
+              if "SOURCE='jeep-jim/OSMINOG';REPO=" in source:
+                  rendered.append(source)
+                  return
+              builtins.exec(source,namespace)
+          file=pathlib.Path('tools/mouse619-emoji-release.py').resolve()
+          namespace={'__file__':str(file),'__name__':'publisher_contract_test','exec':capture,'compile':lambda source,*args:source}
+          builtins.exec(file.read_text(),namespace)
+          assert len(rendered)==1
+          code=rendered[0];builtins.compile(code,str(file),'exec')
+          for text in ["V='6.0.19'","PR=153","(419668574,HEAD,'completed','success')","a['name']=='mouse-arm64-candidate'","pr['head']['sha']!=HEAD","c['behind_by']!=0","sha(archive)!=ARCHIVE_HASH","a.get('digest')!='sha256:'+ARCHIVE_HASH","Refusing to overwrite different existing bytes","Refusing channel downgrade","MOUSE_619_NATIVE_CHARACTER_VIEWER_VISIBLE_PASS","MOUSE_619_EMOJI_FOOTER_PAGE_AI_SHELL_FOCUS_PASS","MOUSE_619_EMOJI_PRIVATE_FOCUS_AND_INSERTION_PASS","MOUSE_619_REAL_618_TO_619_REPLACE_RELAUNCH_PROFILE_PASS","MOUSE_618_BURROW_DOWN1_SHORTER3_BOTH_THEMES_PASS","MOUSE_PROFILE_COOKIE_RESTART_PASS","mouse-619-native-picker.png","mouse-619-native-picker.json","legacy618-update.cjs","ref=ec8054399238fc38bf7df02b5b4996250d1fd2f5","real-618-to-619-profile-preserving-install"]:
+              assert text in code,text
+          assert "V='6.0.18'" not in code
+          print('MOUSE619_PUBLISHER_ALL_RELEASE_GATES_PASS')
+          PY
