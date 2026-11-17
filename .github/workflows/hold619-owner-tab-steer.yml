@@ -1,0 +1,37 @@
+name: Hold unpublished619 for owner tab correction
+on:
+  push:
+    branches: ['ops/hold619-owner-tab-steer']
+    paths: ['.github/workflows/hold619-owner-tab-steer.yml']
+permissions:
+  contents: read
+  actions: write
+jobs:
+  hold:
+    if: github.repository == 'jeep-jim/OSMINOG-Releases' && github.ref == 'refs/heads/ops/hold619-owner-tab-steer'
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - name: Cancel only the exact old release run before publication, never delete a release
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json,subprocess
+          repo='jeep-jim/OSMINOG-Releases';run=44008790394
+          def api(path):return json.loads(subprocess.check_output(['gh','api','repos/'+repo+'/'+path]))
+          r=api(f'actions/runs/{run}')
+          assert r['head_sha']=='0a0dd7414c9a36461c352bd933591d6d11a7a005'
+          assert r['path']=='.github/workflows/publish-mouse619-emoji.yml'
+          releases=api('releases?per_page=100')
+          public=next((x for x in releases if x['tag_name']=='quadro-macos-v6.0.19-arm64' and not x['draft']),None)
+          if public:
+              print('619_ALREADY_PUBLIC_DO_NOT_REPLACE',public['html_url'])
+          elif r['status']=='completed':
+              print('619_RUN_ALREADY_FINISHED',r['conclusion'])
+          else:
+              subprocess.run(['gh','api','--method','POST',f'repos/{repo}/actions/runs/{run}/cancel'],check=True)
+              print('619_CANCELLATION_REQUESTED_FOR_OWNER_STEER')
+          PY
