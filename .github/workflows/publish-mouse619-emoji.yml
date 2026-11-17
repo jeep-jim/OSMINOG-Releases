@@ -22,7 +22,7 @@ jobs:
           node-version: '22'
       - name: Import exact merged native-tested bytes
         run: python3 tools/mouse619-emoji-release.py import
-      - name: Verify installed DMG, native emoji panel and618-to-619 profile-preserving replacement
+      - name: Verify installed DMG, emoji, tab flow, library and618-to-619 profile-preserving replacement
         shell: bash
         run: |
           set -euo pipefail
@@ -48,6 +48,8 @@ jobs:
           grep -q MOUSE_619_NATIVE_CHARACTER_VIEWER_VISIBLE_PASS mouse-smoke-write.log
           grep -q MOUSE_619_EMOJI_FOOTER_PAGE_AI_SHELL_FOCUS_PASS mouse-smoke-write.log
           grep -q MOUSE_619_EMOJI_PRIVATE_FOCUS_AND_INSERTION_PASS mouse-mouse-private-smoke.log
+          grep -q MOUSE_619_ACTIVE_TAB_FLOW_MATCHED_RIM_BOTH_THEMES_PASS mouse-smoke-write.log
+          grep -q MOUSE_619_LIBRARY_ICONS_VIEWS_TOPBAR_SELECTION_SAFE_CLEAR_PASS mouse-smoke-write.log
           grep -q MOUSE_618_BURROW_DOWN1_SHORTER3_BOTH_THEMES_PASS mouse-smoke-write.log
           grep -q MOUSE_617_NATIVE_ADDRESS_CLICKS_HEAD_10PX_FOOTER_PASS mouse-smoke-write.log
           grep -q MOUSE_616_ARCH_PLUS_AND_SEPARATE_FOOTER_BOTH_THEMES_PASS mouse-smoke-write.log

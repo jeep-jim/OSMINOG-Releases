@@ -1,4 +1,5 @@
-Owner requested the native system emoji smiley at the marked footer location and continuation through publication after the interrupted chat.
-Exact source a3c96bb75fd58454306f94791aea1a0ae05b204a passed Mouse macOS run43998304662 (successful retry job133757578229) and all companion workflows. Source PR153 merged44b613b7d2e7bf8b80eed595330bc61cb888bf64 preserving exact tested ancestry.
-Candidate14291726133 and successful verification14290843749 downloaded and SHA256 independently matched. Native Character Viewer window screenshot and normal/private focus logs reviewed; actual618-to-619 profile-preserving update passed. Earlier failed-attempt verification14290882719 is not used as successful evidence.
-Publish only packages in pin.json after all existing installed-DMG/source/checksum/private/profile guards pass. Do not rebuild, overwrite previous assets, disable security or publish other platforms. Windows emoji handler is unit-tested preparation only, not a published or native-tested Windows release.
+Owner requested all three groups in the SAME619: native emoji footer button, divider-matched active tab/burrow rim, and library favicons/file-icons/list-tiles/topbar/selection/round-delete.
+Supersedes the unpublished emoji-only pin. Old release44008790394 was cancelled before publication; do not rerun it.
+Exact source d4c14032a221f98f8026f1bea36cf8afc55c7511/native44015927765 SUCCESS, mergedPR154 as27bf42f4699201adfa717a33190d7d4babae4fbf.
+Candidate14298374466 and verification14299121760 independently downloaded and hashes checked, actual native library/tab screenshots reviewed, normal/private emoji and618-to-619 upgrade markers confirmed.
+Publish only new pin.json bytes after unchanged installed-DMG, native, private, profile and checksum gates. Preserve files, profiles and all prior public releases. No other platform/project publication.
