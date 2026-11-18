@@ -1,46 +1,45 @@
 READY_TO_PUBLISH_MOUSE_626
 
-Mouse Browser6.0.26: source acceptance complete; release publication pending.
-Requested work: continuous Nora growth from the lower bar, symmetric layout,
-and arbitrary screenshot annotation colors through field, hue and exact HEX.
+Mouse Browser 6.0.26: final source acceptance complete; publication pending.
+Source: 132acb473cb149c4da9440f6f89ddb751c0afd7c
+Source PR: https://github.com/jeep-jim/OSMINOG/pull/164
+Source merge: 18297027740a4db1e1e9a973c8986b74fa4c4094
+Native run: https://github.com/jeep-jim/OSMINOG/actions/runs/44271654716
+Native job 134689510434: SUCCESS. All seven companion workflows: SUCCESS.
+Chrome diagnostics 44271654959 passed on attempt 2 without code changes,
+28 PASS / 0 FAIL. The first attempt lacked a selected object in an unchanged
+legacy Canvas fixture; its underlying cause is not established.
 
-Accepted source: c73aa58069bebdb5e0020dbb72257ac7af5f0a5a
-Source PR: https://github.com/jeep-jim/OSMINOG/pull/161
-Source merge: 0baf7209249bffcf797aa59fbdb23911471b54ee
-Native run: https://github.com/jeep-jim/OSMINOG/actions/runs/44266076560
-Native job134670809060: SUCCESS. All seven companion workflows: SUCCESS.
+Candidate artifact 14412429777; archive SHA-256:
+d4a0d4f4b725205e5423f74e0875f2c260b8a1791aa7d7fdf0938d7518c143ca
+Verification artifact 14413815890; archive SHA-256:
+3271d920de106353a882410d5f689f853272de33c0348b1d77d872ca74a0919d
 
-Candidate artifact14411320640; archive SHA-256:
-bada0703dd0543d3713b0a83736b7cce2b2a0180b8e0adbbf2303e87ecbbb0fa
-Verification artifact14411455245; archive SHA-256:
-c3c951a881f701ca27f0ea79e7cfe1b63da712c7f00e41bbd3d68fe3e66bc7f1
+Mouse-Browser-6.0.26-mac-arm64.dmg: 133817545 bytes; SHA-256 c2fed4e66495eaac497ba0ca9196425ecd50867cb9034c5f7e176804a6e73a0c
+Mouse-Browser-6.0.26-mac-arm64.zip: 134163214 bytes; SHA-256 b7701b6bd2c9c9b789b6b307bf59e0aea4dc826a05aaf25b3d5dbbcfe52fe340
 
-Mouse-Browser-6.0.26-mac-arm64.dmg: 133820376 bytes;
-SHA-256 4900336116e19fb11cdf61584d6d7e1d81a6945abb13a2100149feec39f2a144
-Mouse-Browser-6.0.26-mac-arm64.zip: 134157271 bytes;
-SHA-256 072a99cd4282c695b69e0be03d5c306f1b3ba07f637b1214fa8c133527cf9531
-
-Installed source evidence:
+Installed acceptance includes:
 MOUSE_626_BURROW_LIQUID_SYMMETRY_PASS
 MOUSE_626_CAPTURE_ANY_COLOR_PASS
+MOUSE_613_TABS_REGROW_AFTER_CLOSE_PASS
 MOUSE_626_REAL_625_TO_626_REPLACE_RELAUNCH_PROFILE_PASS
-Both themes, continuous opening/closing and connected footer, symmetry,
-interruption, resize, reduced motion, revealed content and real controls passed.
-Arbitrary colors, HEX and color-field selection, annotation application and
-exported PNG colors passed. Final light/dark Nora and palette PNGs inspected.
-Retained621-625 functionality, private cleanup and profile restart passed.
-Actual625-to-626 replacement passed: READY text6.0.26, six bytes, receipt removed,
-installed6.0.26, retained previous6.0.25, signatures and profile checks passed.
+All nine Nora and five palette facts are true, in both themes, with state restored.
+Reversal observes two real closing frames before reopening and preserves exact
+outline/local/fill paths. Full arbitrary colors and actual exported PNG pixels pass.
+The native window drag grip is retained; tab sizing includes its occupied space.
+Retained UI, private cleanup, profile restart and actual published 625-to-626
+replacement pass. READY contains exactly 6.0.26, receipt is removed, installed
+version is 6.0.26 and retained previous application is 6.0.25.
+Final light/dark Nora and palette screenshots were inspected.
 
-Previous625 pins remain unchanged: source
-d70dd1e1a9255709b4816b616dd7860581e882bd; updater blob
-c4a9564bc5a7c3cf2c6798b5eade9680ee0e57cf; public DMG133809131 bytes;
-SHA-256 0367c7b07d2b2d1f34345b2f8696ae71d5459522db2bfa9a3a045e67b82bf74f.
+The earlier c73 publisher run 44268549386 failed before publication because its
+fixture reopened between RAF samples; no packages or channel were published by
+that run. This final candidate contains the corrected observer and tab fitting.
+Previous625 pins and the reviewed publisher chain remain unchanged.
 
-This readiness record does not claim626 is already public. The release workflow
-must import these exact source artifacts, verify checksums and merged ancestry,
-repeat installed native and real625-to-626 replacement checks, publish immutable
-packages, advance the existing static channel, then verify actual625 updater
-anonymous discovery and complete626 download. All historical behavioural gates
-remain required. Previous packages and other platform channels stay unchanged.
-macOS signature remains ad-hoc; no Developer ID or notarization is claimed.
+Import these exact artifact bytes, verify merged ancestry and checksums, repeat
+installed native acceptance and actual 625-to-626 replacement, publish immutable
+packages, advance the existing static channel, and verify actual shipped625
+updater anonymous discovery plus a complete verified626 download. This readiness
+record does not claim publication has already completed.
+The macOS build remains ad-hoc signed, without Developer ID or notarization.
