@@ -1,10 +1,14 @@
 The owner explicitly requested the next Mouse Browser version with all cumulative five-desktop, mode, preview, animation and Agent Mouse requirements. This carries the existing authorization to publish the concrete verified result through the normal update button.
 
-UNSET: source SHA, source PR and exact merge are not yet observed.
-UNSET: native macOS run and all companion checks must finish successfully for that exact source.
-UNSET: candidate and verification archives must be downloaded independently and checked against final pin.json, including exact DMG/ZIP sizes, hashes and provenance.
-UNSET: actual both-theme burrow/preview screenshots and Agent Mouse screenshot must be visually reviewed; any unresolved limitations must be recorded honestly.
-UNSET: confirm real native five-desktop/preserved-tab, trusted preview/switch/Stop/localhost, CDP, manual approval and explicitly consented autonomous actions, PTY, isolated-worker local-model fixture and621-to-622 profile replacement evidence.
+Exact source a94317ce121de73a9a469b55af8eea900a35921d; source PR157. Native macOS run44204108935 attempt2/job134467781352 succeeded. All seven companions succeeded on this same source:44204108642,44204109359 attempt2,44204108676,44204108649,44204108723,44204108897,44204108689. Local181 Mouse tests passed. Initial unsuccessful attempts remain visible; no assertions were disabled.
 
-Replace this template with the observed evidence and READY_TO_PUBLISH_MOUSE_622 only after completing those checks. A local deterministic model fixture does not prove a real Qwen/DeepSeek account, local model installation or cloud connection. No model credentials are included.
+Candidate14382349105 and successful verification14383451808 were independently downloaded and checked against pin.json. Both package hashes, sizes, source/run provenance match. Earlier failed verification14382921987 must not be used. All five final images were visually reviewed: both-theme previews, both-theme modes and running Agent Mouse.
+
+Native proof confirms five desks, seven empty-only suggested requests, eight preserved tabs, zero hidden captures, real thumbnails, manual and explicitly consented autonomous CDP/PTY actions, real terminal stdout, external utility worker with three requests to a local deterministic model fixture, Stop/listener termination, localhost preview and actual621-to-622 profile-preserving replacement.
+
+UNSET_MERGE_RECORD: GitHub merge operation partially completed on2026-11-18. main contains exact tested tree d3f19f7601e622b0fb79197678981ca561afd4b0 in71f943b469ac2678a407ca89f2fe69b6e30990c8 with parents3a24f87904e21fed6b47585ac7c80fa380b2c0c6 and a94317ce121de73a9a469b55af8eea900a35921d. PR157 is still open/merged=false/dirty. Official async recovery run44207768489 failed with Pull Request is not mergeable. This is not an observed normal merged-PR record; sourceMerge remains unset and publication remains blocked. Do not substitute the main commit for the missing PR metadata, reset history, manually close the PR or weaken the publisher guard.
+
+After GitHub reconciles the normal merged record, re-read PR157/main, fill sourceMerge with the actual PR merge SHA and replace this blocker with the ready marker. Then repeat all installed-package and old-updater checks. The tested DMG is separately delivered for manual installation; this does not advance or replace the normal update channel, which remains6.0.21.
+
+A local deterministic model fixture does not prove a real Qwen/DeepSeek account, local model installation or cloud connection. No model credentials are included. The packages are ad-hoc previews without Developer ID or Apple notarization; owner-device acceptance is not observed.
 Repeat retained installed-package gates before publishing release and static channel; import exact verified packages without rebuild, prior-asset overwrite or downgrade. Preserve the user profile and other products.
