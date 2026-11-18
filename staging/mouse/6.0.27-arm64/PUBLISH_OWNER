@@ -1,0 +1,45 @@
+PENDING_MOUSE_627
+
+UNSET: exact successful source commit, merged PR, source native run, candidate
+and verification artifact identifiers, independently checked archive digests,
+DMG/ZIP sizes and SHA-256 digests, and review of the rendered native evidence.
+
+This staging record is deliberately not ready to publish. The publisher rejects
+all import/publish/channel actions before any API request while ready is false.
+
+Required627 evidence, in both the exact source verification artifact and the
+installed publisher rerun:
+
+MOUSE_627_NATIVE_WINDOW_FOOTER_DRAG_PASS
+MOUSE_627_DOCUMENT_TABS_NATIVE_PASS
+MOUSE_627_PDF_EXISTING_TEXT_NATIVE_PASS
+MOUSE_627_NATIVE_METADATA_WORKLOAD_PRESERVES_LIVE_PAGES_PASS
+MOUSE_627_FIXED_PANEL_SLIDE_NATIVE_PASS
+MOUSE_627_BURROW_FIXED_VIEWPORT_CONTROLS_PASS
+MOUSE_627_COMPOSITOR_DESKTOP_SLIDE_NATIVE_PASS
+MOUSE_627_REAL_625_TO_627_REPLACE_RELAUNCH_PROFILE_PASS
+
+The owner requested a fixed-form Nora slide, superseding the former626 contour
+morph, its expanding-height/seam geometry and their feature tokens. Require
+mouse-627-motion.json and all six light/dark opening/open/closing PNGs, plus
+mouse-627-desktop-transition.json and both desktop-transition PNGs. The four
+desktop scenarios must cover both directions in both themes, including a
+delayed native layout acknowledgement. They must preserve actual page identity,
+viewport and scroll position, and bound native layout calls per transition.
+
+Retain all five626 palette facts, its rendered palette PNG and stateRestored,
+using schema6.0.26 plus explicit supersededForNora metadata. The retained623
+schema must prove fixed viewport/scroll controls, stationary footer, matching
+outline, tab lifecycle and agent controls. It must not claim the removed growth
+or former full-footer seam contract. Retain all625 document/search/private/
+profile guards and all other reviewed native gates. The upgrade fixture uses
+the real immutable public625 package and actual shipped625 updater.
+No626 package, release or existing channel file is modified by this preparation.
+
+After the exact source has passed, is merged and its bytes are pinned, the
+publisher still has to verify the installed arm64 DMG/ZIP signatures/resources,
+rerun all native interactions and actual625-to-627 replacement, publish only the
+exact verified packages, advance the established channel without downgrade or
+same-version replacement, and verify actual625 anonymous discovery plus a
+complete verified627 download. None of those publication outcomes is asserted
+by this pending record.
