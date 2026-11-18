@@ -7,7 +7,7 @@
   "verificationArtifact": 14383451808,
   "verificationSHA256": "5eaa39a11efabe7ab664d12e086141b3a2eb9258c4f6eafa9ff95f40a7378780",
   "sourcePR": 157,
-  "sourceMerge": "UNSET_MERGE_SHA",
+  "sourceMerge": "71f943b469ac2678a407ca89f2fe69b6e30990c8",
   "packages": {
     "Mouse-Browser-6.0.22-mac-arm64.dmg": {
       "size": 132133485,
