@@ -1,0 +1,2669 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Mouse627 installed native evidence file bundle",
+  "$comment": "Logical bundle of six627 proof JSON files, retained623 fixed-viewport/lifecycle/agent evidence and retained626 palette evidence. mouse627-release.py verifies cross-frame geometry, signed simultaneous movement, exact captured surface membership, page identity/viewport/scroll equality, bounded native work, required PNG signatures and source/installed evidence. The former626 Nora morph and623 expanding/seam contract are explicitly superseded; all release security, profile and actual625 update gates remain. The PNG extension list covers627 and the retained626 palette; additional historical captures remain required by the publisher. Desktop capture pixel probes use measured exposed BODY coordinates mapped to native PNG pixels, including zoom/Retina scale. The exact source archive and the fresh installed run both require the bounded motion trace. Acceptance is recomputed from trace/motion bytes before release API writes; saved reports are never acceptance inputs.",
+  "type": "object",
+  "required": [
+    "mouse-627-window-verification.json",
+    "mouse-627-document-tabs.json",
+    "mouse-627-pdf-text.json",
+    "mouse-627-performance.json",
+    "mouse-627-motion.json",
+    "mouse-627-desktop-transition.json",
+    "mouse-623-verification.json",
+    "mouse-626-verification.json",
+    "mouse-627-motion-trace.json"
+  ],
+  "properties": {
+    "mouse-627-window-verification.json": {
+      "type": "object",
+      "required": [
+        "version",
+        "restored",
+        "gestures",
+        "controls"
+      ],
+      "properties": {
+        "version": {
+          "const": "6.0.27"
+        },
+        "restored": {
+          "const": true
+        },
+        "gestures": {
+          "type": "array",
+          "minItems": 6,
+          "maxItems": 6,
+          "items": {
+            "type": "object",
+            "required": [
+              "label",
+              "point",
+              "before",
+              "after",
+              "requested"
+            ],
+            "properties": {
+              "label": {
+                "enum": [
+                  "light footer left",
+                  "light footer right",
+                  "light top grip",
+                  "dark footer left",
+                  "dark footer right",
+                  "dark top grip"
+                ]
+              },
+              "point": {
+                "type": "object",
+                "required": [
+                  "x",
+                  "y"
+                ],
+                "properties": {
+                  "x": {
+                    "type": "number"
+                  },
+                  "y": {
+                    "type": "number"
+                  }
+                }
+              },
+              "before": {
+                "$ref": "#/$defs/rectangle"
+              },
+              "after": {
+                "$ref": "#/$defs/rectangle"
+              },
+              "requested": {
+                "type": "object",
+                "required": [
+                  "dx",
+                  "dy"
+                ],
+                "properties": {
+                  "dx": {
+                    "type": "number",
+                    "not": {
+                      "const": 0
+                    }
+                  },
+                  "dy": {
+                    "type": "number",
+                    "not": {
+                      "const": 0
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "controls": {
+          "type": "array",
+          "minItems": 4,
+          "maxItems": 4,
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "light theme",
+              "light Nora",
+              "dark theme",
+              "dark Nora"
+            ]
+          }
+        }
+      }
+    },
+    "mouse-627-document-tabs.json": {
+      "type": "object",
+      "required": [
+        "version",
+        "ordinaryTabs",
+        "noDocumentDialog",
+        "twoVisibleEditors",
+        "paneResize",
+        "tabSwitchDraftPreserved",
+        "closeCancelPreserved",
+        "navigationCancelPreserved",
+        "navigationPreservesTabId",
+        "desktopMovePreserved",
+        "privateCleared"
+      ],
+      "properties": {
+        "version": {
+          "const": "6.0.27"
+        },
+        "ordinaryTabs": {
+          "const": true
+        },
+        "noDocumentDialog": {
+          "const": true
+        },
+        "twoVisibleEditors": {
+          "const": true
+        },
+        "paneResize": {
+          "const": true
+        },
+        "tabSwitchDraftPreserved": {
+          "const": true
+        },
+        "closeCancelPreserved": {
+          "const": true
+        },
+        "navigationCancelPreserved": {
+          "const": true
+        },
+        "navigationPreservesTabId": {
+          "const": true
+        },
+        "desktopMovePreserved": {
+          "const": true
+        },
+        "privateCleared": {
+          "const": true
+        }
+      }
+    },
+    "mouse-627-pdf-text.json": {
+      "type": "object",
+      "required": [
+        "version",
+        "originalTextAbsent",
+        "replacementPresent",
+        "cyrillicPresent",
+        "unrelatedContentPreserved",
+        "undo",
+        "editTextVisible",
+        "readability"
+      ],
+      "properties": {
+        "version": {
+          "const": "6.0.27"
+        },
+        "originalTextAbsent": {
+          "const": true
+        },
+        "replacementPresent": {
+          "const": true
+        },
+        "cyrillicPresent": {
+          "const": true
+        },
+        "unrelatedContentPreserved": {
+          "const": true
+        },
+        "undo": {
+          "const": true
+        },
+        "editTextVisible": {
+          "const": true
+        },
+        "readability": {
+          "$ref": "#/$defs/pdfPresentation"
+        }
+      }
+    },
+    "mouse-627-performance.json": {
+      "type": "object",
+      "required": [
+        "version",
+        "stateRestored",
+        "livePagesPreserved",
+        "platform",
+        "arch",
+        "panes",
+        "measurements"
+      ],
+      "properties": {
+        "version": {
+          "const": "6.0.27"
+        },
+        "stateRestored": {
+          "const": true
+        },
+        "livePagesPreserved": {
+          "const": true
+        },
+        "platform": {
+          "const": "darwin"
+        },
+        "arch": {
+          "const": "arm64"
+        },
+        "panes": {
+          "const": 8
+        },
+        "measurements": {
+          "type": "object",
+          "required": [
+            "controlled-immediate",
+            "controlled-batched",
+            "unchanged-metadata",
+            "renderer-immediate",
+            "renderer-batched"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "controlled-immediate": {
+              "$ref": "#/$defs/measurement"
+            },
+            "controlled-batched": {
+              "$ref": "#/$defs/measurement"
+            },
+            "unchanged-metadata": {
+              "$ref": "#/$defs/measurement"
+            },
+            "renderer-immediate": {
+              "$ref": "#/$defs/measurement"
+            },
+            "renderer-batched": {
+              "$ref": "#/$defs/measurement"
+            }
+          }
+        }
+      }
+    },
+    "mouse-627-motion.json": {
+      "type": "object",
+      "required": [
+        "version",
+        "fixedSize",
+        "translationOnly",
+        "constantContour",
+        "openClosePainted",
+        "interruptionPreserved",
+        "reducedMotion",
+        "contentScrollable",
+        "backgroundStable",
+        "footerStable",
+        "stateRestored",
+        "themes",
+        "frames",
+        "geometry",
+        "captures",
+        "captureStates",
+        "interruption",
+        "footer",
+        "background"
+      ],
+      "properties": {
+        "version": {
+          "const": "6.0.27"
+        },
+        "fixedSize": {
+          "const": true
+        },
+        "translationOnly": {
+          "const": true
+        },
+        "constantContour": {
+          "const": true
+        },
+        "openClosePainted": {
+          "const": true
+        },
+        "interruptionPreserved": {
+          "const": true
+        },
+        "reducedMotion": {
+          "const": true
+        },
+        "contentScrollable": {
+          "const": true
+        },
+        "backgroundStable": {
+          "const": true
+        },
+        "footerStable": {
+          "const": true
+        },
+        "stateRestored": {
+          "const": true
+        },
+        "themes": {
+          "const": [
+            "light",
+            "dark"
+          ]
+        },
+        "frames": {
+          "type": "object",
+          "required": [
+            "lightOpening",
+            "lightClosing",
+            "darkOpening",
+            "darkClosing",
+            "interrupted",
+            "reduced"
+          ],
+          "properties": {
+            "lightOpening": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "$ref": "#/$defs/noraFrame"
+              }
+            },
+            "lightClosing": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "$ref": "#/$defs/noraFrame"
+              }
+            },
+            "darkOpening": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "$ref": "#/$defs/noraFrame"
+              }
+            },
+            "darkClosing": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "$ref": "#/$defs/noraFrame"
+              }
+            },
+            "interrupted": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "$ref": "#/$defs/noraFrame"
+              }
+            },
+            "reduced": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "$ref": "#/$defs/noraFrame"
+              }
+            }
+          }
+        },
+        "geometry": {
+          "type": "object",
+          "required": [
+            "lightOpening",
+            "lightClosing",
+            "darkOpening",
+            "darkClosing",
+            "interrupted",
+            "reduced",
+            "lightControls",
+            "darkControls"
+          ],
+          "properties": {
+            "lightOpening": {
+              "$ref": "#/$defs/noraGeometry"
+            },
+            "lightClosing": {
+              "$ref": "#/$defs/noraGeometry"
+            },
+            "darkOpening": {
+              "$ref": "#/$defs/noraGeometry"
+            },
+            "darkClosing": {
+              "$ref": "#/$defs/noraGeometry"
+            },
+            "interrupted": {
+              "$ref": "#/$defs/noraGeometry"
+            },
+            "reduced": {
+              "$ref": "#/$defs/noraGeometry"
+            },
+            "lightControls": {
+              "type": "array",
+              "minItems": 3,
+              "items": {
+                "$ref": "#/$defs/noraControl"
+              },
+              "maxItems": 3
+            },
+            "darkControls": {
+              "type": "array",
+              "minItems": 3,
+              "items": {
+                "$ref": "#/$defs/noraControl"
+              },
+              "maxItems": 3
+            }
+          }
+        },
+        "captures": {
+          "type": "object",
+          "required": [
+            "light",
+            "dark"
+          ],
+          "properties": {
+            "light": {
+              "type": "object",
+              "required": [
+                "opening",
+                "open",
+                "closing"
+              ],
+              "properties": {
+                "opening": {
+                  "const": "mouse-627-panel-light-opening.png"
+                },
+                "open": {
+                  "const": "mouse-627-panel-light-open.png"
+                },
+                "closing": {
+                  "const": "mouse-627-panel-light-closing.png"
+                }
+              }
+            },
+            "dark": {
+              "type": "object",
+              "required": [
+                "opening",
+                "open",
+                "closing"
+              ],
+              "properties": {
+                "opening": {
+                  "const": "mouse-627-panel-dark-opening.png"
+                },
+                "open": {
+                  "const": "mouse-627-panel-dark-open.png"
+                },
+                "closing": {
+                  "const": "mouse-627-panel-dark-closing.png"
+                }
+              }
+            }
+          }
+        },
+        "captureStates": {
+          "type": "object",
+          "required": [
+            "light",
+            "dark"
+          ],
+          "properties": {
+            "light": {
+              "type": "object",
+              "required": [
+                "opening",
+                "open",
+                "closing"
+              ],
+              "properties": {
+                "opening": {
+                  "$ref": "#/$defs/movingCaptureState"
+                },
+                "open": {
+                  "$ref": "#/$defs/captureState"
+                },
+                "closing": {
+                  "$ref": "#/$defs/movingCaptureState"
+                }
+              }
+            },
+            "dark": {
+              "type": "object",
+              "required": [
+                "opening",
+                "open",
+                "closing"
+              ],
+              "properties": {
+                "opening": {
+                  "$ref": "#/$defs/movingCaptureState"
+                },
+                "open": {
+                  "$ref": "#/$defs/captureState"
+                },
+                "closing": {
+                  "$ref": "#/$defs/movingCaptureState"
+                }
+              }
+            }
+          }
+        },
+        "interruption": {
+          "type": "object",
+          "required": [
+            "before",
+            "after",
+            "closingFrames",
+            "open"
+          ],
+          "properties": {
+            "before": {
+              "$ref": "#/$defs/noraFrame"
+            },
+            "after": {
+              "$ref": "#/$defs/noraFrame"
+            },
+            "closingFrames": {
+              "type": "array",
+              "minItems": 2,
+              "items": {
+                "$ref": "#/$defs/noraFrame"
+              },
+              "maxItems": 2
+            },
+            "open": {
+              "const": true
+            }
+          }
+        },
+        "footer": {
+          "type": "object",
+          "required": [
+            "light",
+            "dark"
+          ],
+          "properties": {
+            "light": {
+              "type": "object",
+              "required": [
+                "before",
+                "after"
+              ],
+              "properties": {
+                "before": {
+                  "$ref": "#/$defs/footerFrame"
+                },
+                "after": {
+                  "$ref": "#/$defs/footerFrame"
+                }
+              }
+            },
+            "dark": {
+              "type": "object",
+              "required": [
+                "before",
+                "after"
+              ],
+              "properties": {
+                "before": {
+                  "$ref": "#/$defs/footerFrame"
+                },
+                "after": {
+                  "$ref": "#/$defs/footerFrame"
+                }
+              }
+            }
+          }
+        },
+        "background": {
+          "type": "object",
+          "required": [
+            "before",
+            "after",
+            "nativeBoundsCalls",
+            "resizeEvents",
+            "snapshots"
+          ],
+          "properties": {
+            "before": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "$ref": "#/$defs/backgroundPage"
+              }
+            },
+            "after": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "$ref": "#/$defs/backgroundPage"
+              }
+            },
+            "nativeBoundsCalls": {
+              "const": 0
+            },
+            "resizeEvents": {
+              "const": 0
+            },
+            "snapshots": {
+              "type": "array",
+              "minItems": 2,
+              "items": {
+                "type": "object",
+                "required": [
+                  "theme",
+                  "images"
+                ],
+                "properties": {
+                  "theme": {
+                    "enum": [
+                      "light",
+                      "dark"
+                    ]
+                  },
+                  "images": {
+                    "type": "array",
+                    "minItems": 1,
+                    "items": {
+                      "$ref": "#/$defs/backgroundImage"
+                    }
+                  }
+                }
+              },
+              "maxItems": 2
+            }
+          }
+        }
+      }
+    },
+    "mouse-627-desktop-transition.json": {
+      "type": "object",
+      "required": [
+        "version",
+        "simultaneous",
+        "pngSurfaces",
+        "compositorOnly",
+        "nativeIdentityPreserved",
+        "viewportAndScrollPreserved",
+        "slowAckBounded",
+        "restored",
+        "transitions"
+      ],
+      "properties": {
+        "version": {
+          "const": "6.0.27"
+        },
+        "simultaneous": {
+          "const": true
+        },
+        "pngSurfaces": {
+          "const": true
+        },
+        "compositorOnly": {
+          "const": true
+        },
+        "nativeIdentityPreserved": {
+          "const": true
+        },
+        "viewportAndScrollPreserved": {
+          "const": true
+        },
+        "slowAckBounded": {
+          "const": true
+        },
+        "restored": {
+          "const": true
+        },
+        "transitions": {
+          "type": "array",
+          "minItems": 4,
+          "items": {
+            "$ref": "#/$defs/desktopTransition"
+          },
+          "maxItems": 4
+        }
+      }
+    },
+    "mouse-623-verification.json": {
+      "type": "object",
+      "required": [
+        "version",
+        "fixedTopCurves",
+        "outlineMatchesFooter",
+        "fixedViewport",
+        "scrollableContent",
+        "footerStationary",
+        "supersededOldGeometry",
+        "geometryVersion",
+        "themes",
+        "states",
+        "frames",
+        "tabLifecycle",
+        "agentEntry"
+      ],
+      "properties": {
+        "version": {
+          "const": "6.0.23"
+        },
+        "fixedTopCurves": {
+          "const": true
+        },
+        "outlineMatchesFooter": {
+          "const": true
+        },
+        "fixedViewport": {
+          "const": true
+        },
+        "scrollableContent": {
+          "const": true
+        },
+        "footerStationary": {
+          "const": true
+        },
+        "supersededOldGeometry": {
+          "const": true
+        },
+        "geometryVersion": {
+          "const": "6.0.27"
+        },
+        "themes": {
+          "const": [
+            "light",
+            "dark"
+          ]
+        },
+        "states": {
+          "const": [
+            "compact",
+            "modes",
+            "preview"
+          ]
+        },
+        "frames": {
+          "type": "array",
+          "minItems": 6,
+          "items": {
+            "type": "object",
+            "required": [
+              "theme",
+              "state"
+            ],
+            "properties": {
+              "theme": {
+                "enum": [
+                  "light",
+                  "dark"
+                ]
+              },
+              "state": {
+                "enum": [
+                  "compact",
+                  "modes",
+                  "preview"
+                ]
+              }
+            }
+          },
+          "maxItems": 6
+        },
+        "tabLifecycle": {
+          "type": "object",
+          "required": [
+            "closedPageDestroyed",
+            "closedCountRemoved",
+            "metadataNodesStable",
+            "chipReorder",
+            "chipTransfer",
+            "faviconsPainted",
+            "pageIdentityPreserved"
+          ],
+          "properties": {
+            "closedPageDestroyed": {
+              "const": true
+            },
+            "closedCountRemoved": {
+              "const": true
+            },
+            "metadataNodesStable": {
+              "const": true
+            },
+            "chipReorder": {
+              "const": true
+            },
+            "chipTransfer": {
+              "const": true
+            },
+            "faviconsPainted": {
+              "const": true
+            },
+            "pageIdentityPreserved": {
+              "const": true
+            }
+          }
+        },
+        "agentEntry": {
+          "type": "object",
+          "required": [
+            "startService",
+            "aiPreset",
+            "aiSelect",
+            "disabledUntilEnabled",
+            "mascotLoaded",
+            "color"
+          ],
+          "properties": {
+            "startService": {
+              "const": true
+            },
+            "aiPreset": {
+              "const": true
+            },
+            "aiSelect": {
+              "const": true
+            },
+            "disabledUntilEnabled": {
+              "const": true
+            },
+            "mascotLoaded": {
+              "const": true
+            },
+            "color": {
+              "enum": [
+                "orange",
+                "cyan",
+                "green",
+                "violet",
+                "coral"
+              ]
+            }
+          }
+        }
+      },
+      "not": {
+        "required": [
+          "seamFree"
+        ]
+      }
+    },
+    "mouse-626-verification.json": {
+      "type": "object",
+      "required": [
+        "version",
+        "stateRestored",
+        "palette",
+        "supersededForNora"
+      ],
+      "properties": {
+        "version": {
+          "const": "6.0.26"
+        },
+        "stateRestored": {
+          "const": true
+        },
+        "palette": {
+          "type": "object",
+          "required": [
+            "arbitraryHex",
+            "arbitraryRGB",
+            "fieldSelection",
+            "annotationApplied",
+            "exportPreserved"
+          ],
+          "properties": {
+            "arbitraryHex": {
+              "const": true
+            },
+            "arbitraryRGB": {
+              "const": true
+            },
+            "fieldSelection": {
+              "const": true
+            },
+            "annotationApplied": {
+              "const": true
+            },
+            "exportPreserved": {
+              "const": true
+            }
+          }
+        },
+        "supersededForNora": {
+          "const": {
+            "version": "6.0.27",
+            "proof": "mouse-627-motion.json",
+            "reason": "Fixed-size compositor slide replaces the former contour morph"
+          }
+        }
+      },
+      "not": {
+        "required": [
+          "nora"
+        ]
+      }
+    },
+    "mouse-627-motion-trace.json": {
+      "type": "object",
+      "required": [
+        "traceEvents",
+        "mouseMotionTrace"
+      ],
+      "properties": {
+        "traceEvents": {
+          "type": "array",
+          "minItems": 1
+        },
+        "mouseMotionTrace": {
+          "type": "object",
+          "required": [
+            "schemaVersion",
+            "source",
+            "complete",
+            "reason",
+            "eventCount",
+            "dataLossOccurred",
+            "errors",
+            "limitedEvents"
+          ],
+          "properties": {
+            "schemaVersion": {
+              "const": 1
+            },
+            "source": {
+              "const": "Chromium CDP Tracing"
+            },
+            "complete": {
+              "const": true
+            },
+            "reason": {
+              "const": "motion-complete"
+            },
+            "eventCount": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "dataLossOccurred": {
+              "const": false
+            },
+            "errors": {
+              "type": "array",
+              "maxItems": 0
+            },
+            "limitedEvents": {
+              "const": 0
+            }
+          }
+        }
+      },
+      "$comment": "tools/mouse627-motion-trace.py additionally requires all three fresh closing generations, their paired Blink animations and a unique temporally correlated pair of compositor models with ordered matching lifetimes and no paired rejection. Missing or ambiguous evidence fails. The saved trace contains no direct DOM-to-KeyframeModel identity link; accepted reports explicitly retain directIdentityLink=false and attribution=temporal-correlation."
+    }
+  },
+  "$defs": {
+    "rectangle": {
+      "type": "object",
+      "required": [
+        "x",
+        "y",
+        "width",
+        "height"
+      ],
+      "properties": {
+        "x": {
+          "type": "number"
+        },
+        "y": {
+          "type": "number"
+        },
+        "width": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "height": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        }
+      }
+    },
+    "measurement": {
+      "type": "object",
+      "required": [
+        "label",
+        "stateBuilds",
+        "stateBuildMs",
+        "layoutCalls",
+        "elapsedMs",
+        "frames",
+        "mainMemoryBefore",
+        "mainMemoryAfter"
+      ],
+      "properties": {
+        "label": {
+          "enum": [
+            "controlled-immediate",
+            "controlled-batched",
+            "unchanged-metadata",
+            "renderer-immediate",
+            "renderer-batched"
+          ]
+        },
+        "stateBuilds": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "stateBuildMs": {
+          "type": "number",
+          "minimum": 0
+        },
+        "layoutCalls": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "elapsedMs": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "frames": {
+          "type": "object",
+          "required": [
+            "count",
+            "p95Ms",
+            "maxMs"
+          ],
+          "properties": {
+            "count": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "p95Ms": {
+              "type": "number",
+              "minimum": 0
+            },
+            "maxMs": {
+              "type": "number",
+              "minimum": 0
+            }
+          }
+        },
+        "mainMemoryBefore": {
+          "$ref": "#/$defs/memory"
+        },
+        "mainMemoryAfter": {
+          "$ref": "#/$defs/memory"
+        }
+      }
+    },
+    "memory": {
+      "type": "object",
+      "required": [
+        "rss",
+        "heapTotal",
+        "heapUsed",
+        "external",
+        "arrayBuffers"
+      ],
+      "properties": {
+        "rss": {
+          "type": "number",
+          "minimum": 0
+        },
+        "heapTotal": {
+          "type": "number",
+          "minimum": 0
+        },
+        "heapUsed": {
+          "type": "number",
+          "minimum": 0
+        },
+        "external": {
+          "type": "number",
+          "minimum": 0
+        },
+        "arrayBuffers": {
+          "type": "number",
+          "minimum": 0
+        }
+      }
+    },
+    "nativeRectangle": {
+      "type": "object",
+      "required": [
+        "x",
+        "y",
+        "width",
+        "height"
+      ],
+      "properties": {
+        "x": {
+          "type": "number"
+        },
+        "y": {
+          "type": "number"
+        },
+        "width": {
+          "type": "number",
+          "minimum": 0
+        },
+        "height": {
+          "type": "number",
+          "minimum": 0
+        }
+      }
+    },
+    "paths": {
+      "type": "object",
+      "required": [
+        "outline",
+        "fill"
+      ],
+      "properties": {
+        "outline": {
+          "type": "string",
+          "minLength": 1
+        },
+        "fill": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "noraFrame": {
+      "type": "object",
+      "required": [
+        "time",
+        "phase",
+        "progress",
+        "open",
+        "hidden",
+        "height",
+        "targetHeight",
+        "width",
+        "left",
+        "baseline",
+        "inert",
+        "opacity",
+        "font",
+        "measurements",
+        "geometryWrites",
+        "paths",
+        "matrix"
+      ],
+      "properties": {
+        "time": {
+          "type": "number",
+          "minimum": 0
+        },
+        "phase": {
+          "enum": [
+            "opening",
+            "open",
+            "closing",
+            "closed"
+          ]
+        },
+        "progress": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "open": {
+          "type": "boolean"
+        },
+        "hidden": {
+          "type": "boolean"
+        },
+        "height": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "targetHeight": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "width": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "left": {
+          "type": "number"
+        },
+        "baseline": {
+          "type": "number"
+        },
+        "inert": {
+          "type": "boolean"
+        },
+        "opacity": {
+          "const": 1
+        },
+        "font": {
+          "type": "string",
+          "minLength": 1
+        },
+        "measurements": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "geometryWrites": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "paths": {
+          "type": "object",
+          "required": [
+            "outline",
+            "fill",
+            "viewBox"
+          ],
+          "properties": {
+            "outline": {
+              "type": "string",
+              "minLength": 1
+            },
+            "fill": {
+              "type": "string",
+              "minLength": 1
+            },
+            "viewBox": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "matrix": {
+          "type": "object",
+          "required": [
+            "a",
+            "b",
+            "c",
+            "d",
+            "e",
+            "f"
+          ],
+          "properties": {
+            "a": {
+              "type": "number"
+            },
+            "b": {
+              "type": "number"
+            },
+            "c": {
+              "type": "number"
+            },
+            "d": {
+              "type": "number"
+            },
+            "e": {
+              "type": "number"
+            },
+            "f": {
+              "type": "number"
+            }
+          }
+        }
+      }
+    },
+    "noraGeometry": {
+      "type": "object",
+      "required": [
+        "initial",
+        "sizes",
+        "mutations"
+      ],
+      "properties": {
+        "initial": {
+          "type": "object",
+          "required": [
+            "tray",
+            "panel",
+            "content",
+            "button"
+          ],
+          "properties": {
+            "tray": {
+              "type": "object",
+              "required": [
+                "width",
+                "height"
+              ],
+              "properties": {
+                "width": {
+                  "type": "number",
+                  "exclusiveMinimum": 0
+                },
+                "height": {
+                  "type": "number",
+                  "exclusiveMinimum": 0
+                }
+              }
+            },
+            "panel": {
+              "type": "object",
+              "required": [
+                "width",
+                "height"
+              ],
+              "properties": {
+                "width": {
+                  "type": "number",
+                  "exclusiveMinimum": 0
+                },
+                "height": {
+                  "type": "number",
+                  "exclusiveMinimum": 0
+                }
+              }
+            },
+            "content": {
+              "type": "object",
+              "required": [
+                "width",
+                "height"
+              ],
+              "properties": {
+                "width": {
+                  "type": "number",
+                  "exclusiveMinimum": 0
+                },
+                "height": {
+                  "type": "number",
+                  "exclusiveMinimum": 0
+                }
+              }
+            },
+            "button": {
+              "type": "object",
+              "required": [
+                "width",
+                "height"
+              ],
+              "properties": {
+                "width": {
+                  "type": "number",
+                  "exclusiveMinimum": 0
+                },
+                "height": {
+                  "type": "number",
+                  "exclusiveMinimum": 0
+                }
+              }
+            }
+          }
+        },
+        "sizes": {
+          "type": "array",
+          "minItems": 0,
+          "items": {
+            "type": "object",
+            "required": [
+              "target",
+              "width",
+              "height"
+            ],
+            "properties": {
+              "target": {
+                "enum": [
+                  "tray",
+                  "panel",
+                  "content",
+                  "button"
+                ]
+              },
+              "width": {
+                "type": "number",
+                "minimum": 0
+              },
+              "height": {
+                "type": "number",
+                "minimum": 0
+              }
+            }
+          }
+        },
+        "mutations": {
+          "type": "array",
+          "minItems": 0,
+          "items": {
+            "type": "object"
+          }
+        }
+      }
+    },
+    "noraControl": {
+      "type": "object",
+      "required": [
+        "name",
+        "height",
+        "width",
+        "paths",
+        "geometryWrites",
+        "scrollTop",
+        "scrollHeight",
+        "clientHeight",
+        "overflow",
+        "accessible",
+        "visibleHeight"
+      ],
+      "properties": {
+        "name": {
+          "enum": [
+            "preview",
+            "modes",
+            "history"
+          ]
+        },
+        "height": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "width": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "paths": {
+          "$ref": "#/$defs/paths"
+        },
+        "geometryWrites": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "scrollTop": {
+          "type": "number",
+          "minimum": 0
+        },
+        "scrollHeight": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "clientHeight": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "overflow": {
+          "const": "auto"
+        },
+        "accessible": {
+          "const": true
+        },
+        "visibleHeight": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        }
+      }
+    },
+    "captureState": {
+      "type": "object",
+      "required": [
+        "before"
+      ],
+      "properties": {
+        "before": {
+          "$ref": "#/$defs/noraFrame"
+        },
+        "after": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/noraFrame"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "footerFrame": {
+      "type": "object",
+      "required": [
+        "x",
+        "y",
+        "width",
+        "height",
+        "pixels"
+      ],
+      "properties": {
+        "x": {
+          "type": "number"
+        },
+        "y": {
+          "type": "number"
+        },
+        "width": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "height": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "pixels": {
+          "type": "array",
+          "minItems": 4,
+          "items": {
+            "type": "object",
+            "required": [
+              "x",
+              "y",
+              "rgb"
+            ],
+            "properties": {
+              "x": {
+                "type": "number"
+              },
+              "y": {
+                "type": "number"
+              },
+              "rgb": {
+                "type": "array",
+                "minItems": 3,
+                "items": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 255
+                },
+                "maxItems": 3
+              }
+            }
+          },
+          "maxItems": 4
+        }
+      }
+    },
+    "backgroundPage": {
+      "type": "object",
+      "required": [
+        "id",
+        "webContentsId",
+        "url",
+        "width",
+        "height",
+        "scrollX",
+        "scrollY",
+        "epoch",
+        "bounds",
+        "clip",
+        "surfaceBounds",
+        "visible",
+        "timeOrigin",
+        "resizeEvents"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "webContentsId": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "url": {
+          "type": "string"
+        },
+        "width": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "height": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "scrollX": {
+          "type": "number"
+        },
+        "scrollY": {
+          "type": "number"
+        },
+        "epoch": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "bounds": {
+          "$ref": "#/$defs/nativeRectangle"
+        },
+        "clip": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/nativeRectangle"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "surfaceBounds": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/nativeRectangle"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "visible": {
+          "type": "boolean"
+        },
+        "timeOrigin": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "resizeEvents": {
+          "type": "array",
+          "minItems": 0,
+          "items": {},
+          "maxItems": 0
+        }
+      }
+    },
+    "backgroundImage": {
+      "type": "object",
+      "required": [
+        "id",
+        "complete",
+        "png",
+        "naturalWidth",
+        "naturalHeight",
+        "bounds",
+        "transform"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "complete": {
+          "const": true
+        },
+        "png": {
+          "const": true
+        },
+        "naturalWidth": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "naturalHeight": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "bounds": {
+          "$ref": "#/$defs/rectangle"
+        },
+        "transform": {
+          "const": "none"
+        }
+      }
+    },
+    "desktopPage": {
+      "type": "object",
+      "required": [
+        "id",
+        "webContentsId",
+        "url",
+        "width",
+        "height",
+        "scrollX",
+        "scrollY",
+        "navigationEpoch",
+        "marker"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "webContentsId": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "url": {
+          "type": "string"
+        },
+        "width": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "height": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "scrollX": {
+          "type": "number"
+        },
+        "scrollY": {
+          "type": "number"
+        },
+        "navigationEpoch": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "marker": {
+          "type": [
+            "number",
+            "string"
+          ]
+        }
+      }
+    },
+    "desktopFrame": {
+      "type": "object",
+      "required": [
+        "at",
+        "outgoingX",
+        "incomingX",
+        "width"
+      ],
+      "properties": {
+        "at": {
+          "type": "number",
+          "minimum": 0
+        },
+        "outgoingX": {
+          "type": "number"
+        },
+        "incomingX": {
+          "type": "number"
+        },
+        "width": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        }
+      }
+    },
+    "desktopImage": {
+      "type": "object",
+      "required": [
+        "id",
+        "frame",
+        "png",
+        "decoded",
+        "pixelWidth",
+        "pixelHeight",
+        "width",
+        "height"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "frame": {
+          "enum": [
+            "outgoing",
+            "incoming"
+          ]
+        },
+        "png": {
+          "const": true
+        },
+        "decoded": {
+          "const": true
+        },
+        "pixelWidth": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "pixelHeight": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "width": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "height": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        }
+      }
+    },
+    "desktopCapture": {
+      "type": "object",
+      "required": [
+        "prepared",
+        "complete",
+        "ids",
+        "rows"
+      ],
+      "properties": {
+        "prepared": {
+          "type": "boolean"
+        },
+        "complete": {
+          "const": true
+        },
+        "ids": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "rows": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "id",
+              "pixelWidth",
+              "pixelHeight",
+              "width",
+              "height",
+              "epoch",
+              "webContentsId",
+              "sample"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "pixelWidth": {
+                "type": "number",
+                "exclusiveMinimum": 0
+              },
+              "pixelHeight": {
+                "type": "number",
+                "exclusiveMinimum": 0
+              },
+              "width": {
+                "type": "number",
+                "exclusiveMinimum": 0
+              },
+              "height": {
+                "type": "number",
+                "exclusiveMinimum": 0
+              },
+              "epoch": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "webContentsId": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "sample": {
+                "$ref": "#/$defs/desktopPixelSample"
+              }
+            }
+          },
+          "maxItems": 1
+        }
+      }
+    },
+    "desktopTransition": {
+      "type": "object",
+      "required": [
+        "theme",
+        "direction",
+        "ackDelayMs",
+        "nativeLayoutCalls",
+        "animationDurationMs",
+        "totalDurationMs",
+        "frames",
+        "pageBefore",
+        "pageAfter",
+        "snapshots",
+        "allSnapshots",
+        "captures"
+      ],
+      "properties": {
+        "theme": {
+          "enum": [
+            "light",
+            "dark"
+          ]
+        },
+        "direction": {
+          "enum": [
+            -1,
+            1
+          ]
+        },
+        "ackDelayMs": {
+          "enum": [
+            0,
+            250
+          ]
+        },
+        "nativeLayoutCalls": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 8
+        },
+        "animationDurationMs": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "maximum": 910
+        },
+        "totalDurationMs": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "frames": {
+          "type": "array",
+          "minItems": 3,
+          "items": {
+            "$ref": "#/$defs/desktopFrame"
+          }
+        },
+        "pageBefore": {
+          "type": "array",
+          "minItems": 2,
+          "items": {
+            "$ref": "#/$defs/desktopPage"
+          },
+          "maxItems": 2
+        },
+        "pageAfter": {
+          "type": "array",
+          "minItems": 2,
+          "items": {
+            "$ref": "#/$defs/desktopPage"
+          },
+          "maxItems": 2
+        },
+        "snapshots": {
+          "type": "array",
+          "minItems": 2,
+          "items": {
+            "$ref": "#/$defs/desktopImage"
+          },
+          "maxItems": 2
+        },
+        "allSnapshots": {
+          "type": "array",
+          "minItems": 2,
+          "items": {
+            "$ref": "#/$defs/desktopImage"
+          }
+        },
+        "captures": {
+          "type": "array",
+          "minItems": 2,
+          "items": {
+            "$ref": "#/$defs/desktopCapture"
+          },
+          "maxItems": 2
+        },
+        "paintedFrame": {
+          "$ref": "#/$defs/desktopPresentation"
+        }
+      },
+      "$comment": "Python validator requires four unique theme/direction pairs, exactly one250ms acknowledgement, animationDurationMs<=660+ackDelayMs, unchanged two tracked page pins and full frame membership matching captures[].ids, including all pre-existing native pages. Both forward transitions also require framebuffer PNG proof of simultaneous fixture surfaces; the reverse transitions retain full identity/layout/RAF acceptance.",
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "direction": {
+                "const": 1
+              }
+            },
+            "required": [
+              "direction"
+            ]
+          },
+          "then": {
+            "required": [
+              "paintedFrame"
+            ]
+          }
+        }
+      ]
+    },
+    "desktopPixelSample": {
+      "type": "object",
+      "required": [
+        "x",
+        "y",
+        "pixelX",
+        "pixelY",
+        "viewportWidth",
+        "viewportHeight",
+        "rgba",
+        "domTag",
+        "background"
+      ],
+      "properties": {
+        "x": {
+          "type": "number",
+          "minimum": 0
+        },
+        "y": {
+          "type": "number",
+          "minimum": 0
+        },
+        "pixelX": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "pixelY": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "viewportWidth": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "viewportHeight": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "rgba": {
+          "type": "array",
+          "minItems": 4,
+          "maxItems": 4,
+          "prefixItems": [
+            {
+              "type": "integer",
+              "minimum": 238,
+              "maximum": 242
+            },
+            {
+              "type": "integer",
+              "minimum": 238,
+              "maximum": 242
+            },
+            {
+              "type": "integer",
+              "minimum": 238,
+              "maximum": 242
+            },
+            {
+              "const": 255
+            }
+          ],
+          "items": false
+        },
+        "domTag": {
+          "const": "BODY"
+        },
+        "background": {
+          "const": "rgb(240, 240, 240)"
+        }
+      }
+    },
+    "rgba": {
+      "type": "array",
+      "items": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 255
+      },
+      "minItems": 4,
+      "maxItems": 4
+    },
+    "rgb": {
+      "type": "array",
+      "items": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 255
+      },
+      "minItems": 3,
+      "maxItems": 3
+    },
+    "positiveViewport": {
+      "type": "object",
+      "required": [
+        "width",
+        "height"
+      ],
+      "properties": {
+        "width": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "height": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        }
+      }
+    },
+    "presentationPixels": {
+      "type": "object",
+      "required": [
+        "width",
+        "height"
+      ],
+      "properties": {
+        "width": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 8192
+        },
+        "height": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 8192
+        }
+      }
+    },
+    "presentedFrame": {
+      "type": "object",
+      "required": [
+        "source",
+        "sequence",
+        "elapsedMs",
+        "dirtyRect",
+        "scaleFactor",
+        "pixelSize",
+        "metadata"
+      ],
+      "properties": {
+        "source": {
+          "const": "beginFrameSubscription"
+        },
+        "sequence": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "elapsedMs": {
+          "type": "number",
+          "minimum": 0
+        },
+        "dirtyRect": {
+          "$ref": "#/$defs/nativeRectangle"
+        },
+        "scaleFactor": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "pixelSize": {
+          "$ref": "#/$defs/presentationPixels"
+        },
+        "metadata": {
+          "type": "object"
+        }
+      }
+    },
+    "noraPresentation": {
+      "type": "object",
+      "required": [
+        "source",
+        "sequence",
+        "elapsedMs",
+        "dirtyRect",
+        "scaleFactor",
+        "pixelSize",
+        "metadata"
+      ],
+      "properties": {
+        "source": {
+          "const": "beginFrameSubscription"
+        },
+        "sequence": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "elapsedMs": {
+          "type": "number",
+          "minimum": 0
+        },
+        "dirtyRect": {
+          "$ref": "#/$defs/nativeRectangle"
+        },
+        "scaleFactor": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "pixelSize": {
+          "$ref": "#/$defs/presentationPixels"
+        },
+        "metadata": {
+          "type": "object",
+          "required": [
+            "theme",
+            "state",
+            "geometry",
+            "top",
+            "translateY",
+            "progress",
+            "probes"
+          ],
+          "properties": {
+            "theme": {
+              "enum": [
+                "light",
+                "dark"
+              ]
+            },
+            "state": {
+              "enum": [
+                "opening",
+                "closing"
+              ]
+            },
+            "geometry": {
+              "type": "object",
+              "required": [
+                "viewport",
+                "width",
+                "height",
+                "left",
+                "baseline",
+                "fill",
+                "line",
+                "before"
+              ],
+              "properties": {
+                "viewport": {
+                  "$ref": "#/$defs/positiveViewport"
+                },
+                "width": {
+                  "type": "number",
+                  "exclusiveMinimum": 0
+                },
+                "height": {
+                  "type": "number",
+                  "exclusiveMinimum": 0
+                },
+                "left": {
+                  "type": "number"
+                },
+                "baseline": {
+                  "type": "number"
+                },
+                "fill": {
+                  "$ref": "#/$defs/rgb"
+                },
+                "line": {
+                  "$ref": "#/$defs/rgb"
+                },
+                "before": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/$defs/noraFrame"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
+              }
+            },
+            "top": {
+              "type": "number"
+            },
+            "translateY": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            },
+            "progress": {
+              "type": "number",
+              "exclusiveMinimum": 0,
+              "exclusiveMaximum": 1
+            },
+            "probes": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": [
+                  "x",
+                  "y",
+                  "above",
+                  "edge",
+                  "inside",
+                  "lower"
+                ],
+                "properties": {
+                  "x": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "y": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "above": {
+                    "$ref": "#/$defs/rgba"
+                  },
+                  "edge": {
+                    "$ref": "#/$defs/rgba"
+                  },
+                  "inside": {
+                    "$ref": "#/$defs/rgba"
+                  },
+                  "lower": {
+                    "$ref": "#/$defs/rgba"
+                  }
+                }
+              },
+              "minItems": 3,
+              "maxItems": 3
+            }
+          }
+        }
+      },
+      "$comment": "The Python validator independently decodes the exact saved RGB/RGBA PNG, matches every recorded sample and requires a three-column outline/fill boundary at an intermediate vertical translation. Logical DOM samples alone cannot establish the captured frame."
+    },
+    "movingCaptureState": {
+      "type": "object",
+      "required": [
+        "before",
+        "painted"
+      ],
+      "properties": {
+        "before": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/noraFrame"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "after": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/noraFrame"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "painted": {
+          "$ref": "#/$defs/noraPresentation"
+        }
+      }
+    },
+    "desktopPresentation": {
+      "type": "object",
+      "required": [
+        "source",
+        "sequence",
+        "elapsedMs",
+        "dirtyRect",
+        "scaleFactor",
+        "pixelSize",
+        "metadata",
+        "filename"
+      ],
+      "properties": {
+        "source": {
+          "const": "beginFrameSubscription"
+        },
+        "sequence": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "elapsedMs": {
+          "type": "number",
+          "minimum": 0
+        },
+        "dirtyRect": {
+          "$ref": "#/$defs/nativeRectangle"
+        },
+        "scaleFactor": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "pixelSize": {
+          "$ref": "#/$defs/presentationPixels"
+        },
+        "metadata": {
+          "type": "object",
+          "required": [
+            "bothDesktopsPainted",
+            "colors",
+            "counts",
+            "minimum",
+            "rows",
+            "viewport",
+            "pixelSize",
+            "scaleFactor"
+          ],
+          "properties": {
+            "bothDesktopsPainted": {
+              "const": true
+            },
+            "colors": {
+              "const": [
+                [
+                  199,
+                  37,
+                  77
+                ],
+                [
+                  29,
+                  125,
+                  220
+                ]
+              ]
+            },
+            "counts": {
+              "type": "array",
+              "items": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "minItems": 2,
+              "maxItems": 2
+            },
+            "minimum": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "rows": {
+              "type": "array",
+              "items": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "minItems": 1
+            },
+            "viewport": {
+              "type": "object",
+              "required": [
+                "width",
+                "height",
+                "rows"
+              ],
+              "properties": {
+                "width": {
+                  "type": "number",
+                  "exclusiveMinimum": 0
+                },
+                "height": {
+                  "type": "number",
+                  "exclusiveMinimum": 0
+                },
+                "rows": {
+                  "type": "array",
+                  "items": {
+                    "type": "number"
+                  },
+                  "minItems": 2,
+                  "maxItems": 2
+                }
+              }
+            },
+            "pixelSize": {
+              "$ref": "#/$defs/presentationPixels"
+            },
+            "scaleFactor": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            }
+          }
+        },
+        "filename": {
+          "enum": [
+            "mouse-627-desktop-transition-light.png",
+            "mouse-627-desktop-transition-dark.png"
+          ]
+        }
+      },
+      "$comment": "The Python validator recomputes both band counts from the archived PNG at the exact recorded viewport rows and requires >=ceil(16*pixelWidth/viewportWidth) opaque pixels of each fixture colour."
+    },
+    "pdfPresentation": {
+      "type": "object",
+      "required": [
+        "source",
+        "sequence",
+        "elapsedMs",
+        "dirtyRect",
+        "scaleFactor",
+        "pixelSize",
+        "metadata",
+        "filename"
+      ],
+      "properties": {
+        "source": {
+          "const": "beginFrameSubscription"
+        },
+        "sequence": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "elapsedMs": {
+          "type": "number",
+          "minimum": 0
+        },
+        "dirtyRect": {
+          "$ref": "#/$defs/nativeRectangle"
+        },
+        "scaleFactor": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "pixelSize": {
+          "$ref": "#/$defs/presentationPixels"
+        },
+        "metadata": {
+          "type": "object",
+          "required": [
+            "text",
+            "mode",
+            "viewport",
+            "beforeStyle",
+            "minimum",
+            "samples"
+          ],
+          "properties": {
+            "text": {
+              "const": "Mouse627 исправлен"
+            },
+            "mode": {
+              "const": "edit"
+            },
+            "viewport": {
+              "$ref": "#/$defs/positiveViewport"
+            },
+            "beforeStyle": {
+              "type": "object",
+              "required": [
+                "backdropFilter",
+                "webkitBackdropFilter",
+                "appearance"
+              ],
+              "properties": {
+                "backdropFilter": {
+                  "const": "none"
+                },
+                "webkitBackdropFilter": {
+                  "enum": [
+                    "",
+                    "none"
+                  ]
+                },
+                "appearance": {
+                  "const": "none"
+                },
+                "background": {
+                  "type": "string"
+                }
+              }
+            },
+            "minimum": {
+              "const": 12
+            },
+            "samples": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": [
+                  "x",
+                  "y",
+                  "sourceRGBA",
+                  "pixelX",
+                  "pixelY",
+                  "rgba",
+                  "dark"
+                ],
+                "properties": {
+                  "x": {
+                    "type": "number",
+                    "minimum": 0
+                  },
+                  "y": {
+                    "type": "number",
+                    "minimum": 0
+                  },
+                  "sourceRGBA": {
+                    "$ref": "#/$defs/rgba"
+                  },
+                  "pixelX": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "pixelY": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "rgba": {
+                    "$ref": "#/$defs/rgba"
+                  },
+                  "dark": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 90
+                  }
+                }
+              },
+              "minItems": 12,
+              "maxItems": 12
+            }
+          }
+        },
+        "filename": {
+          "const": "mouse-627-pdf-existing-text.png"
+        }
+      },
+      "$comment": "The Python validator requires twelve separated dark source-canvas glyph points, matched in the actual edit-mode framebuffer within the recorded Retina-scaled pixel neighbourhood. It verifies those opaque dark pixels in the exact archived PNG; an overlay-blurred or blank page fails."
+    }
+  },
+  "x-requiredPngFiles": [
+    "mouse-627-window-light.png",
+    "mouse-627-window-dark.png",
+    "mouse-627-document-tabs.png",
+    "mouse-627-pdf-existing-text.png",
+    "mouse-627-performance.png",
+    "mouse-627-panel-light-opening.png",
+    "mouse-627-panel-light-open.png",
+    "mouse-627-panel-light-closing.png",
+    "mouse-627-panel-dark-opening.png",
+    "mouse-627-panel-dark-open.png",
+    "mouse-627-panel-dark-closing.png",
+    "mouse-627-desktop-transition-light.png",
+    "mouse-627-desktop-transition-dark.png",
+    "mouse-626-palette.png"
+  ],
+  "x-requiredNativeMarkers": [
+    "MOUSE_627_NATIVE_WINDOW_FOOTER_DRAG_PASS",
+    "MOUSE_627_DOCUMENT_TABS_NATIVE_PASS",
+    "MOUSE_627_PDF_EXISTING_TEXT_NATIVE_PASS",
+    "MOUSE_627_NATIVE_METADATA_WORKLOAD_PRESERVES_LIVE_PAGES_PASS",
+    "MOUSE_627_FIXED_PANEL_SLIDE_NATIVE_PASS",
+    "MOUSE_627_BURROW_FIXED_VIEWPORT_CONTROLS_PASS",
+    "MOUSE_627_COMPOSITOR_DESKTOP_SLIDE_NATIVE_PASS",
+    "MOUSE_626_CAPTURE_ANY_COLOR_PASS"
+  ],
+  "x-supersededFeatureTokens": [
+    "burrow-fixed-top-curves-three-heights",
+    "burrow-footer-seam-free-both-themes",
+    "burrow-liquid-footer-continuous-morph",
+    "burrow-reversible-reduced-motion",
+    "burrow-seam-one-pixel-join",
+    "burrow-symmetric-layout"
+  ],
+  "x-motionTraceGate": {
+    "validator": "tools/mouse627-motion-trace.py",
+    "algorithm": "mouse627-motion-trace-evidence-v1",
+    "maxTraceBytes": 75497472,
+    "inputFiles": [
+      "mouse-627-motion-trace.json",
+      "mouse-627-motion.json"
+    ],
+    "derivedReports": [
+      "mouse-627-source-motion-trace-report.json",
+      "mouse-627-motion-trace-report.json"
+    ],
+    "directIdentityLink": false,
+    "attribution": "temporal-correlation",
+    "savedReportAcceptedAsInput": false,
+    "acceptanceScope": "unique-compositor-starts-and-dom-completion",
+    "continuousCompositorLifetimeProven": false,
+    "missingTerminalPolicy": "Missing both async END and impl terminal may remain unobserved only after unique main/impl startup, matching DOM completion, controller release with null players and subsequent compositor/frame coverage. Contradictory partial terminal evidence, active abort, ambiguous origins and early pointer reuse are rejected. Removal and continuous compositor lifetime are not inferred."
+  }
+}
