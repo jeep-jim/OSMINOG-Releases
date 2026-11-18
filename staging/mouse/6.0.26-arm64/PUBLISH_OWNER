@@ -1,0 +1,46 @@
+READY_TO_PUBLISH_MOUSE_626
+
+Mouse Browser6.0.26: source acceptance complete; release publication pending.
+Requested work: continuous Nora growth from the lower bar, symmetric layout,
+and arbitrary screenshot annotation colors through field, hue and exact HEX.
+
+Accepted source: c73aa58069bebdb5e0020dbb72257ac7af5f0a5a
+Source PR: https://github.com/jeep-jim/OSMINOG/pull/161
+Source merge: 0baf7209249bffcf797aa59fbdb23911471b54ee
+Native run: https://github.com/jeep-jim/OSMINOG/actions/runs/44266076560
+Native job134670809060: SUCCESS. All seven companion workflows: SUCCESS.
+
+Candidate artifact14411320640; archive SHA-256:
+bada0703dd0543d3713b0a83736b7cce2b2a0180b8e0adbbf2303e87ecbbb0fa
+Verification artifact14411455245; archive SHA-256:
+c3c951a881f701ca27f0ea79e7cfe1b63da712c7f00e41bbd3d68fe3e66bc7f1
+
+Mouse-Browser-6.0.26-mac-arm64.dmg: 133820376 bytes;
+SHA-256 4900336116e19fb11cdf61584d6d7e1d81a6945abb13a2100149feec39f2a144
+Mouse-Browser-6.0.26-mac-arm64.zip: 134157271 bytes;
+SHA-256 072a99cd4282c695b69e0be03d5c306f1b3ba07f637b1214fa8c133527cf9531
+
+Installed source evidence:
+MOUSE_626_BURROW_LIQUID_SYMMETRY_PASS
+MOUSE_626_CAPTURE_ANY_COLOR_PASS
+MOUSE_626_REAL_625_TO_626_REPLACE_RELAUNCH_PROFILE_PASS
+Both themes, continuous opening/closing and connected footer, symmetry,
+interruption, resize, reduced motion, revealed content and real controls passed.
+Arbitrary colors, HEX and color-field selection, annotation application and
+exported PNG colors passed. Final light/dark Nora and palette PNGs inspected.
+Retained621-625 functionality, private cleanup and profile restart passed.
+Actual625-to-626 replacement passed: READY text6.0.26, six bytes, receipt removed,
+installed6.0.26, retained previous6.0.25, signatures and profile checks passed.
+
+Previous625 pins remain unchanged: source
+d70dd1e1a9255709b4816b616dd7860581e882bd; updater blob
+c4a9564bc5a7c3cf2c6798b5eade9680ee0e57cf; public DMG133809131 bytes;
+SHA-256 0367c7b07d2b2d1f34345b2f8696ae71d5459522db2bfa9a3a045e67b82bf74f.
+
+This readiness record does not claim626 is already public. The release workflow
+must import these exact source artifacts, verify checksums and merged ancestry,
+repeat installed native and real625-to-626 replacement checks, publish immutable
+packages, advance the existing static channel, then verify actual625 updater
+anonymous discovery and complete626 download. All historical behavioural gates
+remain required. Previous packages and other platform channels stay unchanged.
+macOS signature remains ad-hoc; no Developer ID or notarization is claimed.
