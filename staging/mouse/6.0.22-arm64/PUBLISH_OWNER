@@ -1,0 +1,16 @@
+The owner explicitly requested the next Mouse Browser version with all cumulative five-desktop, mode, preview, animation and Agent Mouse requirements. This carries the existing authorization to publish the concrete verified result through the normal update button.
+
+Exact source a94317ce121de73a9a469b55af8eea900a35921d; source PR157. Native macOS run44204108935 attempt2/job134467781352 succeeded. All seven companions succeeded on this same source:44204108642,44204109359 attempt2,44204108676,44204108649,44204108723,44204108897,44204108689. Local181 Mouse tests passed. Initial unsuccessful attempts remain visible; no assertions were disabled.
+
+Candidate14382349105 and successful verification14383451808 were independently downloaded and checked against pin.json. Both package hashes, sizes, source/run provenance match. Earlier failed verification14382921987 must not be used. All five final images were visually reviewed: both-theme previews, both-theme modes and running Agent Mouse.
+
+Native proof confirms five desks, seven empty-only suggested requests, eight preserved tabs, zero hidden captures, real thumbnails, manual and explicitly consented autonomous CDP/PTY actions, real terminal stdout, external utility worker with three requests to a local deterministic model fixture, Stop/listener termination, localhost preview and actual621-to-622 profile-preserving replacement.
+
+The initial GitHub merge operation returned an error and left the source already integrated while PR157 still showed open/merged=false. Official async recovery run44207768489 failed with Pull Request is not mergeable; its evidence and retired one-use workflow history are preserved. After the append-only source evidence commit ae8e5d4a993ab13710de654314297061b91a84cd, fresh GitHub API now confirms PR157 CLOSED and MERGED=true with exact head a94317ce121de73a9a469b55af8eea900a35921d and merge_commit_sha71f943b469ac2678a407ca89f2fe69b6e30990c8. The normal merge-check endpoint confirms completion. The verified merge tree d3f19f7601e622b0fb79197678981ca561afd4b0 matches the native-tested source, and that source is an ancestor of current main. No main reset, force-push, manual PR closure or publisher guard relaxation occurred.
+
+READY_TO_PUBLISH_MOUSE_622
+
+All source, package, screenshot and native-evidence requirements above are observed. Publish the exact pinned bytes through the existing authorized channel after repeating every installed-package and actual621-updater gate. The tested DMG was also delivered separately for manual installation while the GitHub inconsistency was pending; that file delivery did not itself advance the channel.
+
+A local deterministic model fixture does not prove a real Qwen/DeepSeek account, local model installation or cloud connection. No model credentials are included. The packages are ad-hoc previews without Developer ID or Apple notarization; owner-device acceptance is not observed.
+Repeat retained installed-package gates before publishing release and static channel; import exact verified packages without rebuild, prior-asset overwrite or downgrade. Preserve the user profile and other products.
