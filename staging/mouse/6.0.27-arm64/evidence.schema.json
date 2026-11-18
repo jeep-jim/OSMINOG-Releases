@@ -173,7 +173,9 @@
         "replacementPresent",
         "cyrillicPresent",
         "unrelatedContentPreserved",
-        "undo"
+        "undo",
+        "editTextVisible",
+        "readability"
       ],
       "properties": {
         "version": {
@@ -193,6 +195,12 @@
         },
         "undo": {
           "const": true
+        },
+        "editTextVisible": {
+          "const": true
+        },
+        "readability": {
+          "$ref": "#/$defs/pdfPresentation"
         }
       }
     },
@@ -486,13 +494,13 @@
               ],
               "properties": {
                 "opening": {
-                  "$ref": "#/$defs/captureState"
+                  "$ref": "#/$defs/movingCaptureState"
                 },
                 "open": {
                   "$ref": "#/$defs/captureState"
                 },
                 "closing": {
-                  "$ref": "#/$defs/captureState"
+                  "$ref": "#/$defs/movingCaptureState"
                 }
               }
             },
@@ -505,13 +513,13 @@
               ],
               "properties": {
                 "opening": {
-                  "$ref": "#/$defs/captureState"
+                  "$ref": "#/$defs/movingCaptureState"
                 },
                 "open": {
                   "$ref": "#/$defs/captureState"
                 },
                 "closing": {
-                  "$ref": "#/$defs/captureState"
+                  "$ref": "#/$defs/movingCaptureState"
                 }
               }
             }
@@ -1899,9 +1907,31 @@
             "$ref": "#/$defs/desktopCapture"
           },
           "maxItems": 2
+        },
+        "paintedFrame": {
+          "$ref": "#/$defs/desktopPresentation"
         }
       },
-      "$comment": "Python validator requires four unique theme/direction pairs, exactly one250ms acknowledgement, animationDurationMs<=660+ackDelayMs, unchanged two tracked page pins and full frame membership matching captures[].ids, including all pre-existing native pages."
+      "$comment": "Python validator requires four unique theme/direction pairs, exactly one250ms acknowledgement, animationDurationMs<=660+ackDelayMs, unchanged two tracked page pins and full frame membership matching captures[].ids, including all pre-existing native pages. Both forward transitions also require framebuffer PNG proof of simultaneous fixture surfaces; the reverse transitions retain full identity/layout/RAF acceptance.",
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "direction": {
+                "const": 1
+              }
+            },
+            "required": [
+              "direction"
+            ]
+          },
+          "then": {
+            "required": [
+              "paintedFrame"
+            ]
+          }
+        }
+      ]
     },
     "desktopPixelSample": {
       "type": "object",
@@ -1974,6 +2004,557 @@
           "const": "rgb(240, 240, 240)"
         }
       }
+    },
+    "rgba": {
+      "type": "array",
+      "items": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 255
+      },
+      "minItems": 4,
+      "maxItems": 4
+    },
+    "rgb": {
+      "type": "array",
+      "items": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 255
+      },
+      "minItems": 3,
+      "maxItems": 3
+    },
+    "positiveViewport": {
+      "type": "object",
+      "required": [
+        "width",
+        "height"
+      ],
+      "properties": {
+        "width": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "height": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        }
+      }
+    },
+    "presentationPixels": {
+      "type": "object",
+      "required": [
+        "width",
+        "height"
+      ],
+      "properties": {
+        "width": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 8192
+        },
+        "height": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 8192
+        }
+      }
+    },
+    "presentedFrame": {
+      "type": "object",
+      "required": [
+        "source",
+        "sequence",
+        "elapsedMs",
+        "dirtyRect",
+        "scaleFactor",
+        "pixelSize",
+        "metadata"
+      ],
+      "properties": {
+        "source": {
+          "const": "beginFrameSubscription"
+        },
+        "sequence": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "elapsedMs": {
+          "type": "number",
+          "minimum": 0
+        },
+        "dirtyRect": {
+          "$ref": "#/$defs/nativeRectangle"
+        },
+        "scaleFactor": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "pixelSize": {
+          "$ref": "#/$defs/presentationPixels"
+        },
+        "metadata": {
+          "type": "object"
+        }
+      }
+    },
+    "noraPresentation": {
+      "type": "object",
+      "required": [
+        "source",
+        "sequence",
+        "elapsedMs",
+        "dirtyRect",
+        "scaleFactor",
+        "pixelSize",
+        "metadata"
+      ],
+      "properties": {
+        "source": {
+          "const": "beginFrameSubscription"
+        },
+        "sequence": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "elapsedMs": {
+          "type": "number",
+          "minimum": 0
+        },
+        "dirtyRect": {
+          "$ref": "#/$defs/nativeRectangle"
+        },
+        "scaleFactor": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "pixelSize": {
+          "$ref": "#/$defs/presentationPixels"
+        },
+        "metadata": {
+          "type": "object",
+          "required": [
+            "theme",
+            "state",
+            "geometry",
+            "top",
+            "translateY",
+            "progress",
+            "probes"
+          ],
+          "properties": {
+            "theme": {
+              "enum": [
+                "light",
+                "dark"
+              ]
+            },
+            "state": {
+              "enum": [
+                "opening",
+                "closing"
+              ]
+            },
+            "geometry": {
+              "type": "object",
+              "required": [
+                "viewport",
+                "width",
+                "height",
+                "left",
+                "baseline",
+                "fill",
+                "line",
+                "before"
+              ],
+              "properties": {
+                "viewport": {
+                  "$ref": "#/$defs/positiveViewport"
+                },
+                "width": {
+                  "type": "number",
+                  "exclusiveMinimum": 0
+                },
+                "height": {
+                  "type": "number",
+                  "exclusiveMinimum": 0
+                },
+                "left": {
+                  "type": "number"
+                },
+                "baseline": {
+                  "type": "number"
+                },
+                "fill": {
+                  "$ref": "#/$defs/rgb"
+                },
+                "line": {
+                  "$ref": "#/$defs/rgb"
+                },
+                "before": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/$defs/noraFrame"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
+              }
+            },
+            "top": {
+              "type": "number"
+            },
+            "translateY": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            },
+            "progress": {
+              "type": "number",
+              "exclusiveMinimum": 0,
+              "exclusiveMaximum": 1
+            },
+            "probes": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": [
+                  "x",
+                  "y",
+                  "above",
+                  "edge",
+                  "inside",
+                  "lower"
+                ],
+                "properties": {
+                  "x": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "y": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "above": {
+                    "$ref": "#/$defs/rgba"
+                  },
+                  "edge": {
+                    "$ref": "#/$defs/rgba"
+                  },
+                  "inside": {
+                    "$ref": "#/$defs/rgba"
+                  },
+                  "lower": {
+                    "$ref": "#/$defs/rgba"
+                  }
+                }
+              },
+              "minItems": 3,
+              "maxItems": 3
+            }
+          }
+        }
+      },
+      "$comment": "The Python validator independently decodes the exact saved RGB/RGBA PNG, matches every recorded sample and requires a three-column outline/fill boundary at an intermediate vertical translation. Logical DOM samples alone cannot establish the captured frame."
+    },
+    "movingCaptureState": {
+      "type": "object",
+      "required": [
+        "before",
+        "painted"
+      ],
+      "properties": {
+        "before": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/noraFrame"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "after": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/noraFrame"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "painted": {
+          "$ref": "#/$defs/noraPresentation"
+        }
+      }
+    },
+    "desktopPresentation": {
+      "type": "object",
+      "required": [
+        "source",
+        "sequence",
+        "elapsedMs",
+        "dirtyRect",
+        "scaleFactor",
+        "pixelSize",
+        "metadata",
+        "filename"
+      ],
+      "properties": {
+        "source": {
+          "const": "beginFrameSubscription"
+        },
+        "sequence": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "elapsedMs": {
+          "type": "number",
+          "minimum": 0
+        },
+        "dirtyRect": {
+          "$ref": "#/$defs/nativeRectangle"
+        },
+        "scaleFactor": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "pixelSize": {
+          "$ref": "#/$defs/presentationPixels"
+        },
+        "metadata": {
+          "type": "object",
+          "required": [
+            "bothDesktopsPainted",
+            "colors",
+            "counts",
+            "minimum",
+            "rows",
+            "viewport",
+            "pixelSize",
+            "scaleFactor"
+          ],
+          "properties": {
+            "bothDesktopsPainted": {
+              "const": true
+            },
+            "colors": {
+              "const": [
+                [
+                  199,
+                  37,
+                  77
+                ],
+                [
+                  29,
+                  125,
+                  220
+                ]
+              ]
+            },
+            "counts": {
+              "type": "array",
+              "items": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "minItems": 2,
+              "maxItems": 2
+            },
+            "minimum": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "rows": {
+              "type": "array",
+              "items": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "minItems": 1
+            },
+            "viewport": {
+              "type": "object",
+              "required": [
+                "width",
+                "height",
+                "rows"
+              ],
+              "properties": {
+                "width": {
+                  "type": "number",
+                  "exclusiveMinimum": 0
+                },
+                "height": {
+                  "type": "number",
+                  "exclusiveMinimum": 0
+                },
+                "rows": {
+                  "type": "array",
+                  "items": {
+                    "type": "number"
+                  },
+                  "minItems": 2,
+                  "maxItems": 2
+                }
+              }
+            },
+            "pixelSize": {
+              "$ref": "#/$defs/presentationPixels"
+            },
+            "scaleFactor": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            }
+          }
+        },
+        "filename": {
+          "enum": [
+            "mouse-627-desktop-transition-light.png",
+            "mouse-627-desktop-transition-dark.png"
+          ]
+        }
+      },
+      "$comment": "The Python validator recomputes both band counts from the archived PNG at the exact recorded viewport rows and requires >=ceil(16*pixelWidth/viewportWidth) opaque pixels of each fixture colour."
+    },
+    "pdfPresentation": {
+      "type": "object",
+      "required": [
+        "source",
+        "sequence",
+        "elapsedMs",
+        "dirtyRect",
+        "scaleFactor",
+        "pixelSize",
+        "metadata",
+        "filename"
+      ],
+      "properties": {
+        "source": {
+          "const": "beginFrameSubscription"
+        },
+        "sequence": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "elapsedMs": {
+          "type": "number",
+          "minimum": 0
+        },
+        "dirtyRect": {
+          "$ref": "#/$defs/nativeRectangle"
+        },
+        "scaleFactor": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "pixelSize": {
+          "$ref": "#/$defs/presentationPixels"
+        },
+        "metadata": {
+          "type": "object",
+          "required": [
+            "text",
+            "mode",
+            "viewport",
+            "beforeStyle",
+            "minimum",
+            "samples"
+          ],
+          "properties": {
+            "text": {
+              "const": "Mouse627 исправлен"
+            },
+            "mode": {
+              "const": "edit"
+            },
+            "viewport": {
+              "$ref": "#/$defs/positiveViewport"
+            },
+            "beforeStyle": {
+              "type": "object",
+              "required": [
+                "backdropFilter",
+                "webkitBackdropFilter",
+                "appearance"
+              ],
+              "properties": {
+                "backdropFilter": {
+                  "const": "none"
+                },
+                "webkitBackdropFilter": {
+                  "enum": [
+                    "",
+                    "none"
+                  ]
+                },
+                "appearance": {
+                  "const": "none"
+                },
+                "background": {
+                  "type": "string"
+                }
+              }
+            },
+            "minimum": {
+              "const": 12
+            },
+            "samples": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": [
+                  "x",
+                  "y",
+                  "sourceRGBA",
+                  "pixelX",
+                  "pixelY",
+                  "rgba",
+                  "dark"
+                ],
+                "properties": {
+                  "x": {
+                    "type": "number",
+                    "minimum": 0
+                  },
+                  "y": {
+                    "type": "number",
+                    "minimum": 0
+                  },
+                  "sourceRGBA": {
+                    "$ref": "#/$defs/rgba"
+                  },
+                  "pixelX": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "pixelY": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "rgba": {
+                    "$ref": "#/$defs/rgba"
+                  },
+                  "dark": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 90
+                  }
+                }
+              },
+              "minItems": 12,
+              "maxItems": 12
+            }
+          }
+        },
+        "filename": {
+          "const": "mouse-627-pdf-existing-text.png"
+        }
+      },
+      "$comment": "The Python validator requires twelve separated dark source-canvas glyph points, matched in the actual edit-mode framebuffer within the recorded Retina-scaled pixel neighbourhood. It verifies those opaque dark pixels in the exact archived PNG; an overlay-blurred or blank page fails."
     }
   },
   "x-requiredPngFiles": [

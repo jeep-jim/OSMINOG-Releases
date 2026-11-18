@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Offline publisher contract tests. All positive facts below are synthetic."""
-import contextlib,copy,io,json,pathlib,runpy,sys,tempfile,unittest
+import contextlib,copy,io,json,pathlib,runpy,struct,sys,tempfile,unittest,zlib
 from unittest.mock import patch
 
 ROOT=pathlib.Path(__file__).resolve().parents[1]
@@ -11,7 +11,12 @@ def window():
  before={'x':40,'y':40,'width':1200,'height':800};after={**before,'x':76,'y':64}
  return{'version':'6.0.27','restored':True,'gestures':[{'label':theme+' '+region,'point':{'x':120,'y':780},'before':dict(before),'after':dict(after),'requested':{'dx':36,'dy':24}} for theme in ['light','dark'] for region in ['footer left','footer right','top grip']],'controls':[theme+' '+control for theme in ['light','dark'] for control in ['theme','Nora']]}
 def documents():return{'version':'6.0.27',**dict.fromkeys(P['DOCUMENT_FACTS'],True)}
-def pdf():return{'version':'6.0.27',**dict.fromkeys(P['PDF_FACTS'],True)}
+def presentation(metadata):
+ return{'source':'beginFrameSubscription','sequence':3,'elapsedMs':80,'dirtyRect':{'x':0,'y':0,'width':1200,'height':900},'scaleFactor':1,'pixelSize':{'width':1200,'height':900},'metadata':metadata}
+def pdf():
+ samples=[{'x':100+i*12,'y':400,'sourceRGBA':[0,0,0,255],'pixelX':100+i*12,'pixelY':400,'rgba':[3,7,4,255],'dark':7} for i in range(12)]
+ proof=presentation({'text':'Mouse627 исправлен','mode':'edit','viewport':{'width':1200,'height':900},'beforeStyle':{'backdropFilter':'none','webkitBackdropFilter':'none','appearance':'none','background':'rgba(0, 0, 0, 0)'},'minimum':12,'samples':samples})
+ return{'version':'6.0.27',**dict.fromkeys(P['PDF_FACTS'],True),'readability':{**proof,'filename':'mouse-627-pdf-existing-text.png'}}
 def performance():
  result={'version':'6.0.27','platform':'darwin','arch':'arm64','panes':8,'stateRestored':True,'livePagesPreserved':True,'measurements':{}}
  for name in ['controlled-immediate','controlled-batched','unchanged-metadata','renderer-immediate','renderer-batched']:
@@ -33,7 +38,12 @@ def motion():
   value['frames'][theme+'Opening']=[frame(p,phase,i*10) for i,(p,phase) in enumerate([(0,'opening'),(.2,'opening'),(.5,'opening'),(.8,'opening'),(1,'open')])]
   value['frames'][theme+'Closing']=[frame(p,phase,i*10) for i,(p,phase) in enumerate([(1,'closing'),(.8,'closing'),(.5,'closing'),(.2,'closing'),(0,'closed')])]
   value['captures'][theme]={phase:f'mouse-627-panel-{theme}-{phase}.png' for phase in ['opening','open','closing']}
-  value['captureStates'][theme]={phase:{'before':frame(1 if phase=='open' else .5,phase,20)} for phase in ['opening','open','closing']}
+  value['captureStates'][theme]={'open':{'before':frame(1,'open',20)}}
+  for phase in ['opening','closing']:
+   before=None if phase=='opening' else frame(1,'open',20);fill=[255,255,255] if theme=='light' else [25,33,46];line=[199,207,223] if theme=='light' else [67,83,107]
+   geometry={'viewport':{'width':1200,'height':900},'width':1000,'height':440,'left':100,'baseline':800,'fill':fill,'line':line,'before':copy.deepcopy(before)}
+   probes=[{'x':x,'y':580,'above':[10,20,30,255],'edge':line+[255],'inside':fill+[255],'lower':fill+[255]} for x in [300,600,900]]
+   value['captureStates'][theme][phase]={'before':before,'after':None,'painted':presentation({'theme':theme,'state':phase,'geometry':geometry,'top':580,'translateY':220,'progress':.5,'probes':probes})}
   value['geometry'][theme+'Controls']=[{'name':name,'height':440,'width':1000,'paths':{key:frame(1,'open',0)['paths'][key] for key in ['outline','fill']},'geometryWrites':1,'scrollTop':10,'scrollHeight':600,'clientHeight':440,'overflow':'auto','accessible':True,'visibleHeight':25} for name in ['preview','modes','history']]
   footer={'x':0,'y':800,'width':1200,'height':28,'pixels':[{'x':x,'y':800.25,'rgb':[20,30,40]} for x in [180,360,840,1020]]}
   value['footer'][theme]={'before':copy.deepcopy(footer),'after':copy.deepcopy(footer)}
@@ -54,12 +64,30 @@ def desktop_transition():
  snapshots=[{'id':pin['id'],'frame':frame,'png':True,'decoded':True,'pixelWidth':900,'pixelHeight':600,'width':900,'height':600} for pin,frame in zip(pages,['outgoing','incoming'])]
  captures=[{'prepared':bool(index),'complete':True,'ids':[pin['id']],'rows':[{'id':pin['id'],'epoch':pin['navigationEpoch'],'webContentsId':pin['webContentsId'],'pixelWidth':900,'pixelHeight':600,'width':900,'height':600,'sample':{'x':450,'y':300,'pixelX':450,'pixelY':300,'viewportWidth':900,'viewportHeight':600,'rgba':[240,240,240,255],'domTag':'BODY','background':'rgb(240, 240, 240)'}}]} for index,pin in enumerate(pages)]
  for theme in ['light','dark']:
-  for direction in [-1,1]:value['transitions'].append({'theme':theme,'direction':direction,'ackDelayMs':250 if not value['transitions'] else 0,'nativeLayoutCalls':4,'animationDurationMs':330,'totalDurationMs':650,'pageBefore':copy.deepcopy(pages),'pageAfter':copy.deepcopy(pages),'frames':[{'at':i*165,'outgoingX':-direction*i*600,'incomingX':direction*(1200-i*600),'width':1200} for i in range(3)],'snapshots':copy.deepcopy(snapshots),'allSnapshots':copy.deepcopy(snapshots),'captures':copy.deepcopy(captures)})
+  for direction in [-1,1]:
+   row={'theme':theme,'direction':direction,'ackDelayMs':250 if not value['transitions'] else 0,'nativeLayoutCalls':4,'animationDurationMs':330,'totalDurationMs':650,'pageBefore':copy.deepcopy(pages),'pageAfter':copy.deepcopy(pages),'frames':[{'at':i*165,'outgoingX':-direction*i*600,'incomingX':direction*(1200-i*600),'width':1200} for i in range(3)],'snapshots':copy.deepcopy(snapshots),'allSnapshots':copy.deepcopy(snapshots),'captures':copy.deepcopy(captures)}
+   if direction==1:row['paintedFrame']={**presentation({'bothDesktopsPainted':True,'colors':[[199,37,77],[29,125,220]],'counts':[32,32],'minimum':16,'rows':[90],'viewport':{'width':1200,'height':900,'rows':[90,90]},'pixelSize':{'width':1200,'height':900},'scaleFactor':1}),'filename':f'mouse-627-desktop-transition-{theme}.png'}
+   value['transitions'].append(row)
  return value
+def png_bytes(width=1200,height=900,points=None,channels=4):
+ pixels=bytearray([255])*(width*height*channels)
+ for (x,y),value in (points or {}).items():pixels[(y*width+x)*channels:(y*width+x+1)*channels]=bytes(value[:channels])
+ def chunk(kind,data):return struct.pack('>I',len(data))+kind+data+struct.pack('>I',zlib.crc32(kind+data)&0xffffffff)
+ stride=width*channels;raw=b''.join(b'\0'+pixels[y*stride:(y+1)*stride] for y in range(height))
+ return b'\x89PNG\r\n\x1a\n'+chunk(b'IHDR',struct.pack('>IIBBBBB',width,height,8,6 if channels==4 else 2,0,0,0))+chunk(b'IDAT',zlib.compress(raw))+chunk(b'IEND',b'')
 def evidence():
- data={name:json.dumps(facts).encode() for name,facts in zip(P['JSON_FILES_627'],[window(),documents(),pdf(),performance(),motion(),desktop_transition()])}
+ facts=dict(zip(P['JSON_FILES_627'],[window(),documents(),pdf(),performance(),motion(),desktop_transition()]));data={name:json.dumps(value).encode() for name,value in facts.items()}
  data['mouse-623-verification.json']=json.dumps(retained623()).encode()
- for name in P['PNG_FILES_627']:data[name]=b'\x89PNG\r\n\x1a\nsynthetic-unit-fixture'
+ for name in P['PNG_FILES_627']:data[name]=png_bytes(1,1)
+ for theme in ['light','dark']:
+  for phase in ['opening','closing']:
+   points={}
+   for probe in facts['mouse-627-motion.json']['captureStates'][theme][phase]['painted']['metadata']['probes']:
+    for key,dy in [('above',-2),('edge',0),('inside',2),('lower',6)]:points[(probe['x'],probe['y']+dy)]=probe[key]
+   data[f'mouse-627-panel-{theme}-{phase}.png']=png_bytes(points=points)
+  points={(x,90):color+[255] for start,color in [(100,[199,37,77]),(600,[29,125,220])] for x in range(start,start+32)}
+  data[f'mouse-627-desktop-transition-{theme}.png']=png_bytes(points=points)
+ data['mouse-627-pdf-existing-text.png']=png_bytes(points={(s['pixelX'],s['pixelY']):s['rgba'] for s in facts['mouse-627-pdf-text.json']['readability']['metadata']['samples']})
  return data
 
 class PublisherContract(unittest.TestCase):
@@ -86,6 +114,37 @@ class PublisherContract(unittest.TestCase):
     for value in [False,'true',1,None]:
      with self.subTest(key=key,value=value),self.assertRaises(ValueError):facts=factory();facts[key]=value;validator(facts)
     with self.subTest(missing=key),self.assertRaises(ValueError):facts=factory();del facts[key];validator(facts)
+
+ def test_pdf_readability_requires_glyphs_in_edit_mode_without_blur(self):
+  validate=P['verify_627_pdf'];validate(pdf())
+  for mutate in [lambda f:f.pop('readability'),lambda f:f['readability'].update(source='capturePage'),lambda f:f['readability'].update(filename='unrelated.png'),lambda f:f['readability']['metadata'].update(mode='view'),lambda f:f['readability']['metadata']['beforeStyle'].update(backdropFilter='blur(14px)'),lambda f:f['readability']['metadata']['samples'].pop(),lambda f:f['readability']['metadata']['samples'][0].update(pixelX=500),lambda f:f['readability']['metadata']['samples'][0].update(sourceRGBA=[100,100,100,255]),lambda f:f['readability']['metadata']['samples'][0].update(rgba=[190,190,190,255],dark=190),lambda f:f['readability']['metadata']['samples'][1].update(f['readability']['metadata']['samples'][0])]:
+   with self.assertRaises(ValueError):facts=pdf();mutate(facts);validate(facts)
+
+ def test_motion_presentation_requires_natural_intermediate_edges_and_both_desktops(self):
+  # Opening starts from a truthful null/closed DOM sample. Only delivered
+  # presentation pixels establish that the selected PNG is intermediate.
+  P['verify_627_motion'](motion())
+  for mutate in [lambda p:p.update(source='capturePage'),lambda p:p.update(sequence=0),lambda p:p.update(elapsedMs=float('nan')),lambda p:p['metadata'].update(top=360,translateY=0,progress=1),lambda p:p['metadata'].update(top=800,translateY=440,progress=0),lambda p:p['metadata']['probes'][0].update(x=301),lambda p:p['metadata']['probes'][0].update(inside=[0,0,0,255]),lambda p:p['metadata']['probes'][0].update(edge=[199,207,223,0])]:
+   with self.assertRaises(ValueError):facts=motion();mutate(facts['captureStates']['light']['opening']['painted']);P['verify_627_motion'](facts)
+  for theme in ['light','dark']:
+   with self.assertRaises(ValueError):facts=motion();del facts['captureStates'][theme]['closing']['painted'];P['verify_627_motion'](facts)
+  for mutate in [lambda r:r.pop('paintedFrame'),lambda r:r['paintedFrame'].update(source='capturePage'),lambda r:r['paintedFrame']['metadata'].update(counts=[32,0]),lambda r:r['paintedFrame']['metadata'].update(rows=[91]),lambda r:r['paintedFrame']['metadata'].update(colors=[[0,0,0],[29,125,220]]),lambda r:r['paintedFrame']['metadata'].update(bothDesktopsPainted=False)]:
+   with self.assertRaises(ValueError):facts=desktop_transition();mutate(facts['transitions'][1]);P['verify_627_desktop_transition'](facts)
+
+ def test_presented_png_bytes_must_match_claimed_edge_bands_and_glyphs(self):
+  files=evidence();P['verify_627_evidence'](files.__getitem__);blank=png_bytes()
+  moving=[f'mouse-627-panel-{theme}-{phase}.png' for theme in ['light','dark'] for phase in ['opening','closing']]+[f'mouse-627-desktop-transition-{theme}.png' for theme in ['light','dark']]+['mouse-627-pdf-existing-text.png']
+  for name in moving:
+   with self.subTest(blank=name),self.assertRaises(ValueError):changed=dict(files);changed[name]=blank;P['verify_627_evidence'](changed.__getitem__)
+  with self.assertRaisesRegex(ValueError,'dimensions'):changed=dict(files);changed[moving[0]]=png_bytes(1,1);P['verify_627_evidence'](changed.__getitem__)
+  # A different valid bitmap cannot be accepted on the strength of JSON alone.
+  changed=dict(files);changed[moving[0]]=files['mouse-627-panel-dark-opening.png']
+  with self.assertRaisesRegex(ValueError,'pixel evidence'):P['verify_627_evidence'](changed.__getitem__)
+  for channels in [3,4]:
+   image=P['decode_png'](png_bytes(2,2,{(1,1):[12,34,56,255]},channels),'synthetic test');self.assertEqual(P['png_pixel'](image,1,1),[12,34,56,255])
+  corrupt=bytearray(files[moving[0]]);corrupt[-1]^=1
+  for blob in [bytes(corrupt),files[moving[0]][:-1],files[moving[0]]+b'trailing']:
+   with self.assertRaises(ValueError):P['decode_png'](blob,'corrupt synthetic fixture')
 
  def test_performance_requires_actual_pages_counts_and_valid_measurements(self):
   P['verify_627_performance'](performance())
@@ -158,6 +217,13 @@ class PublisherContract(unittest.TestCase):
    for field in fields:self.assertIn(field,proof['required']);self.assertEqual(proof['properties'][field],{'const':True})
   self.assertIn('allSnapshots',schema['$defs']['desktopTransition']['required']);self.assertIn('ids',schema['$defs']['desktopCapture']['required'])
   self.assertIn('sample',schema['$defs']['desktopCapture']['properties']['rows']['items']['required']);self.assertEqual(schema['$defs']['desktopPixelSample']['properties']['domTag'],{'const':'BODY'})
+  for name in ['noraPresentation','desktopPresentation','pdfPresentation']:
+   self.assertEqual(schema['$defs'][name]['properties']['source'],{'const':'beginFrameSubscription'})
+   for field in ['source','sequence','elapsedMs','dirtyRect','scaleFactor','pixelSize','metadata']:self.assertIn(field,schema['$defs'][name]['required'])
+  self.assertIn('painted',schema['$defs']['movingCaptureState']['required'])
+  self.assertEqual(schema['$defs']['desktopTransition']['allOf'],[{'if':{'properties':{'direction':{'const':1}},'required':['direction']},'then':{'required':['paintedFrame']}}])
+  self.assertIn('readability',schema['properties']['mouse-627-pdf-text.json']['required']);self.assertEqual(schema['properties']['mouse-627-pdf-text.json']['properties']['editTextVisible'],{'const':True})
+  self.assertEqual(schema['$defs']['pdfPresentation']['properties']['metadata']['properties']['samples']['minItems'],12)
   self.assertEqual(schema['$defs']['desktopTransition']['properties']['nativeLayoutCalls'],{'type':'integer','minimum':1,'maximum':8})
   self.assertEqual(schema['properties']['mouse-626-verification.json']['properties']['supersededForNora'],{'const':P['SUPERSEDED_NORA_METADATA']})
   self.assertEqual(schema['properties']['mouse-626-verification.json']['not'],{'required':['nora']})

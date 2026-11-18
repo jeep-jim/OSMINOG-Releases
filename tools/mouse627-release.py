@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Publish exact627 bytes; supersede requested Nora geometry, retain release safety."""
-import builtins,hashlib,json,math,pathlib,re,sys
+import builtins,hashlib,json,math,pathlib,re,struct,sys,zlib
 
 # Extract the reviewed publisher without running its pin dispatch or any API.
 # The existing607→626 files remain byte-for-byte unchanged.
@@ -63,7 +63,7 @@ PNG_FILES_627=['mouse-627-window-light.png','mouse-627-window-dark.png','mouse-6
 RETAINED_JSON_FILES=['mouse-623-verification.json']
 EVIDENCE_FILES_627=JSON_FILES_627+RETAINED_JSON_FILES+PNG_FILES_627
 DOCUMENT_FACTS=['ordinaryTabs','noDocumentDialog','twoVisibleEditors','paneResize','tabSwitchDraftPreserved','closeCancelPreserved','navigationCancelPreserved','navigationPreservesTabId','desktopMovePreserved','privateCleared']
-PDF_FACTS=['originalTextAbsent','replacementPresent','cyrillicPresent','unrelatedContentPreserved','undo']
+PDF_FACTS=['originalTextAbsent','replacementPresent','cyrillicPresent','unrelatedContentPreserved','undo','editTextVisible']
 MOTION_FACTS=['fixedSize','translationOnly','constantContour','openClosePainted','interruptionPreserved','reducedMotion','contentScrollable','backgroundStable','footerStable','stateRestored']
 DESKTOP_TRANSITION_FACTS=['simultaneous','pngSurfaces','compositorOnly','nativeIdentityPreserved','viewportAndScrollPreserved','slowAckBounded','restored']
 LIFECYCLE_FACTS_623=['closedPageDestroyed','closedCountRemoved','metadataNodesStable','chipReorder','chipTransfer','faviconsPainted','pageIdentityPreserved']
@@ -114,6 +114,24 @@ def verify_627_documents(facts):
 
 def verify_627_pdf(facts):
  facts_version(facts,'PDF text');true_fields(facts,PDF_FACTS,'existing PDF text')
+ painted=facts.get('readability');metadata=presented_frame(painted,'PDF glyphs')
+ if painted.get('filename')!='mouse-627-pdf-existing-text.png' or metadata.get('text')!='Mouse627 исправлен' or metadata.get('mode')!='edit' or metadata.get('minimum')!=12:raise ValueError('Mouse627 PDF edit-mode glyph proof missing')
+ style=metadata.get('beforeStyle')
+ if not isinstance(style,dict) or style.get('backdropFilter')!='none' or style.get('webkitBackdropFilter') not in ['', 'none'] or style.get('appearance')!='none':raise ValueError('Mouse627 PDF hit regions still blur or paint over the text')
+ viewport=positive_size(metadata.get('viewport'),'PDF viewport');size=painted['pixelSize'];sx=size['width']/viewport['width'];sy=size['height']/viewport['height'];radius=math.ceil(max(sx,sy));samples=metadata.get('samples')
+ if not isinstance(samples,list) or len(samples)!=12:raise ValueError('Mouse627 PDF requires twelve rendered glyph samples')
+ points=[];pixels=set()
+ for sample in samples:
+  if not isinstance(sample,dict) or not all(finite(sample.get(key)) for key in ['x','y']) or not 0<=sample['x']<viewport['width'] or not 0<=sample['y']<viewport['height']:raise ValueError('Mouse627 PDF source glyph location is invalid')
+  if any(math.hypot(sample['x']-x,sample['y']-y)<2.999 for x,y in points):raise ValueError('Mouse627 PDF glyph samples are not separated')
+  points.append((sample['x'],sample['y']));source=rgba(sample.get('sourceRGBA'),'PDF source canvas');actual=rgba(sample.get('rgba'),'PDF presentation')
+  if source[3]!=255 or max(source[:3])>=60 or actual[3]!=255 or max(actual[:3])>90 or sample.get('dark')!=max(actual[:3]):raise ValueError('Mouse627 PDF text is covered or blurred in the presentation')
+  for axis,dimension,scale in [('X','width',sx),('Y','height',sy)]:
+   value=sample.get('pixel'+axis)
+   if not whole(value) or not 0<=value<size[dimension] or abs(value-math.floor(sample[axis.lower()]*scale))>radius:raise ValueError('Mouse627 PDF glyph proof is mapped to an unrelated pixel')
+  point=(sample['pixelX'],sample['pixelY'])
+  if point in pixels:raise ValueError('Mouse627 PDF presentation repeats a glyph sample')
+  pixels.add(point)
 
 def verify_627_performance(facts):
  facts_version(facts,'performance');true_fields(facts,['stateRestored','livePagesPreserved'],'performance restoration and page lifetime')
@@ -139,6 +157,128 @@ def verify_627_performance(facts):
 
 def rectangle(value,label):
  if not isinstance(value,dict) or not all(finite(value.get(k)) for k in ['x','y','width','height']) or value['width']<0 or value['height']<0:raise ValueError('Mouse627 invalid rectangle: '+label)
+
+def positive_size(value,label):
+ if not isinstance(value,dict) or not all(finite(value.get(key)) and value[key]>0 for key in ['width','height']):raise ValueError('Mouse627 invalid presentation size: '+label)
+ return value
+
+def rgba(value,label):
+ if not isinstance(value,list) or len(value)!=4 or any(not whole(channel) or channel>255 for channel in value):raise ValueError('Mouse627 invalid RGBA sample: '+label)
+ return value
+
+def presented_frame(value,label):
+ if not isinstance(value,dict) or value.get('source')!='beginFrameSubscription' or not whole(value.get('sequence'),1) or not nonnegative(value.get('elapsedMs')) or not finite(value.get('scaleFactor')) or value['scaleFactor']<=0:raise ValueError('Mouse627 actual presentation capture missing: '+label)
+ rectangle(value.get('dirtyRect'),label+' dirty rectangle');size=positive_size(value.get('pixelSize'),label+' bitmap')
+ if not all(whole(size[key],1) and size[key]<=8192 for key in ['width','height']) or size['width']*size['height']*4>64*1024**2:raise ValueError('Mouse627 presentation bitmap exceeds its bounded size: '+label)
+ metadata=value.get('metadata')
+ if not isinstance(metadata,dict):raise ValueError('Mouse627 actual presentation metadata missing: '+label)
+ return metadata
+
+def verify_panel_presentation(painted,theme,phase,first,before):
+ metadata=presented_frame(painted,'Nora '+theme+' '+phase);geometry=metadata.get('geometry')
+ if metadata.get('theme')!=theme or metadata.get('state')!=phase or not isinstance(geometry,dict) or geometry.get('before')!=before:raise ValueError('Mouse627 Nora presentation state differs from its recorded action')
+ viewport=positive_size(geometry.get('viewport'),'Nora viewport');size=painted['pixelSize'];sx=size['width']/viewport['width'];sy=size['height']/viewport['height']
+ if not all(finite(geometry.get(key)) and abs(geometry[key]-first[key])<=1 for key in ['width','height','left','baseline']):raise ValueError('Mouse627 Nora pixels do not use the fixed panel geometry')
+ for key in ['fill','line']:
+  color=geometry.get(key)
+  if not isinstance(color,list) or len(color)!=3 or any(not whole(channel) or channel>255 for channel in color):raise ValueError('Mouse627 Nora presentation colour missing')
+ if not all(finite(metadata.get(key)) for key in ['top','translateY','progress']):raise ValueError('Mouse627 Nora painted position missing')
+ translate=metadata['translateY'];height=geometry['height'];top=geometry['baseline']-height
+ if not max(16,height*.08)<=translate<=height*.9 or abs(metadata['top']-top-translate)>1e-6 or abs(metadata['progress']-(1-translate/height))>1e-6:raise ValueError('Mouse627 Nora PNG is an endpoint instead of a moving panel')
+ fill=geometry['fill'];delta=[line-channel for line,channel in zip(geometry['line'],fill)];norm=sum(value*value for value in delta)
+ if norm==0:raise ValueError('Mouse627 Nora outline cannot be distinguished from its fill')
+ def distance(a,b):return max(abs(x-y) for x,y in zip(a,b))
+ def solid(pixel):return pixel[3]==255 and distance(pixel[:3],fill)<=2
+ probes=metadata.get('probes');expected_y=round(metadata['top']*sy)
+ if not isinstance(probes,list) or len(probes)!=3 or abs(expected_y-metadata['top']*sy)>1e-6:raise ValueError('Mouse627 Nora actual edge samples missing')
+ for fraction,probe in zip([.2,.5,.8],probes):
+  if not isinstance(probe,dict) or probe.get('x')!=math.floor((geometry['left']+geometry['width']*fraction)*sx) or probe.get('y')!=expected_y or not whole(probe.get('x')) or not whole(probe.get('y')):raise ValueError('Mouse627 Nora edge probe uses an unrelated pixel')
+  if not 0<=probe['x']<size['width'] or probe['y']-max(2,math.floor(2*sy+.5))<0 or probe['y']+max(6,math.floor(6*sy+.5))>=size['height']:raise ValueError('Mouse627 Nora edge probe is outside the presentation')
+  above,edge,inside,lower=[rgba(probe.get(key),'Nora '+key) for key in ['above','edge','inside','lower']];mix=sum((value-channel)*step for value,channel,step in zip(edge[:3],fill,delta))/norm
+  if solid(above) or not solid(inside) or not solid(lower) or edge[3]!=255 or not .025<=mix<=1.03 or distance(edge[:3],[channel+step*mix for channel,step in zip(fill,delta)])>8:raise ValueError('Mouse627 Nora PNG does not show its opaque moving top edge')
+
+def verify_desktop_presentation(painted,theme):
+ metadata=presented_frame(painted,'desktop '+theme);viewport=positive_size(metadata.get('viewport'),'desktop viewport');size=painted['pixelSize']
+ if painted.get('filename')!=f'mouse-627-desktop-transition-{theme}.png' or metadata.get('bothDesktopsPainted') is not True or metadata.get('colors')!=[[199,37,77],[29,125,220]] or metadata.get('pixelSize')!=size or metadata.get('scaleFactor')!=painted['scaleFactor']:raise ValueError('Mouse627 desktop presentation does not identify both actual surfaces')
+ css_rows=viewport.get('rows')
+ if not isinstance(css_rows,list) or len(css_rows)!=2 or not all(finite(y) for y in css_rows):raise ValueError('Mouse627 desktop source band rows missing')
+ expected=list(dict.fromkeys(max(0,min(size['height']-1,math.floor(y*size['height']/viewport['height']))) for y in css_rows));rows=metadata.get('rows');minimum=math.ceil(16*size['width']/viewport['width']);counts=metadata.get('counts')
+ if rows!=expected or not whole(metadata.get('minimum'),1) or metadata['minimum']!=minimum or not isinstance(counts,list) or len(counts)!=2 or any(not whole(count) or not minimum<=count<=size['width']*len(rows) for count in counts):raise ValueError('Mouse627 desktop PNG is missing one of the two moving surfaces')
+
+def decode_png(blob,label):
+ # Bounded, dependency-free decoding of Electron's RGB8/RGBA8 screenshots.
+ # Pixel acceptance must inspect the exact archived PNG, not just JSON claims.
+ if not isinstance(blob,bytes) or not blob.startswith(b'\x89PNG\r\n\x1a\n') or len(blob)>16*1024**2:raise ValueError('Mouse627 screenshot is not PNG: '+label)
+ offset=8;header=None;compressed=bytearray();ended=False
+ while offset<len(blob):
+  if offset+12>len(blob):raise ValueError('Mouse627 truncated PNG: '+label)
+  length=struct.unpack_from('>I',blob,offset)[0];kind=blob[offset+4:offset+8];end=offset+12+length
+  if end>len(blob):raise ValueError('Mouse627 truncated PNG chunk: '+label)
+  chunk=blob[offset+8:offset+8+length];crc=struct.unpack_from('>I',blob,offset+8+length)[0]
+  if zlib.crc32(kind+chunk)&0xffffffff!=crc:raise ValueError('Mouse627 PNG checksum mismatch: '+label)
+  if header is None and kind!=b'IHDR':raise ValueError('Mouse627 PNG has no first header: '+label)
+  if kind==b'IHDR':
+   if header is not None or length!=13:raise ValueError('Mouse627 ambiguous PNG header: '+label)
+   width,height,depth,color,compression,filtering,interlace=struct.unpack('>IIBBBBB',chunk);channels={2:3,6:4}.get(color)
+   if not channels or depth!=8 or compression or filtering or interlace or not 0<width<=8192 or not 0<height<=8192 or width*height*4>64*1024**2:raise ValueError('Mouse627 unsupported or oversized PNG: '+label)
+   header=(width,height,channels)
+  elif kind==b'IDAT':compressed.extend(chunk)
+  elif kind==b'IEND':
+   if length or end!=len(blob):raise ValueError('Mouse627 invalid PNG end: '+label)
+   ended=True;break
+  elif kind==b'tRNS' or kind[0]&32==0 and kind!=b'PLTE':raise ValueError('Mouse627 unsupported PNG chunk: '+label)
+  offset=end
+ if not ended or not header or not compressed:raise ValueError('Mouse627 incomplete PNG: '+label)
+ width,height,channels=header;stride=width*channels;expected=(stride+1)*height;decoder=zlib.decompressobj()
+ try:raw=decoder.decompress(compressed,expected+1)
+ except zlib.error as error:raise ValueError('Mouse627 corrupt PNG pixels: '+label) from error
+ if len(raw)!=expected or not decoder.eof or decoder.unconsumed_tail or decoder.unused_data:raise ValueError('Mouse627 invalid PNG pixel length: '+label)
+ result=bytearray(stride*height);previous=bytearray(stride)
+ for y in range(height):
+  start=y*(stride+1);method=raw[start];row=bytearray(raw[start+1:start+1+stride])
+  if method not in range(5):raise ValueError('Mouse627 invalid PNG row filter: '+label)
+  if method:
+   for x in range(stride):
+    a=row[x-channels] if x>=channels else 0;b=previous[x];c=previous[x-channels] if x>=channels else 0
+    if method==1:predictor=a
+    elif method==2:predictor=b
+    elif method==3:predictor=(a+b)//2
+    else:
+     p=a+b-c;pa=abs(p-a);pb=abs(p-b);pc=abs(p-c);predictor=a if pa<=pb and pa<=pc else b if pb<=pc else c
+    row[x]=(row[x]+predictor)&255
+  result[y*stride:(y+1)*stride]=row;previous=row
+ return{'width':width,'height':height,'channels':channels,'pixels':result}
+
+def png_pixel(image,x,y):
+ if not whole(x) or not whole(y) or x>=image['width'] or y>=image['height']:raise ValueError('Mouse627 PNG sample is outside its image')
+ start=(y*image['width']+x)*image['channels'];value=list(image['pixels'][start:start+image['channels']]);return value if image['channels']==4 else value+[255]
+
+def presented_png(read,name,painted):
+ image=decode_png(read(name),name)
+ if any(image[key]!=painted['pixelSize'][key] for key in ['width','height']):raise ValueError('Mouse627 PNG dimensions differ from its selected presentation: '+name)
+ return image
+
+def verify_presented_pixels(facts,read):
+ motion=facts['mouse-627-motion.json']
+ for theme in ['light','dark']:
+  for phase in ['opening','closing']:
+   painted=motion['captureStates'][theme][phase]['painted'];metadata=painted['metadata'];image=presented_png(read,motion['captures'][theme][phase],painted);sy=image['height']/metadata['geometry']['viewport']['height'];near=max(2,math.floor(2*sy+.5));far=max(6,math.floor(6*sy+.5))
+   for probe in metadata['probes']:
+    for key,dy in [('above',-near),('edge',0),('inside',near),('lower',far)]:
+     if png_pixel(image,probe['x'],probe['y']+dy)!=probe[key]:raise ValueError('Mouse627 Nora pixel evidence differs from the saved PNG')
+ for row in facts['mouse-627-desktop-transition.json']['transitions']:
+  if row['direction']!=1:continue
+  painted=row['paintedFrame'];metadata=painted['metadata'];image=presented_png(read,painted['filename'],painted);counts=[0,0]
+  for y in metadata['rows']:
+   for x in range(image['width']):
+    pixel=png_pixel(image,x,y)
+    if pixel[3]!=255:continue
+    for index,color in enumerate(metadata['colors']):
+     if all(abs(a-b)<=2 for a,b in zip(pixel[:3],color)):counts[index]+=1
+  if counts!=metadata['counts'] or any(count<metadata['minimum'] for count in counts):raise ValueError('Mouse627 desktop PNG does not paint both recorded surfaces')
+ painted=facts['mouse-627-pdf-text.json']['readability'];image=presented_png(read,painted['filename'],painted)
+ for sample in painted['metadata']['samples']:
+  if png_pixel(image,sample['pixelX'],sample['pixelY'])!=sample['rgba']:raise ValueError('Mouse627 PDF glyph pixels differ from the saved PNG')
 
 def page_pins(rows,label,epoch_key,background=False):
  if not isinstance(rows,list) or not rows:raise ValueError('Mouse627 live page evidence missing: '+label)
@@ -213,11 +353,17 @@ def verify_627_motion(facts):
  if any(row.get('phase')!='closing' or not row['open'] or row['hidden'] for row in pair) or pair[1]['time']<=pair[0]['time'] or not 0<pair[1]['progress']<pair[0]['progress'] or pair[1]['matrix']['f']-pair[0]['matrix']['f']<1:raise ValueError('Mouse627 Nora reversal did not follow actual closing motion')
  for theme in ['light','dark']:
   if captures.get(theme)!={phase:f'mouse-627-panel-{theme}-{phase}.png' for phase in ['opening','open','closing']}:raise ValueError('Mouse627 Nora capture filenames incomplete: '+theme)
+  first=first_by_group[theme+'Opening']
   for phase in ['opening','open','closing']:
    state=capture_states.get(theme,{}).get(phase,{});sample=state.get('before')
-   motion_frame(sample,theme+' '+phase+' capture')
-   if sample.get('phase')!=phase or not sample['open'] or sample['hidden'] or (sample['progress']!=1 if phase=='open' else not 0<sample['progress']<1):raise ValueError('Mouse627 Nora screenshot did not begin in the required state: '+theme+' '+phase)
-  controls=geometry.get(theme+'Controls');first=first_by_group[theme+'Opening']
+   if phase=='open' or sample is not None:motion_frame(sample,theme+' '+phase+' capture')
+   if phase=='open':
+    if sample.get('phase')!='open' or not sample['open'] or sample['hidden'] or sample['progress']!=1:raise ValueError('Mouse627 Nora settled screenshot did not begin open: '+theme)
+   else:
+    if phase=='closing' and (sample is None or sample.get('phase')!='open' or not sample['open'] or sample['hidden'] or sample['progress']!=1):raise ValueError('Mouse627 Nora close capture does not record its open starting state')
+    if phase=='opening' and sample is not None and (sample['open'] or not sample['hidden'] or sample['progress']!=0):raise ValueError('Mouse627 Nora open capture does not record its closed starting state')
+    verify_panel_presentation(state.get('painted'),theme,phase,first,sample)
+  controls=geometry.get(theme+'Controls')
   if not isinstance(controls,list) or len(controls)!=3 or any(not isinstance(row,dict) for row in controls) or {row.get('name') for row in controls}!={'preview','modes','history'}:raise ValueError('Mouse627 Nora control coverage incomplete: '+theme)
   for row in controls:
    if not all(finite(row.get(key)) for key in ['height','width','visibleHeight','scrollTop','scrollHeight','clientHeight']) or abs(row['height']-first['height'])>1 or abs(row['width']-first['width'])>1 or row['overflow']!='auto' or row.get('accessible') is not True or row['visibleHeight']<=0 or row['paths']!={key:first['paths'][key] for key in ['outline','fill']} or row.get('geometryWrites')!=first['geometryWrites']:raise ValueError('Mouse627 Nora controls do not stay accessible in a fixed viewport: '+theme)
@@ -257,6 +403,7 @@ def verify_627_desktop_transition(facts):
   if any(frame['width']!=width or abs((frame['incomingX']-frame['outgoingX'])-row['direction']*width)>1.5 for frame in frames):raise ValueError('Mouse627 desktop surfaces are not adjacent equal-width layers')
   if any(b['at']<a['at'] for a,b in zip(frames,frames[1:])) or any(len({math.floor(frame[key]+.5) for frame in frames})<3 for key in ['outgoingX','incomingX']):raise ValueError('Mouse627 desktop surfaces do not both move')
   if any(abs((b['outgoingX']-a['outgoingX'])-(b['incomingX']-a['incomingX']))>2 for a,b in zip(frames,frames[1:])):raise ValueError('Mouse627 desktop surfaces do not move simultaneously')
+  if row['direction']==1:verify_desktop_presentation(row.get('paintedFrame'),row['theme'])
   snapshots=row.get('snapshots');all_snapshots=row.get('allSnapshots');captures=row.get('captures')
   if not isinstance(snapshots,list) or len(snapshots)!=2 or any(not isinstance(image,dict) for image in snapshots) or {image.get('id') for image in snapshots}!=set(before) or {image.get('frame') for image in snapshots}!={'outgoing','incoming'}:raise ValueError('Mouse627 desktop PNG surface identities incomplete')
   if not isinstance(all_snapshots,list) or len(all_snapshots)<2 or any(not isinstance(image,dict) or not isinstance(image.get('id'),str) or not image['id'] or image.get('frame') not in ['outgoing','incoming'] for image in all_snapshots) or len({(image['frame'],image['id']) for image in all_snapshots})!=len(all_snapshots):raise ValueError('Mouse627 complete desktop surface set missing')
@@ -284,11 +431,12 @@ def verify_627_desktop_transition(facts):
 
 def verify_627_evidence(read):
  validators=[verify_627_window,verify_627_documents,verify_627_pdf,verify_627_performance,verify_627_motion,verify_627_desktop_transition]
- assert len(JSON_FILES_627)==len(validators)
- for name,validator in zip(JSON_FILES_627,validators):validator(json.loads(read(name)))
+ assert len(JSON_FILES_627)==len(validators);facts={}
+ for name,validator in zip(JSON_FILES_627,validators):facts[name]=json.loads(read(name));validator(facts[name])
  verify_623_retained(json.loads(read('mouse-623-verification.json')))
  for name in PNG_FILES_627:
   if not read(name).startswith(b'\x89PNG\r\n\x1a\n'):raise ValueError('Mouse627 screenshot is not PNG: '+name)
+ verify_presented_pixels(facts,read)
 
 once(" if not required.issubset(set(b['tests']))", " if SUPERSEDED_FEATURE_TOKENS.intersection(b['tests']):raise ValueError('Mouse627 build still claims superseded Nora morph evidence')\n if not FEATURE_TOKENS_627.issubset(set(b['tests'])):raise ValueError('Mouse627 feature evidence incomplete')\n if not required.issubset(set(b['tests']))")
 once(" matches=[a for a in artifacts if a['id']==ARTIFACT", """ with zipfile.ZipFile(io.BytesIO(verification_bytes)) as z:

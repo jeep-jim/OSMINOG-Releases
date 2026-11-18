@@ -27,6 +27,15 @@ desktop scenarios must cover both directions in both themes, including a
 delayed native layout acknowledgement. They must preserve actual page identity,
 viewport and scroll position, and bound native layout calls per transition.
 
+Moving Nora frames, both forward desktop frames and the PDF text screenshot
+must come from actual beginFrameSubscription presentations. Decode the exact
+saved PNGs and verify the recorded intermediate three-column panel edges,
+both desktop fixture colour bands, and twelve separated visible PDF glyph
+pixels in Edit mode. A moving DOM sample paired with a stale endpoint image,
+or transparent controls that blur away the underlying PDF text, cannot pass.
+The independent RAF samples and native identity/geometry checks remain required;
+these captures are not a machine-independent FPS guarantee.
+
 Retain all five626 palette facts, its rendered palette PNG and stateRestored,
 using schema6.0.26 plus explicit supersededForNora metadata. The retained623
 schema must prove fixed viewport/scroll controls, stationary footer, matching
