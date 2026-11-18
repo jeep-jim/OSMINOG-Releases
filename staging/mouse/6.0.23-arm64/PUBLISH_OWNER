@@ -1,0 +1,32 @@
+READY_TO_PUBLISH_MOUSE_623
+
+The owner authorized Mouse 6.0.23 for the three burrow geometry fixes, understandable foreground/background tab counts, actual page closure, draggable and closable tab chips with favicons and horizontal scrolling, stable preview updates, and Agent Mouse entries with the colored antenna-mouse mascot. Existing unplaced tabs and the prior browser/Agent Mouse behavior are preserved.
+
+Publication preparation is based on OSMINOG-Releases main bc3277663896d739768d37b25521d008fc5fcc33 and reviewed 622 publisher blob 4dd99f9004e276c70bf1d11c009e419cbf66b1a1. Only the five 623 publisher files are proposed. This approval permits publication of the exact pinned bytes; public release and update-channel status still depend on the publisher and public readback succeeding.
+
+Exact tested source: f3019ed8efae25aac9bad5e3b006ed6b4a9d3954.
+Source PR: https://github.com/jeep-jim/OSMINOG/pull/158.
+Merged source commit: a0955016dd62b0bdb59a9876a362bfa1ab35904a.
+Fresh GitHub readback confirmed PR closed/merged, the exact tested head, main as the base, and the pinned merge commit. Root additionally confirmed head-to-main ahead=1/behind=0 with merge_base=head and all eight workflows for this head successful.
+Native macOS run: https://github.com/jeep-jim/OSMINOG/actions/runs/44217980488, attempt 1, job 134512496910, SUCCESS. Independent run readback confirmed workflow 419668574, exact source f3019ed8efae25aac9bad5e3b006ed6b4a9d3954 and completed/success.
+
+Candidate artifact: 14389995680, mouse-arm64-candidate, 263992219 bytes, archive SHA256 a87075c906720e3d28a0d5a796589ca2faacb1a70be26963a860e869ac4c6ec1.
+Verification artifact: 14389860906, mouse-arm64-verification, 7503707 bytes, archive SHA256 b40b57187a2adac2622ea77bbdc70f376ba6005491b14d21a902db57803a44fa.
+GitHub artifact metadata matches both IDs, archive sizes and digests, exact run/source, and non-expired status. Local archive hashes were recomputed. Every extracted candidate member (4) and verification member (99) matches its archive bytes.
+
+DMG: Mouse-Browser-6.0.23-mac-arm64.dmg, 132165312 bytes, SHA256 a4165a9c97516836a13d5916377191cb6b3665243400c0d13bed8c44dd88b4fe.
+ZIP: Mouse-Browser-6.0.23-mac-arm64.zip, 132493494 bytes, SHA256 a0d80d481e0be383cd800f44c0d443bfc151ae0cc2a76266d7994f615c4f3f86.
+Both package hashes were recomputed and match SHA256SUMS.txt. mouse-build.json matches version 6.0.23, exact source/run, darwin/arm64 and all 60 retained publisher provenance requirements, together with the new 623 build tags. ZIP Info.plist confirms version 6.0.23 and unchanged application ID com.osminog.desktop.preview; app.asar and the executable darwin-arm64 node-pty spawn-helper are present.
+
+The actual local evidence-checking prefix of this publisher passed against the downloaded verification directory: 32 required smoke markers, 69 required evidence files, private/restart checks, the retained 622 facts and the new 623 facts. MOUSE_623_REAL_622_TO_623_REPLACE_RELAUNCH_PROFILE_PASS appears in mouse-update-roundtrip.log with MOUSE_READY 6.0.23; MOUSE_PROFILE_COOKIE_RESTART_PASS appears in the restart log.
+
+mouse-623-verification.json has six geometry frames for compact/modes/preview in light/dark, fixedTopCurves=true, seamFree=true and outlineMatchesFooter=true. All seven tabLifecycle fields are true: closedPageDestroyed, closedCountRemoved, metadataNodesStable, chipReorder, chipTransfer, faviconsPainted, pageIdentityPreserved. Both new required markers are present: MOUSE_623_BURROW_GEOMETRY_AND_SEAM_PASS and MOUSE_623_TAB_LIFECYCLE_CHIPS_STABILITY_PASS.
+The same helper reports agentEntry startService, aiPreset, aiSelect, disabledUntilEnabled and mascotLoaded all true, with actual color coral. No separate heavyweight publication scenario was added for the Agent entry.
+Retained mouse-622-verification.json confirms fixedDesks=5, suggestedRequests=7, preservedTabs=8, hiddenCaptures=0, localModelFixtureRequests=3, and realThumbnails/externalWorker/ptyStdout/autonomousActions/stoppedListener/localhostPreview all true. Both dependency audit artifacts report zero total vulnerabilities at this run.
+Root reviewed all six final mouse-623-{compact,modes,preview}-{light,dark}.png files, the final 612 AI chooser and 622 agent-running frames. No clipping, seam or outline mismatch was observed in those captured states. This is bounded visual evidence, not a claim about every display size. No measured CPU or memory reduction is claimed.
+
+EXCLUDED_FAILED_VERIFICATION_ARTIFACT: 14389301391. It came from the failed preceding attempt and is excluded from this pin and all successful publication evidence. The previous main-only legacy 613 persisted-order expectation was corrected to retain the complete order and existing main-tab/draft assertions before this successful exact-source run; the failed artifact is not rehabilitated by the later success.
+
+The prior published 622 DMG is 132133485 bytes, SHA256 15af3eabd5da82b4051c1979fb897cb962110ac9236bec883045ee5623cae9f9, from immutable tested source a94317ce121de73a9a469b55af8eea900a35921d. The publisher retains the installed-package signature/runtime/profile gates and uses that exact released updater for anonymous static discovery, complete download and hash verification after the channel advances.
+
+Publish only the pinned candidate bytes without rebuilding, overwriting prior release bytes, weakening existing gates or changing other products. The package remains an ad-hoc Apple Silicon preview without Developer ID or Apple notarization. Local model fixture coverage does not claim a verified connection to the owner's Qwen/DeepSeek or cloud account.
