@@ -1,0 +1,37 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Mouse626 installed native interaction evidence",
+  "type": "object",
+  "required": ["version", "themes", "stateRestored", "nora", "palette"],
+  "properties": {
+    "version": {"const": "6.0.26"},
+    "themes": {"const": ["light", "dark"]},
+    "stateRestored": {"const": true},
+    "nora": {
+      "type": "object",
+      "required": ["symmetric", "footerConnected", "continuousOpen", "continuousClose", "interruptedMotion", "resizeContinuous", "reducedMotion", "contentRevealed", "controlsWork"],
+      "properties": {
+        "symmetric": {"const": true},
+        "footerConnected": {"const": true},
+        "continuousOpen": {"const": true},
+        "continuousClose": {"const": true},
+        "interruptedMotion": {"const": true},
+        "resizeContinuous": {"const": true},
+        "reducedMotion": {"const": true},
+        "contentRevealed": {"const": true},
+        "controlsWork": {"const": true}
+      }
+    },
+    "palette": {
+      "type": "object",
+      "required": ["arbitraryHex", "arbitraryRGB", "fieldSelection", "annotationApplied", "exportPreserved"],
+      "properties": {
+        "arbitraryHex": {"const": true},
+        "arbitraryRGB": {"const": true},
+        "fieldSelection": {"const": true},
+        "annotationApplied": {"const": true},
+        "exportPreserved": {"const": true}
+      }
+    }
+  }
+}
