@@ -1,14 +1,14 @@
 {
   "version": "6.0.25",
-  "ready": false,
-  "source": "UNSET_SOURCE_SHA",
-  "run": "UNSET_NATIVE_RUN",
-  "artifact": "UNSET_CANDIDATE_ARTIFACT_ID",
-  "archiveSHA256": "UNSET_CANDIDATE_ARCHIVE_SHA256",
-  "verificationArtifact": "UNSET_SUCCESSFUL_VERIFICATION_ARTIFACT_ID",
-  "verificationSHA256": "UNSET_VERIFICATION_ARCHIVE_SHA256",
-  "sourcePR": "UNSET_SOURCE_PR",
-  "sourceMerge": "UNSET_SOURCE_MERGE_SHA",
+  "ready": true,
+  "source": "d70dd1e1a9255709b4816b616dd7860581e882bd",
+  "run": 44249252935,
+  "artifact": 14403013848,
+  "archiveSHA256": "52298c978da72b654fb3d7f5aa537d18e83ecde58394a05b5191b13963f1a1de",
+  "verificationArtifact": 14403083616,
+  "verificationSHA256": "c5e79c0fced1c03edb7386c558463cc3a38a347db57c3b91c435b21c0f8b3136",
+  "sourcePR": 160,
+  "sourceMerge": "b219a66a1a7e01f2e48adc7ea6384bfe39eb8c38",
   "previous": {
     "version": "6.0.23",
     "source": "f3019ed8efae25aac9bad5e3b006ed6b4a9d3954",
@@ -21,12 +21,12 @@
   },
   "packages": {
     "Mouse-Browser-6.0.25-mac-arm64.dmg": {
-      "size": "UNSET_DMG_SIZE",
-      "sha256": "UNSET_DMG_SHA256"
+      "size": 133809131,
+      "sha256": "0367c7b07d2b2d1f34345b2f8696ae71d5459522db2bfa9a3a045e67b82bf74f"
     },
     "Mouse-Browser-6.0.25-mac-arm64.zip": {
-      "size": "UNSET_ZIP_SIZE",
-      "sha256": "UNSET_ZIP_SHA256"
+      "size": 134142774,
+      "sha256": "54ff836391b4e0b978f43219c24175aa381a47f326eb1f5752cb6eb9a7bf2dc4"
     }
   }
 }
