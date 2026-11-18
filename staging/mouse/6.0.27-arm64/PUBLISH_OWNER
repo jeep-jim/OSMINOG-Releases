@@ -1,11 +1,45 @@
-PENDING_MOUSE_627
+READY_TO_PUBLISH_MOUSE_627
 
-UNSET: exact successful source commit, merged PR, source native run, candidate
-and verification artifact identifiers, independently checked archive digests,
-DMG/ZIP sizes and SHA-256 digests, and review of the rendered native evidence.
+Owner authorization: finish the work and publish; explicitly confirmed in chat.
+Accepted source: acbcf36beff4ec504b018402227e5b553e4f0fdc
+Source tree: b29e35d7ec327ad399ebeda35fe84b33d6b37573
+Source PR: https://github.com/jeep-jim/OSMINOG/pull/165
+Actual ordinary merge: d4e94ff9844bf81f3a54821a0bf9cee9df03705f
+Merge readback: merged=true and exact accepted source tree, both parents retained.
 
-This staging record is deliberately not ready to publish. The publisher rejects
-all import/publish/channel actions before any API request while ready is false.
+Native run: https://github.com/jeep-jim/OSMINOG/actions/runs/44379124696
+Attempt3 / job135087871076 / runner1000048936 / macos-15: all21steps SUCCESS.
+All seven companion workflows on the same exact source also SUCCESS.
+Attempts1 and2 were cancelled before any runner or step; this source had one
+executed full native acceptance. No executed failure was retried on this source.
+
+Verification artifact14467111554:12372073bytes
+SHA256 0b6cd60b0500eb61783171b8528e0824502ea6eab5253b8d96b5c6c17a7adeb7
+Candidate artifact14466087376:267400261bytes
+SHA256 52f30f0b7abc05a27210411c284ee53a270a7dbfd628f0f09ac2fcf1fdf6a0d9
+
+DMG133881495bytes
+SHA256 e383c648d316f4087c04fcecc7cb6afd2aa46c625af84c580cab55293628c286
+ZIP134212464bytes
+SHA256 629ec26ccabdc95022b765454cbab4812e7e43cbffa59d7bd78d0c7805a1a6af
+
+Independent API/archive/provenance/digest/CRC checks passed. Root recomputed
+publisher facts and actual PNG pixel gates directly from the verification ZIP;
+a separate reviewer independently recomputed the saved pixels and retained
+623-626 facts. Profile restart and actual625-to-627 replacement/relaunch/profile
+markers are in actual stdout. Candidate has exact4 safe regular files, all86
+required feature tokens among124, and no superseded tokens.
+
+The unchanged strict trace helper passed independently twice. All three fresh
+closing pairs227/294/336, properties0/4, have observed END plus main/impl FINISHED;
+no active-phase rejection. directIdentityLink=false and temporal-correlation
+remain explicit; continuous compositor lifetime and constantFPS are not proven.
+Earlier d6 closing delays have an unknown cause and are disclosed in the notes.
+Diagnostic10-slot artifacts and older candidates do not authorize publication.
+
+The notes also disclose RAM-only drafts, unsupported PDF fragments/noOCR/no
+reflow and possible long-text overlap, the unfinished per-pane progress pill,
+and ad-hoc AppleSilicon preview signing without DeveloperID/notarization.
 
 Required627 evidence, in both the exact source verification artifact and the
 installed publisher rerun:
@@ -41,14 +75,16 @@ using schema6.0.26 plus explicit supersededForNora metadata. The retained623
 schema must prove fixed viewport/scroll controls, stationary footer, matching
 outline, tab lifecycle and agent controls. It must not claim the removed growth
 or former full-footer seam contract. Retain all625 document/search/private/
-profile guards and all other reviewed native gates. The upgrade fixture uses
-the real immutable public625 package and actual shipped625 updater.
+profile guards and all other reviewed native gates. The replacement fixture
+uses the real immutable public625 package and the current installer. Separately,
+the publisher executes the actual shipped625 updater for anonymous discovery
+and a complete verified627 download.
 No626 package, release or existing channel file is modified by this preparation.
 
-After the exact source has passed, is merged and its bytes are pinned, the
+The exact source above has passed and is merged; its bytes are pinned. The
 publisher still has to verify the installed arm64 DMG/ZIP signatures/resources,
 rerun all native interactions and actual625-to-627 replacement, publish only the
 exact verified packages, advance the established channel without downgrade or
 same-version replacement, and verify actual625 anonymous discovery plus a
-complete verified627 download. None of those publication outcomes is asserted
-by this pending record.
+complete verified627 download. This authorization record does not itself
+assert those publication outcomes.
