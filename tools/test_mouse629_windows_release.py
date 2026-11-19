@@ -5,6 +5,7 @@ These tests exercise rejection rules only. They do not install Mouse, run an
 updater, inspect native windows, or constitute Windows release evidence.
 """
 from pathlib import Path
+from copy import deepcopy
 import json
 import runpy
 import subprocess
@@ -139,6 +140,142 @@ class WindowsPublisherSourceBranch(unittest.TestCase):
             with self.subTest(change=change):
                 with self.assertRaisesRegex(ValueError, 'not an ancestor'):
                     self.source_merge(**change)
+
+
+def source_run_fixture():
+    """Synthetic completed workflow with both required Windows host jobs."""
+    p = pin_fixture()
+    run = {'head_sha': p['source'], 'path': '.github/workflows/mouse-windows.yml',
+           'status': 'completed', 'conclusion': 'success', 'run_attempt': p['attempt']}
+    identity = {'run_id': p['run'], 'run_attempt': p['attempt'], 'head_sha': p['source'],
+                'status': 'completed', 'conclusion': 'success'}
+    build_steps = ['Run retained and Windows Mouse tests', 'Build Mouse Browser NSIS installer',
+                   'Verify installed app, native UI, restart and profile preservation',
+                   'Bind verified installer bytes to source and test evidence',
+                   'Require both unit and installed acceptance']
+    modern_steps = ['Verify immutable installer and source evidence',
+                    'Verify same installed app on modern Windows',
+                    'Upload modern Windows verification evidence']
+    jobs = [{**identity, 'id': p['job'], 'name': 'mouse-windows-x64',
+             'steps': [{'name': name, 'status': 'completed', 'conclusion': 'success'} for name in build_steps]},
+            {**identity, 'id': 99, 'name': 'mouse-windows-x64-modern',
+             'steps': [{'name': name, 'status': 'completed', 'conclusion': 'success'} for name in modern_steps]}]
+    return p, run, jobs
+
+
+class WindowsPublisherModernSourceGate(unittest.TestCase):
+    def validate(self, *, run=None, jobs=None):
+        p, default_run, default_jobs = source_run_fixture()
+        run = default_run if run is None else run
+        jobs = default_jobs if jobs is None else jobs
+        calls = []
+
+        def fixture_api(repo, resource):
+            self.assertEqual(repo, 'jeep-jim/OSMINOG')
+            calls.append(resource)
+            if resource == 'actions/runs/1':
+                return run
+            self.assertEqual(resource, 'actions/runs/1/attempts/1/jobs?per_page=100')
+            return {'jobs': jobs}
+
+        with patch.dict(PUBLISHER['verify_source_run'].__globals__, {'api': fixture_api}):
+            PUBLISHER['verify_source_run'](p)
+        return calls
+
+    def test_complete_current_attempt_with_both_hosts_is_accepted(self):
+        self.assertEqual(self.validate(), ['actions/runs/1', 'actions/runs/1/attempts/1/jobs?per_page=100'])
+
+    def test_overall_failed_or_unfinished_run_is_rejected(self):
+        for change in [{'conclusion': 'failure'}, {'conclusion': 'cancelled'}, {'conclusion': 'skipped'},
+                       {'status': 'in_progress', 'conclusion': None}, {'status': 'queued', 'conclusion': None}]:
+            with self.subTest(change=change):
+                _, run, _ = source_run_fixture()
+                run.update(change)
+                with self.assertRaisesRegex(ValueError, 'not completed successfully'):
+                    self.validate(run=run)
+
+    def test_overall_run_attempt_must_match_the_pin(self):
+        for attempt in [None, 0, 2, '1']:
+            with self.subTest(attempt=attempt):
+                _, run, _ = source_run_fixture()
+                run['run_attempt'] = attempt
+                with self.assertRaisesRegex(ValueError, 'not the pinned attempt'):
+                    self.validate(run=run)
+
+    def test_modern_job_must_exist_exactly_once(self):
+        _, _, complete = source_run_fixture()
+        for jobs in [complete[:1], complete + [deepcopy(complete[1])], []]:
+            with self.subTest(job_count=len(jobs)):
+                with self.assertRaises(ValueError):
+                    self.validate(jobs=jobs)
+
+    def test_modern_job_must_complete_successfully(self):
+        for change in [{'conclusion': 'failure'}, {'conclusion': 'skipped'}, {'conclusion': 'cancelled'},
+                       {'status': 'in_progress', 'conclusion': None}]:
+            with self.subTest(change=change):
+                _, _, jobs = source_run_fixture()
+                jobs[1].update(change)
+                with self.assertRaisesRegex(ValueError, 'Modern Windows installed verification job has not passed'):
+                    self.validate(jobs=jobs)
+
+    def test_modern_job_must_match_source_run_and_attempt(self):
+        for change in [{'run_attempt': 2}, {'run_attempt': None}, {'run_id': 999}, {'head_sha': '6' * 40}]:
+            with self.subTest(change=change):
+                _, _, jobs = source_run_fixture()
+                jobs[1].update(change)
+                with self.assertRaisesRegex(ValueError, 'Modern Windows job is not from the pinned source attempt'):
+                    self.validate(jobs=jobs)
+
+    def test_every_modern_gate_and_evidence_upload_must_succeed(self):
+        for index in range(3):
+            for change in [None, {'conclusion': 'failure'}, {'conclusion': 'skipped'}, {'status': 'in_progress'}]:
+                with self.subTest(step=index, change=change):
+                    _, _, jobs = source_run_fixture()
+                    if change is None:
+                        jobs[1]['steps'].pop(index)
+                    else:
+                        jobs[1]['steps'][index].update(change)
+                    with self.assertRaisesRegex(ValueError, 'did not execute every modern release gate'):
+                        self.validate(jobs=jobs)
+
+    def test_original_build_identity_and_required_unit_gate_still_apply(self):
+        for change in [{'id': 999}, {'run_attempt': 2}, {'run_id': 999}, {'head_sha': '6' * 40}]:
+            with self.subTest(change=change):
+                _, _, jobs = source_run_fixture()
+                jobs[0].update(change)
+                with self.assertRaises(ValueError):
+                    self.validate(jobs=jobs)
+        _, _, jobs = source_run_fixture()
+        jobs[0]['steps'][0]['conclusion'] = 'skipped'
+        with self.assertRaisesRegex(ValueError, 'Source job did not execute every release gate'):
+            self.validate(jobs=jobs)
+
+    def test_original_source_workflow_identity_is_still_required(self):
+        for change in [{'head_sha': '6' * 40}, {'path': '.github/workflows/unrelated.yml'}]:
+            with self.subTest(change=change):
+                _, run, _ = source_run_fixture()
+                run.update(change)
+                with self.assertRaisesRegex(ValueError, 'Pinned run is not the Windows source workflow'):
+                    self.validate(run=run)
+
+    def test_import_rejects_missing_modern_job_before_reading_artifacts(self):
+        p, run, jobs = source_run_fixture()
+
+        def fixture_api(repo, resource):
+            self.assertEqual(repo, 'jeep-jim/OSMINOG')
+            if resource == 'actions/runs/1':
+                return run
+            self.assertEqual(resource, 'actions/runs/1/attempts/1/jobs?per_page=100')
+            return {'jobs': jobs[:1]}
+
+        def forbidden(*args, **kwargs):
+            raise AssertionError('Incomplete source run must stop before merge/artifact access')
+
+        with patch.dict(PUBLISHER['import_candidate'].__globals__,
+                        {'pin': lambda: p, 'api': fixture_api, 'verify_source_merge': forbidden,
+                         'read_artifact': forbidden}):
+            with self.assertRaisesRegex(ValueError, 'Modern Windows installed verification job has not passed'):
+                PUBLISHER['import_candidate']()
 
 
 class WindowsPublisherContract(unittest.TestCase):
