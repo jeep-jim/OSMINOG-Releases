@@ -121,21 +121,42 @@ def verify_source_merge(p):
         raise ValueError('Tested source is not an ancestor of the fixed 6.0.29 branch')
 
 
-def import_candidate():
-    p = pin()
+def verify_source_run(p):
     run = api(SOURCE, f'actions/runs/{p["run"]}')
     if run.get('head_sha') != p['source'] or run.get('path') != '.github/workflows/mouse-windows.yml':
         raise ValueError('Pinned run is not the Windows source workflow')
+    if run.get('status') != 'completed' or run.get('conclusion') != 'success':
+        raise ValueError('Entire Windows source run has not completed successfully')
+    if run.get('run_attempt') != p['attempt']:
+        raise ValueError('Source run is not the pinned attempt')
     jobs = api(SOURCE, f'actions/runs/{p["run"]}/attempts/{p["attempt"]}/jobs?per_page=100')['jobs']
     job = [j for j in jobs if j['id'] == p['job'] and j['name'] == 'mouse-windows-x64' and j['conclusion'] == 'success' and j['status'] == 'completed']
     if len(job) != 1:
         raise ValueError('Exact Windows source job has not passed')
+    if (job[0].get('run_id'), job[0].get('run_attempt'), job[0].get('head_sha')) != (p['run'], p['attempt'], p['source']):
+        raise ValueError('Source build job is not from the pinned source attempt')
     required_steps = {'Run retained and Windows Mouse tests', 'Build Mouse Browser NSIS installer',
                       'Verify installed app, native UI, restart and profile preservation',
                       'Bind verified installer bytes to source and test evidence',
                       'Require both unit and installed acceptance'}
-    if not required_steps.issubset({s['name'] for s in job[0]['steps'] if s['conclusion'] == 'success'}):
+    if not required_steps.issubset({s['name'] for s in job[0]['steps'] if s['status'] == 'completed' and s['conclusion'] == 'success'}):
         raise ValueError('Source job did not execute every release gate')
+    modern = [j for j in jobs if j.get('name') == 'mouse-windows-x64-modern']
+    if len(modern) != 1 or modern[0].get('status') != 'completed' or modern[0].get('conclusion') != 'success':
+        raise ValueError('Modern Windows installed verification job has not passed')
+    if (modern[0].get('run_id'), modern[0].get('run_attempt'), modern[0].get('head_sha')) != (p['run'], p['attempt'], p['source']):
+        raise ValueError('Modern Windows job is not from the pinned source attempt')
+    modern_steps = {'Verify immutable installer and source evidence',
+                    'Verify same installed app on modern Windows',
+                    'Upload modern Windows verification evidence'}
+    if not modern_steps.issubset({s['name'] for s in modern[0].get('steps', [])
+                                 if s.get('status') == 'completed' and s.get('conclusion') == 'success'}):
+        raise ValueError('Modern Windows job did not execute every modern release gate')
+
+
+def import_candidate():
+    p = pin()
+    verify_source_run(p)
     verify_source_merge(p)
     artifacts = api(SOURCE, f'actions/runs/{p["run"]}/artifacts?per_page=100')['artifacts']
     candidate = [a for a in artifacts if a['id'] == p['artifact'] and a['name'] == 'mouse-windows-x64-candidate']
