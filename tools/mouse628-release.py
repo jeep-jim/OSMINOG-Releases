@@ -5,7 +5,7 @@ SOURCE='jeep-jim/OSMINOG';REPO='jeep-jim/OSMINOG-Releases';V='6.0.28';TAG='quadr
 ROOT=pathlib.Path(__file__).resolve().parents[1];STAGE=ROOT/'staging/mouse/6.0.28-arm64';OUT=ROOT/'mouse628-release'
 DMG='Mouse-Browser-6.0.28-mac-arm64.dmg';ZIP='Mouse-Browser-6.0.28-mac-arm64.zip';ALIAS='Quadro-Browser-6.0.28-mac-arm64.dmg'
 NAMES=[DMG,ZIP,ALIAS,'SHA256SUMS.txt','mouse-build.json']
-PIN=json.loads((STAGE/'pin.json').read_text());HEAD=PIN['source'];RUN=int(PIN['run']);ARTIFACT=int(PIN['artifact']);ARCHIVE_HASH=PIN['archiveSHA256'];PR=int(PIN['sourcePR'])
+PIN=json.loads((STAGE/'pin.json').read_text());HEAD=PIN['source'];RUN=int(PIN['run']);ARTIFACT=int(PIN['artifact']);ARCHIVE_HASH=PIN['archiveSHA256'];PR=int(PIN['sourcePR']);ATTEMPT=int(PIN['sourceAttempt']);SOURCE_JOB=int(PIN['sourceJob'])
 assert PIN['version']==V and PIN.get('ready') is True and len(HEAD)==40 and len(ARCHIVE_HASH)==64 and len(PIN['verificationSHA256'])==64 and PIN['sourceMerge'] and PIN['sourcePR'] and PIN['packages']
 import hashlib as _hashlib, importlib.util as _util, runpy as _runpy
 _previous=pathlib.Path(__file__).with_name('mouse627-release.py')
@@ -41,7 +41,7 @@ def verify_628_trace(read,provenance):
  return {'version':V,'inputs':{n:{'size':len(blobs[n]),'sha256':sha(blobs[n])} for n in names},'provenance':provenance,'evidence':report}
 
 def validate():
- if PIN.get('version')!=V or PIN.get('ready') is not True:raise ValueError('Mouse628 pin not ready')
+ if PIN.get('version')!=V or PIN.get('ready') is not True or ATTEMPT<1 or SOURCE_JOB<1:raise ValueError('Mouse628 pin not ready')
  if PIN['previous'].get('version')!='6.0.27' or PIN['previous'].get('source')!='acbcf36beff4ec504b018402227e5b553e4f0fdc' or PIN['previous'].get('updaterBlobSHA')!='c4a9564bc5a7c3cf2c6798b5eade9680ee0e57cf':raise ValueError('Previous627 source/updater pin mismatch')
  if set(PIN['packages'])!={DMG,ZIP}:raise ValueError('Expected exactly two release packages')
  for name,package in PIN['packages'].items():
@@ -63,7 +63,15 @@ def api(repo,p,method='GET',payload=None,missing=False):
 def sha(data):return hashlib.sha256(data).hexdigest()
 def import_candidate():
  run=api(SOURCE,f'actions/runs/{RUN}')
- if (run['workflow_id'],run['head_sha'],run['status'],run['conclusion'])!=(419668574,HEAD,'completed','success'):raise ValueError('Exact native source has not passed')
+ if (run['workflow_id'],run['head_sha'])!=(419668574,HEAD):raise ValueError('Exact native source run mismatch')
+ # GitHub re-runs change the run's aggregate conclusion. Bind the artifact to
+ # the successful, immutable attempt/job instead of trusting a later attempt.
+ jobs=api(SOURCE,f'actions/runs/{RUN}/attempts/{ATTEMPT}/jobs?per_page=100')['jobs']
+ passed=[job for job in jobs if job['id']==SOURCE_JOB and job['name']=='mouse-arm64' and
+         job['status']=='completed' and job['conclusion']=='success']
+ if len(passed)!=1 or not all(any(step['number']==number and step['conclusion']=='success'
+     for step in passed[0].get('steps',[])) for number in (15,16,17,18)):
+  raise ValueError('Pinned exact native source attempt has not passed all package gates')
  pr=api(SOURCE,f'pulls/{PR}')
  if not pr.get('merged') or pr['head']['sha']!=HEAD or pr['base']['ref']!='main' or pr['merge_commit_sha']!=PIN['sourceMerge']:raise ValueError('Exact source PR not merged')
  c=api(SOURCE,f'compare/{HEAD}...main')
