@@ -20,7 +20,7 @@ from pathlib import Path
 import statistics
 
 
-ALGORITHM = 'mouse628-motion-trace-evidence-v1'
+ALGORITHM = 'mouse628-motion-trace-evidence-v2'
 MAX_TRACE_BYTES = 72 * 1024 * 1024
 MAX_MOTION_BYTES = 16 * 1024 * 1024
 MAX_EVENTS = 200000
@@ -447,6 +447,55 @@ class CompositorEvidence:
                     is impl['terminal'], label + ': terminal state belongs to another chain')
         return chains
 
+    def preexisting_reserved_chain(self, group, lo, label):
+        # Chromium can recycle the reserved group 1/property 4 for a shell
+        # animation already starting before this Nora play. It cannot be used
+        # to prove a fresh Nora pair. Exclude it only with a unique pointer,
+        # a pre-play impl origin, and exact start/end boundary-state links.
+        key = group['key']
+        require(key == (1, 4) and not group['invalid'] and group['end'] is not None and
+                group['begin']['tid'] == group['end']['tid'] == self.compositor_tid and
+                group['begin']['ts'] < group['end']['ts'] and
+                sum(model['id'] == group['id'] and lo <= model['begin']['ts'] <=
+                    group['end']['ts'] for model in self.models) == 1 and
+                all(model['begin']['ts'] < lo and model['key'] != key
+                    for model in self.models if model['id'] == group['id'] and model is not group
+                    and model['begin']['ts'] < group['begin']['ts']),
+                label + ': reserved extra model has ambiguous identity or lifetime')
+        chains = {}
+        for role, tid in (('main', self.main_tid), ('impl', self.compositor_tid)):
+            rows = self.states[key][tid]
+            origins = [event for event in rows if event['ts'] < group['begin']['ts'] and
+                       (event['args']['ccModel']['from'], event['args']['ccModel']['to']) ==
+                       ('WAITING_FOR_TARGET_AVAILABILITY', 'STARTING')]
+            require(origins, label + ': reserved extra model lacks a structural origin')
+            origin = origins[-1]
+            segment = [event for event in rows if origin['ts'] <= event['ts'] <= group['end']['ts'] + 5000]
+            require(segment[0] is origin and sum(event['args']['ccModel']['from'] ==
+                    'WAITING_FOR_TARGET_AVAILABILITY' for event in segment) == 1,
+                    label + ': reserved extra model has another origin in its segment')
+            running = [event for event in segment if
+                       (event['args']['ccModel']['from'], event['args']['ccModel']['to']) ==
+                       ('STARTING', 'RUNNING')]
+            terminal = [event for event in segment if
+                        (event['args']['ccModel']['from'], event['args']['ccModel']['to']) ==
+                        ('RUNNING', 'FINISHED')]
+            require(len(running) == len(terminal) == 1 and origin['ts'] < running[0]['ts'] <
+                    terminal[0]['ts'] and not any(event['args']['ccModel']['to'] == 'ABORTED'
+                    for event in segment),
+                    label + ': reserved extra model has conflicting structural states')
+            chains[role] = {'origin': origin, 'running': running[0], 'terminal': terminal[0],
+                            'events': [origin, running[0], terminal[0]]}
+        require(chains['impl']['origin']['ts'] < lo and
+                chains['main']['origin']['ts'] < group['begin']['ts'] and
+                chains['main']['running']['ts'] < group['begin']['ts'] and
+                self.boundary_state(group['begin'], key, ('STARTING', 'RUNNING'), label + ' start')
+                is chains['impl']['running'] and
+                self.boundary_state(group['end'], key, ('RUNNING', 'FINISHED'), label + ' end')
+                is chains['impl']['terminal'],
+                label + ': reserved extra model is not provably preexisting')
+        return chains
+
     def select(self, lo, hi, label):
         candidates = [g for g in self.models if lo <= g['begin']['ts'] <= hi]
         by_group = collections.defaultdict(list)
@@ -464,7 +513,8 @@ class CompositorEvidence:
                 continue
             require(len(by_group[group['key'][0]]) == 1,
                     label + ': competing compositor group is not an attributable singleton')
-            chain = self.chain(group, label + ' extra model')
+            chain = (self.preexisting_reserved_chain(group, lo, label + ' reserved extra')
+                     if group['key'] == (1, 4) else self.chain(group, label + ' extra model'))
             require(chain['impl']['origin']['ts'] < lo,
                     label + ': extra compositor model has new/unknown origin')
             excluded.append((group, chain))
@@ -676,7 +726,9 @@ def verify_trace_data(trace_doc, motion_doc, diagnostics_doc=None):
                         'blinkLifetimes': [dict(summarize(g), nodeId=n) for g, n in zip(paired, nodes)],
                         'compositorLifetimes': [structural(g, chains[g['key']]) for g in active_models],
                         'excludedFreshSingletons': [dict(structural(g, chain),
-                            reason='unique structural impl origin precedes fresh play') for g, chain in excluded],
+                            reason=('reserved shell group with exact boundary-state links and pre-play impl origin'
+                                    if g['key'] == (1, 4) else
+                                    'unique structural impl origin precedes fresh play')) for g, chain in excluded],
                         'explainedPreexistingOrigins': [dict(structural(g, chain),
                             reason='unique consistent impl startup began before play; main origin may follow')
                             for g, chain in explained_preexisting],
@@ -697,7 +749,8 @@ def verify_trace_data(trace_doc, motion_doc, diagnostics_doc=None):
                        'compositor execution, and does not replace the native visual gates.',
             'acceptanceScope': 'unique-compositor-starts-and-dom-completion',
             'nativeVisualGateRequired': True, 'continuousCompositorLifetimeProven': False,
-            'structuralEvidence': 'ccModel group/property and bounded SetRunState enums; renderer-wide key uniqueness',
+            'structuralEvidence': 'unique selected ccModel group/property keys, bounded SetRunState enums; '
+                                  'reserved extra group requires pre-play impl origin and exact boundary links',
             'traceSchemaVersion': meta['schemaVersion'], 'versions': meta['versions'],
             'rendererPid': pid, 'rendererMainTid': main_tid, 'compositorTid': compositor_tid,
             'clock': {'offsetMs': offset, 'anchorCount': anchor_count, 'anchorSpreadMs': spread,
