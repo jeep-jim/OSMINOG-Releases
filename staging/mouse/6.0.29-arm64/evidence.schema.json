@@ -1,0 +1,64 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Mouse Browser 6.0.29 native evidence bundle",
+  "$comment": "Preserves reviewed 628 Local/progress/Nora/motion evidence. Replaces the rejected three-finger tutorial with native mouseWheel first-use evidence. The separate 629 UI contract binds restored 627 vein colours, native pane seams, Nora layering and site scrollbar pixels. Physical trackpad hardware is not claimed. JSON flags alone do not replace decoded original captures.",
+  "type": "object",
+  "required": [
+    "mouse-628-local.json",
+    "mouse-628-progress.json",
+    "mouse-628-borderless.json",
+    "mouse-628-motion.json",
+    "mouse-628-desktop-transition.json",
+    "mouse-628-motion-trace.json",
+    "mouse-629-swipe-tutorial.json",
+    "mouse-629-ui-regressions.json"
+  ],
+  "x-nativeMarkers": [
+    "MOUSE_628_LOCAL_MCP_NATIVE_PASS",
+    "MOUSE_628_PER_PANE_PROGRESS_NATIVE_PASS",
+    "MOUSE_628_BORDERLESS_NATIVE_PASS",
+    "MOUSE_628_NORA_CONTENT_FIT_NATIVE_PASS",
+    "MOUSE_628_OPEN_NORA_DESKTOP_SLIDE_NATIVE_PASS",
+    "MOUSE_628_BURROW_CONTENT_FIT_CONTROLS_PASS",
+    "MOUSE_628_ACTIVE_TAB_FLOW_BORDERLESS_BOTH_THEMES_PASS",
+    "MOUSE_628_BORDERLESS_UPDATE_BADGE_BOTH_THEMES_PASS",
+    "MOUSE_629_TWO_FINGER_WHEEL_TUTORIAL_WRITE_PASS",
+    "MOUSE_629_TWO_FINGER_WHEEL_TUTORIAL_NATIVE_PASS",
+    "MOUSE_629_UI_REGRESSIONS_NATIVE_PASS"
+  ],
+  "x-motionTraceGate": {
+    "validator": "tools/mouse628-motion-trace.py",
+    "sha256": "76715b9ff5951e92bae4771da644341d3de988edce24dab0f6a4eb73aa7720a9",
+    "algorithm": "mouse628-motion-trace-evidence-v2",
+    "maxTraceBytes": 75497472,
+    "inputFiles": [
+      "mouse-628-motion-trace.json",
+      "mouse-628-motion.json"
+    ],
+    "directIdentityLink": false,
+    "attribution": "temporal-correlation",
+    "savedReportAcceptedAsInput": false
+  },
+  "x-gesture": {
+    "file": "mouse-629-swipe-tutorial.json",
+    "recognizer": "two-finger-or-wheel",
+    "source": "nora-wheel",
+    "physicalTrackpadVerified": false
+  },
+  "x-uiRegressions": {
+    "file": "mouse-629-ui-regressions.json",
+    "baselineVersion": "6.0.27",
+    "paneCount": 7,
+    "separatorScenes": 4,
+    "noraThemes": 2,
+    "nativeSource": "globalCapture.acquire(display)",
+    "exactSeparatorPalette": {
+      "light": "#c7cfdf",
+      "dark": "#43536b"
+    },
+    "scrollbarSource": "installed guest WebContents + bundled preload",
+    "scrollbarCaptureSource": "guest WebContents.capturePage",
+    "scrollbarNativeComposite": false,
+    "physicalTrackpadVerified": false
+  }
+}
