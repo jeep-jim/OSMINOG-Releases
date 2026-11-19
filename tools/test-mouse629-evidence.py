@@ -442,5 +442,41 @@ class ReleaseTemplateTests(unittest.TestCase):
                 publisher.validate()
 
 
+class RetainedVersionTests(unittest.TestCase):
+    # Version fields read from real source 87f2b68941e534881778c5d61ac5f6a47a26ab49,
+    # run 44487095970 attempt 2, verification artifact 14512351654.
+    # ZIP SHA256: be9336732337e687278fc60ceb7a025c7691d7f078c71e0c7ea0795a96a444c5.
+    # This metadata regression checks version dispatch only, not native PASS.
+    ACTUAL_ARTIFACT_VERSIONS = {
+        'mouse-628-local.json':'6.0.29',
+        'mouse-628-progress.json':'6.0.29',
+        'mouse-628-borderless.json':'6.0.28',
+        'mouse-628-motion.json':'6.0.28',
+        'mouse-628-desktop-transition.json':'6.0.28',
+    }
+
+    def facts(self):
+        return {name:{'version':version} for name, version in self.ACTUAL_ARTIFACT_VERSIONS.items()}
+
+    def test_actual_629_artifact_preserves_runtime_and_schema_versions(self):
+        evidence.verify_retained_versions(self.facts())
+
+    def test_old_application_version_does_not_prove_current_local_or_progress(self):
+        for name in ('mouse-628-local.json', 'mouse-628-progress.json'):
+            with self.subTest(name=name):
+                facts = self.facts()
+                facts[name]['version'] = '6.0.28'
+                with self.assertRaisesRegex(ValueError, 'retained version mismatch: '+name):
+                    evidence.verify_retained_versions(facts)
+
+    def test_geometry_and_motion_schema_cannot_be_silently_relabelled(self):
+        for name in ('mouse-628-borderless.json', 'mouse-628-motion.json', 'mouse-628-desktop-transition.json'):
+            with self.subTest(name=name):
+                facts = self.facts()
+                facts[name]['version'] = '6.0.29'
+                with self.assertRaisesRegex(ValueError, 'retained version mismatch: '+name):
+                    evidence.verify_retained_versions(facts)
+
+
 if __name__ == '__main__':
     unittest.main()

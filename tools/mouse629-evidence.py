@@ -254,11 +254,20 @@ def verify_gesture(swipe, read):
             'restartPid':restart['pid']}
 
 
-def verify_retained(read, docs):
-    local, progress, border, motion, slides, trace = (docs[n] for n in RETAINED_JSON_NAMES)
+def verify_retained_versions(docs):
+    # Local/progress helpers record app.getVersion(), not an evidence schema
+    # version. Their historical filenames remain unchanged in a 629 install.
+    # Geometry/motion helpers explicitly keep their reviewed 628 schema version.
     for name in RETAINED_JSON_NAMES:
         if name != 'mouse-628-motion-trace.json':
-            require(docs[name].get('version') == '6.0.28', 'retained version mismatch: ' + name)
+            expected = ('6.0.29' if name in ('mouse-628-local.json', 'mouse-628-progress.json')
+                        else '6.0.28')
+            require(docs[name].get('version') == expected, 'retained version mismatch: ' + name)
+
+
+def verify_retained(read, docs):
+    local, progress, border, motion, slides, trace = (docs[n] for n in RETAINED_JSON_NAMES)
+    verify_retained_versions(docs)
     require(local.get('status') == 'pass' and local.get('completed') is True and
             local.get('restored') is True and local.get('fixture') is True and
             local.get('physicalExternalModelVerified') is False, 'Local completion or scope')
