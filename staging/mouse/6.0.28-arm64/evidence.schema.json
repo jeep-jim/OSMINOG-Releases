@@ -23,7 +23,7 @@
   ],
   "x-motionTraceGate": {
     "validator": "tools/mouse628-motion-trace.py",
-    "algorithm": "mouse628-motion-trace-evidence-v1",
+    "algorithm": "mouse628-motion-trace-evidence-v2",
     "maxTraceBytes": 75497472,
     "inputFiles": ["mouse-628-motion-trace.json", "mouse-628-motion.json"],
     "directIdentityLink": false,
