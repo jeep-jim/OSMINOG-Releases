@@ -9,9 +9,11 @@ from pathlib import Path
 import re
 import subprocess
 import sys
+from urllib.parse import quote
 import zipfile
 
 SOURCE = 'jeep-jim/OSMINOG'
+SOURCE_BRANCH = 'release/mouse-6.0.29'
 REPO = 'jeep-jim/OSMINOG-Releases'
 VERSION = '6.0.29'
 TAG = 'mouse-windows-v6.0.29-x64'
@@ -43,6 +45,8 @@ def pin():
     value = json.loads((STAGE / 'pin.json').read_text(encoding='utf-8'))
     if value.get('version') != VERSION or value.get('ready') is not True:
         raise ValueError('Windows publication pin is not ready')
+    if value.get('sourceBranch') != SOURCE_BRANCH:
+        raise ValueError('Windows publication requires the fixed 6.0.29 source branch')
     for key in ['source', 'sourceMerge']:
         if not re.fullmatch('[0-9a-f]{40}', value.get(key, '')):
             raise ValueError('Missing immutable ' + key)
@@ -107,6 +111,16 @@ def verification(value):
         raise ValueError('Ordinary launch, second-instance restore or native close missing')
 
 
+def verify_source_merge(p):
+    pr = api(SOURCE, f'pulls/{p["sourcePR"]}')
+    if (not pr.get('merged') or pr['head']['sha'] != p['source']
+            or pr['merge_commit_sha'] != p['sourceMerge'] or pr['base']['ref'] != SOURCE_BRANCH):
+        raise ValueError('Exact tested source PR is not merged into the fixed 6.0.29 branch')
+    comparison = api(SOURCE, f'compare/{p["source"]}...{quote(SOURCE_BRANCH, safe="")}')
+    if comparison['status'] not in ['ahead', 'identical'] or comparison['behind_by'] != 0:
+        raise ValueError('Tested source is not an ancestor of the fixed 6.0.29 branch')
+
+
 def import_candidate():
     p = pin()
     run = api(SOURCE, f'actions/runs/{p["run"]}')
@@ -122,12 +136,7 @@ def import_candidate():
                       'Require both unit and installed acceptance'}
     if not required_steps.issubset({s['name'] for s in job[0]['steps'] if s['conclusion'] == 'success'}):
         raise ValueError('Source job did not execute every release gate')
-    pr = api(SOURCE, f'pulls/{p["sourcePR"]}')
-    if not pr.get('merged') or pr['head']['sha'] != p['source'] or pr['merge_commit_sha'] != p['sourceMerge'] or pr['base']['ref'] != 'main':
-        raise ValueError('Exact tested source PR is not merged')
-    comparison = api(SOURCE, f'compare/{p["source"]}...main')
-    if comparison['status'] not in ['ahead', 'identical'] or comparison['behind_by'] != 0:
-        raise ValueError('Tested source is not an ancestor of main')
+    verify_source_merge(p)
     artifacts = api(SOURCE, f'actions/runs/{p["run"]}/artifacts?per_page=100')['artifacts']
     candidate = [a for a in artifacts if a['id'] == p['artifact'] and a['name'] == 'mouse-windows-x64-candidate']
     evidence = [a for a in artifacts if a['id'] == p['verificationArtifact'] and a['name'] == 'mouse-windows-x64-verification']
@@ -259,7 +268,9 @@ const {MouseUpdates,WINDOWS_CHANNEL}=require('./mouse-update.cjs');
 (async()=>{
  const target={platform:'win32',arch:'x64'},app={getVersion:()=> '6.0.28',getPath:()=>os.tmpdir()};
  let updater,error;const observations=[];
- for(let i=0;i<36;i++){
+ // The preceding Mac publication needed more than three minutes before the
+ // static channel was observed. Keep a bounded six-minute visibility budget.
+ for(let i=0;i<72;i++){
   try{updater=new MouseUpdates({app,shell:{},target});const state=await updater.run('check');observations.push({attempt:i+1,...state});assert.equal(state.phase,'available');assert.equal(state.channel,'static');assert.equal(state.availableVersion,'6.0.29');error=null;break;}
   catch(e){error=e;await new Promise(r=>setTimeout(r,5000));}
  }

@@ -5,8 +5,10 @@ These tests exercise rejection rules only. They do not install Mouse, run an
 updater, inspect native windows, or constitute Windows release evidence.
 """
 from pathlib import Path
+import json
 import runpy
 import subprocess
+import tempfile
 import unittest
 from unittest.mock import patch
 
@@ -57,6 +59,86 @@ def report_fixture():
             },
         },
     }
+
+
+def pin_fixture():
+    """Synthetic provenance for branch guards; never a real candidate pin."""
+    return {
+        'version': '6.0.29', 'ready': True, 'sourceBranch': 'release/mouse-6.0.29',
+        'source': '1' * 40, 'sourceMerge': '2' * 40,
+        'artifactSHA256': '3' * 64, 'verificationSHA256': '4' * 64,
+        'sourcePR': 172, 'run': 1, 'attempt': 1, 'job': 2, 'artifact': 3,
+        'verificationArtifact': 4,
+        'package': {'name': 'Mouse-Browser-6.0.29-Windows-x64.exe',
+                    'size': 100 * 1024**2, 'sha256': '5' * 64},
+    }
+
+
+class WindowsPublisherSourceBranch(unittest.TestCase):
+    def validate_pin(self, value):
+        with tempfile.TemporaryDirectory(prefix='mouse-publisher-pin-fixture-') as temporary:
+            stage = Path(temporary)
+            (stage / 'pin.json').write_text(json.dumps(value), encoding='utf-8')
+            (stage / 'PUBLISH_OWNER').write_text('Publish verified Mouse Browser 6.0.29 Windows x64', encoding='utf-8')
+            with patch.dict(PUBLISHER['pin'].__globals__, {'STAGE': stage}):
+                return PUBLISHER['pin']()
+
+    def test_fixed_629_pin_branch_is_accepted(self):
+        value = pin_fixture()
+        self.assertEqual(self.validate_pin(value), value)
+        self.assertEqual(PUBLISHER['SOURCE_BRANCH'], 'release/mouse-6.0.29')
+
+    def test_pin_rejects_main_missing_and_other_release_branches(self):
+        for branch in [None, '', 'main', 'release/mouse-6.0.30', 'refs/heads/release/mouse-6.0.29']:
+            with self.subTest(branch=branch):
+                value = pin_fixture()
+                if branch is None:
+                    value.pop('sourceBranch')
+                else:
+                    value['sourceBranch'] = branch
+                with self.assertRaisesRegex(ValueError, 'fixed 6.0.29 source branch'):
+                    self.validate_pin(value)
+
+    def source_merge(self, *, base='release/mouse-6.0.29', merged=True,
+                     head=None, merge=None, status='ahead', behind=0):
+        value = pin_fixture()
+        calls = []
+
+        def fixture_api(repo, resource):
+            self.assertEqual(repo, 'jeep-jim/OSMINOG')
+            calls.append(resource)
+            if resource == 'pulls/172':
+                return {'merged': merged, 'head': {'sha': head or value['source']},
+                        'merge_commit_sha': merge or value['sourceMerge'], 'base': {'ref': base}}
+            self.assertEqual(resource, 'compare/' + value['source'] + '...release%2Fmouse-6.0.29')
+            return {'status': status, 'behind_by': behind}
+
+        with patch.dict(PUBLISHER['verify_source_merge'].__globals__, {'api': fixture_api}):
+            PUBLISHER['verify_source_merge'](value)
+        return calls
+
+    def test_merged_source_is_compared_to_only_the_fixed_release_branch(self):
+        for status in ['ahead', 'identical']:
+            with self.subTest(status=status):
+                self.assertEqual(len(self.source_merge(status=status)), 2)
+
+    def test_merge_into_main_or_another_branch_is_rejected(self):
+        for base in ['main', 'release/mouse-6.0.30', '']:
+            with self.subTest(base=base):
+                with self.assertRaisesRegex(ValueError, 'not merged into the fixed'):
+                    self.source_merge(base=base)
+
+    def test_exact_tested_head_and_merge_are_still_required(self):
+        for change in [{'merged': False}, {'head': '6' * 40}, {'merge': '7' * 40}]:
+            with self.subTest(change=change):
+                with self.assertRaisesRegex(ValueError, 'not merged into the fixed'):
+                    self.source_merge(**change)
+
+    def test_diverged_or_behind_source_cannot_be_published(self):
+        for change in [{'status': 'diverged'}, {'status': 'behind'}, {'behind': 1}]:
+            with self.subTest(change=change):
+                with self.assertRaisesRegex(ValueError, 'not an ancestor'):
+                    self.source_merge(**change)
 
 
 class WindowsPublisherContract(unittest.TestCase):
