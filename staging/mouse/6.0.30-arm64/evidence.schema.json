@@ -1,0 +1,230 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Mouse Browser 6.0.30 native evidence bundle",
+  "$comment": "The publisher binds an exact source artifact and a fresh installed DMG run. Reviewed 628 geometry/motion contracts and the accepted 629 Nora wheel tutorial, seven-pane separator/Nora pixels and website scrollbar contracts remain required. tools/mouse630-evidence.py adds header progress, native DownloadItem/capture feedback, closed-page wheel ownership and Nora foreground/fractional/freshness proofs. tools/mouse630-ui-evidence.py retains accepted629 algorithms with explicit runtime6.0.30 expectations. Archived inputs are never relabelled or normalized. Native wheel injection does not claim physical trackpad verification; the separate system screenshot editor uses an explicitly synthetic input frame.",
+  "type": "object",
+  "required": [
+    "mouse-628-local.json",
+    "mouse-628-progress.json",
+    "mouse-628-borderless.json",
+    "mouse-628-motion.json",
+    "mouse-628-desktop-transition.json",
+    "mouse-629-swipe-tutorial.json",
+    "mouse-628-motion-trace.json",
+    "mouse-629-ui-regressions.json",
+    "mouse-630-feedback-evidence.json",
+    "mouse-630-wheel-pages.json",
+    "mouse-630-nora-foreground.json"
+  ],
+  "x-nativeMarkers": [
+    "MOUSE_628_LOCAL_MCP_NATIVE_PASS",
+    "MOUSE_628_PER_PANE_PROGRESS_NATIVE_PASS",
+    "MOUSE_628_BORDERLESS_NATIVE_PASS",
+    "MOUSE_628_NORA_CONTENT_FIT_NATIVE_PASS",
+    "MOUSE_628_OPEN_NORA_DESKTOP_SLIDE_NATIVE_PASS",
+    "MOUSE_628_BURROW_CONTENT_FIT_CONTROLS_PASS",
+    "MOUSE_628_ACTIVE_TAB_FLOW_BORDERLESS_BOTH_THEMES_PASS",
+    "MOUSE_628_BORDERLESS_UPDATE_BADGE_BOTH_THEMES_PASS",
+    "MOUSE_630_DOWNLOAD_ACTIVITY_PASS",
+    "MOUSE_630_PRIVATE_DOWNLOAD_SCOPE_PASS",
+    "MOUSE_630_CAPTURE_FEEDBACK_PASS",
+    "MOUSE_629_TWO_FINGER_WHEEL_TUTORIAL_WRITE_PASS",
+    "MOUSE_629_TWO_FINGER_WHEEL_TUTORIAL_NATIVE_PASS",
+    "MOUSE_630_NATIVE_WHEEL_DESKTOPS_PASS",
+    "MOUSE_630_PAGE_SCROLL_PRESERVED_PASS",
+    "MOUSE_630_NORA_NATIVE_FOREGROUND_PASS",
+    "MOUSE_629_UI_REGRESSIONS_NATIVE_PASS"
+  ],
+  "x-motionTraceGate": {
+    "validator": "tools/mouse628-motion-trace.py",
+    "algorithm": "mouse628-motion-trace-evidence-v2",
+    "maxTraceBytes": 75497472,
+    "inputFiles": [
+      "mouse-628-motion-trace.json",
+      "mouse-628-motion.json"
+    ],
+    "directIdentityLink": false,
+    "attribution": "temporal-correlation",
+    "savedReportAcceptedAsInput": false
+  },
+  "x-feedbackGate": {
+    "validator": "tools/mouse630-evidence.py",
+    "file": "mouse-630-feedback-evidence.json",
+    "runtimeVersion": "6.0.30",
+    "downloads": "actual Electron DownloadItem events",
+    "editorPixels": "BrowserWindow.capturePage",
+    "globalEditorInput": "synthetic fixture",
+    "copyAttempt": {
+      "required": true,
+      "path": "capture.copyAttempt",
+      "source": "one actual copy export and one BrowserWindow.capturePage during the natural CSS visibility plateau",
+      "copyExports": 1,
+      "nativeReadbacks": 1,
+      "barrierReason": "plateau",
+      "maxBarrierSamples": 128,
+      "rendererObservations": [
+        "barrier.before",
+        "after"
+      ],
+      "animation": {
+        "name": "mouse-capture-confirm",
+        "durationMs": 1400,
+        "playState": "running",
+        "currentTimeRangeMsInclusive": [
+          224,
+          1064
+        ],
+        "minimumOpacity": 0.99,
+        "sameRendererTimeOrigin": true,
+        "sameAnimationStartTime": true,
+        "monotonicSampleAndAnimationTimes": true,
+        "replayed": false,
+        "durationModified": false
+      },
+      "mainClock": "performance.now() with recorded mainTimeOrigin",
+      "mainClockOrder": [
+        "copyStartedAt",
+        "copyResolvedAt",
+        "requestedAt",
+        "receivedAt",
+        "afterSampledAt",
+        "encodedAt"
+      ],
+      "rendererAndMainClocksComparedSeparately": true,
+      "beforeFeedbackBoundTo": "capture.copied.feedback",
+      "nativeFrameBoundTo": "capture.copied.frame",
+      "pixelProof": "Exact export result, PNG SHA-256 and capture clocks, unchanged viewport, matching changedRegion and changedPixels, badge-to-bitmap geometry and independently recomputed PNG pixel differences",
+      "savedReportAcceptedAsInput": false
+    },
+    "savedReportAcceptedAsInput": false
+  },
+  "x-noraForegroundGate": {
+    "validator": "tools/mouse630-evidence.py",
+    "file": "mouse-630-nora-foreground.json",
+    "runtimeVersion": "6.0.30",
+    "visibility": "actual native page and clip Views",
+    "pixels": "OS display framebuffer plus exact window crop",
+    "savedReportAcceptedAsInput": false,
+    "fractionalLayout": {
+      "requiredCases": 1,
+      "theme": "light",
+      "panels": 7,
+      "windowWidth": 971,
+      "bounds": "actual native roots versus separately rounded DOM endpoints",
+      "snapshots": "seven decoded PNGs with independently checked bounds and SHA-256",
+      "identity": "same WebContents, URL, epoch, DOM marker, viewport, scroll and native root order before/during/after Nora"
+    },
+    "freshDisplayReadiness": {
+      "scope": "all eight settled-state OS display captures",
+      "timeoutMs": 4000,
+      "maxAttempts": 20,
+      "allRawAttemptFramesRetained": true,
+      "stabilitySnapshotsPerAttempt": 3,
+      "pixelTolerance": 2,
+      "regions": [
+        "Nora title",
+        "Nora actions",
+        "opaque fill",
+        "three original foreground probes"
+      ],
+      "animationReplayed": false
+    }
+  },
+  "x-wheelGate": {
+    "validator": "tools/mouse630-evidence.py",
+    "files": [
+      "mouse-630-wheel-pages.json"
+    ],
+    "runtimeVersion": "6.0.30",
+    "recognizer": "horizontal-wheel-and-desktop-controls",
+    "packetSource": "trusted-wheel",
+    "surfaces": [
+      "page",
+      "control"
+    ],
+    "input": "native mouseWheel injection and trusted DOM events",
+    "horizontalThreshold": 112,
+    "controlThreshold": 64,
+    "quietMs": 280,
+    "cooldownMs": 420,
+    "pageScrollOwnershipPreserved": true,
+    "normalPrivateSessionsIsolated": true,
+    "physicalTwoFingerHardwareVerified": false,
+    "savedReportAcceptedAsInput": false
+  },
+  "x-motionMediaGate": {
+    "validator": "tools/mouse630-evidence.py",
+    "normal": false,
+    "requiresRestoredOriginalQuery": true,
+    "scopes": [
+      "Nora foreground",
+      "main capture editor",
+      "global capture editor"
+    ],
+    "reducedMotionExportRequiredInBothEditors": true,
+    "productOrOSPreferencesModified": false
+  },
+  "x-runtimeVersions": {
+    "mouse-628-local.json": "6.0.30",
+    "mouse-628-progress.json": "6.0.30",
+    "mouse-628-borderless.json": "6.0.28",
+    "mouse-628-motion.json": "6.0.28",
+    "mouse-628-desktop-transition.json": "6.0.28",
+    "mouse-629-swipe-tutorial.json": "6.0.30",
+    "mouse-629-ui-regressions.json": "6.0.30",
+    "mouse-630-feedback-evidence.json": "6.0.30",
+    "mouse-630-wheel-pages.json": "6.0.30",
+    "mouse-630-nora-foreground.json": "6.0.30"
+  },
+  "x-gesture": {
+    "file": "mouse-629-swipe-tutorial.json",
+    "recognizer": "two-finger-or-wheel",
+    "source": "nora-wheel",
+    "physicalTrackpadVerified": false,
+    "validator": "tools/mouse630-ui-evidence.py",
+    "runtimeVersion": "6.0.30",
+    "persistenceKey": "mouseDesktopWheelHintV2",
+    "sameHintAcrossNativeRestartRequired": true,
+    "normalPrivateLearningIsolated": true,
+    "savedReportAcceptedAsInput": false
+  },
+  "x-uiRegressions": {
+    "file": "mouse-629-ui-regressions.json",
+    "baselineVersion": "6.0.27",
+    "paneCount": 7,
+    "separatorScenes": 4,
+    "noraThemes": 2,
+    "nativeSource": "globalCapture.acquire(display)",
+    "exactSeparatorPalette": {
+      "light": "#c7cfdf",
+      "dark": "#43536b"
+    },
+    "scrollbarSource": "installed guest WebContents + bundled preload",
+    "scrollbarCaptureSource": "guest WebContents.capturePage",
+    "scrollbarNativeComposite": false,
+    "physicalTrackpadVerified": false,
+    "validator": "tools/mouse630-ui-evidence.py",
+    "runtimeVersion": "6.0.30",
+    "nativeWheelScrolls": 4,
+    "trustedScrollEnds": 4,
+    "savedReportAcceptedAsInput": false
+  },
+  "x-noraTransitions": {
+    "file": "mouse-628-desktop-transition.json",
+    "schemaVersion": "6.0.28",
+    "tutorialFile": "mouse-629-swipe-tutorial.json",
+    "dispatchSource": "nora-wheel",
+    "themes": [
+      "light",
+      "dark"
+    ],
+    "directions": [
+      -1,
+      1
+    ],
+    "nativeIdentityViewportScrollPreserved": true,
+    "sharedNoraHoldRetained": true,
+    "inputAndTransitionRecordsBound": true,
+    "savedReportAcceptedAsInput": false
+  }
+}
