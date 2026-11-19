@@ -53,7 +53,8 @@ jobs:
           codesign --verify --deep --strict "$RUNNER_TEMP/mouse628-zip/Mouse Browser.app"
           cmp "$APP/Contents/Resources/app.asar" "$RUNNER_TEMP/mouse628-zip/Mouse Browser.app/Contents/Resources/app.asar"
           diff -qr "$APP/Contents/Resources/mouse-agent-node_modules" "$RUNNER_TEMP/mouse628-zip/Mouse Browser.app/Contents/Resources/mouse-agent-node_modules"
-          test -x "$APP/Contents/Resources/mouse-agent-node_modules/node-pty/prebuilds/darwin-arm64/spawn-helper"
+          test -x "$APP/Contents/Resources/mouse-agent-node_modules/node_modules/node-pty/prebuilds/darwin-arm64/spawn-helper"
+          test -x "$RUNNER_TEMP/mouse628-zip/Mouse Browser.app/Contents/Resources/mouse-agent-node_modules/node_modules/node-pty/prebuilds/darwin-arm64/spawn-helper"
           hdiutil detach "$MOUNT"
           trap - EXIT
           cd mouse628-release
