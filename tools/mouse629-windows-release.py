@@ -22,6 +22,8 @@ ROOT = Path(__file__).resolve().parents[1]
 STAGE = ROOT / 'staging/mouse/6.0.29-windows-x64'
 OUT = ROOT / 'mouse629-windows-release'
 ASSETS = (INSTALLER, 'SHA256SUMS.txt', 'mouse-windows-build.json')
+RELEASE_TITLE = 'Mouse Browser 6.0.29 — Windows x64'
+RELEASE_PAGE_LIMIT = 20
 
 
 def sha(data):
@@ -211,38 +213,110 @@ def verify_installed():
     verification(json.loads((OUT / 'mouse-windows-verification.json').read_text(encoding='utf-8')))
 
 
+def release_identity(value, p, expected_id=None):
+    release_id = value.get('id') if isinstance(value, dict) else None
+    if (type(release_id) is not int or release_id <= 0
+            or expected_id is not None and release_id != expected_id
+            or value.get('url') != f'https://api.github.com/repos/{REPO}/releases/{release_id}'
+            or value.get('tag_name') != TAG or value.get('name') != RELEASE_TITLE
+            or type(value.get('draft')) is not bool or value.get('prerelease') is not True
+            or not isinstance(value.get('assets'), list)):
+        raise ValueError('Unexpected Windows release identity')
+    lines = (value.get('body') or '').splitlines()
+    required = [f'Source: https://github.com/{SOURCE}/commit/{p["source"]}',
+                f'Source checks: https://github.com/{SOURCE}/actions/runs/{p["run"]}',
+                p['package']['sha256'] + '  ' + INSTALLER]
+    if not all(line in lines for line in required):
+        raise ValueError('Existing Windows release does not match the pinned source and installer')
+    return value
+
+
+def read_release(release_id, p):
+    return release_identity(api(REPO, f'releases/{release_id}'), p, release_id)
+
+
+def find_release(p):
+    # By-tag lookup only promises a published release. Authenticated listing
+    # includes drafts; finish every page before deciding that a tag is unique.
+    # https://docs.github.com/en/rest/releases/releases#list-releases
+    matches = {}
+    published = api(REPO, f'releases/tags/{TAG}', missing=True)
+    if published is not None:
+        published = release_identity(published, p)
+        matches[published['id']] = published
+    for page in range(1, RELEASE_PAGE_LIMIT + 1):
+        releases = api(REPO, f'releases?per_page=100&page={page}')
+        if not isinstance(releases, list) or len(releases) > 100:
+            raise ValueError('Invalid authenticated release listing')
+        for release in releases:
+            if release.get('tag_name') == TAG:
+                release = release_identity(release, p)
+                matches[release['id']] = release
+        if len(releases) < 100:
+            break
+    else:
+        raise ValueError('Release listing exceeded the bounded pagination limit')
+    if len(matches) > 1:
+        raise ValueError('Ambiguous Windows releases for the exact tag')
+    return read_release(next(iter(matches)), p) if matches else None
+
+
+def upload_release_asset(release_id, name):
+    # The upload endpoint is keyed by the validated release ID, including for
+    # drafts. No tag lookup or --clobber operation occurs inside this command.
+    endpoint = f'https://uploads.github.com/repos/{REPO}/releases/{release_id}/assets?name={quote(name, safe="")}'
+    subprocess.run(['gh', 'api', endpoint, '--method', 'POST',
+                    '--header', 'Content-Type: application/octet-stream',
+                    '--input', str(OUT / name)], stdout=subprocess.DEVNULL, check=True, timeout=300)
+
+
 def publish():
     p = pin()
     verification(json.loads((OUT / 'mouse-windows-verification.json').read_text(encoding='utf-8')))
     if sha((OUT / INSTALLER).read_bytes()) != p['package']['sha256']:
         raise ValueError('Installer changed after verification')
-    release = api(REPO, f'releases/tags/{TAG}', missing=True)
+    release = find_release(p)
+    notes = (OUT / 'RELEASE_NOTES.md').read_text(encoding='utf-8')
     if release is None:
-        subprocess.run(['gh', 'release', 'create', TAG, '--repo', REPO, '--draft', '--prerelease', '--latest=false',
-                        '--title', 'Mouse Browser 6.0.29 — Windows x64', '--notes-file', str(OUT / 'RELEASE_NOTES.md')], check=True, timeout=120)
-        release = api(REPO, f'releases/tags/{TAG}')
+        release = release_identity(api(REPO, 'releases', 'POST', {
+            'tag_name': TAG, 'target_commitish': 'main', 'name': RELEASE_TITLE,
+            'body': notes, 'draft': True, 'prerelease': True, 'make_latest': 'false',
+        }), p)
+        if release['draft'] is not True:
+            raise ValueError('New Windows release must remain a draft until assets are verified')
+    release_id = release['id']
     names = [*ASSETS, 'mouse-windows-verification.json']
+    missing = []
+    # Inspect every existing immutable asset before uploading any missing one.
     for name in names:
         data = (OUT / name).read_bytes()
         existing = [a for a in release['assets'] if a['name'] == name]
         if existing:
-            if len(existing) != 1 or existing[0]['size'] != len(data) or existing[0].get('digest') != 'sha256:' + sha(data):
+            if len(existing) != 1 or existing[0].get('state') != 'uploaded':
+                raise ValueError('Unexpected existing Windows release asset: ' + name)
+            if existing[0]['size'] != len(data) or existing[0].get('digest') != 'sha256:' + sha(data):
                 # Installer and original evidence are immutable, including across reruns.
                 # A fresh rerun report belongs in CI artifacts, not over an old release asset.
-                if name == 'mouse-windows-verification.json' and len(existing) == 1:
+                if name == 'mouse-windows-verification.json':
                     continue
                 raise ValueError('Refusing to overwrite an immutable release asset: ' + name)
         else:
-            subprocess.run(['gh', 'release', 'upload', TAG, str(OUT / name), '--repo', REPO], check=True, timeout=300)
-    release = api(REPO, f'releases/tags/{TAG}')
+            missing.append(name)
+    for name in missing:
+        upload_release_asset(release_id, name)
+    release = read_release(release_id, p)
     for name in ASSETS:
         actual = [a for a in release['assets'] if a['name'] == name]
         data = (OUT / name).read_bytes()
         if len(actual) != 1 or actual[0].get('state') != 'uploaded' or actual[0]['size'] != len(data) or actual[0].get('digest') != 'sha256:' + sha(data):
             raise ValueError('Remote release asset checksum mismatch: ' + name)
     if release['draft']:
-        subprocess.run(['gh', 'release', 'edit', TAG, '--repo', REPO, '--draft=false', '--prerelease', '--latest=false'], check=True, timeout=120)
-    release = api(REPO, f'releases/tags/{TAG}')
+        # Refresh only this verified draft's notes to link the current successful
+        # fresh-install run. Existing public releases and assets stay immutable.
+        release_identity(api(REPO, f'releases/{release_id}', 'PATCH', {
+            'draft': False, 'prerelease': True, 'make_latest': 'false', 'body': notes,
+        }), p, release_id)
+    release = read_release(release_id, p)
     if release['draft'] or not release.get('published_at'):
         raise ValueError('Release is not public')
     (OUT / 'public-release-verification.json').write_text(json.dumps(release, indent=2) + '\n', encoding='utf-8')
