@@ -37,7 +37,7 @@ def verify_628_trace(read,provenance):
  if not all(0<len(v)<=72*1024**2 for v in blobs.values()):raise ValueError('Missing/oversized trace input')
  docs={n:json.loads(v) for n,v in blobs.items()}
  report=_trace['verify_trace_data'](docs[names[0]],docs[names[1]])
- if report.get('status')!='pass' or report.get('algorithm')!='mouse628-motion-trace-evidence-v1' or report.get('directIdentityLink') is not False:raise ValueError('Motion trace rejected')
+ if report.get('status')!='pass' or report.get('algorithm')!='mouse628-motion-trace-evidence-v2' or report.get('directIdentityLink') is not False:raise ValueError('Motion trace rejected')
  return {'version':V,'inputs':{n:{'size':len(blobs[n]),'sha256':sha(blobs[n])} for n in names},'provenance':provenance,'evidence':report}
 
 def validate():
@@ -49,7 +49,7 @@ def validate():
  if not (STAGE/'RELEASE_NOTES.md').read_text().startswith('# Mouse Browser 6.0.28'):raise ValueError('Release notes version mismatch')
  if (STAGE/'PUBLISH_OWNER').read_text().strip()!='Mouse Browser 6.0.28: publish pinned source and verified Mac packages':raise ValueError('Owner publication trigger mismatch')
  schema=json.loads((STAGE/'evidence.schema.json').read_text())
- if set(schema['required'])!=set(_evidence.JSON_NAMES) or schema['x-motionTraceGate']['algorithm']!='mouse628-motion-trace-evidence-v1':raise ValueError('Evidence schema mismatch')
+ if set(schema['required'])!=set(_evidence.JSON_NAMES) or schema['x-motionTraceGate']['algorithm']!='mouse628-motion-trace-evidence-v2':raise ValueError('Evidence schema mismatch')
  print('MOUSE628_RELEASE_PIN_CONTRACT_PASS',flush=True)
 
 def api(repo,p,method='GET',payload=None,missing=False):
