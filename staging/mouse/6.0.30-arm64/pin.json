@@ -1,16 +1,16 @@
 {
   "version": "6.0.30",
   "ready": true,
-  "source": "a1e3d0d8a594cbf324fee8cece53080c9f750d12",
-  "run": 44524997073,
-  "artifact": 14532270598,
-  "archiveSHA256": "b761f3481caca3adc01ac4d72f6810a0303e7639b15ec07b63e48a1a2ea63bfe",
-  "verificationArtifact": 14532460586,
-  "verificationSHA256": "c6e09af40eb7fe579793ce5e5a87eb0440e2698fc517904d4596079ec94feb92",
-  "sourcePR": 169,
-  "sourceMerge": "82b6d317eed274d4c009572581970280bec2fb3e",
-  "sourceAttempt": 1,
-  "sourceJob": 135563089855,
+  "source": "3912217f69d42714fcbbda1fd3606a50459a05f1",
+  "run": 44547972810,
+  "artifact": 14544690281,
+  "archiveSHA256": "4889f1e18aed2ca4fb02a66d77b28119c871790d4a33db970f1cd8103586b74a",
+  "verificationArtifact": 14542952947,
+  "verificationSHA256": "83af534a3ffc567b0184855447f6e14c36adbb8881bef41d85aeffbe749efb64",
+  "sourcePR": 174,
+  "sourceMerge": "e1140a1a69d5148c66d65dfb65c639e7c07f0d0c",
+  "sourceAttempt": 2,
+  "sourceJob": 135654921736,
   "previous": {
     "version": "6.0.29",
     "source": "72679ee907dda6e7ac134b1f01addee858c4e59a",
@@ -23,12 +23,12 @@
   },
   "packages": {
     "Mouse-Browser-6.0.30-mac-arm64.dmg": {
-      "size": 137840964,
-      "sha256": "e9ae8fff7384b5bdf0b432e70b308ea4cd6ce1a883b5268dc6e082b4dd1e65a2"
+      "size": 137799053,
+      "sha256": "208681732445fda519a656001636810c9ec961e60ad02f9d5106bead587d9203"
     },
     "Mouse-Browser-6.0.30-mac-arm64.zip": {
-      "size": 140143239,
-      "sha256": "925afc2877acf414774138e3d72d530ee1a20ce1fdf94695240e80cb192f4a85"
+      "size": 140153101,
+      "sha256": "4e332f006674daef6fd517eb87aa3b920d07d5836b6b3d4078e69b24ede4953a"
     }
   }
 }
