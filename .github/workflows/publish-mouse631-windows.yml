@@ -1,7 +1,7 @@
 name: Publish verified Mouse Browser 6.0.31 Windows x64
 on:
   pull_request:
-    paths: ['tools/mouse631-windows-release.py','tools/test_mouse631_windows_release.py','tools/mouse631-task-evidence.py','tools/test_mouse631_task_evidence.py','tools/test_mouse631_native_report.py','.github/workflows/publish-mouse631-windows.yml','staging/mouse/6.0.31-windows-x64/**']
+    paths: ['.gitattributes','tools/mouse631-windows-release.py','tools/test_mouse631_windows_release.py','tools/mouse631-task-evidence.py','tools/test_mouse631_task_evidence.py','tools/test_mouse631_native_report.py','.github/workflows/publish-mouse631-windows.yml','staging/mouse/6.0.31-windows-x64/**']
   push:
     branches: [main]
     paths: ['staging/mouse/6.0.31-windows-x64/PUBLISH_OWNER']
