@@ -498,6 +498,7 @@ def verify_scrollbars(facts, read):
             {row.get('theme') for row in rows} == {'light', 'dark'},
             'scrollbar theme matrix incomplete')
     site = time_origin = previous = None
+    completed_wheels = []
     for row in rows:
         theme = row['theme']
         thumb, track = ([104]*3, [23]*3) if theme == 'dark' else ([139]*3, [245]*3)
@@ -521,6 +522,10 @@ def verify_scrollbars(facts, read):
         for state in (measured, after):
             require(state.get('media') == {'dark':theme == 'dark', 'forcedColors':False},
                     'scrollbar evidence used the wrong browser theme or forced colours')
+            require(number(state.get('at')) and state['at'] >= 0 and
+                    state.get('scrollEndSupported') == {'root':True, 'nested':True} and
+                    isinstance(state.get('scrollEndEvents'), list),
+                    'scrollbar native scrollend observation is unavailable')
             for key in ('root', 'nested'):
                 value = state.get(key, {})
                 require(value.get('width') == 'thin' and value.get('color') == expected_color and
@@ -563,6 +568,30 @@ def verify_scrollbars(facts, read):
                     wheel.get('desktopBefore') == wheel.get('desktopAfter') ==
                     {'bank':fixture['desktop'], 'shell':fixture['desktop']},
                     'page wheel did not scroll exactly its intended container or switched desktop')
+            completion = wheel.get('completion', {})
+            end = completion.get('event', {})
+            settled = completion.get('afterTwoFrames', {})
+            require(wheel.get('theme') == theme and wheel.get('target') == target and
+                    wheel.get('status') == 'completed' and
+                    number(wheel.get('startedAt')) and number(wheel.get('observedAt')) and
+                    type(event.get('index')) is int and event['index'] >= 0 and
+                    completion.get('method') == 'trusted scrollend' and
+                    completion.get('supported') is True and completion.get('timeoutMs') == 6000 and
+                    end.get('target') == target and end.get('isTrusted') is True and
+                    end.get('wheelEventIndex') == event['index'] and number(end.get('at')) and
+                    wheel['startedAt'] <= event['at'] <= end['at'] and
+                    end in after['scrollEndEvents'] and
+                    {key:end.get(key) for key in ('root', 'nested')} == result and
+                    end.get('scrollTop') == result[target] and
+                    end.get('scrollLeft') == after[target]['scrollLeft'] and
+                    completion.get('positions') == result and
+                    {key:settled.get(key) for key in ('root', 'nested')} == result and
+                    number(completion.get('observedAt')) and number(settled.get('at')) and
+                    end['at'] <= completion['observedAt'] <= settled['at'] == wheel['observedAt'] <= after['at'],
+                    'wheel completion lacks its own trusted scrollend and stable final positions')
+            require(not completed_wheels or completed_wheels[-1]['observedAt'] <= wheel['startedAt'],
+                    'next native wheel began before the preceding scroll completed')
+            completed_wheels.append(wheel)
             running = result
         require(running == {key:after[key]['scrollTop'] for key in ('root', 'nested')},
                 'scrollbar final page scroll differs from delivered wheel evidence')
@@ -583,8 +612,11 @@ def verify_scrollbars(facts, read):
         if theme == 'dark':
             require(facts.get('wheel') == wheels, 'summary wheel evidence differs from the dark native run')
         previous = after
+    require(facts.get('wheelAttempts') == completed_wheels and
+            [wheel['event']['index'] for wheel in completed_wheels] == [0, 1, 2, 3],
+            'scrollbar wheel attempt journal is incomplete or refers to another input')
     return {'themes':2, 'nativeWheelScrolls':4, 'guestCaptures':2,
-            'nativeComposite':False, 'physicalTrackpadVerified':False}
+            'trustedScrollEnds':4, 'nativeComposite':False, 'physicalTrackpadVerified':False}
 
 
 def verify_ui_regressions(facts, read):

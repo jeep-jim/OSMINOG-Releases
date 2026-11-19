@@ -109,8 +109,8 @@ def scrollbar_fixture(images):
              'fixture':{'tabId':'scroll-page', 'webContentsId':10, 'desktop':'desk-a',
                         'url':'http://127.0.0.1:12345/mouse629-scrollbars',
                         'authorScrollbar':{'width':'auto', 'rootThumb':'#aaaaaa', 'nestedThumb':'#cccccc',
-                                           'track':'white', 'priority':'important'}}, 'themes':[]}
-    tops, events, previous = {'root':300, 'nested':80}, [], None
+                                           'track':'white', 'priority':'important'}}, 'themes':[], 'wheelAttempts':[]}
+    tops, events, ends, previous = {'root':300, 'nested':80}, [], [], None
     for theme in ('dark', 'light'):
         thumb, track = (104, 23) if theme == 'dark' else (139, 245)
         style = {'width':'thin', 'color':f'rgb({thumb}, {thumb}, {thumb}) rgb({track}, {track}, {track})',
@@ -118,6 +118,8 @@ def scrollbar_fixture(images):
                  'overflowX':'scroll', 'overflowY':'scroll', 'clientWidth':320, 'clientHeight':220,
                  'offsetWidth':322, 'offsetHeight':222, 'scrollWidth':900, 'scrollHeight':1000, 'scrollLeft':40}
         measured = {'viewport':{'width':500, 'height':450, 'devicePixelRatio':1}, 'timeOrigin':1000,
+                    'at':100+len(events)*100, 'scrollEndSupported':{'root':True, 'nested':True},
+                    'scrollEndEvents':copy.deepcopy(ends),
                     'media':{'dark':theme == 'dark', 'forcedColors':False}, 'site':copy.deepcopy(site),
                     'wheelEvents':copy.deepcopy(events),
                     **{key:dict(style, scrollTop=value) for key, value in tops.items()}}
@@ -127,17 +129,29 @@ def scrollbar_fixture(images):
             point = {'x':100 if target == 'nested' else 455, 'y':190 if target == 'nested' else 395,
                      'nested':target == 'nested', 'hit':'DIV' if target == 'nested' else 'BODY', 'inside':True}
             event = {'isTrusted':True, 'nested':target == 'nested', 'x':point['x'], 'y':point['y'],
-                     'deltaX':0, 'deltaY':160, 'deltaMode':0, 'at':len(events)+1}
+                     'deltaX':0, 'deltaY':160, 'deltaMode':0, 'index':len(events), 'at':110+len(events)*100}
             after_tops = dict(tops)
             after_tops[target] += 160
+            end = {'target':target, 'isTrusted':True, 'at':event['at']+50,
+                   'wheelEventIndex':event['index'], **after_tops,
+                   'scrollTop':after_tops[target], 'scrollLeft':40}
             wheels[target] = {'input':{'type':'mouseWheel', 'x':point['x'], 'y':point['y'], 'deltaX':0, 'deltaY':-160},
+                              'theme':theme, 'target':target, 'status':'completed',
+                              'startedAt':event['at']-2, 'observedAt':end['at']+2,
                               'point':point, 'event':event, 'before':dict(tops), 'after':after_tops,
                               'desktopBefore':{'bank':'desk-a', 'shell':'desk-a'},
-                              'desktopAfter':{'bank':'desk-a', 'shell':'desk-a'}}
+                              'desktopAfter':{'bank':'desk-a', 'shell':'desk-a'},
+                              'completion':{'method':'trusted scrollend', 'timeoutMs':6000, 'supported':True,
+                                            'event':end, 'observedAt':end['at']+1, 'positions':dict(after_tops),
+                                            'afterTwoFrames':{'at':end['at']+2, **after_tops}}}
+            facts['wheelAttempts'].append(wheels[target])
             tops = after_tops
             events.append(event)
+            ends.append(end)
         after = copy.deepcopy(measured)
         after['wheelEvents'] = copy.deepcopy(events)
+        after['scrollEndEvents'] = copy.deepcopy(ends)
+        after['at'] = 100+len(events)*100
         for key in ('root', 'nested'):
             after[key]['scrollTop'] = tops[key]
         filename = 'mouse-629-scrollbars-'+theme+'.png'
@@ -389,6 +403,32 @@ class UiEvidenceTests(unittest.TestCase):
         self.facts['scrollbars']['themes'][0]['screenshot']['nativeComposite'] = True
         with self.assertRaisesRegex(ValueError, 'source was mislabelled'):
             self.verify()
+
+    def test_fixed_delay_cannot_substitute_for_scroll_completion(self):
+        self.facts['scrollbars']['themes'][0]['wheels']['root']['completion'] = {'method':'120ms sleep'}
+        with self.assertRaisesRegex(ValueError, 'own trusted scrollend'):
+            self.verify()
+
+    def test_previous_wheel_scrollend_cannot_complete_next_wheel(self):
+        self.facts['scrollbars']['themes'][0]['wheels']['nested']['completion']['event']['wheelEventIndex'] = 0
+        with self.assertRaisesRegex(ValueError, 'own trusted scrollend'):
+            self.verify()
+
+    def test_motion_after_scrollend_cannot_pass_completed_input(self):
+        self.facts['scrollbars']['themes'][0]['wheels']['root']['completion']['afterTwoFrames']['root'] += 2
+        with self.assertRaisesRegex(ValueError, 'stable final positions'):
+            self.verify()
+
+    def test_failed_or_unobserved_scrollend_cannot_complete_wheel(self):
+        for target in ('status', 'trusted'):
+            self.facts = copy.deepcopy(self.original)
+            wheel = self.facts['scrollbars']['themes'][0]['wheels']['root']
+            if target == 'status':
+                wheel['status'] = 'failed'
+            else:
+                wheel['completion']['event']['isTrusted'] = False
+            with self.assertRaisesRegex(ValueError, 'own trusted scrollend'):
+                self.verify()
 
 
 class ReleaseTemplateTests(unittest.TestCase):
