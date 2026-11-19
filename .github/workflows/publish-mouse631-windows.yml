@@ -1,0 +1,64 @@
+name: Publish verified Mouse Browser 6.0.31 Windows x64
+on:
+  pull_request:
+    paths: ['tools/mouse631-windows-release.py','tools/test_mouse631_windows_release.py','tools/mouse631-task-evidence.py','tools/test_mouse631_task_evidence.py','tools/test_mouse631_native_report.py','.github/workflows/publish-mouse631-windows.yml','staging/mouse/6.0.31-windows-x64/**']
+  push:
+    branches: [main]
+    paths: ['staging/mouse/6.0.31-windows-x64/PUBLISH_OWNER']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - name: Verify publication refuses incomplete evidence
+        run: python3 tools/test_mouse631_windows_release.py -v
+      - name: Verify task and fifty-tab native evidence contracts
+        run: python3 tools/test_mouse631_task_evidence.py -v
+      - name: Verify native process report and immutable byte bindings
+        run: python3 tools/test_mouse631_native_report.py -v
+  publish-windows:
+    if: github.event_name != 'pull_request'
+    needs: contract
+    runs-on: windows-latest
+    timeout-minutes: 55
+    permissions:
+      contents: write
+    concurrency:
+      group: mouse-windows-x64-release
+      cancel-in-progress: false
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Import immutable successful Windows CI installer
+        run: python tools/mouse631-windows-release.py import
+      - name: Verify exact installer on a fresh Windows machine
+        run: python tools/mouse631-windows-release.py verify
+      - name: Publish and verify immutable public asset
+        run: python tools/mouse631-windows-release.py publish
+      - name: Advance Windows feed and verify anonymous discovery and download
+        run: python tools/mouse631-windows-release.py channel
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: mouse631-windows-release-verification-${{ github.run_attempt }}
+          path: |
+            mouse631-windows-release/*.json
+            mouse631-windows-release/*.log
+            mouse631-windows-release/*.png
+            mouse631-windows-release/mouse-631-upgrade/**
+            mouse631-windows-release/SHA256SUMS.txt
+            mouse631-windows-release/RELEASE_NOTES.md
+          retention-days: 14
