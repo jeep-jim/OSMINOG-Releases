@@ -1,0 +1,25 @@
+{
+  "version": "6.0.29",
+  "ready": false,
+  "source": null,
+  "run": null,
+  "artifact": null,
+  "archiveSHA256": null,
+  "verificationArtifact": null,
+  "verificationSHA256": null,
+  "sourcePR": null,
+  "sourceMerge": null,
+  "sourceAttempt": null,
+  "sourceJob": null,
+  "previous": {
+    "version": "6.0.28",
+    "source": "91ed7fd7e9843b554ef5c00096972c0bd78ff3f4",
+    "updaterBlobSHA": "c4a9564bc5a7c3cf2c6798b5eade9680ee0e57cf",
+    "package": {
+      "name": "Mouse-Browser-6.0.28-mac-arm64.dmg",
+      "size": 137749805,
+      "sha256": "1fdc4dbf48d816e136b4ca08bf6c64a80ed25170a9494307c1b33da068a68241"
+    }
+  },
+  "packages": {}
+}
