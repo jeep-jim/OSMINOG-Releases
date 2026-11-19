@@ -118,7 +118,8 @@ def import_candidate():
         raise ValueError('Exact Windows source job has not passed')
     required_steps = {'Run retained and Windows Mouse tests', 'Build Mouse Browser NSIS installer',
                       'Verify installed app, native UI, restart and profile preservation',
-                      'Bind verified installer bytes to source and test evidence'}
+                      'Bind verified installer bytes to source and test evidence',
+                      'Require both unit and installed acceptance'}
     if not required_steps.issubset({s['name'] for s in job[0]['steps'] if s['conclusion'] == 'success'}):
         raise ValueError('Source job did not execute every release gate')
     pr = api(SOURCE, f'pulls/{p["sourcePR"]}')
