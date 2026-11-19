@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Mouse Browser 6.0.28 native evidence bundle",
+  "$comment": "The publisher validates the source workflow's archived evidence and a fresh installed DMG run. The independent mouse628-evidence.py and mouse628-motion-trace.py validators recompute pixel and motion acceptance from the exact archived inputs. A saved report alone is not an acceptance input. A synthetic native swipe fixture verifies first-use lifecycle; a physical trackpad gesture is not claimed.",
+  "type": "object",
+  "required": [
+    "mouse-628-local.json",
+    "mouse-628-progress.json",
+    "mouse-628-borderless.json",
+    "mouse-628-motion.json",
+    "mouse-628-desktop-transition.json",
+    "mouse-628-swipe-tutorial.json",
+    "mouse-628-motion-trace.json"
+  ],
+  "x-nativeMarkers": [
+    "MOUSE_628_LOCAL_MCP_NATIVE_PASS",
+    "MOUSE_628_PER_PANE_PROGRESS_NATIVE_PASS",
+    "MOUSE_628_BORDERLESS_NATIVE_PASS",
+    "MOUSE_628_NORA_CONTENT_FIT_NATIVE_PASS",
+    "MOUSE_628_OPEN_NORA_DESKTOP_SLIDE_NATIVE_PASS",
+    "MOUSE_628_THREE_FINGER_TUTORIAL_WRITE_PASS",
+    "MOUSE_628_THREE_FINGER_TUTORIAL_NATIVE_PASS"
+  ],
+  "x-motionTraceGate": {
+    "validator": "tools/mouse628-motion-trace.py",
+    "algorithm": "mouse628-motion-trace-evidence-v2",
+    "maxTraceBytes": 75497472,
+    "inputFiles": ["mouse-628-motion-trace.json", "mouse-628-motion.json"],
+    "directIdentityLink": false,
+    "attribution": "temporal-correlation",
+    "savedReportAcceptedAsInput": false
+  }
+}
