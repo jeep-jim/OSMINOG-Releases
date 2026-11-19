@@ -1,0 +1,20 @@
+{
+  "version": "6.0.29",
+  "ready": true,
+  "sourceBranch": "release/mouse-6.0.29",
+  "source": "9b15a122c82edcec853e78a88d921128a58d1bf2",
+  "sourcePR": 172,
+  "run": 44532782697,
+  "attempt": 1,
+  "job": 135590206217,
+  "artifact": 14534374217,
+  "artifactSHA256": "1c130747da1e46ba20601c811acecaa6f32a5ec6696f112e50d21eaccbe2f221",
+  "verificationArtifact": 14534454040,
+  "verificationSHA256": "246af007e06a1c492d176b2b882978b3919ffca47d59033d1b59493f5b029c8b",
+  "package": {
+    "name": "Mouse-Browser-6.0.29-Windows-x64.exe",
+    "size": 125607419,
+    "sha256": "e789302e49469b733cdb735fee41d7a0094fd8d9425a64b72a915e2e578ce88e"
+  },
+  "sourceMerge": "adc2faee898c8b835f20d0451fe91c9f95b5ed63"
+}
