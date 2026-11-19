@@ -14,6 +14,9 @@ jobs:
     timeout-minutes: 4
     steps:
       - uses: actions/checkout@v4
+      # Frozen AST digests use Python 3.12's representation, including empty lists.
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
       - run: python3 -m py_compile tools/mouse630-release.py tools/mouse630-evidence.py tools/mouse630-ui-evidence.py tools/mouse628-motion-trace.py
       - run: python3 tools/test-mouse630-evidence.py
       - run: python3 tools/test-mouse630-ui-evidence.py
@@ -32,6 +35,8 @@ jobs:
       GH_TOKEN: ${{ github.token }}
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
       - uses: actions/setup-node@v4
         with: {node-version: '22'}
       - name: Import exact merged native-tested packages
