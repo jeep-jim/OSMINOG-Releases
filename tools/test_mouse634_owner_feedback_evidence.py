@@ -364,4 +364,11 @@ class Current634Evidence(unittest.TestCase):
   with self.assertRaisesRegex(ValueError,'process/report'):E['verify'](self.files.__getitem__)
 
 
+def load_tests(loader,tests,pattern):
+ # Existing required platform workflows run this entrypoint. Keep the new
+ # search adversaries in that mandatory suite, not just a local-only script.
+ tests.addTests(loader.loadTestsFromTestCase(SEARCH_FIXTURES['SearchEvidence']))
+ return tests
+
+
 if __name__=='__main__':unittest.main()
