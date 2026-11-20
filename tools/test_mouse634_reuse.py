@@ -39,6 +39,24 @@ class Reuse634(unittest.TestCase):
   for fn in ('import_candidate','verify_installed','publish'):
    node=next(n for n in tree.body if isinstance(n,ast.FunctionDef) and n.name==fn)
    self.assertEqual(sum(isinstance(n,ast.Call) and isinstance(n.func,ast.Name) and n.func.id=='_verify_current_upgrade' for n in ast.walk(node)),1,fn)
+ def test_current_footer_changes_only_search_label_count_and_action_order(self):
+  original=ast.parse(R['checked']('mouse633-feedback-evidence.py'))
+  current=R['adapted_tree']('mouse633-feedback-evidence.py')
+  old=next(n for n in original.body if isinstance(n,ast.FunctionDef) and n.name=='verify_footer')
+  new=next(n for n in current.body if isinstance(n,ast.FunctionDef) and n.name=='verify_footer')
+  reverse={"row.get('count') == 6":"row.get('count') == 5",
+           "row.get('actions') == ['tile-search', 'emoji', 'zoom', 'history', 'bookmarks', 'downloads']":
+           "row.get('actions') == ['emoji', 'zoom', 'history', 'bookmarks', 'downloads']"}
+  changed=set()
+  for node in ast.walk(new):
+   if isinstance(node,ast.Compare) and ast.unparse(node) in reverse:
+    value=ast.unparse(node);changed.add(value)
+    node.comparators=ast.parse(reverse[value],mode='eval').body.comparators
+  self.assertEqual(changed,set(reverse))
+  loop=next(n for n in new.body if isinstance(n,ast.For) and isinstance(n.target,ast.Name) and n.target.id=='row')
+  label=ast.parse("need(row.get('label') == 'Поиск, эмодзи, история, закладки и загрузки', 'search footer accessible label differs')").body[0]
+  self.assertEqual(ast.dump(loop.body.pop(0)),ast.dump(label))
+  self.assertEqual(ast.dump(old),ast.dump(new))
  def test_version_scoped_pipelines_and_native_environment_are_preserved(self):
   for suffix,stage in [('', '6.0.34-arm64'),('-windows','6.0.34-windows-x64'),('-linux','6.0.34-linux-x64')]:
    name='publish-mouse634'+suffix+'.yml';text=(ROOT/'.github/workflows'/name).read_text()

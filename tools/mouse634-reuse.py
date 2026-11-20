@@ -95,6 +95,27 @@ def adapted_tree(name):
                 return ast.copy_location(ast.Constant(value=value), node)
             return node
     tree = Identity().visit(tree)
+    if name == 'mouse633-feedback-evidence.py':
+        # The native634 footer adds the search control immediately before the
+        # smile and names it in the accessible group label. Retain every other
+        # order, geometry, icon and PNG requirement.
+        fn = next(n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name == 'verify_footer')
+        replacements = {
+            "row.get('count') == 5": "row.get('count') == 6",
+            "row.get('actions') == ['emoji', 'zoom', 'history', 'bookmarks', 'downloads']":
+                "row.get('actions') == ['tile-search', 'emoji', 'zoom', 'history', 'bookmarks', 'downloads']",
+        }
+        changed = set()
+        for node in ast.walk(fn):
+            if isinstance(node, ast.Compare) and ast.unparse(node) in replacements:
+                old = ast.unparse(node)
+                assert old not in changed, 'Footer634 predicate unexpectedly duplicated'
+                node.comparators = ast.parse(replacements[old], mode='eval').body.comparators
+                changed.add(old)
+        assert changed == set(replacements), 'Only the explicit634 footer count and actions may change'
+        loop = next(n for n in fn.body if isinstance(n, ast.For) and isinstance(n.target, ast.Name)
+                    and n.target.id == 'row' and isinstance(n.iter, ast.Name) and n.iter.id == 'cases')
+        loop.body[:0] = ast.parse("need(row.get('label') == 'Поиск, эмодзи, история, закладки и загрузки', 'search footer accessible label differs')").body
     if name == 'mouse632-evidence.py':
         # Only the explicitly superseded download placement and terminal-widget
         # checks change. Retry/native bytes/private scope/capture stay identical.
