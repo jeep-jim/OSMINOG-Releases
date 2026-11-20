@@ -1,24 +1,24 @@
 {
   "version": "6.0.33",
-  "ready": false,
-  "source": null,
-  "run": null,
-  "artifact": null,
-  "archiveSHA256": null,
-  "verificationArtifact": null,
-  "verificationSHA256": null,
-  "sourcePR": null,
-  "sourceMerge": null,
-  "sourceAttempt": null,
-  "sourceJob": null,
+  "ready": true,
+  "source": "0a3f8aab08356297b3b8982a081debbfa65d826d",
+  "run": 44719381658,
+  "artifact": 14621648503,
+  "archiveSHA256": "26e67f3d6db987289022cb6ff04d140a1b5a54959a58442400915a2cf5011562",
+  "verificationArtifact": 14621927172,
+  "verificationSHA256": "f003d9aa97423561d72d71d18a3fe0ee42e0e4d2c3c473506dc1ae2de023d330",
+  "sourcePR": 183,
+  "sourceMerge": "5d92a4b6d340b38ab5f103d75790ccd671530164",
+  "sourceAttempt": 1,
+  "sourceJob": 136230894795,
   "packages": {
-    "Mouse-Browser-6.0.33-mac-arm64.zip": {
-      "size": null,
-      "sha256": null
-    },
     "Mouse-Browser-6.0.33-mac-arm64.dmg": {
-      "size": null,
-      "sha256": null
+      "size": 137894277,
+      "sha256": "fd19b8a6c3a3cc219f1fa57a1855d18f8bd48bfd7042b13000cb78138ef75d75"
+    },
+    "Mouse-Browser-6.0.33-mac-arm64.zip": {
+      "size": 140256446,
+      "sha256": "9ff7a5b9f544f53d4863ee493b7fd7d5d33c38310bd70325249584c051e09630"
     }
   },
   "previous": {
