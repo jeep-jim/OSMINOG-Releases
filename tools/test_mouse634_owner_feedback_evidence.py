@@ -93,6 +93,10 @@ def fixture(platform='win32'):
   return {'aiId':'page2','previewId':preview,'aiOpen':True,'mainSlots':slots,'gap':6,'chat':{**edges(chat),'hidden':False},'preview':{**edges(previewbox),'hidden':not split},'chatSlot':{**edges(box(chat['x'],chat['y']+32,chat['width'],chat['height']-32)),'hidden':False},'previewSlot':{**edges(gridslots[3]),'hidden':not split},'column':edges(box(406,46,234,520)),'workspace':edges(box(0,40,640,532)),'tabs':copy.deepcopy(oldtabs)+([{'id':preview,'url':url,'lane':'side','previewOf':'page2'}] if preview else [])}
  before=ai_state();first=ai_state('firstPreview',cross+'/page/3/',True);second=ai_state('firstPreview',cross+'/page/4/',True);reopened=ai_state('page3',cross+'/page/3/',True);firstowner={**owners[3],'id':'firstPreview','webContentsId':150}
  ai={'ok':True,'before':before,'first':first,'second':second,'closed':copy.deepcopy(before),'reopened':reopened,'native':[native(owners[2],gridslots[2]),native(firstowner,gridslots[3])],'blankClick':click('#link-blank',owners[2]),'sameClick':click('#link-same',owners[2]),'closeClick':click('[data-action="close-ai-preview"]'),'chatBefore':owners[2],'chatAfter':copy.deepcopy(owners[2]),'mainBefore':owners[:2],'mainAfter':copy.deepcopy(owners[:2]),'mainTabsUnchanged':True,'previewReused':True,'chatRestored':True}
+ ai['chatAfterBlank']=copy.deepcopy(owners[2]);owners[2]={**owners[2],'navigationEpoch':2};ai['chatAfterSame']=copy.deepcopy(owners[2]);ai['chatAfterClose']=copy.deepcopy(owners[2]);ai['chatAfter']=copy.deepcopy(owners[2]);ai['mainAfterSame']=copy.deepcopy(owners[:2])
+ ai['chatNavigation']={'source':'WebContents navigation events for one native same-window link click','tabId':owners[2]['id'],'webContentsId':owners[2]['webContentsId'],'targetURL':cross+'/page/4/','events':[
+  {'type':'did-start-navigation','url':cross+'/page/4/','mainFrame':True,'sameDocument':False,'navigationEpoch':2,'at':1000},
+  {'type':'will-navigate','url':cross+'/page/4/','mainFrame':True,'sameDocument':False,'navigationEpoch':2,'at':1001,'prevented':True}]}
  click('#link-blank',owners[2]);capture('mouse-634-ai-preview-new-window.png');ai['downloads']=download(owners[2:],['chat','preview'],gridpanes[2:],gridslots[2:],2);facts['aiPreview']=ai
  targets=[]
  for i,row in enumerate(owners):
@@ -188,6 +192,26 @@ class Current634Evidence(unittest.TestCase):
   self.facts['aiPreview']['blankClick']['events'][0].update(trusted=False,isTrusted=False);self.reject()
   self.setUp();self.facts['aiPreview']['chatAfter']['timeOrigin']+=1;self.reject()
   self.setUp();self.facts['requests'].append({'index':2,'at':10});self.reject()
+ def test_only_exact_observed_canceled_chat_attempt_may_advance_its_epoch(self):
+  ai=self.facts['aiPreview'];args=('win32',*self.facts['fixtureOrigins']);self.assertEqual(E['canceled_chat_navigation'](ai,*args)['navigationEpoch'],2)
+  with self.assertRaisesRegex(ValueError,'identity'):E['N']['identity'](ai['chatBefore'],ai['chatAfter'],self.facts['fixtureOrigins'][0])
+  mutations=[lambda a:a.pop('chatNavigation'),lambda a:a['chatAfterBlank'].update(navigationEpoch=2),lambda a:a['chatAfterSame'].update(navigationEpoch=3),lambda a:a['chatAfterClose'].update(navigationEpoch=1),lambda a:a['chatAfter'].update(navigationEpoch=3),
+   lambda a:a['chatNavigation'].update(tabId='other'),lambda a:a['chatNavigation'].update(webContentsId=999),lambda a:a['chatNavigation'].update(targetURL='https://external.example/'),
+   lambda a:a['chatNavigation']['events'][0].update(navigationEpoch=1),lambda a:a['chatNavigation']['events'][0].update(mainFrame=False),lambda a:a['chatNavigation']['events'][0].update(sameDocument=True),
+   lambda a:a['chatNavigation']['events'][1].update(prevented=False),lambda a:a['chatNavigation']['events'][1].update(at=999),lambda a:a['chatNavigation']['events'][1].update(url='http://127.0.0.1:31338/page/3/')]
+  for number,mutate in enumerate(mutations):
+   value=copy.deepcopy(ai);mutate(value)
+   with self.subTest(number=number),self.assertRaises((ValueError,KeyError,TypeError)):E['canceled_chat_navigation'](value,*args)
+ def test_navigation_commit_finish_or_reloaded_chat_cannot_hide_behind_cancellation(self):
+  ai=self.facts['aiPreview'];args=('win32',*self.facts['fixtureOrigins'])
+  for event in ('did-frame-navigate','did-navigate','did-navigate-in-page','did-finish-load','did-start-navigation'):
+   value=copy.deepcopy(ai);value['chatNavigation']['events'].append({**value['chatNavigation']['events'][0],'type':event})
+   with self.subTest(event=event),self.assertRaisesRegex(ValueError,'canceled navigation witness'):E['canceled_chat_navigation'](value,*args)
+  for field,value in [('timeOrigin',9999),('identity','new-document'),('webContentsId',999),('url','http://127.0.0.1:31338/page/4/'),('field','changed'),('cookie','changed'),('scrollY',1)]:
+   changed=copy.deepcopy(ai);changed['chatAfterSame'][field]=value
+   with self.subTest(field=field),self.assertRaisesRegex(ValueError,'identity'):E['canceled_chat_navigation'](changed,*args)
+ def test_post_cancellation_native_helpers_must_keep_the_actual_new_epoch(self):
+  self.facts['aiPreview']['downloads']['stages'][0]['identities'][0]['navigationEpoch']=1;self.reject()
  def test_composed_corner_pixels_and_fixed_radius_are_recomputed(self):
   self.facts['captureCorners']['scenes'][0]['before']['native'][0]['roundBottom']=0;self.reject()
   self.setUp();row=self.facts['captureCorners']['captures'][1];row['probes'][0]['actualRGBA']=[0,0,0,255];self.reject()

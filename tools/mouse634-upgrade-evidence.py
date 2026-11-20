@@ -3,6 +3,7 @@
 import hashlib
 import json
 from pathlib import PurePosixPath
+import posixpath
 import re
 
 BASELINES = {
@@ -41,6 +42,40 @@ def read_json(read, name):
 
 def positive(value):
     return type(value) is int and value > 0
+
+
+def linux_process_binding(native, report, expected_image):
+    chain = native.get('launchAncestry')
+    need(native.get('launcherPid') == report['launcherPid'] and isinstance(chain, list) and 1 <= len(chain) <= 16 and
+         all(isinstance(row, dict) and positive(row.get('pid')) and positive(row.get('parentPid')) and row.get('uid') == native['uid'] for row in chain) and
+         len({row['pid'] for row in chain}) == len(chain) and chain[0]['pid'] == report['pid'] and chain[-1]['pid'] == report['launcherPid'] and
+         all(chain[i]['parentPid'] == chain[i+1]['pid'] for i in range(len(chain)-1)), 'actual browser is not bound to its owned launcher')
+    need('environmentAppImage' in native, 'initial environment diagnostic is absent')
+    if native['packageFormat'] == 'deb':
+        need(native['environmentAppImage'] is None, 'deb has an AppImage environment')
+        return
+    target = native.get('appImage')
+    need(native.get('appImageSource') == 'verified launch path and owned browser ancestry' and
+         native['environmentAppImage'] in (None, target), 'AppImage environment conflicts with the verified launch')
+    image = native.get('launchedImage', {})
+    need(image.get('path') == target and image.get('uid') == native['uid'] and image.get('regularFile') is True and
+         image.get('executable') is True and positive(image.get('size')) and image.get('size') == expected_image['size'] and
+         image.get('sha256') == expected_image['sha256'] and type(image.get('device')) is int and image['device'] >= 0 and
+         positive(image.get('inode')), 'launched AppImage does not match the immutable package bytes')
+    mount = native.get('mount', {}); raw = mount.get('raw')
+    need(isinstance(raw, str) and 0 < len(raw) <= 16384 and not any(value in raw for value in ('\0','\n','\r')), 'raw native mountinfo is absent')
+    fields = raw.split(' ');separator = fields.index('-') if '-' in fields else -1
+    need(separator >= 6 and len(fields) == separator+4 and all(fields) and re.fullmatch(r'[1-9]\d*',fields[0]) and
+         re.fullmatch(r'[1-9]\d*',fields[1]) and re.fullmatch(r'\d+:\d+',fields[2]), 'raw native mountinfo is malformed')
+    decode = lambda value: re.sub(r'\\(040|011|012|134)', lambda match: chr(int(match[1],8)), value)
+    decoded = {'raw':raw,'mountId':int(fields[0]),'parentMountId':int(fields[1]),'device':fields[2],'root':decode(fields[3]),
+               'mountPoint':decode(fields[4]),'options':fields[5].split(','),'filesystem':fields[separator+1],
+               'source':decode(fields[separator+2]),'superOptions':fields[separator+3].split(',')}
+    need(mount == decoded and mount['root'] == '/' and PurePosixPath(mount['mountPoint']).is_absolute() and
+         mount['mountPoint'] not in ('/','') and not mount['mountPoint'].startswith('//') and
+         posixpath.normpath(mount['mountPoint']) == mount['mountPoint'] and
+         re.fullmatch(r'fuse(?:\.[^\s/\\\0]+)?',mount['filesystem']) and 'ro' in mount['options'] and 'rw' not in mount['options'] and
+         native['executable'] == mount['mountPoint']+'/mouse-browser', 'AppImage browser is not on its exact read-only FUSE mount')
 
 
 def transition(read, facts, platform, arch, package, baseline, prefix, format_=None):
@@ -102,6 +137,7 @@ def transition(read, facts, platform, arch, package, baseline, prefix, format_=N
                 need(native.get('appImage') is None and native['executable'].startswith('/opt/'), 'deb was replaced with a portable launch')
             else:
                 need(isinstance(native.get('appImage'),str) and PurePosixPath(native['appImage']).is_absolute(), 'real mounted AppImage missing')
+            linux_process_binding(native,report,baseline if mode == 'write' else package)
         reports.append(report)
     need(reports[0]['pid'] != reports[1]['pid'] and reports[0]['profile'] == reports[1]['profile'], 'same process or different profile cannot prove upgrade')
     if platform == 'win32':

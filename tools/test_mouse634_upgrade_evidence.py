@@ -25,7 +25,12 @@ def fixture(platform):
    pid=100+number*10+relative
    report={'ok':True,'mode':mode,'version':version,'platform':platform,'arch':arch,'pid':pid,'launcherPid':pid+1000 if fmt=='appimage' else pid,'reportPrefix':prefix,'source':E['SOURCE'],'physicalUserInputVerified':False,'nativeExit':{'code':0,'signal':None},'identity':{'version':version,'platform':platform,'arch':arch,'test':True},'profile':{'pageId':'page'+str(number),'url':url,'tokenSha256':'c'*64,'preferences':{'theme':'dark','aiWidth':413,'libraryWidth':417},'cookiePreserved':True,'localStoragePreserved':True,'bookmarkPreserved':True,'tabPreserved':True,'preferencesPreserved':True},'pageReadiness':{'ready':True,'attempts':2,'expectedURL':url,'expectedOrigin':'http://127.0.0.1:31337','target':{'id':'target','url':url},'last':{'href':url,'origin':'http://127.0.0.1:31337','readyState':'complete','title':'Mouse634 preserved profile fixture','input':True,'storageAccessible':True,'storageError':None},'evaluationError':None}}
    if fmt:
-    report['processIdentity']={'source':'CDP SystemInfo.getProcessInfo and owned /proc','type':'browser','pid':pid,'uid':1001,'executable':'/opt/Mouse Browser/mouse-browser' if fmt=='deb' else '/tmp/.mount_Mouse/mouse-browser','appImage':None if fmt=='deb' else '/tmp/owned/Mouse Browser.AppImage','packageFormat':fmt,'exited':True}
+    report['processIdentity']={'source':'CDP SystemInfo.getProcessInfo and owned /proc','type':'browser','pid':pid,'launcherPid':report['launcherPid'],'uid':1001,'executable':'/opt/Mouse Browser/mouse-browser' if fmt=='deb' else '/tmp/.mount_Mouse ABC123/mouse-browser','appImage':None if fmt=='deb' else '/tmp/owned/Mouse Browser.AppImage','environmentAppImage':None,'packageFormat':fmt,'exited':True,
+      'launchAncestry':[{'pid':pid,'parentPid':30 if fmt=='deb' else report['launcherPid'],'uid':1001}]+([{'pid':report['launcherPid'],'parentPid':30,'uid':1001}] if fmt=='appimage' else [])}
+    if fmt=='appimage':
+     expected=baseline if mode=='write' else package
+     report['processIdentity'].update(appImageSource='verified launch path and owned browser ancestry',launchedImage={'path':'/tmp/owned/Mouse Browser.AppImage','uid':1001,'device':2049,'inode':12345+relative,'size':expected['size'],'sha256':expected['sha256'],'regularFile':True,'executable':True},
+       mount={'raw':'91 37 0:84 / /tmp/.mount_Mouse\\040ABC123 ro,nosuid,nodev,relatime - fuse.AppImage AppImage ro,user_id=1001,group_id=1001','mountId':91,'parentMountId':37,'device':'0:84','root':'/','mountPoint':'/tmp/.mount_Mouse ABC123','options':['ro','nosuid','nodev','relatime'],'filesystem':'fuse.AppImage','source':'AppImage','superOptions':['ro','user_id=1001','group_id=1001']})
    native.append(report);files[prefix+'-'+mode+'.log']=('MOUSE_634_UPGRADE_PROFILE_'+mode.upper()+'_PASS\nSynthetic unit fixture\n').encode();files[prefix+'-'+mode+'-app.log']=b'MOUSE_EXIT_SAVED\nMOUSE_APP_QUIT\n'
   if platform=='win32':
    for key in ('oldInstallation','replacement'): facts[key]={'exitCode':0,'peMachine':'0x8664','unicodeAndSpaces':True}
@@ -92,6 +97,27 @@ class ActualCurrentUpgrade(unittest.TestCase):
   for key,value in [('target','/tmp/different.AppImage'),('uid',0),('sha256','f'*64),('executable',False)]:
    package,facts,native,files,refresh=fixture('linux');facts['formats']['appimage']['replacement'][key]=value;refresh()
    with self.subTest(key=key),self.assertRaises(ValueError):invoke('linux',files,package)
+ def test_appimage_requires_raw_fuse_mount_and_unbroken_owned_launch_ancestry(self):
+  mutations=[lambda n:n.update(launchAncestry=[]),lambda n:n['launchAncestry'][0].update(parentPid=999),lambda n:n['launchAncestry'][-1].update(uid=0),
+   lambda n:n.update(launcherPid=999),lambda n:n.update(environmentAppImage='/tmp/wrong.AppImage'),lambda n:n.pop('environmentAppImage'),
+   lambda n:n.update(appImageSource='invented runtime environment'),lambda n:n['mount'].update(filesystem='ext4'),lambda n:n['mount'].update(options=['rw']),
+   lambda n:n['mount'].update(raw=n['mount']['raw'].replace('0:84','0:85')),lambda n:n['mount'].update(root='/other'),lambda n:n.update(executable='/tmp/ordinary/mouse-browser')]
+  for index,mutate in enumerate(mutations):
+   package,facts,native,files,refresh=fixture('linux');mutate(native[-1]['processIdentity']);refresh()
+   with self.subTest(index=index),self.assertRaises(ValueError):invoke('linux',files,package)
+ def test_appimage_launch_receipt_must_match_the_actual_old_or_new_package(self):
+  for key,value in [('path','/tmp/other.AppImage'),('uid',0),('size',1),('sha256','0'*64),('regularFile',False),('executable',False),('inode',0),('device',-1)]:
+   package,facts,native,files,refresh=fixture('linux');native[-1]['processIdentity']['launchedImage'][key]=value;refresh()
+   with self.subTest(key=key),self.assertRaisesRegex(ValueError,'immutable package bytes'):invoke('linux',files,package)
+  package,facts,native,files,refresh=fixture('linux');native[-1]['processIdentity']['launchedImage']=copy.deepcopy(native[-2]['processIdentity']['launchedImage']);refresh()
+  with self.assertRaisesRegex(ValueError,'immutable package bytes'):invoke('linux',files,package)
+ def test_missing_initial_environment_does_not_relax_real_native_mount_proof(self):
+  package,facts,native,files,refresh=fixture('linux');self.assertIsNone(native[-1]['processIdentity']['environmentAppImage']);self.assertTrue(invoke('linux',files,package)['ok'])
+  native[-1]['processIdentity']['environmentAppImage']=native[-1]['processIdentity']['appImage'];refresh();self.assertTrue(invoke('linux',files,package)['ok'])
+  mount=native[-1]['processIdentity']['mount'];mount['raw']=mount['raw'].replace('fuse.AppImage','fuse.mouse.browser');mount['filesystem']='fuse.mouse.browser';refresh();self.assertTrue(invoke('linux',files,package)['ok'])
+  for fs_type,options in [('ext4',['ro']),('fuse.AppImage',['rw'])]:
+   package,facts,native,files,refresh=fixture('linux');mount=native[-1]['processIdentity']['mount'];mount['raw']=mount['raw'].replace(mount['filesystem'],fs_type).replace('ro,nosuid,nodev,relatime',','.join(options));mount['filesystem']=fs_type;mount['options']=options;refresh()
+   with self.subTest(filesystem=fs_type,options=options),self.assertRaisesRegex(ValueError,'read-only FUSE mount'):invoke('linux',files,package)
 
 
 if __name__=='__main__':unittest.main()

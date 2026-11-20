@@ -23,6 +23,27 @@ def ai_split(value,chat,preview,slots):
  return target
 
 
+def canceled_chat_navigation(ai,platform,origin,preview_origin):
+ before,blank,same,after=(ai.get(key) for key in ('chatBefore','chatAfterBlank','chatAfterSame','chatAfter'))
+ need(isinstance(before,dict) and before.get('index')==2,'AI chat owner differs');N['identity'](before,blank,origin)
+ N['input_event'](ai.get('sameClick'),platform,'#link-same',before)
+ witness=ai.get('chatNavigation',{});events=witness.get('events')
+ need(witness.get('source')=='WebContents navigation events for one native same-window link click' and
+      witness.get('tabId')==before['id'] and witness.get('webContentsId')==before['webContentsId'] and
+      witness.get('targetURL')==preview_origin+'/page/4/' and isinstance(events,list) and
+      [event.get('type') for event in events]==['did-start-navigation','will-navigate'],
+      'same-window chat requires its exact canceled navigation witness without commit or finish-load')
+ need(type(blank.get('navigationEpoch')) is int and blank['navigationEpoch']>=0,'chat security epoch is absent')
+ expected_epoch=blank['navigationEpoch']+1
+ need(all(event.get('url')==witness['targetURL'] and event.get('mainFrame') is True and event.get('sameDocument') is False and
+          type(event.get('navigationEpoch')) is int and event['navigationEpoch']==expected_epoch and N['positive'](event.get('at')) for event in events) and
+      events[1].get('prevented') is True and events[0]['at']<=events[1]['at'], 'chat navigation was not exactly one prevented main-frame attempt')
+ # Only this witnessed cancellation can advance the revocation token. All
+ # document, state, URL, WebContents and frame-clock checks remain unchanged.
+ N['identity']({**blank,'navigationEpoch':expected_epoch},same,origin);N['identity'](same,ai.get('chatAfterClose'),origin);N['identity'](ai['chatAfterClose'],after,origin)
+ return after
+
+
 def verify(read,*,expected_platform=None,expected_arch=None):
  evidence=N['Evidence'](read);raw,facts=evidence.json(NAME)
  platform,arch,pid=facts.get('platform'),facts.get('arch'),facts.get('pid')
@@ -40,7 +61,9 @@ def verify(read,*,expected_platform=None,expected_arch=None):
  ai=facts.get('aiPreview',{});N['flags'](ai,('ok','mainTabsUnchanged','previewReused','chatRestored'),'AI preview did not preserve its source chat/main pages')
  main_before,main_after=ai.get('mainBefore',[]),ai.get('mainAfter',[]);need(len(main_before)==len(main_after)==2,'both original main pages required')
  for index,(old,new) in enumerate(zip(main_before,main_after)): need(old.get('index')==index,'main fixture order differs');N['identity'](old,new,primary)
- chat=ai.get('chatBefore',{});need(chat.get('index')==2,'AI chat owner differs');N['identity'](chat,ai.get('chatAfter'),primary)
+ main_same=ai.get('mainAfterSame',[]);need(len(main_same)==2,'both main pages after canceled chat navigation are missing')
+ for old,new in zip(main_before,main_same): N['identity'](old,new,primary)
+ chat=canceled_chat_navigation(ai,platform,primary,preview_origin)
  before,first,second,closed,reopened=(ai.get(key,{}) for key in ('before','first','second','closed','reopened'))
  need(before.get('aiId')==chat['id'] and before.get('previewId')=='' and before.get('aiOpen') is True and set(before.get('mainSlots',{}).values())=={o['id'] for o in main_before},'initial AI/main workspace differs')
  slots=before['mainSlots'];old_tabs={r['id']:r for r in before.get('tabs',[])};need(chat['id'] in old_tabs,'initial native chat missing')
