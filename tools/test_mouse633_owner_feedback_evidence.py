@@ -250,11 +250,18 @@ class CurrentOwnerEvidence(unittest.TestCase):
  def test_full_composition_runs_owner_and_retained_verifiers_without_mocks(self):
   module=runpy.run_path(str(Path(__file__).with_name('test_mouse633_feedback_evidence.py')))
   files,facts=module['fixtures']();owner_files,owner=fixture();files.update(owner_files)
+  geometry=runpy.run_path(str(Path(__file__).with_name('test_mouse633_workspace_evidence.py')))
+  workspace_files,workspace=geometry['fixture']('win32');files.update(workspace_files)
   for name,value in facts.items():files[name]=json.dumps(value).encode()
   files[E['NAME']]=json.dumps(owner).encode()
+  files['mouse-629-ui-regressions.json']=json.dumps(workspace).encode()
   result=module['CURRENT'].verify(files.__getitem__,expected_platform='win32',expected_arch='x64')
   self.assertEqual(result['documents']['unchangedOriginalFiles'],9);self.assertTrue(result['owner']['ok'])
-  self.assertTrue(result['owner']['contextMenu']['ok']);self.assertEqual(len(result['inputs']),5)
+  self.assertTrue(result['owner']['contextMenu']['ok']);self.assertEqual(len(result['inputs']),6)
+  self.assertTrue(result['workspaceGeometry']['ok']);self.assertEqual(result['workspaceGeometry']['scenes'],6)
+  del workspace['workspace633'];files['mouse-629-ui-regressions.json']=json.dumps(workspace).encode()
+  with self.assertRaisesRegex(ValueError,'workspace geometry'):
+   module['CURRENT'].verify(files.__getitem__,expected_platform='win32',expected_arch='x64')
 
 
 if __name__=='__main__':unittest.main()

@@ -59,6 +59,7 @@ def validate_template():
                         ('x-ownerFeedbackGate', 'mouse633-feedback-evidence.py'),
                         ('x-currentOwnerGate', 'mouse633-owner-feedback-evidence.py'),
                         ('x-currentContextGate', 'mouse633-context-evidence.py'),
+                        ('x-workspaceGeometryGate', 'mouse633-workspace-evidence.py'),
                         ('x-currentUpgradeGate', 'mouse633-upgrade-evidence.py')]:
         gate = schema[key]
         if gate['validator'] != 'tools/'+module or gate['sha256'] != sha(Path(__file__).with_name(module).read_bytes()) or gate['sourceAndFreshInstalled'] is not True:

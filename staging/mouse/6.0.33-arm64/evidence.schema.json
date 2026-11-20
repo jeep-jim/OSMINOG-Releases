@@ -286,7 +286,7 @@
   },
   "x-ownerFeedbackGate": {
     "validator": "tools/mouse633-feedback-evidence.py",
-    "sha256": "2d16e7dfb639dc68ed8fad7c59782f44bb13016a954753451eea30dbc23835c9",
+    "sha256": "26e96683b0df92e87c42472aff9c444bfd36a324e8c488559e59b2d1486780a1",
     "runtimeVersion": "6.0.33",
     "platform": "darwin",
     "arch": "arm64",
@@ -297,7 +297,8 @@
       "mouse-623-verification.json",
       "mouse-624-verification.json",
       "mouse-633-owner-feedback.json",
-      "mouse-633-context-menu.json"
+      "mouse-633-context-menu.json",
+      "mouse-629-ui-regressions.json"
     ],
     "sourceAndFreshInstalled": true,
     "savedReportAcceptedAsInput": false,
@@ -474,5 +475,47 @@
     "normalPagesPreserved": true,
     "physicalUserDeviceVerified": false,
     "sha256": "d9293accaa4d467e6579dd3096da0b92581705851cef86c13d4ccca43d4e279a"
+  },
+  "x-workspaceGeometryGate": {
+    "validator": "tools/mouse633-workspace-evidence.py",
+    "sha256": "61c6d315a5c7286294c8e8b2bc13ca5faea92291608512687036df9266bb554c",
+    "runtimeVersion": "6.0.33",
+    "sourceAndFreshInstalled": true,
+    "savedReportAcceptedAsInput": false,
+    "file": "mouse-629-ui-regressions.json",
+    "supplement": "workspace633",
+    "currentTargets": [
+      "darwin-arm64",
+      "win32-x64",
+      "linux-x64"
+    ],
+    "themes": [
+      "light",
+      "dark"
+    ],
+    "mainPaneScenes": 4,
+    "mainPanes": 7,
+    "aiScenes": 2,
+    "workspacePadding": {
+      "top": 6,
+      "right": 0,
+      "bottom": 6,
+      "left": 0
+    },
+    "dividerWidth": 6,
+    "allCornerRadii": 12,
+    "nativeDisplayCaptures": 6,
+    "legacyBottomCornerChecksRetained": true,
+    "pixelProof": "independently decoded original display and viewport pixels; fixed palette, all corners and interior witnesses",
+    "nativeCornerInputs": 4,
+    "nativeInputLocations": [
+      "main internal right painted cutout",
+      "AI internal left painted cutout"
+    ],
+    "pagesAndWindowRestored": true,
+    "linuxActualOwnedMappedMasksHaveEmptyInputShape": true,
+    "physicalUserDeviceVerified": false,
+    "outerPaneToStageCSSEndpointTolerance": 0.0625,
+    "roundedNativeOuterEndpointsMustMatch": true
   }
 }

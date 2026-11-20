@@ -28,6 +28,8 @@ jobs:
         run: python3 tools/test_mouse633_context_evidence.py -v
       - name: Verify current owner and retained feedback evidence
         run: python3 tools/test_mouse633_feedback_evidence.py -v
+      - name: Verify workspace spacing, all corners and native input
+        run: python3 tools/test_mouse633_workspace_evidence.py -v
       - name: Verify hidden scrollbar input preservation
         run: python3 tools/test-mouse633-ui-evidence.py -v
       - run: python3 tools/mouse633-linux-release.py validate-template
@@ -52,7 +54,7 @@ jobs:
       - name: Prepare native Linux desktop dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y xvfb openbox xdotool dbus-x11 pulseaudio libfuse2 libgtk-3-0 libnss3 libxss1 libasound2 libgbm1 libsecret-1-0 libnotify4 libatspi2.0-0 libxtst6
+          sudo apt-get install -y xvfb openbox xdotool dbus-x11 pulseaudio libfuse2 libgtk-3-0 libnss3 libxss1 libasound2 libgbm1 libsecret-1-0 libnotify4 libatspi2.0-0 libxtst6 libxext6
       - name: Import immutable successful Linux CI packages
         run: python3 tools/mouse633-linux-release.py import
       - name: Verify exact packages on a fresh Linux desktop

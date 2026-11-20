@@ -12,7 +12,8 @@ _reuse = runpy.run_path(str(Path(__file__).with_name('mouse633-reuse.py')))
 R = _reuse['load']('mouse632-feedback-evidence.py')
 VERSION = '6.0.33'
 JSON_NAMES = ('mouse-632-media.json', 'mouse-632-documents.json',
-              'mouse-632-footer.json', 'mouse-633-owner-feedback.json', 'mouse-633-context-menu.json')
+              'mouse-632-footer.json', 'mouse-633-owner-feedback.json', 'mouse-633-context-menu.json',
+              'mouse-629-ui-regressions.json')
 need, sha = R['need'], R['sha']
 verify_media, verify_documents = R['verify_media'], R['verify_documents']
 flags, T = R['flags'], R['T']
@@ -84,5 +85,9 @@ def verify(read, *, expected_platform=None, expected_arch=None):
     need(isinstance(raw, bytes) and 0 < len(raw) <= 4*1024**2, 'owner633 report missing or oversized')
     owner = runpy.run_path(str(Path(__file__).with_name('mouse633-owner-feedback-evidence.py')))
     current = owner['verify'](read, expected_platform=result['platform'], expected_arch=result['arch'])
+    geometry = runpy.run_path(str(Path(__file__).with_name('mouse633-workspace-evidence.py')))
+    workspace = geometry['verify'](read, expected_platform=result['platform'], expected_arch=result['arch'])
     return {**result, 'inputs': {**result['inputs'], 'mouse-633-owner-feedback.json': sha(raw),
-                              'mouse-633-context-menu.json': current['contextMenu']['reportSha256']}, 'owner': current}
+                              'mouse-633-context-menu.json': current['contextMenu']['reportSha256'],
+                              'mouse-629-ui-regressions.json': workspace['reportSha256']},
+            'owner': current, 'workspaceGeometry': workspace}

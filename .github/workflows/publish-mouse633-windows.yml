@@ -32,6 +32,8 @@ jobs:
         run: python3 tools/test_mouse633_context_evidence.py -v
       - name: Verify current media, document viewer and footer evidence
         run: python3 tools/test_mouse633_feedback_evidence.py -v
+      - name: Verify workspace spacing, all corners and native input
+        run: python3 tools/test_mouse633_workspace_evidence.py -v
   publish-windows:
     if: github.event_name != 'pull_request'
     needs: contract
