@@ -29,7 +29,8 @@
     "mouse-634-owner-feedback.json",
     "mouse-634-download-widget.json",
     "mouse-634-ai-download-widget.json",
-    "mouse-634-focused-chrome.json"
+    "mouse-634-focused-chrome.json",
+    "mouse-634-search.json"
   ],
   "x-nativeMarkers": [
     "MOUSE_628_LOCAL_MCP_NATIVE_PASS",
@@ -209,7 +210,8 @@
     "mouse-634-owner-feedback.json": "6.0.34",
     "mouse-634-download-widget.json": "6.0.34",
     "mouse-634-ai-download-widget.json": "6.0.34",
-    "mouse-634-focused-chrome.json": "6.0.34"
+    "mouse-634-focused-chrome.json": "6.0.34",
+    "mouse-634-search.json": "6.0.34"
   },
   "x-gesture": {
     "file": "mouse-629-swipe-tutorial.json",
@@ -311,7 +313,8 @@
       "mouse-634-owner-feedback.json",
       "mouse-634-download-widget.json",
       "mouse-634-ai-download-widget.json",
-      "mouse-634-focused-chrome.json"
+      "mouse-634-focused-chrome.json",
+      "mouse-634-search.json"
     ],
     "sourceAndFreshInstalled": true,
     "savedReportAcceptedAsInput": false,
@@ -601,15 +604,51 @@
       "topRadius": 12,
       "topGap": 6,
       "actualHeaderFooterPixelsCompared": true,
-      "noraOpenIncluded": true
+      "noraOpenIncluded": true,
+      "measuredProbeWindow": {
+        "darwinBottomClearance": 32,
+        "otherPlatformsUnchanged": true,
+        "nativeMinimumSizePreserved": true
+      },
+      "callerWindowNativeGeometryAndCornersRestored": true
     },
     "physicalUserDeviceVerified": false,
-    "sha256": "51db1e47a6163db765aca66455328a2dbb4f2f6bfe8860134fed5936b9aa9fca",
+    "sha256": "30feb04b6aa7d5a0cbf8ca6bb1d7189c9a4183ce540bb19ec3b69b356764aa9d",
     "dependencies": {
       "mouse634-native-evidence.py": "5219ae1ebc3428163f4492f9f99a6288a68f942fda62e6ca939adc3435c45e00",
       "mouse634-download-evidence.py": "4e654a795e07847bef5adb4f66e43394f54d4f43624e0aa437de427e6abe5fe7",
       "mouse634-capture-evidence.py": "c46d3bd3244b6484c143042004b2c85bdb8e39b37f9e872e5eae9a13399c209a",
-      "mouse634-focused-evidence.py": "354589ac503f87c9f47b8a88efac28b6c4230edcb18ad4fa1b7df966a48d8e99"
+      "mouse634-focused-evidence.py": "d214c9f7fe4de4c48e4760b4c64337159f798a779b81364bdc1799f7f5049384",
+      "mouse634-search-evidence.py": "81d03c8cdf6459c73f2505380c5a91b7c51968e58839ba3ce66fda9de8630561"
+    },
+    "search": {
+      "required": true,
+      "file": "mouse-634-search.json",
+      "marker": "MOUSE_634_SEARCH_NATIVE_PASS",
+      "stage": "visual-search",
+      "afterStage": "focused-chrome",
+      "nativeFooterMagnifierImmediatelyBefore": "#emoji-button",
+      "nativeViewBudget": 8,
+      "roundedNativeRadius": 12,
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "rawOSPixelsAndActualViewClipping": true,
+      "ownedHTTPQueryAndOpenGraph": true,
+      "nativeWheelPagination": true,
+      "ownedModelFixtureGrounding": true,
+      "explicitSelectedPageVision": true,
+      "privateFormContentExcluded": true,
+      "navigationOverlayCloseRevocation": true,
+      "originalDeskTabsProfileRestored": true,
+      "livePublicSearchVerified": false,
+      "livePublicModelVerified": false,
+      "publicBackendRequiresSeparateActualWorkflowEvidence": true,
+      "actualOSCapturesMinimum": 5,
+      "realHTTPTrustedClickAndWheelReceipts": true,
+      "emptyQueryRevocation": true,
+      "completeNativeSnapshotsForScreenshotOverlay": true
     }
   }
 }

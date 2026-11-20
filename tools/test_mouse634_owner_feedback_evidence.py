@@ -10,6 +10,7 @@ import struct
 import unittest
 import zlib
 E=runpy.run_path(str(Path(__file__).with_name('mouse634-owner-feedback-evidence.py')))
+SEARCH_FIXTURES=runpy.run_path(str(Path(__file__).with_name('test_mouse634_search_evidence.py')))
 LINE={'light':[199,207,223],'dark':[67,83,107]};PANEL={'light':[255,255,255],'dark':[25,33,46]}
 TRACK=[83,207,139];FILL=[7,130,60];BODY=[243,240,232]
 
@@ -125,7 +126,7 @@ def fixture(platform='win32'):
    shot.update(phase=phase,theme=theme,probes=[{**p,'pixel':{'x':math.floor(p['cssPoint']['x']),'y':math.floor(p['cssPoint']['y'])},'actualRGBA':p['expectedRGB']+[255],'tolerance':3} for p in points]);corners['captures'].append(shot)
   corners['scenes'].append(scene)
  facts['captureCorners']=corners
- def chrome_surface(r,theme):return {'bounds':edges(r),'backgroundImage':'linear-gradient(rgb(240, 240, 240), rgb(230, 230, 230))' if theme=='light' else 'linear-gradient(rgb(40, 40, 40), rgb(30, 30, 30))','backgroundColor':'rgb(240, 240, 240)' if theme=='light' else 'rgb(35, 35, 35)','backdropFilter':'none','opacity':'1','points':[{'fraction':fraction,'point':{'x':100,'y':r['y']+r['height']*fraction},'hit':'toolbar','surfacePath':[]} for fraction in (.1,.9)]}
+ def chrome_surface(r,theme):return {'bounds':edges(r),'backgroundImage':'linear-gradient(rgb(240, 240, 240), rgb(230, 230, 230))' if theme=='light' else 'linear-gradient(rgb(40, 40, 40), rgb(30, 30, 30))','backgroundColor':'rgb(240, 240, 240)' if theme=='light' else 'rgb(35, 35, 35)','backdropFilter':'none','opacity':'1','occluders':[],'pointSource':'live-hit-test','referenceStage':None,'points':[{'fraction':fraction,'point':{'x':100,'y':r['y']+r['height']*fraction},'hit':'toolbar','surfacePath':[]} for fraction in (.1,.9)]}
  def focused_state(name,theme,mode):
   w,h=(800,700) if mode in ('pane','ai') else (640,600);footer=box(0,h-28,w,28);header=box(0,0,w,40)
   if mode=='pane':panes=[box(0,46,w,h-28-46)];indices=[0]
@@ -136,11 +137,19 @@ def fixture(platform='win32'):
    radius=0 if mode=='pane' or mode=='ai' and i==3 else 12;s=box(p['x'],p['y']+32,p['width'],p['height']-32);panels.append({'key':'pane:p'+str(i+1) if i<2 else 'ai' if i==2 else 'ai-preview','tabId':owners[i]['id'],'pane':edges(p),'slot':edges(s),'radius':{'topLeft':12,'topRight':12,'bottomLeft':radius,'bottomRight':radius}})
   for i,row in enumerate(owners):
    panel=next((p for p in panels if p['tabId']==row['id']),None);r={k:v for k,v in panel['slot'].items() if k in ('x','y','width','height')} if panel else gridslots[i];nativepages.append(native(row,r,visible=panel is not None and mode!='nora',radius=panel['radius']['bottomLeft'] if panel else 12))
-  return {'name':name,'mode':mode,'theme':theme,'focusPane':'p1' if mode=='pane' else '','focusAI':mode=='ai','aiId':'page2','aiPreviewId':'page3','mainSlots':slots,'workspace':edges(box(0,40,w,h-68)),'padding':{'top':6,'bottom':0 if mode in ('pane','ai') else 6,'left':0,'right':0},'header':chrome_surface(header,theme),'footer':chrome_surface(footer,theme),'nora':{'open':mode=='nora','motion':'open' if mode=='nora' else 'closed'},'panels':panels,'window':{'bounds':box(0,0,w,h),'contentBounds':box(0,0,w,h),'fullscreen':mode in ('pane','ai')},'native':nativepages,'identities':copy.deepcopy(owners)}
+  nora={'open':mode=='nora','motion':'open' if mode=='nora' else 'closed','settingsButtonPresent':False,'scrim':{'hidden':mode!='nora','opacity':.24 if mode=='nora' else 0,'backgroundColor':'rgb(0, 0, 0)','bounds':edges(box(0,0,w,h-28) if mode=='nora' else box(0,0,0,0))}}
+  return {'name':name,'mode':mode,'theme':theme,'focusPane':'p1' if mode=='pane' else '','focusAI':mode=='ai','aiId':'page2','aiPreviewId':'page3','mainSlots':slots,'workspace':edges(box(0,40,w,h-68)),'padding':{'top':6,'bottom':0 if mode in ('pane','ai') else 6,'left':0,'right':0},'header':chrome_surface(header,theme),'footer':chrome_surface(footer,theme),'nora':nora,'panels':panels,'window':{'bounds':box(0,0,w,h),'contentBounds':box(0,0,w,h),'fullscreen':mode in ('pane','ai')},'native':nativepages,'identities':copy.deepcopy(owners)}
  focused={'schema':1,'version':'6.0.34','platform':platform,'arch':arch,'pid':91,'physicalUserDeviceVerified':False,'source':'Native pane fullscreen controls, actual native bounds and full OS display pixels','stages':[focused_state('before','light','grid')],'nativeInputs':[],'captures':[],'ok':True,'restored':True,'reportFile':'mouse-634-focused-chrome.json'}
+ original_bounds=box(0,32 if platform=='darwin' else 0,640,600);original_native=copy.deepcopy(focused['stages'][0]['native'])
+ focused['probeWindow']={'originalBounds':original_bounds,'workArea':box(0,0,640,632),'minimumSize':[600,600],'minimumBottomClearance':32 if platform=='darwin' else 0,'adjustedBounds':box(0,0,640,600)}
+ focused['windowRestoration']={'bounds':copy.deepcopy(original_bounds),'native':copy.deepcopy(original_native),'originalNative':original_native}
  for theme in ('light','dark'):
   for label,mode in [('grid','grid'),('pane-expanded','pane'),('pane-restored','grid'),('ai-expanded','ai'),('ai-restored','grid'),('nora-open','nora'),('nora-restored','grid')]:
-   stage=focused_state(label+'-'+theme,theme,mode);focused['stages'].append(stage)
+   stage=focused_state(label+'-'+theme,theme,mode)
+   if mode=='nora':
+    previous=focused['stages'][-1]
+    for surface in ('header','footer'):stage[surface].update(pointSource='pre-modal-layout',referenceStage=previous['name'],points=[{**copy.deepcopy(point),'actualModalHit':'synthetic-modal-hit'} for point in previous[surface]['points']])
+   focused['stages'].append(stage)
    if label not in ('grid','pane-expanded','ai-expanded','nora-open'):continue
    points=[]
    if mode!='nora':
@@ -148,15 +157,20 @@ def fixture(platform='win32'):
      row=next(p for p in stage['native'] if p['tabId']==panel['tabId']);r=row['bounds'];radius=row['roundBottom']
      for side in ('left','right'):points.append({'kind':'native-bottom-corner','tabId':row['tabId'],'side':side,'roundBottom':radius,'point':{'x':r['x']+1.5 if side=='left' else r['x']+r['width']-1.5,'y':r['y']+r['height']-1.5},'expectedRGB':BODY if radius==0 else LINE[theme]})
      points.append({'kind':'native-bottom-interior','tabId':row['tabId'],'point':{'x':r['x']+r['width']-24.5,'y':r['y']+r['height']-1.5},'expectedRGB':BODY})
-   pixel=[240,240,240,255] if theme=='light' else [35,35,35,255];pairs=[];extra={}
+   pixel=[240,240,240,255] if theme=='light' else [35,35,35,255];shade=.24 if mode=='nora' else 0;header_rgb=[math.floor(v*(1-shade)+.5) for v in pixel[:3]];pairs=[];extra={}
    for a,b in zip(stage['header']['points'],stage['footer']['points']):
-    ap={'x':math.floor(a['point']['x']),'y':math.floor(a['point']['y']),'rgba':pixel};bp={'x':math.floor(b['point']['x']),'y':math.floor(b['point']['y']),'rgba':pixel};extra[(ap['x'],ap['y'])]=pixel;extra[(bp['x'],bp['y'])]=pixel;pairs.append({'fraction':a['fraction'],'header':a,'footer':b,'headerPixel':ap,'footerPixel':bp,'maxChannelDelta':0,'pass':True})
+    ap={'x':math.floor(a['point']['x']),'y':math.floor(a['point']['y']),'rgba':header_rgb+[255]};bp={'x':math.floor(b['point']['x']),'y':math.floor(b['point']['y']),'rgba':pixel};extra[(ap['x'],ap['y'])]=ap['rgba'];extra[(bp['x'],bp['y'])]=pixel;pairs.append({'fraction':a['fraction'],'header':a,'footer':b,'headerPixel':ap,'footerPixel':bp,'shadeOpacity':shade,'expectedHeaderRGB':header_rgb,'maxChannelDelta':0,'pass':True})
    r=stage['window']['contentBounds'];shot=capture('mouse-634-focused-chrome-'+label+'-'+theme+'-1.png',points,width=r['width'],height=r['height'],extra_pixels=extra);shot.update(attempt=1,probes=sampled(points),chromePairs=pairs);shot['pass']=True;focused['captures'].append({'label':label,'theme':theme,'attempts':[shot],'acceptedAttempt':1})
-  for selector in ['.pane[data-pane="p1"] [data-pane-action="fullscreen"]']*2+['[data-action="ai-fullscreen"]']*2+['#desktops-button']*2:focused['nativeInputs'].append(click(selector))
+  for selector in ['.pane[data-pane="p1"] [data-pane-action="fullscreen"]']*2+['[data-action="ai-fullscreen"]']*2+['#desktops-button','#desks-close']:focused['nativeInputs'].append(click(selector))
  focused['stages'].append(focused_state('restored','light','grid'));facts['focusedChrome']=focused
- files['mouse-634-owner-feedback.log']=b'MOUSE_634_OWNER_FEEDBACK_PASS\nSynthetic parser fixture only\n'
+ search_files,search,_=SEARCH_FIXTURES['fixture'](platform,owners,focused['stages'][-1]['native']);files.update(search_files);facts['search']=search
+ facts['nativeInputs'].extend(copy.deepcopy(row) for row in search['inputs'] if 'id' not in row)
+ facts['captures'].extend(copy.deepcopy(shot) for group in search['captures'] for shot in group['attempts'])
+ facts['captures'].extend(copy.deepcopy(shot) for shot in (search['nora']['capture'],search['captureModal']['capture'],search['restoredCapture']))
+ files['mouse-634-owner-feedback.log']=b'MOUSE_634_OWNER_FEEDBACK_PASS\nMOUSE_634_SEARCH_NATIVE_PASS\nSynthetic parser fixture only\n'
  def refresh():
-  for report in (facts['downloads'],facts['aiPreview']['downloads'],facts['focusedChrome']):
+  for report in (facts['downloads'],facts['aiPreview']['downloads'],facts['focusedChrome'],facts.get('search')):
+   if report is None:continue
    raw=json.dumps({k:v for k,v in report.items() if k not in ('reportFile','reportSha256')}).encode();files[report['reportFile']]=raw;report['reportSha256']=sha(raw)
   raw=json.dumps(facts).encode();files[E['NAME']]=raw
   if platform in ('win32','linux'):
@@ -171,9 +185,41 @@ class Current634Evidence(unittest.TestCase):
  def verify(self):self.refresh();return E['verify'](self.files.__getitem__,expected_platform=self.facts['platform'],expected_arch=self.facts['arch'])
  def reject(self):
   with self.assertRaises((ValueError,KeyError,TypeError)):self.verify()
+ def focused_pixels(self,index,header_rgba,footer_rgba,shade):
+  # Rewrite both actual PNGs and every size/hash receipt, leaving a deliberately
+  # self-consistent claimed pass for the independent pixel gate to assess.
+  shot=self.facts['focusedChrome']['captures'][index]['attempts'][0];pixels={(p['pixel']['x'],p['pixel']['y']):p['pixel']['rgba'] for p in shot['probes']}
+  for pair in shot['chromePairs']:
+   for key,rgba in (('headerPixel',header_rgba),('footerPixel',footer_rgba)):
+    pair[key]['rgba']=list(rgba);pixels[(pair[key]['x'],pair[key]['y'])]=list(rgba)
+   pair.update(shadeOpacity=shade,expectedHeaderRGB=list(header_rgba[:3]),maxChannelDelta=0,pass_=True);pair['pass']=pair.pop('pass_')
+  raw=png(shot['pixelSize']['width'],shot['pixelSize']['height'],pixels);self.files[shot['filename']]=raw;self.files[shot['displayFilename']]=raw
+  for row in [shot]+[r for r in self.facts['captures'] if r['filename']==shot['filename']]:row.update(sha256=sha(raw),displaySha256=sha(raw),bytes=len(raw))
  def test_all_three_actual_schemas_accept_explicit_synthetic_fixtures(self):
   for platform in ('win32','darwin','linux'):
-   self.files,self.facts,self.refresh=fixture(platform);result=self.verify();self.assertEqual(result['captureCorners']['decodedProbes'],534);self.assertEqual(result['focusedChrome']['captureGroups'],8);self.assertEqual(len(result['nativeCaptures']),23)
+   self.files,self.facts,self.refresh=fixture(platform);result=self.verify();self.assertEqual(result['captureCorners']['decodedProbes'],534);self.assertEqual(result['focusedChrome']['captureGroups'],8);self.assertEqual(result['search']['captureGroups'],2);self.assertEqual(len(result['nativeCaptures']),28)
+ def test_native_search_is_required_and_bound_to_its_raw_report_and_owner_ledgers(self):
+  self.facts.pop('search');self.reject()
+  self.setUp();self.facts['search']['reportFile']='mouse-634-optional-search.json';self.reject()
+  self.setUp();name=self.facts['search']['captures'][0]['attempts'][0]['filename'];self.facts['captures']=[shot for shot in self.facts['captures'] if shot['filename']!=name];self.reject()
+  self.setUp();event=next(row for row in self.facts['search']['inputs'] if row['selector']=='#mouse-search-button');self.facts['nativeInputs']=[row for row in self.facts['nativeInputs'] if row!=event];self.reject()
+ def test_focused_probe_window_is_derived_and_only_mac_can_adjust_it(self):
+  self.facts['focusedChrome']['probeWindow']['adjustedBounds']['y']=1;self.reject()
+  self.setUp();self.facts['focusedChrome']['probeWindow']['minimumBottomClearance']=32;self.reject()
+  self.files,self.facts,self.refresh=fixture('darwin');self.facts['focusedChrome']['probeWindow']['minimumBottomClearance']=0;self.reject()
+  self.files,self.facts,self.refresh=fixture('darwin');self.facts['focusedChrome']['probeWindow']['workArea']['height']=620;self.reject()
+ def test_focused_mac_adjustment_keeps_native_minimum_size_and_exact_clearance(self):
+  adjusted=E['F']['probe_bounds'](box(20,32,800,632),box(0,0,900,650),[800,600],'darwin');self.assertEqual(adjusted,box(20,18,800,600))
+  unchanged=E['F']['probe_bounds'](box(20,32,800,632),box(0,0,900,650),[800,600],'win32');self.assertEqual(unchanged,box(20,32,800,632))
+  for area,minimum in [(box(0,0,900,620),[800,600]),(box(0,0,799,900),[800,600]),(box(0,0,900,900),[900,600])]:
+   with self.assertRaises(ValueError):E['F']['probe_bounds'](box(20,32,800,632),area,minimum,'darwin')
+ def test_focused_caller_window_native_hierarchy_and_corner_restore_require_raw_data(self):
+  self.facts['focusedChrome'].pop('windowRestoration');self.reject()
+  self.setUp();self.facts['focusedChrome']['windowRestoration']['bounds']['height']-=1;self.reject()
+  self.setUp();self.facts['focusedChrome']['windowRestoration']['native'][0]['actualBounds']['height']+=1;self.reject()
+  self.setUp()
+  for key in ('native','originalNative'):self.facts['focusedChrome']['windowRestoration'][key][0]['roundBottom']=0
+  self.reject()
  def test_download_owners_and_exact_reservation_are_required(self):
   for branch in ('downloads','ai'):
    self.setUp();value=self.facts['downloads'] if branch=='downloads' else self.facts['aiPreview']['downloads'];value['stages'][2]['native'][0]['bounds']['height']+=1;self.reject()
@@ -236,9 +282,81 @@ class Current634Evidence(unittest.TestCase):
   for stage,radius in [(2,12),(1,0)]:
    self.setUp();self.facts['focusedChrome']['stages'][stage]['panels'][0]['radius']['bottomLeft']=radius;self.reject()
   self.setUp();self.facts['focusedChrome']['stages'][2]['padding']['bottom']=6;self.reject()
- def test_footer_requires_actual_matching_header_pixels_even_in_nora(self):
+ def test_footer_requires_actual_shaded_header_pixels_in_nora(self):
   row=self.facts['focusedChrome']['captures'][3]['attempts'][0];row['chromePairs'][0]['footerPixel']['rgba']=[0,0,0,255];self.reject()
   self.setUp();self.facts['focusedChrome']['stages'][6]['footer']['backgroundImage']='none';self.reject()
+ def test_chrome_excludes_pointer_transparent_tab_flow_bounds(self):
+  state=copy.deepcopy(self.facts['focusedChrome']['stages'][1]);header=state['header'];header['occluders']=[{'selector':'.mouse-tab-flow','bounds':edges(box(90,32,400,8))}]
+  for x in (100,490,492):
+   header['points'][1]['point']['x']=x
+   with self.subTest(x=x),self.assertRaisesRegex(ValueError,'pointer-transparent tab-flow'):E['F']['chrome'](state)
+  header['points'][1]['point']['x']=494;E['F']['chrome'](state)
+  header['occluders'][0]['bounds']['right']+=1
+  with self.assertRaisesRegex(ValueError,'vector right endpoint'):E['F']['chrome'](state)
+  header['occluders'][0]['bounds']['right']-=1;header['occluders'][0]['selector']='unmeasured'
+  with self.assertRaisesRegex(ValueError,'unexpected chrome vector'):E['F']['chrome'](state)
+  header.pop('occluders')
+  with self.assertRaisesRegex(ValueError,'vector occluders missing'):E['F']['chrome'](state)
+ def test_nora_uses_exact_prior_points_and_records_the_actual_modal_hit(self):
+  previous=self.facts['focusedChrome']['stages'][5];original=self.facts['focusedChrome']['stages'][6];state=copy.deepcopy(original)
+  for surface in ('header','footer'):
+   for point in state[surface]['points']:point['actualModalHit']=None
+  E['F']['chrome'](state,previous)
+  for change in (lambda p:p.pop('actualModalHit'),lambda p:p.update(actualModalHit=''),lambda p:p.update(actualModalHit=42),lambda p:p.update(hit='invented'),lambda p:p['point'].update(x=102),lambda p:p.update(surfacePath=['invented'])):
+   state=copy.deepcopy(original);change(state['header']['points'][0])
+   with self.assertRaisesRegex(ValueError,'modal hit differs'):E['F']['chrome'](state,previous)
+  self.facts['focusedChrome']['stages'][6]['header']['referenceStage']='grid-light';self.reject()
+ def test_nora_rejects_changed_chrome_or_an_unrelated_reference(self):
+  previous=self.facts['focusedChrome']['stages'][5];original=self.facts['focusedChrome']['stages'][6]
+  for reference in (self.facts['focusedChrome']['stages'][1],self.facts['focusedChrome']['stages'][12]):
+   with self.assertRaisesRegex(ValueError,'immediately preceding restored grid'):E['F']['chrome'](original,reference)
+  for key,value in [('bounds',edges(box(1,0,640,40))),('occluders',[{'selector':'.mouse-tab-flow','bounds':edges(box(300,32,80,8))}]),('backgroundImage','linear-gradient(rgb(250, 250, 250), rgb(230, 230, 230))'),('backgroundColor','rgb(239, 239, 239)'),('backdropFilter','blur(1px)'),('opacity','.99')]:
+   state=copy.deepcopy(original)
+   for surface in ('header','footer'):state[surface][key]=copy.deepcopy(value)
+   with self.subTest(field=key),self.assertRaises(ValueError):E['F']['chrome'](state,previous)
+  state=copy.deepcopy(original);state['header']['pointSource']='live-hit-test'
+  with self.assertRaisesRegex(ValueError,'measured pre-modal reference'):E['F']['chrome'](state,previous)
+ def test_closed_chrome_cannot_claim_pre_modal_or_modal_hits(self):
+  original=self.facts['focusedChrome']['stages'][1]
+  for change in (lambda s:s.update(pointSource='pre-modal-layout'),lambda s:s.update(referenceStage='ai-restored-light'),lambda s:s.pop('referenceStage'),lambda s:s['points'][0].update(actualModalHit=None)):
+   state=copy.deepcopy(original);change(state['header'])
+   with self.assertRaisesRegex(ValueError,'not live hit tests'):E['F']['chrome'](state)
+ def test_nora_has_no_settings_gear_in_any_stage(self):
+  for original in self.facts['focusedChrome']['stages']:
+   state=copy.deepcopy(original);state['nora']['settingsButtonPresent']=True
+   with self.subTest(stage=state['name']),self.assertRaisesRegex(ValueError,'removed settings control'):E['F']['nora_surface'](state,state['mode']=='nora')
+  self.facts['focusedChrome']['stages'][-1]['nora'].pop('settingsButtonPresent');self.reject()
+ def test_nora_shade_requires_exact_visibility_opacity_and_black(self):
+  for stage,changes in [(6,{'hidden':True}),(6,{'opacity':.12}),(6,{'opacity':.240001}),(6,{'opacity':'0.24'}),(6,{'backgroundColor':'rgb(1, 1, 1)'}),(0,{'hidden':False}),(0,{'opacity':.24}),(0,{'opacity':False}),(0,{'backgroundColor':'transparent'})]:
+   state=copy.deepcopy(self.facts['focusedChrome']['stages'][stage]);state['nora']['scrim'].update(changes)
+   with self.subTest(stage=stage,changes=changes),self.assertRaisesRegex(ValueError,'Nora shade'):E['F']['nora_surface'](state,state['mode']=='nora')
+ def test_nora_shade_bounds_cover_header_and_stop_before_footer(self):
+  original=self.facts['focusedChrome']['stages'][6]
+  for key,delta in [('x',1),('y',1),('width',-1),('height',-1),('height',1)]:
+   state=copy.deepcopy(original);bounds=state['nora']['scrim']['bounds'];bounds[key]+=delta;bounds.update(edges(bounds))
+   with self.subTest(key=key,delta=delta),self.assertRaisesRegex(ValueError,'Nora shade bounds'):E['F']['nora_surface'](state,True)
+  state=copy.deepcopy(original);state['nora']['scrim']['bounds']['bottom']+=1
+  with self.assertRaisesRegex(ValueError,'Nora shade bounds'):E['F']['nora_surface'](state,True)
+  state=copy.deepcopy(original);state['header']['bounds']['y']=-1
+  with self.assertRaisesRegex(ValueError,'complete header'):E['F']['nora_surface'](state,True)
+  state=copy.deepcopy(original);state['footer']['points'][0]['point']['y']=10
+  with self.assertRaisesRegex(ValueError,'covers the footer'):E['F']['nora_surface'](state,True)
+ def test_nora_visibility_is_measured_on_the_undimmed_footer(self):
+  self.focused_pixels(3,[152,156,160,255],[200,205,210,255],.24)
+  self.focused_pixels(7,[9,9,9,255],[12,12,12,255],.24)
+  self.assertTrue(self.verify()['ok'])
+ def test_independent_pngs_reject_missing_half_or_footer_shade(self):
+  cases=[(3,[240,240,240,255],[240,240,240,255],.24),(7,[35,35,35,255],[35,35,35,255],.24),(3,[211,211,211,255],[240,240,240,255],.24),(3,[182,182,182,255],[182,182,182,255],.24),(0,[182,182,182,255],[240,240,240,255],0)]
+  for index,header,footer,shade in cases:
+   self.setUp();self.focused_pixels(index,header,footer,shade)
+   with self.subTest(index=index,header=header,footer=footer),self.assertRaisesRegex(ValueError,'actual top/footer shade pixels'):self.verify()
+ def test_shade_metadata_and_alpha_cannot_override_actual_pixels(self):
+  for changes in ({'shadeOpacity':.12},{'shadeOpacity':True},{'expectedHeaderRGB':[240,240,240]}):
+   self.setUp();self.facts['focusedChrome']['captures'][3]['attempts'][0]['chromePairs'][0].update(changes)
+   with self.subTest(changes=changes),self.assertRaisesRegex(ValueError,'actual top/footer shade pixels'):self.verify()
+  for header,footer in [([182,182,182,254],[240,240,240,255]),([182,182,182,255],[240,240,240,254])]:
+   self.setUp();self.focused_pixels(3,header,footer,.24)
+   with self.subTest(header=header,footer=footer),self.assertRaisesRegex(ValueError,'actual top/footer shade pixels'):self.verify()
  def test_raw_report_bytes_and_installed_process_must_match(self):
   self.files['mouse-634-download-widget.json']+=b' '
   with self.assertRaises(ValueError):E['verify'](self.files.__getitem__)

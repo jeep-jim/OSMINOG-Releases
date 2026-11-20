@@ -18,7 +18,7 @@ def validate_template():
  if not (STAGE/'RELEASE_NOTES.md').read_text().startswith('# Mouse Browser 6.0.34'):
   raise ValueError('Release notes version mismatch')
  schema=json.loads((STAGE/'evidence.schema.json').read_text())
- required=set(_evidence.JSON_NAMES)|{'mouse-631-native.json','mouse-631-task.json','mouse-631-stress.json','mouse-632-media.json','mouse-632-footer.json','mouse-632-documents.json','mouse-633-owner-feedback.json','mouse-633-context-menu.json','mouse-634-owner-feedback.json','mouse-634-download-widget.json','mouse-634-ai-download-widget.json','mouse-634-focused-chrome.json','mouse-634-upgrade.json','mouse-634-upgrade-write.json','mouse-634-upgrade-read.json'}
+ required=set(_evidence.JSON_NAMES)|{'mouse-631-native.json','mouse-631-task.json','mouse-631-stress.json','mouse-632-media.json','mouse-632-footer.json','mouse-632-documents.json','mouse-633-owner-feedback.json','mouse-633-context-menu.json','mouse-634-owner-feedback.json','mouse-634-download-widget.json','mouse-634-ai-download-widget.json','mouse-634-focused-chrome.json','mouse-634-search.json','mouse-634-upgrade.json','mouse-634-upgrade-write.json','mouse-634-upgrade-read.json'}
  if set(schema['required'])!=required or schema['x-motionTraceGate']['algorithm']!='mouse628-motion-trace-evidence-v2':
   raise ValueError('Evidence schema mismatch')
  gates=[('x-taskStressGate','mouse634-task-evidence.py'),('x-ownerFeedbackGate','mouse634-feedback-evidence.py'),('x-currentOwnerGate','mouse634-retained-owner-evidence.py'),('x-currentContextGate','mouse634-context-evidence.py'),('x-workspaceGeometryGate','mouse634-workspace-evidence.py'),('x-currentUpgradeGate','mouse634-upgrade-evidence.py'),('x-current634OwnerGate','mouse634-owner-feedback-evidence.py')]
@@ -27,7 +27,7 @@ def validate_template():
   if gate['validator']!='tools/'+module or gate['sha256']!=sha(Path(__file__).with_name(module).read_bytes()) or gate['sourceAndFreshInstalled'] is not True:
    raise ValueError('Independent634 checker contract mismatch: '+module)
  dependencies=schema['x-current634OwnerGate'].get('dependencies',{})
- names=('mouse634-native-evidence.py','mouse634-download-evidence.py','mouse634-capture-evidence.py','mouse634-focused-evidence.py')
+ names=('mouse634-native-evidence.py','mouse634-download-evidence.py','mouse634-capture-evidence.py','mouse634-focused-evidence.py','mouse634-search-evidence.py')
  if dependencies!={name:sha(Path(__file__).with_name(name).read_bytes()) for name in names}:
   raise ValueError('Independent634 native dependency hashes differ')
  if PIN['ready'] is False:

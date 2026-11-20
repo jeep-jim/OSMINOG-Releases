@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Independent634 downloads, right-column preview, capture and focus acceptance."""
+"""Independent634 downloads, preview, capture, focus and native search acceptance."""
 from pathlib import Path
 import re
 import runpy
@@ -7,6 +7,7 @@ N=runpy.run_path(str(Path(__file__).with_name('mouse634-native-evidence.py')))
 D=runpy.run_path(str(Path(__file__).with_name('mouse634-download-evidence.py')))
 C=runpy.run_path(str(Path(__file__).with_name('mouse634-capture-evidence.py')))
 F=runpy.run_path(str(Path(__file__).with_name('mouse634-focused-evidence.py')))
+S=runpy.run_path(str(Path(__file__).with_name('mouse634-search-evidence.py')))
 need,near,rect=N['need'],N['near'],N['rect']
 NAME='mouse-634-owner-feedback.json'
 MARKER='MOUSE_634_OWNER_FEEDBACK_PASS'
@@ -87,19 +88,20 @@ def verify(read,*,expected_platform=None,expected_arch=None):
  side=D['verify'](evidence,right,platform,arch,pid,['chat','preview'],right_initial,[primary,preview_origin])
  owners=main_before+right_initial;corners=C['verify'](evidence,facts.get('captureCorners',{}),platform,owners)
  focused=F['verify'](evidence,facts.get('focusedChrome',{}),platform,arch,pid,owners)
+ search=S['verify'](evidence,facts.get('search',{}),platform,arch,pid,owners)
  inputs=facts.get('nativeInputs',[]);need(isinstance(inputs,list) and 15<=len(inputs)<=100,'actual owner native input ledger missing')
  for item in inputs:
   owner=next((o for o in owners if o['id']==item.get('tabId')),None) if 'tabId' in item else None
   if 'tabId' in item: need(owner is not None,'foreign native input owner')
   N['input_event'](item,platform,item.get('selector'),owner)
- for item in [*main_downloads['nativeInputs'],*right['nativeInputs'],ai['blankClick'],ai['sameClick'],ai['closeClick'],*facts['focusedChrome']['nativeInputs']]: need(item in inputs,'helper native input absent from actual owner ledger')
+ for item in [*main_downloads['nativeInputs'],*right['nativeInputs'],ai['blankClick'],ai['sameClick'],ai['closeClick'],*facts['focusedChrome']['nativeInputs'],*(row for row in facts['search']['inputs'] if 'id' not in row)]: need(item in inputs,'helper native input absent from actual owner ledger')
  for scene in facts['captureCorners']['scenes']:
   for key in ('openInput','closeInput','themeInput'):
    if key in scene: need(scene[key] in inputs,'screenshot native input missing from owner ledger')
- capture_rows=facts.get('captures',[]);need(isinstance(capture_rows,list) and 23<=len(capture_rows)<=80 and len({r.get('filename') for r in capture_rows})==len(capture_rows),'native screenshot ledger missing/duplicated')
+ capture_rows=facts.get('captures',[]);need(isinstance(capture_rows,list) and 28<=len(capture_rows)<=80 and len({r.get('filename') for r in capture_rows})==len(capture_rows),'native screenshot ledger missing/duplicated')
  for row in capture_rows: evidence.screen(row)
  need({r['filename'] for r in capture_rows}==set(evidence.receipts),'referenced native capture absent from canonical ledger')
  need(any(row['filename']=='mouse-634-ai-preview-new-window.png' for row in capture_rows),'actual first preview OS image missing')
  requests=facts.get('requests',[]);need(isinstance(requests,list) and len(requests)==6 and [r.get('index') for r in requests]==[0,1,2,3,4,3] and all(N['finite'](r.get('at')) for r in requests),'main/chat unexpectedly reloaded or an extra page was requested')
  cleanup=facts.get('cleanup',{});N['flags'](cleanup,('restored','desktopStateRestored'),'original desktop did not restore');need(type(cleanup.get('ownedPagesClosed')) is int and cleanup['ownedPagesClosed']>=5 and type(cleanup.get('originalPagesPreserved')) is int and cleanup['originalPagesPreserved']>=0,'owned fixtures not closed or original pages unaccounted')
- return {'ok':True,'version':N['VERSION'],'platform':platform,'arch':arch,'pid':pid,'reportSha256':N['sha'](raw),'nativeInputSource':N['source'](platform),'downloads':ordinary,'aiPreview':{'chat':chat['id'],'preview':reopened_id,'mainTabsPreserved':True,'downloads':side},'captureCorners':corners,'focusedChrome':focused,'nativeCaptures':list(evidence.receipts.values()),'physicalUserDeviceVerified':False}
+ return {'ok':True,'version':N['VERSION'],'platform':platform,'arch':arch,'pid':pid,'reportSha256':N['sha'](raw),'nativeInputSource':N['source'](platform),'downloads':ordinary,'aiPreview':{'chat':chat['id'],'preview':reopened_id,'mainTabsPreserved':True,'downloads':side},'captureCorners':corners,'focusedChrome':focused,'search':search,'nativeCaptures':list(evidence.receipts.values()),'physicalUserDeviceVerified':False}
