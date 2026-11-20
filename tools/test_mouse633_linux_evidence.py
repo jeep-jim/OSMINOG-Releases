@@ -138,6 +138,47 @@ class LinuxInstalledEvidence(unittest.TestCase):
         self.native[0]['sandbox']['renderers'][0]['preferences']['nodeIntegration']=True;self.refresh()
         with self.assertRaisesRegex(ValueError,'preferences'):self.invoke()
 
+    def test_proc_process_title_preserves_spaced_paths_and_unicode(self):
+        for index, native in enumerate(self.native):
+            executable='/tmp/.mount_Mouse-owned/mouse-browser' if index==2 else '/opt/Mouse Browser/mouse-browser'
+            for row in native['sandbox']['renderers']:
+                row['argv']=[executable+' --type=renderer --user-data-dir=/tmp/Профиль Mouse '
+                             '--app-path=/opt/Mouse Browser/resources/app.asar --enable-sandbox '
+                             '--disable-gpu-compositing --disable-features=NativeViewHostManagesLayers '
+                             '--fixture-path=/tmp/--no-sandbox/assets --no-sandboxed']
+        self.refresh()
+        self.assertEqual(self.invoke()['sandboxRendererCount'],4)
+
+    def test_every_disabled_sandbox_switch_is_rejected_in_both_proc_formats(self):
+        row=self.native[0]['sandbox']['renderers'][0]
+        executable='/opt/Mouse Browser/mouse-browser'
+        for flag in ('--no-sandbox','--disable-setuid-sandbox','--disable-seccomp-filter-sandbox','--disable-gpu-sandbox'):
+            for suffix in ('','=false','=true'):
+                for argv in ([executable,'--type=renderer',flag+suffix],
+                             [executable+' --type=renderer '+flag+suffix],
+                             [executable+'\t'+flag+suffix+' --type=renderer'],
+                             [executable+' --type=renderer\n'+flag+suffix],
+                             [executable+' --type=renderer "'+flag+suffix+'"'],
+                             [executable+" --type=renderer '"+flag+suffix+"'"]):
+                    row['argv']=argv;self.refresh()
+                    with self.subTest(flag=flag,suffix=suffix,argv=argv),self.assertRaisesRegex(ValueError,'renderer command'):
+                        self.invoke()
+
+    def test_process_title_requires_the_exact_renderer_switch(self):
+        row=self.native[0]['sandbox']['renderers'][0]
+        for switch in ('--type=renderer-extra','--custom=--type=renderer','prefix--type=renderer','--type=utility','',
+                       '--fixture=" --type=renderer "',"--fixture=' --type=renderer '",'"--type=renderer"'):
+            row['argv']=['/opt/Mouse Browser/mouse-browser '+switch+' --enable-sandbox'];self.refresh()
+            with self.subTest(switch=switch),self.assertRaisesRegex(ValueError,'renderer command'):self.invoke()
+        row['argv']=['/opt/Mouse Browser/mouse-browser --type=renderer\0 --no-sandbox'];self.refresh()
+        with self.assertRaisesRegex(ValueError,'renderer command'):self.invoke()
+
+    def test_regular_argv_does_not_promote_a_path_value_to_renderer_identity(self):
+        self.native[0]['sandbox']['renderers'][0]['argv']=[
+            '/opt/Mouse Browser/mouse-browser','--app-path=/tmp/Профиль --type=renderer']
+        self.refresh()
+        with self.assertRaisesRegex(ValueError,'renderer command'):self.invoke()
+
     def test_actual_appimage_runtime_and_identical_asar_are_required(self):
         for key,value in [('packageFormat','deb'),('appImage',None),('asarSha256','9'*64)]:
             old=self.native[2][key];self.native[2][key]=value;self.refresh()

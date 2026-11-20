@@ -53,6 +53,23 @@ def scope(value):
          'failed or non-Linux/current report')
 
 
+def renderer_commandline(argv):
+    if not isinstance(argv, list) or not argv or not all(isinstance(arg, str) and '\0' not in arg for arg in argv):
+        return False
+    unsafe = r'--(?:no-sandbox|disable-setuid-sandbox|disable-seccomp-filter-sandbox|disable-gpu-sandbox)'
+    if len(argv) == 1:
+        # Chromium can rewrite /proc/cmdline into one process-title string.
+        # Recognize whole switches without splitting paths containing spaces.
+        command = argv[0]
+        # A rewritten title cannot recover quoted argv boundaries reliably.
+        # Accept the observed unquoted form; reject ambiguous quoted flags.
+        if '"' in command or "'" in command:
+            return False
+        return bool(re.search(r'(?:^|\s)--type=renderer(?:\s|$)', command)) and not re.search(
+            r'(?:^|\s)'+unsafe+r'(?:=|\s|$)', command)
+    return '--type=renderer' in argv and not any(re.match(unsafe+r'(?:=|$)', arg) for arg in argv)
+
+
 def sandbox(value, uid, count):
     need(isinstance(value, dict) and value.get('disabledFlags') == [], 'sandbox disabled or absent')
     rows = value.get('renderers', [])
@@ -61,10 +78,7 @@ def sandbox(value, uid, count):
         need(positive(row.get('pid')) and row.get('seccomp') == 2 and row.get('noNewPrivs') == 1 and
              row.get('uid') == uid and positive(row.get('webContentsId')), 'renderer /proc sandbox facts differ')
         argv = row.get('argv')
-        need(isinstance(argv, list) and argv and all(isinstance(arg, str) for arg in argv) and
-             '--type=renderer' in argv and not any(re.match(
-                 r'--(?:no-sandbox|disable-setuid-sandbox|disable-seccomp-filter-sandbox|disable-gpu-sandbox)(?:=|$)', arg)
-                 for arg in argv), 'renderer command disables isolation')
+        need(renderer_commandline(argv), 'renderer command disables isolation or lacks renderer identity')
         prefs = row.get('preferences', {})
         need(prefs.get('sandbox') is True and prefs.get('contextIsolation') is True and
              prefs.get('webSecurity') is True and prefs.get('nodeIntegration') is False,
