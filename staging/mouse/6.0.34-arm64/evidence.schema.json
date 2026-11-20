@@ -619,7 +619,7 @@
       "mouse634-download-evidence.py": "4e654a795e07847bef5adb4f66e43394f54d4f43624e0aa437de427e6abe5fe7",
       "mouse634-capture-evidence.py": "c46d3bd3244b6484c143042004b2c85bdb8e39b37f9e872e5eae9a13399c209a",
       "mouse634-focused-evidence.py": "d214c9f7fe4de4c48e4760b4c64337159f798a779b81364bdc1799f7f5049384",
-      "mouse634-search-evidence.py": "81d03c8cdf6459c73f2505380c5a91b7c51968e58839ba3ce66fda9de8630561"
+      "mouse634-search-evidence.py": "f828c2ed5d299d440b116a6ac118ca3df02eaeedcba370a90a66be6d92d009f0"
     },
     "search": {
       "required": true,

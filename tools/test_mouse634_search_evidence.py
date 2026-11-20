@@ -77,6 +77,14 @@ def fixture(platform='win32',owners=None,original_native=None):
  for index in (0,1,2,9):facts['requests'].append({'kind':'site','index':index,'path':'/site/'+str(index),'source':'native','origin':origins[index%2],'url':all_results[index]['url']})
  facts.update(scrollBefore=0,scrollAfter=1200,wheelInputSource='webContents.sendInputEvent(mouseWheel), observed by sandbox preload only after isTrusted',wheel=[{'id':first['id'],'revision':2,'deltaX':0,'deltaY':650,'ctrlKey':False}])
  wheel_receipt={'index':0,'identity':'search-wheel-document','trusted':True,'deltaX':0,'deltaY':650,'deltaMode':0};facts['requests'].append({'kind':'wheel','origin':origins[0],'url':origins[0]+'/wheel','path':'/wheel','receipt':wheel_receipt});facts['wheelInputs']=[{'id':first['id'],'webContentsId':300,'sent':{'type':'mouseWheel','x':40,'y':40,'deltaX':0,'deltaY':-650,'canScroll':True,'hasPreciseScrollingDeltas':True},'receipt':wheel_receipt,'forwarded':copy.deepcopy(facts['wheel'])}]
+ wheel_pin={'identity':wheel_receipt['identity'],'timeOrigin':1000,'url':first['url'],'webContentsId':300,'revision':2,'navigationEpoch':1,'bounds':copy.deepcopy(slots[0]),'contentBounds':box(0,0,width,height),'zoom':1}
+ wheel_native={'current':True,'destroyed':False,'webContentsId':300,'revision':2,'navigationEpoch':1,'url':first['url'],'zoom':1,'visible':True,'viewVisible':True,'attached':True,'blocked':False,'loading':False,'focused':True,'bounds':copy.deepcopy(slots[0]),'window':{'visible':True,'focused':True,'minimized':False,'contentBounds':box(0,0,width,height)}}
+ wheel_ready={'pin':copy.deepcopy(wheel_pin),'point':{'x':40,'y':40},'before':copy.deepcopy(wheel_native),'native':copy.deepcopy(wheel_native),'dom':{'identity':wheel_pin['identity'],'timeOrigin':1000,'url':first['url'],'readyState':'complete','visibilityState':'visible','focused':True,'viewport':{'width':slots[0]['width'],'height':slots[0]['height']},'point':{'x':40,'y':40},'hit':True,'pointer':{'trusted':True,'x':40,'y':40}}}
+ wheel_before=copy.deepcopy(wheel_ready)
+ for key in ('before','native'):wheel_before[key]['focused']=False;wheel_before[key]['window']['focused']=False
+ wheel_before['dom'].update(focused=False,pointer=None)
+ facts['wheelInputs'][0].update(status='completed',timeoutMs=10000,startedAt=1000,intentSavedAt=1010,sentAt=1011,completedAt=1020,finishedAt=1021,
+     pin=wheel_pin,before=wheel_before,ready=copy.deepcopy(wheel_ready),readiness=copy.deepcopy(wheel_ready),waitingFor=[],point={'x':56,'y':190},pointer={'warpResult':0,'postAccess':True},scrollBefore=0,scrollAfter=1200,uiAfter=copy.deepcopy(facts['pagedScene']['ui']))
  def click(selector):
   event={'selector':selector,'source':source,'point':{'x':100,'y':100},'at':1000,'navigates':False,'events':[{'type':'click','trusted':True,'matches':True}]};facts['inputs'].append(event);return event
  def guest(selector,wcid=300):
@@ -122,6 +130,11 @@ class SearchEvidence(unittest.TestCase):
   self.refresh();return S['verify'](S['N']['Evidence'](self.files.__getitem__),self.facts,self.facts['platform'],self.facts['arch'],self.facts['pid'],self.facts['original']['before']['identities'])
  def reject(self):
   with self.assertRaises((ValueError,KeyError,TypeError)):self.verify()
+ def verify_wheel(self):
+  item=self.facts['wheelInputs'][0];group=self.facts['captures'][-1]
+  return S['wheel_preparation'](item,self.facts['initialResults'][0],group['native']['revision'],group['attempts'][-1]['contentBounds'],item['receipt'])
+ def reject_wheel(self):
+  with self.assertRaises(ValueError):self.verify_wheel()
  def rewrite_screen(self,group_index,probe_index,rgba):
   shot=self.facts['captures'][group_index]['attempts'][0];points={(p['pixel']['x'],p['pixel']['y']):p['pixel']['rgba'] for p in shot['probes']};probe=shot['probes'][probe_index];probe['pixel']['rgba']=rgba;points[(probe['pixel']['x'],probe['pixel']['y'])]=rgba
   raw=png(shot['pixelSize']['width'],shot['pixelSize']['height'],points);self.files[shot['filename']]=raw;self.files[shot['displayFilename']]=raw;shot.update(sha256=sha(raw),displaySha256=sha(raw),bytes=len(raw));return probe
@@ -188,6 +201,41 @@ class SearchEvidence(unittest.TestCase):
   self.facts['requests']=[r for r in self.facts['requests'] if r['kind']!='wheel'];self.reject()
   self.setUp();self.facts['wheelInputs'][0]['receipt']['trusted']=False;self.reject()
   self.setUp();self.facts['wheelInputs'][0]['forwarded'][0]['deltaY']=300;self.reject()
+  self.setUp();self.facts['wheelInputs'][0].pop('ready');self.reject()
+ def test_prepared_wheel_requires_saved_intent_before_dispatch_within_the_original_budget(self):
+  for key,value in [('status','prepared'),('status','failed'),('timeoutMs',12000),('intentSavedAt',1012),('sentAt',999),('completedAt',11001),('finishedAt',1019),('startedAt',-1)]:
+   self.setUp();self.facts['wheelInputs'][0][key]=value;self.reject_wheel()
+  for key in ('intentSavedAt','completedAt','pin','before','ready','pointer'):
+   self.setUp();self.facts['wheelInputs'][0].pop(key);self.reject_wheel()
+  self.setUp();self.facts['wheelInputs'][0]['error']={'message':'receipt timed out'};self.reject_wheel()
+ def test_prepared_wheel_rejects_recycled_native_owners_geometry_and_zoom(self):
+  for key,value in [('current',False),('destroyed',True),('webContentsId',301),('revision',3),('navigationEpoch',2),('url','http://127.0.0.1:43112/site/1'),('zoom',2),('zoom',True),('focused',False),('visible',False),('viewVisible',False),('attached',False),('blocked',True),('loading',True)]:
+   self.setUp();item=self.facts['wheelInputs'][0];item['ready']['native'][key]=value;item['readiness']=copy.deepcopy(item['ready']);self.reject_wheel()
+  for key,value in [('focused',False),('visible',False),('minimized',True)]:
+   self.setUp();item=self.facts['wheelInputs'][0];item['ready']['native']['window'][key]=value;item['readiness']=copy.deepcopy(item['ready']);self.reject_wheel()
+  for key in ('before','native'):
+   self.setUp();item=self.facts['wheelInputs'][0];item['ready'][key]['bounds']['x']+=1;item['readiness']=copy.deepcopy(item['ready']);self.reject_wheel()
+  self.setUp();item=self.facts['wheelInputs'][0];item['ready']['before']['zoom']=2;item['readiness']=copy.deepcopy(item['ready']);self.reject_wheel()
+ def test_prepared_wheel_requires_the_same_ready_document_and_real_pointer_coordinates(self):
+  for key,value in [('identity','another document'),('timeOrigin',1001),('url','https://outside.invalid/'),('focused',False),('readyState','interactive'),('visibilityState','hidden'),('hit',False),('point',{'x':39,'y':40}),('pointer',None),('pointer',{'trusted':False,'x':40,'y':40}),('pointer',{'trusted':True,'x':40,'y':38})]:
+   self.setUp();item=self.facts['wheelInputs'][0];item['ready']['dom'][key]=value;item['readiness']=copy.deepcopy(item['ready']);self.reject_wheel()
+  for key,value in [('point',{'x':56,'y':191}),('pointer',{'warpResult':1,'postAccess':True}),('pointer',{'warpResult':0,'postAccess':False}),('waitingFor',['native-pointer-not-observed'])]:
+   self.setUp();self.facts['wheelInputs'][0][key]=value;self.reject_wheel()
+  self.setUp();self.facts['wheelInputs'][0]['receipt']['identity']='foreign HTTP document';self.reject_wheel()
+ def test_prepared_wheel_requires_actual_masonry_scroll_and_matching_readback(self):
+  for key,value in [('scrollBefore',1200),('scrollAfter',0),('scrollAfter',3000)]:
+   self.setUp();self.facts['wheelInputs'][0][key]=value;self.reject_wheel()
+  self.setUp();self.facts['wheelInputs'][0]['uiAfter']['scrollTop']=1199;self.reject_wheel()
+  self.setUp();self.facts['wheelInputs'][0]['uiAfter']['open']=False;self.reject_wheel()
+ def test_prepared_wheel_accepts_live_scaled_coordinates_and_separate_final_cleanup(self):
+  item=self.facts['wheelInputs'][0];item['pin']['zoom']=2
+  for key in ('before','ready'):
+   snapshot=item[key];snapshot['pin']['zoom']=2
+   for name in ('before','native'):snapshot[name]['zoom']=2
+   snapshot['dom']['point']={'x':20,'y':20};snapshot['dom']['viewport']={'width':146,'height':210}
+  item['ready']['dom']['pointer']={'trusted':True,'x':20,'y':20};item['readiness']=copy.deepcopy(item['ready'])
+  item['completedAt']=10999;item['finishedAt']=11050
+  self.assertEqual(self.verify_wheel(),[1000,1010,1011,10999,11050])
  def test_guest_http_click_cannot_be_replaced_with_a_claimed_input_flag(self):
   self.facts['requests']=[r for r in self.facts['requests'] if r['kind']!='click'];self.reject()
   self.setUp();event=next(r for r in self.facts['inputs'] if r['selector']=='#site-next');event['events'][0]['identity']='another document';self.reject()

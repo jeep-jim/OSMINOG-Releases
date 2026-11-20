@@ -63,6 +63,79 @@ def intersection(*bounds):
 def inside(inner,outer):return inner['x']>=outer['x'] and inner['y']>=outer['y'] and N['right'](inner)<=N['right'](outer) and N['bottom'](inner)<=N['bottom'](outer)
 
 
+def wheel_preparation(item,result,revision,window_bounds,receipt):
+ need(item.get('status')=='completed' and item.get('timeoutMs')==10000 and
+      not any(key in item for key in ('error','failure','failureNative','failureUI','failureReadError','failureNativeError','failureUIError')),
+      'search wheel preparation failed, is missing or changed its input budget')
+ times=[item.get(key) for key in ('startedAt','intentSavedAt','sentAt','completedAt','finishedAt')]
+ need(all(N['finite'](t) and t>=0 for t in times) and times==sorted(times) and
+      0<times[3]-times[0]<=10000,'search wheel intent was not saved before dispatch or exceeded ten seconds')
+ pin=record(item.get('pin'),'pinned wheel target');sent=record(item.get('sent'),'prepared wheel event')
+ need(pin.get('webContentsId')==item.get('webContentsId') and N['positive'](pin.get('webContentsId')) and
+      N['positive'](pin.get('revision')) and pin['revision']==revision and N['positive'](pin.get('navigationEpoch')) and pin.get('url')==result['url'] and
+      isinstance(pin.get('identity'),str) and 0<len(pin['identity'])<=256 and pin['identity']==receipt.get('identity') and
+      N['finite'](pin.get('timeOrigin')) and pin['timeOrigin']>0 and N['finite'](pin.get('zoom')) and pin['zoom']>0,
+      'search wheel pinned native/document identity differs from its owned HTTP receipt')
+ bounds=rect(pin.get('bounds'));content=rect(pin.get('contentBounds'));zoom=pin['zoom']
+ need(content==window_bounds and inside(bounds,{'x':0,'y':0,'width':content['width'],'height':content['height']}) and
+      bounds['width']>=24 and bounds['height']>=24,'search wheel target is outside the actual OS window')
+ point={key:N['jsround'](min(40,bounds[size]/2)) for key,size in (('x','width'),('y','height'))}
+ need(all(sent.get(key)==point[key] and N['finite'](sent.get(key)) for key in ('x','y')),
+      'search wheel send point differs from its actual presented native target')
+ absolute=record(item.get('point'),'native OS wheel pointer');expected={key:N['jsround'](content[key]+bounds[key]+point[key]) for key in ('x','y')}
+ need(all(N['finite'](absolute.get(k)) for k in ('x','y')) and absolute==expected,
+      'search wheel OS pointer does not map to the sent guest coordinates')
+ pointer=record(item.get('pointer'),'real OS wheel pointer result')
+ need(type(pointer.get('warpResult')) is int and pointer['warpResult']==0 and pointer.get('postAccess') is True,
+      'search wheel did not move the actual OS pointer')
+
+ def native_snapshot(value,ready=False):
+  value=record(value,'wheel native readback');window=record(value.get('window'),'wheel window readback')
+  rect(value.get('bounds'));rect(window.get('contentBounds'))
+  need(value.get('current') is True and value.get('destroyed') is False and
+       all(N['positive'](value.get(key)) for key in ('webContentsId','revision','navigationEpoch')) and N['finite'](value.get('zoom')) and
+       all(value.get(key)==pin[key] for key in ('webContentsId','revision','navigationEpoch','url','zoom')) and
+       value.get('bounds')==bounds and window.get('contentBounds')==content,
+       'search wheel native owner, epoch, zoom or geometry changed before dispatch')
+  need(all(type(value.get(key)) is bool for key in ('visible','viewVisible','attached','blocked','loading','focused')) and
+       all(type(window.get(key)) is bool for key in ('visible','focused','minimized')),
+       'search wheel native readiness readback is missing or truthy')
+  if ready:
+   need(all(value.get(key) is True for key in ('visible','viewVisible','attached','focused')) and
+        value['blocked'] is False and value['loading'] is False and window['visible'] is True and
+        window['focused'] is True and window['minimized'] is False,
+        'search wheel target was not visibly attached, loaded and focused')
+
+ for key in ('before','ready'):
+  snapshot=record(item.get(key),'wheel '+key+' snapshot');need(snapshot.get('pin')==pin and snapshot.get('point')==point,
+       'search wheel readiness belongs to another pinned target or point')
+  native_snapshot(snapshot.get('before'));native_snapshot(snapshot.get('native'),key=='ready')
+  dom=record(snapshot.get('dom'),'wheel DOM readback');viewport=record(dom.get('viewport'),'wheel DOM viewport')
+  need(all(dom.get(field)==pin[field] for field in ('identity','timeOrigin','url')) and
+       all(N['finite'](viewport.get(axis)) and viewport[axis]>0 for axis in ('width','height')) and
+       dom.get('point')=={axis:point[axis]/zoom for axis in ('x','y')} and
+       all(0<=dom['point'][axis]<viewport[size] for axis,size in (('x','width'),('y','height'))),
+       'search wheel document identity or zoomed DOM coordinates changed')
+  need(all(type(dom.get(field)) is bool for field in ('focused','hit')) and
+       dom.get('readyState') in ('loading','interactive','complete') and dom.get('visibilityState') in ('visible','hidden'),
+       'search wheel document readiness is missing or truthy')
+  if key=='ready':
+   observed=record(dom.get('pointer'),'trusted native guest pointer')
+   need(dom['focused'] is True and dom['hit'] is True and dom['readyState']=='complete' and dom['visibilityState']=='visible' and
+        observed.get('trusted') is True and all(N['finite'](observed.get(axis)) and
+        0<=observed[axis]<viewport[size] and N['jsround'](observed[axis]*zoom)==point[axis]
+        for axis,size in (('x','width'),('y','height'))),
+        'search wheel has no trusted real pointer at its ready focused guest point')
+ need(item.get('readiness')==item['ready'] and item.get('waitingFor')==[],
+      'search wheel readiness still has an unresolved target condition')
+ before,after=item.get('scrollBefore'),item.get('scrollAfter');ui=record(item.get('uiAfter'),'wheel scroll UI readback')
+ viewport=rect(ui.get('viewport'));height=ui.get('scrollHeight')
+ need(N['finite'](before) and N['finite'](after) and 0<=before<after and ui.get('open') is True and
+      ui.get('scrollTop')==after and N['finite'](height) and height>=viewport['height'] and
+      after<=height-viewport['height']+1,'search wheel did not produce its measured masonry scroll')
+ return times
+
+
 def native_state(value,actual,origins,*,active=True,hidden=False,empty=False):
  value=record(value,'native state');actual=rows(actual,'actual WebContentsViews',0,8);pages=rows(value.get('pages'),'native result owners',0,12)
  need(type(value.get('revision')) is int and value['revision']>=1 and value.get('maxLive')==8 and type(value.get('liveCount')) is int,'search native revision/live budget differs')
@@ -234,15 +307,20 @@ def verify(evidence,value,platform,arch,pid,owners):
  for group in groups:need([p['id'] for p in group['native']['pages']]==[r['id'] for r in facts['initialResults']],'search pixel evidence is not for the actual first result page')
  wheel=rows(facts.get('wheel'),'trusted native guest wheel',1,64);need(facts.get('wheelInputSource')=='webContents.sendInputEvent(mouseWheel), observed by sandbox preload only after isTrusted' and N['finite'](facts.get('scrollBefore')) and N['finite'](facts.get('scrollAfter')) and 0<=facts['scrollBefore']<facts['scrollAfter'],'search native wheel did not scroll the result masonry')
  for event in wheel:need(event.get('id') in known and event.get('revision')==revision and all(N['finite'](event.get(k)) and abs(event[k])<=4096 for k in ('deltaX','deltaY')) and event['deltaY']!=0 and event.get('ctrlKey') is False,'search wheel belongs to another result/generation or is not a real scroll')
- wheel_inputs=rows(facts.get('wheelInputs'),'actual guest wheel sends and receipts',1,8);forwarded=[]
+ wheel_inputs=rows(facts.get('wheelInputs'),'actual guest wheel sends and receipts',1,8);forwarded=[];previous=None
  for item in wheel_inputs:
   need(item.get('id') in known and N['positive'](item.get('webContentsId')),'search native wheel owner missing');sent=record(item.get('sent'),'native wheel send');receipt=record(item.get('receipt'),'native wheel receipt');index=index_for(known[item['id']]['url'],origins)
   need(sent.get('type')=='mouseWheel' and sent.get('deltaX')==0 and sent.get('deltaY')==-650 and sent.get('canScroll') is True and sent.get('hasPreciseScrollingDeltas') is True and all(N['finite'](sent.get(k)) and 0<=sent[k]<=40 for k in ('x','y')),'search wheel was not actually sent to its native site')
   need(receipt.get('index')==index and receipt.get('trusted') is True and receipt.get('deltaMode')==0 and receipt.get('deltaX')==0 and N['finite'](receipt.get('deltaY')) and receipt['deltaY']>0 and any(r.get('kind')=='wheel' and r.get('receipt')==receipt for r in facts['requests']),'search wheel has no trusted guest HTTP witness')
+  times=wheel_preparation(item,known[item['id']],revision,groups[-1]['attempts'][-1]['contentBounds'],receipt)
+  need((previous is None and item['scrollBefore']==facts['scrollBefore']) or
+       (previous is not None and times[0]>=previous['finishedAt'] and item['scrollBefore']>=previous['scrollAfter']),
+       'search wheel attempts overlap or reset the measured masonry scroll')
+  previous=item
   events=rows(item.get('forwarded'),'sandbox wheel forwarding',1,16)
   for event in events:need(event in wheel and event.get('id')==item['id'] and event.get('deltaX')==receipt['deltaX'] and event.get('deltaY')==min(4096,receipt['deltaY']),'search masonry scroll does not match its trusted native guest wheel')
   forwarded.extend(events)
- need(all(event in forwarded for event in wheel) and initial_scene['ui']['scrollTop']==facts['scrollBefore'] and paged_scene['ui']['scrollTop']==facts['scrollAfter'],'search scroll positions/forwarding are not bound to its measured scenes')
+ need(all(event in forwarded for event in wheel) and initial_scene['ui']['scrollTop']==facts['scrollBefore'] and paged_scene['ui']['scrollTop']==facts['scrollAfter'] and previous['scrollAfter']<=facts['scrollAfter'],'search scroll positions/forwarding are not bound to its measured scenes')
  inputs=rows(facts.get('inputs'),'native search input ledger',20,80);shell=[];guest=[]
  for event in inputs:
   if 'id' not in event:N['input_event'](event,platform,event.get('selector'));shell.append(event);continue
