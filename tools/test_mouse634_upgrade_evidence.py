@@ -30,7 +30,7 @@ def fixture(platform):
     if fmt=='appimage':
      expected=baseline if mode=='write' else package
      report['processIdentity'].update(appImageSource='verified launch path and owned browser ancestry',launchedImage={'path':'/tmp/owned/Mouse Browser.AppImage','uid':1001,'device':2049,'inode':12345+relative,'size':expected['size'],'sha256':expected['sha256'],'regularFile':True,'executable':True},
-       mount={'raw':'91 37 0:84 / /tmp/.mount_Mouse\\040ABC123 ro,nosuid,nodev,relatime - fuse.AppImage AppImage ro,user_id=1001,group_id=1001','mountId':91,'parentMountId':37,'device':'0:84','root':'/','mountPoint':'/tmp/.mount_Mouse ABC123','options':['ro','nosuid','nodev','relatime'],'filesystem':'fuse.AppImage','source':'AppImage','superOptions':['ro','user_id=1001','group_id=1001']})
+       mount={'raw':'91 37 0:84 / /tmp/.mount_Mouse\\040ABC123 ro,nosuid,nodev,relatime - fuse.Mouse\\040Browser.AppImage Mouse\\040Browser.AppImage ro,user_id=1001,group_id=1001','mountId':91,'parentMountId':37,'device':'0:84','root':'/','mountPoint':'/tmp/.mount_Mouse ABC123','options':['ro','nosuid','nodev','relatime'],'filesystem':'fuse.Mouse\\040Browser.AppImage','source':'Mouse Browser.AppImage','superOptions':['ro','user_id=1001','group_id=1001']})
    native.append(report);files[prefix+'-'+mode+'.log']=('MOUSE_634_UPGRADE_PROFILE_'+mode.upper()+'_PASS\nSynthetic unit fixture\n').encode();files[prefix+'-'+mode+'-app.log']=b'MOUSE_EXIT_SAVED\nMOUSE_APP_QUIT\n'
   if platform=='win32':
    for key in ('oldInstallation','replacement'): facts[key]={'exitCode':0,'peMachine':'0x8664','unicodeAndSpaces':True}
@@ -114,10 +114,23 @@ class ActualCurrentUpgrade(unittest.TestCase):
  def test_missing_initial_environment_does_not_relax_real_native_mount_proof(self):
   package,facts,native,files,refresh=fixture('linux');self.assertIsNone(native[-1]['processIdentity']['environmentAppImage']);self.assertTrue(invoke('linux',files,package)['ok'])
   native[-1]['processIdentity']['environmentAppImage']=native[-1]['processIdentity']['appImage'];refresh();self.assertTrue(invoke('linux',files,package)['ok'])
-  mount=native[-1]['processIdentity']['mount'];mount['raw']=mount['raw'].replace('fuse.AppImage','fuse.mouse.browser');mount['filesystem']='fuse.mouse.browser';refresh();self.assertTrue(invoke('linux',files,package)['ok'])
+  mount=native[-1]['processIdentity']['mount'];mount['raw']=mount['raw'].replace(mount['filesystem'],'fuse.mouse.browser');mount['filesystem']='fuse.mouse.browser';refresh();self.assertTrue(invoke('linux',files,package)['ok'])
   for fs_type,options in [('ext4',['ro']),('fuse.AppImage',['rw'])]:
    package,facts,native,files,refresh=fixture('linux');mount=native[-1]['processIdentity']['mount'];mount['raw']=mount['raw'].replace(mount['filesystem'],fs_type).replace('ro,nosuid,nodev,relatime',','.join(options));mount['filesystem']=fs_type;mount['options']=options;refresh()
    with self.subTest(filesystem=fs_type,options=options),self.assertRaisesRegex(ValueError,'read-only FUSE mount'):invoke('linux',files,package)
+ def test_appimage_fuse_subtype_keeps_the_observed_raw_space_escape(self):
+  package,facts,native,files,refresh=fixture('linux')
+  for report in native[-2:]:
+   mount=report['processIdentity']['mount'];self.assertEqual(mount['filesystem'],r'fuse.Mouse\040Browser.AppImage');self.assertEqual(mount['source'],'Mouse Browser.AppImage')
+  self.assertTrue(invoke('linux',files,package)['ok'])
+  native[-1]['processIdentity']['mount']['filesystem']='fuse.Mouse Browser.AppImage';refresh()
+  with self.assertRaisesRegex(ValueError,'read-only FUSE mount'):invoke('linux',files,package)
+ def test_appimage_fuse_subtype_rejects_other_escapes_and_path_or_space_tokens(self):
+  for filesystem in (r'fuse.Mouse\011Browser.AppImage',r'fuse.Mouse\012Browser.AppImage',r'fuse.Mouse\134Browser.AppImage',r'fuse.Mouse\000Browser.AppImage',
+                     r'fuse.Mouse\x20Browser.AppImage',r'fuse.Mouse\04Browser.AppImage',r'fuse.Mouse\040Browser/AppImage','fuse.Mouse Browser.AppImage',
+                     'fuse.Mouse\tBrowser.AppImage','fuse.Mouse\0Browser.AppImage','fuse.'):
+   package,facts,native,files,refresh=fixture('linux');mount=native[-1]['processIdentity']['mount'];mount['raw']=mount['raw'].replace(mount['filesystem'],filesystem);mount['filesystem']=filesystem;refresh()
+   with self.subTest(filesystem=filesystem),self.assertRaises(ValueError):invoke('linux',files,package)
 
 
 if __name__=='__main__':unittest.main()

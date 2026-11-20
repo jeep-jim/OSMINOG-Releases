@@ -56,7 +56,7 @@ def fixture(platform='win32'):
   return result
  mainpanes=[box(0,46,317,520),box(323,46,317,520)];mainslots=[box(p['x'],78,p['width'],488) for p in mainpanes]
  gridpanes=[box(0,46,197,520),box(203,46,197,520),box(406,46,234,257),box(406,309,234,257)];gridslots=[box(p['x'],p['y']+32,p['width'],p['height']-32) for p in gridpanes]
- def download(rows,names,panes,slots,unread):
+ def download(rows,names,panes,slots,unread,download_origins):
   prefix='mouse-634-'+('ai-' if names[0]=='chat' else '')+'download-widget';report=prefix+'.json'
   value={'schema':1,'version':'6.0.34','platform':platform,'arch':arch,'pid':91,'source':'Actual DownloadItems, trusted native guest clicks and full OS display pixels','physicalUserDeviceVerified':False,'placement':'bottom','pillHeight':16,'gap':6,'reservedHeight':22,'palette':{'track':TRACK,'fill':FILL},'pixelTolerance':12,'names':names,'tabIds':[r['id'] for r in rows],'nativeInputs':[click('#download-'+name,row) for name,row in zip(names,rows)],'stages':[],'captures':[],'files':[],'ok':True,'unreadBefore':unread,'unreadAfter':unread+2,'reportFile':report}
   for number,(label,active) in enumerate(zip(['before','first-active','both-active','measured-progress','both-other-theme','first-completed','both-completed'],[[],[names[0]],names,names,names,[names[1]],[]])):
@@ -84,9 +84,9 @@ def fixture(platform='win32'):
    shot=capture(prefix+'-'+label+'-'+stage['theme']+'-1.png',points);shot.update(attempt=1,pass_=True,probes=sampled(points));shot['pass']=shot.pop('pass_');value['captures'].append({'label':label,'theme':stage['theme'],'attempts':[shot],'acceptedAttempt':1})
   for index,(name,row) in enumerate(zip(names,rows)):
    events=[{'event':kind,'type':kind,'state':'completed' if kind=='done' else 'progressing','received':received,'total':524288,'at':i+1} for i,(kind,received) in enumerate([('start',0),('updated',65536),('updated',262144 if index==0 else 131072),('done',524288)])];digest=sha(bytes([65+['a','b','chat','preview'].index(name)])*524288)
-   value['files'].append({'name':name,'id':'download-'+name,'tabId':row['id'],'webContentsId':row['webContentsId'],'url':origin+'/download/'+name,'filename':'mouse634-'+name+'.bin','bytes':524288,'sha256':digest,'expectedBytes':524288,'expectedSha256':digest,'requests':1,'events':events,'saveDecision':'DownloadItem.setSavePath only for this owned HTTP fixture'})
+   value['files'].append({'name':name,'id':'download-'+name,'tabId':row['id'],'webContentsId':row['webContentsId'],'url':download_origins[index]+'/download/'+name,'filename':'mouse634-'+name+'.bin','bytes':524288,'sha256':digest,'expectedBytes':524288,'expectedSha256':digest,'requests':1,'events':events,'saveDecision':'DownloadItem.setSavePath only for this owned HTTP fixture'})
   return value
- facts['downloads']=download(owners[:2],['a','b'],mainpanes,mainslots,0)
+ facts['downloads']=download(owners[:2],['a','b'],mainpanes,mainslots,0,[origin,origin])
  slots={'p1':'page0','p2':'page1'};oldtabs=[{'id':row['id'],'url':row['url'],'lane':'side' if i==2 else 'main','previewOf':''} for i,row in enumerate(owners[:3])]
  def ai_state(preview='',url='',split=False):
   chat=gridpanes[2] if split else box(406,46,234,520);previewbox=gridpanes[3] if split else box(0,0,0,0)
@@ -97,7 +97,7 @@ def fixture(platform='win32'):
  ai['chatNavigation']={'source':'WebContents navigation events for one native same-window link click','tabId':owners[2]['id'],'webContentsId':owners[2]['webContentsId'],'targetURL':cross+'/page/4/','events':[
   {'type':'did-start-navigation','url':cross+'/page/4/','mainFrame':True,'sameDocument':False,'navigationEpoch':2,'at':1000},
   {'type':'will-navigate','url':cross+'/page/4/','mainFrame':True,'sameDocument':False,'navigationEpoch':2,'at':1001,'prevented':True}]}
- click('#link-blank',owners[2]);capture('mouse-634-ai-preview-new-window.png');ai['downloads']=download(owners[2:],['chat','preview'],gridpanes[2:],gridslots[2:],2);facts['aiPreview']=ai
+ click('#link-blank',owners[2]);capture('mouse-634-ai-preview-new-window.png');ai['downloads']=download(owners[2:],['chat','preview'],gridpanes[2:],gridslots[2:],2,[origin,cross]);facts['aiPreview']=ai
  targets=[]
  for i,row in enumerate(owners):
   role='main' if i<2 else 'ai-chat' if i==2 else 'ai-preview';pane='.pane[data-pane="p'+str(i+1)+'"]' if i<2 else '#'+role+'-pane';targets.append({'id':row['id'],'role':role,'slotSelector':pane+' .page-slot' if i<2 else '#ai-slot' if i==2 else '#ai-preview-slot','paneSelector':pane,'backgroundRGB':BODY})
@@ -184,6 +184,21 @@ class Current634Evidence(unittest.TestCase):
  def test_native_file_bytes_and_known_meter_are_independent(self):
   self.facts['downloads']['files'][0]['sha256']='0'*64;self.reject()
   self.setUp();self.facts['downloads']['stages'][3]['panels'][0]['ui']['pill']['ariaNow']='49';self.reject()
+ def test_download_urls_are_bound_to_each_validated_document_origin(self):
+  primary,preview=self.facts['fixtureOrigins']
+  self.assertEqual([row['url'] for row in self.facts['downloads']['files']],[primary+'/download/a',primary+'/download/b'])
+  self.assertEqual([row['url'] for row in self.facts['aiPreview']['downloads']['files']],[primary+'/download/chat',preview+'/download/preview'])
+  self.assertTrue(self.verify()['ok'])
+ def test_swapped_and_foreign_download_origins_are_rejected(self):
+  primary,preview=self.facts['fixtureOrigins']
+  for branch,index,wrong in [('main',0,preview),('main',1,preview),('ai',0,preview),('ai',1,primary),('ai',1,'http://127.0.0.1:31339')]:
+   self.setUp();value=self.facts['downloads'] if branch=='main' else self.facts['aiPreview']['downloads'];entry=value['files'][index];entry['url']=wrong+'/download/'+entry['name']
+   with self.subTest(branch=branch,index=index,origin=wrong),self.assertRaisesRegex(ValueError,'native downloaded bytes/owner'):self.verify()
+ def test_downloads_do_not_revoke_or_replace_either_owning_document(self):
+  for branch,index in [('main',0),('main',1),('ai',0),('ai',1)]:
+   for field in ('navigationEpoch','timeOrigin'):
+    self.setUp();value=self.facts['downloads'] if branch=='main' else self.facts['aiPreview']['downloads'];value['stages'][1]['identities'][index][field]+=1
+    with self.subTest(branch=branch,index=index,field=field),self.assertRaisesRegex(ValueError,'identity'):self.verify()
  def test_ai_links_must_target_the_right_preview_without_background_tab(self):
   self.facts['aiPreview']['first']['tabs'][-1]['lane']='main';self.reject()
   self.setUp();self.facts['aiPreview']['second']['previewId']='different';self.reject()

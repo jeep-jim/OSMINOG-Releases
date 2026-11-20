@@ -74,7 +74,9 @@ def linux_process_binding(native, report, expected_image):
     need(mount == decoded and mount['root'] == '/' and PurePosixPath(mount['mountPoint']).is_absolute() and
          mount['mountPoint'] not in ('/','') and not mount['mountPoint'].startswith('//') and
          posixpath.normpath(mount['mountPoint']) == mount['mountPoint'] and
-         re.fullmatch(r'fuse(?:\.[^\s/\\\0]+)?',mount['filesystem']) and 'ro' in mount['options'] and 'rw' not in mount['options'] and
+         # mountinfo preserves an AppImage name's space as the raw \\040 escape
+         # in the FUSE subtype. Accept only that escape; keep the raw field bound.
+         re.fullmatch(r'fuse(?:\.(?:[^\s/\\\0]|\\040)+)?',mount['filesystem']) and 'ro' in mount['options'] and 'rw' not in mount['options'] and
          native['executable'] == mount['mountPoint']+'/mouse-browser', 'AppImage browser is not on its exact read-only FUSE mount')
 
 

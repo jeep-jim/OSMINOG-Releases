@@ -446,7 +446,7 @@
   },
   "x-currentUpgradeGate": {
     "validator": "tools/mouse634-upgrade-evidence.py",
-    "sha256": "1baea081e908f4bc2209a52620452086f2ccb277ec7f2a0d32a90cfd8efd4feb",
+    "sha256": "04f9df24e2824159342d475138ae15b56c97cc5a00356e5ce229ab86e5195cf7",
     "sourceAndFreshInstalled": true,
     "savedReportAcceptedAsInput": false,
     "fromVersion": "6.0.33",
@@ -604,10 +604,10 @@
       "noraOpenIncluded": true
     },
     "physicalUserDeviceVerified": false,
-    "sha256": "43b878c790d252025b0878881d3f5b5f63c5ad68e739b85d3d5bca7e130687d3",
+    "sha256": "51db1e47a6163db765aca66455328a2dbb4f2f6bfe8860134fed5936b9aa9fca",
     "dependencies": {
       "mouse634-native-evidence.py": "5219ae1ebc3428163f4492f9f99a6288a68f942fda62e6ca939adc3435c45e00",
-      "mouse634-download-evidence.py": "f94bac4bc393663c21edd2a8da6ba724d35dfeb664f0eb003c11477f3b588503",
+      "mouse634-download-evidence.py": "4e654a795e07847bef5adb4f66e43394f54d4f43624e0aa437de427e6abe5fe7",
       "mouse634-capture-evidence.py": "c46d3bd3244b6484c143042004b2c85bdb8e39b37f9e872e5eae9a13399c209a",
       "mouse634-focused-evidence.py": "354589ac503f87c9f47b8a88efac28b6c4230edcb18ad4fa1b7df966a48d8e99"
     }

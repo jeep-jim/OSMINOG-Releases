@@ -48,7 +48,10 @@ def download_geometry(ui,native,label):
  need(native.get('bounds')==N['endpoints'](slot),label+' native viewport overlaps widget');rect(ui.get('footer',{}).get('bounds'));return shape
 
 
-def verify(evidence,value,platform,arch,pid,names,owners,origin):
+def verify(evidence,value,platform,arch,pid,names,owners,origins):
+ # The caller binds each owner to the separately validated primary/preview
+ # fixture origins. Never derive expected URLs from the download report itself.
+ need(isinstance(origins,(list,tuple)) and len(origins)==2 and all(isinstance(o,str) and re.fullmatch(r'http://127\.0\.0\.1:\d+',o) for o in origins),'both caller-bound download origins required')
  filename='mouse-634-'+('ai-' if names==['chat','preview'] else '')+'download-widget.json'
  raw,facts=evidence.json(filename)
  need(value.get('reportFile')==filename and value.get('reportSha256')==N['sha'](raw) and {k:v for k,v in value.items() if k not in ('reportFile','reportSha256')}==facts,'download embedded/raw reports differ')
@@ -66,7 +69,7 @@ def verify(evidence,value,platform,arch,pid,names,owners,origin):
   need(len(stage.get('panels',[]))==len(stage.get('native',[]))==len(stage.get('identities',[]))==2,'stage lost an owner')
   need(stage['theme']==(next(t for t in themes if t!=before['theme']) if number==4 else before['theme']),'theme was not restored')
   for index,(row,native,ident) in enumerate(zip(stage['panels'],stage['native'],stage['identities'])):
-   owner=owners[index];N['identity'](owner,ident);N['native'](native,owner);active=names[index] in active_names
+   owner=owners[index];N['identity'](owner,ident,origins[index]);N['native'](native,owner);active=names[index] in active_names
    need(row.get('tabId')==owner['id'],'panel owner differs');pane(row['ui'],before['panels'][index]['ui'],active,owner['id'])
    need(native['bounds']==N['endpoints'](row['ui']['slot']),'actual native viewport misses reserved slot')
    for key in ('x','y','width'): need(native['bounds'][key]==before['native'][index]['bounds'][key],'another native coordinate changed')
@@ -83,7 +86,7 @@ def verify(evidence,value,platform,arch,pid,names,owners,origin):
  files=facts.get('files',[]);need(len(files)==2,'both completed native files required')
  for index,(entry,name,owner) in enumerate(zip(files,names,owners)):
   expected=N['sha'](bytes([65+['a','b','chat','preview'].index(name)])*524288)
-  need(entry.get('name')==name and entry.get('url')==origin+'/download/'+name and entry.get('filename')=='mouse634-'+name+'.bin' and entry.get('tabId')==owner['id'] and entry.get('webContentsId')==owner['webContentsId'] and entry.get('id')==stages[2]['panels'][index]['activity']['id'] and entry.get('bytes')==entry.get('expectedBytes')==524288 and entry.get('sha256')==entry.get('expectedSha256')==expected and entry.get('requests')==1 and entry.get('saveDecision')=='DownloadItem.setSavePath only for this owned HTTP fixture','native downloaded bytes/owner or exact single request differ')
+  need(entry.get('name')==name and entry.get('url')==origins[index]+'/download/'+name and entry.get('filename')=='mouse634-'+name+'.bin' and entry.get('tabId')==owner['id'] and entry.get('webContentsId')==owner['webContentsId'] and entry.get('id')==stages[2]['panels'][index]['activity']['id'] and entry.get('bytes')==entry.get('expectedBytes')==524288 and entry.get('sha256')==entry.get('expectedSha256')==expected and entry.get('requests')==1 and entry.get('saveDecision')=='DownloadItem.setSavePath only for this owned HTTP fixture','native downloaded bytes/owner or exact single request differ')
   events=entry.get('events',[]);need(3<=len(events)<=2048 and events[0].get('event')=='start' and events[-1].get('event')=='done' and events[-1].get('state')=='completed','actual DownloadItem lifecycle incomplete')
   for event in events: need(event.get('event')==event.get('type') and event['event'] in ('start','updated','done') and event.get('total')==524288 and type(event.get('received')) is int and 0<=event['received']<=524288 and N['finite'](event.get('at')),'invalid DownloadItem observation')
   need(all(a['at']<=b['at'] and a['received']<=b['received'] for a,b in zip(events,events[1:])) and events[-1]['received']==524288,'native bytes/time regress or completion is early')
