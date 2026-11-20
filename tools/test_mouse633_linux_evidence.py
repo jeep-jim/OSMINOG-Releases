@@ -51,7 +51,8 @@ def fixture():
                        'physicalUserDeviceVerified':False,'displayBackend':'X11','asarSha256':'2'*64,
                        'sandbox':{'disabledFlags':[],'renderers':rows},'nativeClose':{'accelerator':'Ctrl+Q','input':'XTest'},'profile':profile,'captures':captures})
     files['mouse-632-documents.json']=b'{"synthetic downstream":"documents"}'
-    native[0]['checks']={'nativeInput':{'ctrlASelects':True,'noCaptureFromCtrlA':True,'scrollbarHidden':True,'source':'XTest via xdotool','wheelScrollY':120},
+    native[0]['checks']={'nativeInput':{'ctrlASelects':True,'noCaptureFromCtrlA':True,'scrollbarHidden':True,'source':'XTest via xdotool','wheelScrollY':120,
+        'primaryButton':{'source':'XQueryPointer','before':False,'pressed':True,'released':False}},
         'private':{'normalWebContentsPreserved':True,'privateWebContentsClosed':True,'privateCookiesCleared':True,'noPrivateProfileMarker':True},
         'nativeRuntime':{'terminalPid':55,'terminalExitCode':0,'terminalOutput':'MOUSE_LINUX_PTY_OK\n','nativeFileRead':True},
         'documents':{'report':'mouse-632-documents.json','sha256':E['sha'](files['mouse-632-documents.json'])}}
@@ -176,6 +177,23 @@ class LinuxInstalledEvidence(unittest.TestCase):
             self.native[0]['checks'][group][key]=False;self.refresh()
             with self.subTest(group=group),self.assertRaises(ValueError):self.invoke()
             self.native[0]['checks'][group][key]=True
+
+    def test_native_primary_button_requires_the_actual_linux_reader(self):
+        mouse=self.native[0]['checks']['nativeInput'];expected=copy.deepcopy(mouse['primaryButton'])
+        for value in (None,{},[],{**expected,'source':'XTest via xdotool'},{**expected,'source':'CGEvent'}):
+            mouse['primaryButton']=value;self.refresh()
+            with self.subTest(value=value),self.assertRaisesRegex(ValueError,'primary-button readback'):self.invoke()
+        del mouse['primaryButton'];self.refresh()
+        with self.assertRaisesRegex(ValueError,'primary-button readback'):self.invoke()
+
+    def test_native_primary_button_requires_each_boolean_transition(self):
+        mouse=self.native[0]['checks']['nativeInput'];expected=copy.deepcopy(mouse['primaryButton'])
+        for key in ('before','pressed','released'):
+            for value in (None,not expected[key],int(expected[key]),str(expected[key]).lower()):
+                mouse['primaryButton']={**expected,key:value};self.refresh()
+                with self.subTest(key=key,value=value),self.assertRaisesRegex(ValueError,'primary-button readback'):self.invoke()
+            mouse['primaryButton']={name:value for name,value in expected.items() if name!=key};self.refresh()
+            with self.subTest(missing=key),self.assertRaisesRegex(ValueError,'primary-button readback'):self.invoke()
 
     def test_log_success_and_raw_owner_task_hashes_cannot_be_fabricated(self):
         self.files['mouse-633-owner-feedback.log']=b'no success marker\n'

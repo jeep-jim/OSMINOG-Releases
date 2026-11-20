@@ -210,6 +210,10 @@ def verify(read, p):
     flags(mouse, ('ctrlASelects','noCaptureFromCtrlA','scrollbarHidden'), 'native Linux input')
     need(mouse.get('source') == 'XTest via xdotool' and type(mouse.get('wheelScrollY')) in (int,float) and
          mouse['wheelScrollY'] > 0, 'XTest wheel did not move the native page')
+    primary = mouse.get('primaryButton')
+    need(isinstance(primary, dict) and primary.get('source') == 'XQueryPointer' and
+         primary.get('before') is False and primary.get('pressed') is True and
+         primary.get('released') is False, 'native primary-button readback missing or incorrect')
     flags(native_checks.get('private'), ('normalWebContentsPreserved','privateWebContentsClosed','privateCookiesCleared','noPrivateProfileMarker'), 'private isolation')
     terminal = native_checks.get('nativeRuntime', {})
     need(positive(terminal.get('terminalPid')) and terminal.get('terminalExitCode') == 0 and
