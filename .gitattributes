@@ -1,3 +1,4 @@
 # The independent checker is compared byte for byte with the pinned source.
 # Keep those canonical bytes on hosts with automatic CRLF checkout conversion.
 tools/mouse631-task-evidence.py text eol=lf
+tools/mouse632-task-evidence.py text eol=lf

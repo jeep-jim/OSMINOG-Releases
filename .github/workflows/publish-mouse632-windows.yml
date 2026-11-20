@@ -1,0 +1,68 @@
+name: Publish verified Mouse Browser 6.0.32 Windows x64
+on:
+  pull_request:
+    paths: ['.gitattributes','tools/mouse632-windows-release.py','tools/test_mouse632_windows_release.py','tools/mouse632-task-evidence.py','tools/test_mouse632_task_evidence.py','tools/test_mouse632_native_report.py','tools/mouse632-ui-evidence.py','tools/test-mouse632-ui-evidence.py','tools/mouse632-feedback-evidence.py','tools/test_mouse632_feedback_evidence.py','.github/workflows/publish-mouse632-windows.yml','staging/mouse/6.0.32-windows-x64/**']
+  push:
+    branches: [main]
+    paths: ['staging/mouse/6.0.32-windows-x64/PUBLISH_OWNER']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - name: Verify publication refuses incomplete evidence
+        run: python3 tools/test_mouse632_windows_release.py -v
+      - name: Verify task and fifty-tab native evidence contracts
+        run: python3 tools/test_mouse632_task_evidence.py -v
+      - name: Verify native process report and immutable byte bindings
+        run: python3 tools/test_mouse632_native_report.py -v
+      - name: Verify hidden scrollbars preserve native scrolling
+        run: python3 tools/test-mouse632-ui-evidence.py -v
+      - name: Verify current media, document viewer and footer evidence
+        run: python3 tools/test_mouse632_feedback_evidence.py -v
+  publish-windows:
+    if: github.event_name != 'pull_request'
+    needs: contract
+    runs-on: windows-latest
+    timeout-minutes: 55
+    permissions:
+      contents: write
+    concurrency:
+      group: mouse-windows-x64-release
+      cancel-in-progress: false
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Import immutable successful Windows CI installer
+        run: python tools/mouse632-windows-release.py import
+      - name: Verify exact installer on a fresh Windows machine
+        run: python tools/mouse632-windows-release.py verify
+      - name: Publish and verify immutable public asset
+        run: python tools/mouse632-windows-release.py publish
+      - name: Advance Windows feed and verify anonymous discovery and download
+        run: python tools/mouse632-windows-release.py channel
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: mouse632-windows-release-verification-${{ github.run_attempt }}
+          path: |
+            mouse632-windows-release/*.json
+            mouse632-windows-release/*.log
+            mouse632-windows-release/*.png
+            mouse632-windows-release/mouse-631-upgrade/**
+            mouse632-windows-release/SHA256SUMS.txt
+            mouse632-windows-release/RELEASE_NOTES.md
+          retention-days: 14
