@@ -478,7 +478,7 @@
   },
   "x-workspaceGeometryGate": {
     "validator": "tools/mouse633-workspace-evidence.py",
-    "sha256": "61c6d315a5c7286294c8e8b2bc13ca5faea92291608512687036df9266bb554c",
+    "sha256": "17a5ce2b600403e88b64019dbb4f0572989381063ccf94184d59615d96df3d2a",
     "runtimeVersion": "6.0.33",
     "sourceAndFreshInstalled": true,
     "savedReportAcceptedAsInput": false,

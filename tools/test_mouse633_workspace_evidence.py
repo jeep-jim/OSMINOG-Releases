@@ -81,7 +81,7 @@ def points(geometry, theme, rows):
             for u in (.65,1.6,3):
                 for v in (.65,1.6,3):
                     if math.hypot(12-u,12-v)>13.5:out.append({'kind':'pane-top-cutout','id':pane['id'],'side':side,'paneBounds':dict(r),'point':{'x':r['x']+u if side=='left' else right(r)-u,'y':r['y']+v},'expected':LINE[theme]})
-            out.append({'kind':'pane-top-interior','id':pane['id'],'side':side,'paneBounds':dict(r),'point':{'x':r['x']+12 if side=='left' else right(r)-12,'y':math.ceil(r['y'])+.5},'expected':PANEL[theme]})
+            out.append({'kind':'pane-top-interior','id':pane['id'],'side':side,'paneBounds':dict(r),'point':{'x':math.ceil(r['x']+12)+.5 if side=='left' else math.floor(right(r)-12)-.5,'y':math.ceil(r['y'])+.5},'expected':PANEL[theme]})
     if geometry['ai']:
         r=rows[-1]['bounds']
         for side in ('left','right'):
@@ -180,6 +180,18 @@ class WorkspaceEvidence(unittest.TestCase):
             bad=geometry(width,917);inset_right(bad,inset)
             with self.subTest(width=width,inset=inset),self.assertRaisesRegex(ValueError,'stage edge'):
                 E['geometry'](bad,False)
+    def test_top_interior_pixel_is_wholly_inside_the_straight_header_span_at_1x_and_2x(self):
+        for fraction in (0,1/64,.046875,.375,.609375,.96875):
+            g=geometry(1443,917);b={'x':767+fraction,'y':46+fraction,'width':274.4375,'height':565.078125};g['panes'][0]['bounds']=b
+            samples=[p for p in E['expected_points'](g,'light',{}) if p.get('id')=='page-0' and p['kind']=='pane-top-interior']
+            for sample in samples:
+                for scale in (1,2):
+                    x=math.floor(sample['point']['x']*scale)/scale;y=math.floor(sample['point']['y']*scale)/scale
+                    self.assertGreaterEqual(x,b['x']+12);self.assertLessEqual(x+1/scale,b['x']+b['width']-12)
+                    self.assertGreaterEqual(y,b['y']);self.assertLess(sample['point']['y'],b['y']+2)
+        g=geometry(1443,917);g['panes'][0]['bounds']={'x':767.609375,'y':46,'width':274.4375,'height':565.078125}
+        measured=next(p for p in E['expected_points'](g,'light',{}) if p.get('id')=='page-0' and p['kind']=='pane-top-interior' and p['side']=='right')
+        self.assertEqual(measured['point'],{'x':1029.5,'y':46.5})
     def test_actual_view_and_identity_substitution_is_rejected(self):
         for mutate in (lambda r:r['nativePanels'][0].update(attached=False),lambda r:r['nativePanels'][0]['actualBounds'].update(width=1),
                        lambda r:r['identityAfter'][0].update(webContentsId=999),lambda r:r['identityAfter'][0].update(identity=.99)):

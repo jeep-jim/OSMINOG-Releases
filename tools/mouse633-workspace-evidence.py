@@ -150,7 +150,8 @@ def expected_points(value, theme, native):
                         points.append({'kind':'pane-top-cutout','id':pane['id'],'side':side,'paneBounds':bounds,
                                        'point':{'x':bounds['x']+u if side == 'left' else right(bounds)-u,'y':bounds['y']+v},'expected':LINE[theme]})
             points.append({'kind':'pane-top-interior','id':pane['id'],'side':side,'paneBounds':bounds,
-                           'point':{'x':bounds['x']+12 if side == 'left' else right(bounds)-12,'y':math.ceil(bounds['y'])+.5},'expected':PANEL[theme]})
+                           'point':{'x':math.ceil(bounds['x']+12)+.5 if side == 'left' else math.floor(right(bounds)-12)-.5,
+                                    'y':math.ceil(bounds['y'])+.5},'expected':PANEL[theme]})
     if value.get('ai'):
         pane = value['ai']; bounds = native[pane['id']]['bounds']
         for side in ('left','right'):
