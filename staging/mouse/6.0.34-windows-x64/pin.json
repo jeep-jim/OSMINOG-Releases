@@ -1,0 +1,30 @@
+{
+  "version": "6.0.34",
+  "ready": false,
+  "sourceBranch": "main",
+  "source": null,
+  "sourcePR": null,
+  "sourceMerge": null,
+  "run": null,
+  "attempt": null,
+  "job": null,
+  "artifact": null,
+  "artifactSHA256": null,
+  "verificationArtifact": null,
+  "verificationSHA256": null,
+  "package": {
+    "name": "Mouse-Browser-6.0.34-Windows-x64.exe",
+    "size": null,
+    "sha256": null
+  },
+  "previous": {
+    "version": "6.0.29",
+    "source": "164462db8d81f614cce9c9a8ab5d1fed0e2b7381",
+    "package": {
+      "name": "Mouse-Browser-6.0.29-Windows-x64.exe",
+      "size": 125623123,
+      "sha256": "18bf6e78eb5519e37d2ceb0e45acd1ea88d8f519e715e1d94d2fbc3c476e2e9d"
+    },
+    "updaterBlobSHA": "a767aa6eb2c1953be6d3fe7d42f0ab277fe438d5"
+  }
+}

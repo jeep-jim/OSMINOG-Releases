@@ -1,0 +1,150 @@
+#!/usr/bin/env python3
+"""Independently bind real published633-to634 profile replacement on all3OS."""
+import hashlib
+import json
+from pathlib import PurePosixPath
+import re
+
+BASELINES = {
+ 'darwin': {'name':'Mouse-Browser-6.0.33-mac-arm64.dmg','tag':'quadro-macos-v6.0.33-arm64','size':137894277,
+            'sha256':'fd19b8a6c3a3cc219f1fa57a1855d18f8bd48bfd7042b13000cb78138ef75d75'},
+ 'win32': {'name':'Mouse-Browser-6.0.33-Windows-x64.exe','tag':'mouse-windows-v6.0.33-x64','size':125765703,
+           'sha256':'3a864fcdbc2f4d3cc5c3c295abcd1f66ac7411a0b8e4ca235e0ab65fc0ccbab8'},
+ 'linux': {
+  'appimage': {'name':'Mouse-Browser-6.0.33-Linux-x64.AppImage','tag':'mouse-linux-v6.0.33-x64','size':135575147,
+              'sha256':'b2e6b90a1cfb82e3af9e391789ef756a581170223e4de948c1f890bbd29efc67'},
+  'deb': {'name':'Mouse-Browser-6.0.33-Linux-x64.deb','tag':'mouse-linux-v6.0.33-x64','size':105781032,
+          'sha256':'1d8b5a1072ab893daff35590b1964ca84c56458e83c6992316030c6c215e9128'},
+ },
+}
+SOURCE = 'real installed executable and owned loopback CDP fixture'
+METHOD = 'verified package replacement and actual old/new profile processes; retained629 gate tests updater'
+LINUX_METHOD = 'verified deb and AppImage replacement with actual old/new profile processes'
+
+
+def need(value, message):
+    if not value:
+        raise ValueError('Mouse634 actual633 upgrade: ' + message)
+
+
+def sha(raw):
+    return hashlib.sha256(raw).hexdigest()
+
+
+def read_json(read, name):
+    raw = read(name)
+    need(isinstance(raw, bytes) and 0 < len(raw) <= 2*1024**2, 'missing or oversized ' + name)
+    value = json.loads(raw)
+    need(isinstance(value, dict), 'non-object ' + name)
+    return raw, value
+
+
+def positive(value):
+    return type(value) is int and value > 0
+
+
+def transition(read, facts, platform, arch, package, baseline, prefix, format_=None):
+    expected_baseline = {**baseline, 'url':'https://github.com/jeep-jim/OSMINOG-Releases/releases/download/'+baseline['tag']+'/'+baseline['name']}
+    method = LINUX_METHOD if platform == 'linux' else METHOD
+    need(facts.get('ok') is True and not facts.get('error') and facts.get('fromVersion') == '6.0.33' and
+         facts.get('toVersion') == '6.0.34' and facts.get('platform') == platform and facts.get('baseline') == expected_baseline and
+         facts.get('package') == package and facts.get('reportPrefix') == prefix, 'wrong versions or immutable package bytes')
+    need(facts.get('method') == method and facts.get('physicalUserDeviceVerified') is False,
+         'package replacement method or physical scope misrepresented')
+    need(facts.get('closedProfileUnchanged') is True and facts.get('differentProcesses') is True and
+         isinstance(facts.get('closedProfileSha256'), str) and re.fullmatch('[0-9a-f]{64}', facts['closedProfileSha256']),
+         'closed profile preservation is not bound')
+    reports, inputs = [], {}
+    for mode, version, key in [('write','6.0.33','oldWrite'), ('read','6.0.34','newRead')]:
+        name = prefix+'-'+mode+'.json'
+        data, report = read_json(read, name)
+        bound = facts.get(key, {})
+        need(bound.get('report') == name and bound.get('reportSha256') == sha(data) and bound.get('result') == report,
+             'raw native profile report differs')
+        inputs[name] = sha(data)
+        need(report.get('ok') is True and not report.get('error') and
+             (report.get('version'),report.get('platform'),report.get('arch'),report.get('mode'),report.get('reportPrefix')) ==
+             (version,platform,arch,mode,prefix) and positive(report.get('pid')) and positive(report.get('launcherPid')),
+             'native old/new runtime identity differs')
+        need(report.get('source') == SOURCE and report.get('physicalUserInputVerified') is False and
+             report.get('nativeExit') == {'code':0,'signal':None}, 'actual process lifecycle or input scope differs')
+        identity = report.get('identity', {})
+        need(identity.get('version') == version and identity.get('platform') == platform and
+             identity.get('arch') == arch and identity.get('test') is True, 'installed runtime identity absent')
+        logname = prefix+'-'+mode+'.log';log = read(logname)
+        need(bound.get('log') == logname and isinstance(log,bytes) and 0 < len(log) <= 8*1024**2 and
+             sha(log) == bound.get('logSha256') and 'MOUSE_634_UPGRADE_PROFILE_'+mode.upper()+'_PASS' in log.decode('utf-8').splitlines(),
+             'native probe log differs')
+        app = read(prefix+'-'+mode+'-app.log')
+        need(isinstance(app,bytes) and 0 < len(app) <= 16*1024**2 and
+             all(marker in app.decode('utf-8') for marker in ('MOUSE_EXIT_SAVED','MOUSE_APP_QUIT')), 'old/new app did not save and quit')
+        profile = report.get('profile', {})
+        need(all(profile.get(flag) is True for flag in ('cookiePreserved','localStoragePreserved','bookmarkPreserved','tabPreserved','preferencesPreserved')) and
+             profile.get('preferences') == {'theme':'dark','aiWidth':413,'libraryWidth':417}, 'profile values were not preserved')
+        need(isinstance(profile.get('pageId'),str) and bool(profile['pageId']) and isinstance(profile.get('url'),str) and
+             re.fullmatch(r'http://127\.0\.0\.1:\d+/persisted',profile['url']) and isinstance(profile.get('tokenSha256'),str) and
+             re.fullmatch('[0-9a-f]{64}',profile['tokenSha256']), 'owned profile identity missing')
+        ready = report.get('pageReadiness', {});last = ready.get('last', {})
+        origin = profile['url'].removesuffix('/persisted')
+        need(ready.get('ready') is True and positive(ready.get('attempts')) and ready['attempts'] <= 200 and
+             ready.get('expectedURL') == ready.get('target',{}).get('url') == last.get('href') == profile['url'] and
+             ready.get('expectedOrigin') == last.get('origin') == origin and last.get('readyState') == 'complete' and
+             last.get('title') == 'Mouse634 preserved profile fixture' and last.get('input') is True and
+             last.get('storageAccessible') is True and last.get('storageError') is None and ready.get('evaluationError') is None,
+             'committed native profile document was not ready')
+        if platform == 'linux':
+            native = report.get('processIdentity', {})
+            need(native.get('source') == 'CDP SystemInfo.getProcessInfo and owned /proc' and native.get('type') == 'browser' and
+                 native.get('pid') == report['pid'] and positive(native.get('uid')) and native.get('exited') is True and
+                 native.get('packageFormat') == format_ and isinstance(native.get('executable'),str) and
+                 PurePosixPath(native['executable']).name == 'mouse-browser', 'actual Linux browser process identity missing')
+            if format_ == 'deb':
+                need(native.get('appImage') is None and native['executable'].startswith('/opt/'), 'deb was replaced with a portable launch')
+            else:
+                need(isinstance(native.get('appImage'),str) and PurePosixPath(native['appImage']).is_absolute(), 'real mounted AppImage missing')
+        reports.append(report)
+    need(reports[0]['pid'] != reports[1]['pid'] and reports[0]['profile'] == reports[1]['profile'], 'same process or different profile cannot prove upgrade')
+    if platform == 'win32':
+        for key in ('oldInstallation','replacement'):
+            value = facts.get(key,{})
+            need(value.get('exitCode') == 0 and value.get('peMachine') == '0x8664' and value.get('unicodeAndSpaces') is True, 'Windows installation failed')
+    if platform == 'linux':
+        need(facts.get('format') == format_, 'Linux format scope differs')
+        for key, version, expected, native, phase in [('oldInstallation','6.0.33',baseline,reports[0],'old'),('replacement','6.0.34',package,reports[1],'new')]:
+            value = facts.get(key,{})
+            if format_ == 'deb':
+                name = prefix+'-'+phase+'-install.log';raw = read(name)
+                need(value.get('exitCode') == 0 and positive(value.get('pid')) and value.get('packageName') == 'mouse-browser' and
+                     value.get('version') == version and value.get('executable') == native['processIdentity']['executable'] and
+                     value.get('log') == name and isinstance(raw,bytes) and 0 < len(raw) <= 16*1024**2 and sha(raw) == value.get('logSha256'),
+                     'actual old/new deb installation failed or its log differs')
+            else:
+                need(value.get('method') == 'user-owned AppImage atomic replacement' and value.get('uid') == native['processIdentity']['uid'] and
+                     value.get('target') == native['processIdentity']['appImage'] and value.get('executable') is True and
+                     value.get('size') == expected['size'] and value.get('sha256') == expected['sha256'], 'actual AppImage replacement differs')
+        if format_ == 'appimage':
+            need(facts['oldInstallation']['target'] == facts['replacement']['target'], 'AppImage replacement changed the owned installed path')
+    return {'ok':True,'fromVersion':'6.0.33','toVersion':'6.0.34','platform':platform,'arch':arch,'method':method,
+            'inputs':inputs,'baseline':expected_baseline,'package':package,'oldPid':reports[0]['pid'],'newPid':reports[1]['pid'],
+            'closedProfileSha256':facts['closedProfileSha256']}
+
+
+def verify(read, *, expected_platform, expected_arch, expected_package=None, expected_packages=None):
+    need((expected_platform,expected_arch) in (('darwin','arm64'),('win32','x64'),('linux','x64')), 'unsupported target')
+    raw, facts = read_json(read, 'mouse-634-upgrade.json')
+    if expected_platform != 'linux':
+        result = transition(read,facts,expected_platform,expected_arch,expected_package,BASELINES[expected_platform],'mouse-634-upgrade')
+        result['inputs']['mouse-634-upgrade.json'] = sha(raw)
+        return result
+    need(facts.get('ok') is True and not facts.get('error') and facts.get('fromVersion') == '6.0.33' and facts.get('toVersion') == '6.0.34' and
+         facts.get('platform') == 'linux' and facts.get('physicalUserDeviceVerified') is False and facts.get('firstLinuxRelease') is False and
+         facts.get('previousVersion') == '6.0.33' and facts.get('method') == LINUX_METHOD and facts.get('packages') == expected_packages and
+         set(facts.get('formats',{})) == {'deb','appimage'}, 'Linux633 baseline or both actual package formats missing')
+    results = {}
+    for format_, extension in [('deb','deb'),('appimage','AppImage')]:
+        name = 'Mouse-Browser-6.0.34-Linux-x64.'+extension
+        need(isinstance(expected_packages,dict) and name in expected_packages, 'Linux candidate package missing')
+        results[format_] = transition(read,facts['formats'][format_],'linux','x64',{'name':name,**expected_packages[name]},
+                                      BASELINES['linux'][format_],'mouse-634-upgrade-'+format_,format_)
+    return {'ok':True,'fromVersion':'6.0.33','toVersion':'6.0.34','platform':'linux','arch':'x64','firstLinuxRelease':False,
+            'inputs':{'mouse-634-upgrade.json':sha(raw)},'formats':results}

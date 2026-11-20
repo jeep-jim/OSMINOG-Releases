@@ -1,0 +1,40 @@
+{
+  "version": "6.0.34",
+  "ready": false,
+  "sourceBranch": "main",
+  "source": null,
+  "sourcePR": null,
+  "sourceMerge": null,
+  "run": null,
+  "attempt": null,
+  "job": null,
+  "artifact": null,
+  "artifactSHA256": null,
+  "verificationArtifact": null,
+  "verificationSHA256": null,
+  "previous": {
+    "version": "6.0.33",
+    "source": "0a3f8aab08356297b3b8982a081debbfa65d826d",
+    "updaterBlobSHA": "91ab363f926774825caf8055b2d3d81bf0d51264",
+    "packages": {
+      "Mouse-Browser-6.0.33-Linux-x64.AppImage": {
+        "size": 135575147,
+        "sha256": "b2e6b90a1cfb82e3af9e391789ef756a581170223e4de948c1f890bbd29efc67"
+      },
+      "Mouse-Browser-6.0.33-Linux-x64.deb": {
+        "size": 105781032,
+        "sha256": "1d8b5a1072ab893daff35590b1964ca84c56458e83c6992316030c6c215e9128"
+      }
+    }
+  },
+  "packages": {
+    "Mouse-Browser-6.0.34-Linux-x64.AppImage": {
+      "size": null,
+      "sha256": null
+    },
+    "Mouse-Browser-6.0.34-Linux-x64.deb": {
+      "size": null,
+      "sha256": null
+    }
+  }
+}
