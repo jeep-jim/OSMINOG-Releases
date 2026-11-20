@@ -9,8 +9,10 @@ from copy import deepcopy
 from contextlib import redirect_stdout
 import io
 import json
+import os
 import runpy
 import subprocess
+import sys
 import tempfile
 import unittest
 from unittest.mock import patch
@@ -564,6 +566,60 @@ class WindowsPublisherDraftPublication(unittest.TestCase):
         self.assertTrue(command.call_args.kwargs['check'])
         self.assertEqual(command.call_args.kwargs['timeout'], 300)
         self.assertEqual((self.out / PUBLISHER['INSTALLER']).read_bytes(), self.files[PUBLISHER['INSTALLER']])
+
+
+class WindowsCanonicalCheckout(unittest.TestCase):
+    def test_windows_publisher_disables_crlf_conversion_before_checkout(self):
+        workflow = SCRIPT.parents[1] / '.github/workflows/publish-mouse632-windows.yml'
+        publisher = workflow.read_text().split('  publish-windows:\n', 1)[1]
+        steps = publisher.split('    steps:\n', 1)[1]
+        before_checkout = steps.split('      - uses: actions/checkout@v4\n', 1)[0]
+        self.assertIn('      - name: Preserve exact publisher source bytes on Windows\n', before_checkout)
+        self.assertIn('        shell: pwsh\n', before_checkout)
+        self.assertIn('        run: git config --global core.autocrlf false\n', before_checkout)
+
+    def test_actual_git_checkout_keeps_the_unchanged_frozen_dependency_chain(self):
+        # Controlled Git fixture, not a native Windows or publication result.
+        # The real shared checker and its historical hashes run unmodified.
+        root = SCRIPT.parents[1]
+        sources = [root / '.gitattributes', *sorted(SCRIPT.parent.glob('*.py'))]
+        canonical = {path.relative_to(root): path.read_bytes() for path in sources}
+        frozen = Path('tools/mouse629-evidence.py')
+        with tempfile.TemporaryDirectory(prefix='mouse632-canonical-checkout-') as directory:
+            checkout = Path(directory)
+
+            def git(*args):
+                return subprocess.run(['git', *args], cwd=checkout, check=True,
+                                      capture_output=True, text=True)
+
+            git('init', '-q')
+            git('config', 'core.autocrlf', 'false')
+            for name, raw in canonical.items():
+                path = checkout / name
+                path.parent.mkdir(parents=True, exist_ok=True)
+                path.write_bytes(raw)
+            git('add', '--', '.gitattributes', 'tools')
+            for autocrlf in ['true', 'false']:
+                with self.subTest(autocrlf=autocrlf):
+                    git('config', 'core.autocrlf', autocrlf)
+                    for name in canonical:
+                        (checkout / name).unlink()
+                    git('checkout-index', '--all', '--force')
+                    actual = (checkout / frozen).read_bytes()
+                    result = subprocess.run([sys.executable, '-c',
+                        "import runpy; runpy.run_path('tools/mouse632-ui-evidence.py', "
+                        "run_name='controlled_frozen_checker')"], cwd=checkout,
+                        env={**os.environ, 'PYTHONDONTWRITEBYTECODE':'1'},
+                        capture_output=True, text=True)
+                    if autocrlf == 'true':
+                        self.assertNotEqual(actual, canonical[frozen])
+                        self.assertEqual(actual.replace(b'\r\n', b'\n'), canonical[frozen])
+                        self.assertNotEqual(result.returncode, 0)
+                        self.assertIn('Accepted Mouse629 evidence validator changed', result.stderr)
+                    else:
+                        self.assertEqual(actual, canonical[frozen])
+                        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+                        self.assertIn('MOUSE627_REVIEWED_PUBLISHER_TEMPLATE_GATES_PASS', result.stdout)
 
 
 class WindowsCurrentFeedbackGate(unittest.TestCase):

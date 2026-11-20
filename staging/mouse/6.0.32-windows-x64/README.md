@@ -19,5 +19,13 @@ archive member, validates its Windows632 identity and restoration state, then
 checks its unchanged scrollbar payload and rendered frames. The temporary
 standalone JSON is not an uploaded source artifact.
 
+The first publisher run44686632337 stopped during import with `Accepted Mouse629
+evidence validator changed`, before installation or publication. A controlled
+Git checkout reproduced the same rejection with `core.autocrlf=true`; the
+unchanged dependency chain passes with `false`. The Windows publisher now sets
+this value before checkout. A real-checkout regression preserves the existing
+frozen hashes and confirms the failure/success boundary; all58 Windows contract
+tests pass. Source packages, artifact pins and the owner trigger are unchanged.
+
 The actual published 6.0.29 baseline remains pinned. Retained 631 task/stress
 report filenames and markers continue to be validated with version 6.0.32.
