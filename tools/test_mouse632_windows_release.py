@@ -7,6 +7,7 @@ updater, inspect native windows, or constitute Windows release evidence.
 from pathlib import Path
 from copy import deepcopy
 from contextlib import redirect_stdout
+import ast
 import io
 import json
 import os
@@ -94,11 +95,12 @@ def pin_fixture():
 
 
 class WindowsPublisherSourceBranch(unittest.TestCase):
-    def validate_pin(self, value):
+    def validate_pin(self, value, owner='Publish verified Mouse Browser 6.0.32 Windows x64'):
         with tempfile.TemporaryDirectory(prefix='mouse-publisher-pin-fixture-') as temporary:
             stage = Path(temporary)
             (stage / 'pin.json').write_text(json.dumps(value), encoding='utf-8')
-            (stage / 'PUBLISH_OWNER').write_text('Publish verified Mouse Browser 6.0.32 Windows x64', encoding='utf-8')
+            if owner is not None:
+                (stage / 'PUBLISH_OWNER').write_text(owner, encoding='utf-8')
             with patch.dict(PUBLISHER['pin'].__globals__, {'STAGE': stage}):
                 return PUBLISHER['pin']()
 
@@ -106,6 +108,13 @@ class WindowsPublisherSourceBranch(unittest.TestCase):
         value = pin_fixture()
         self.assertEqual(self.validate_pin(value), value)
         self.assertEqual(PUBLISHER['SOURCE_BRANCH'], 'main')
+
+    def test_pipeline_retry_still_requires_the_exact_owner_trigger(self):
+        for owner in ['', 'UNSET', 'Publish verified Mouse Browser 6.0.31 Windows x64']:
+            with self.subTest(owner=owner), self.assertRaisesRegex(ValueError, 'publication trigger'):
+                self.validate_pin(pin_fixture(), owner=owner)
+        with self.assertRaises(FileNotFoundError):
+            self.validate_pin(pin_fixture(), owner=None)
 
     def test_unready_staging_cannot_publish_placeholder_provenance(self):
         stage = SCRIPT.parents[1] / 'staging/mouse/6.0.32-windows-x64/pin.json'
@@ -569,6 +578,20 @@ class WindowsPublisherDraftPublication(unittest.TestCase):
 
 
 class WindowsCanonicalCheckout(unittest.TestCase):
+    def test_pipeline_retry_is_scoped_to_this_windows_version_on_main(self):
+        path = SCRIPT.parents[1] / '.github/workflows/publish-mouse632-windows.yml'
+        workflow = path.read_text()
+        push = workflow.split('  push:\n', 1)[1].split('  workflow_dispatch:\n', 1)[0]
+        fields = dict(line.strip().split(': ', 1) for line in push.splitlines() if line.strip())
+        self.assertEqual(fields['branches'], '[main]')
+        self.assertEqual(ast.literal_eval(fields['paths']), [
+            'staging/mouse/6.0.32-windows-x64/PUBLISH_OWNER',
+            '.github/workflows/publish-mouse632-windows.yml'])
+        publisher = workflow.split('  publish-windows:\n', 1)[1]
+        for gate in ["    if: github.event_name != 'pull_request'\n", '    needs: contract\n',
+                     '      group: mouse-windows-x64-release\n', '      cancel-in-progress: false\n']:
+            self.assertIn(gate, publisher)
+
     def test_windows_publisher_disables_crlf_conversion_before_checkout(self):
         workflow = SCRIPT.parents[1] / '.github/workflows/publish-mouse632-windows.yml'
         publisher = workflow.read_text().split('  publish-windows:\n', 1)[1]
