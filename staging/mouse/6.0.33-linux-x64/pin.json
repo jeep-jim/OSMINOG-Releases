@@ -1,0 +1,26 @@
+{
+  "version": "6.0.33",
+  "ready": false,
+  "sourceBranch": "main",
+  "source": null,
+  "sourcePR": null,
+  "sourceMerge": null,
+  "run": null,
+  "attempt": null,
+  "job": null,
+  "artifact": null,
+  "artifactSHA256": null,
+  "verificationArtifact": null,
+  "verificationSHA256": null,
+  "previous": null,
+  "packages": {
+    "Mouse-Browser-6.0.33-Linux-x64.AppImage": {
+      "size": null,
+      "sha256": null
+    },
+    "Mouse-Browser-6.0.33-Linux-x64.deb": {
+      "size": null,
+      "sha256": null
+    }
+  }
+}
