@@ -1,0 +1,79 @@
+name: Publish verified Mouse Browser 6.0.33 Windows x64
+on:
+  pull_request:
+    paths: ['.gitattributes','tools/mouse633-*.py','tools/test_mouse633_*.py','tools/test-mouse633-*.py','.github/workflows/publish-mouse633-windows.yml','staging/mouse/6.0.33-windows-x64/**']
+  push:
+    branches: [main]
+    paths: ['staging/mouse/6.0.33-windows-x64/PUBLISH_OWNER', '.github/workflows/publish-mouse633-windows.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - name: Verify publication refuses incomplete evidence
+        run: python3 tools/test_mouse633_windows_release.py -v
+      - name: Verify actual published632 profile replacement evidence
+        run: python3 tools/test_mouse633_upgrade_evidence.py -v
+      - name: Verify task and fifty-tab native evidence contracts
+        run: python3 tools/test_mouse633_task_evidence.py -v
+      - name: Verify native process report and immutable byte bindings
+        run: python3 tools/test_mouse633_native_report.py -v
+      - name: Verify hidden scrollbars preserve native scrolling
+        run: python3 tools/test-mouse633-ui-evidence.py -v
+      - name: Verify native settings, Agent, zoom and import witnesses
+        run: python3 tools/test_mouse633_owner_feedback_evidence.py -v
+      - name: Verify native context menus and private favorite isolation
+        run: python3 tools/test_mouse633_context_evidence.py -v
+      - name: Verify current media, document viewer and footer evidence
+        run: python3 tools/test_mouse633_feedback_evidence.py -v
+      - name: Verify workspace spacing, all corners and native input
+        run: python3 tools/test_mouse633_workspace_evidence.py -v
+  publish-windows:
+    if: github.event_name != 'pull_request'
+    needs: contract
+    runs-on: windows-latest
+    timeout-minutes: 55
+    permissions:
+      contents: write
+    concurrency:
+      group: mouse-windows-x64-release
+      cancel-in-progress: false
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - name: Preserve exact publisher source bytes on Windows
+        shell: pwsh
+        run: git config --global core.autocrlf false
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Import immutable successful Windows CI installer
+        run: python tools/mouse633-windows-release.py import
+      - name: Verify exact installer on a fresh Windows machine
+        run: python tools/mouse633-windows-release.py verify
+      - name: Publish and verify immutable public asset
+        run: python tools/mouse633-windows-release.py publish
+      - name: Advance Windows feed and verify anonymous discovery and download
+        run: python tools/mouse633-windows-release.py channel
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: mouse633-windows-release-verification-${{ github.run_attempt }}
+          path: |
+            mouse633-windows-release/*.json
+            mouse633-windows-release/*.log
+            mouse633-windows-release/*.png
+            mouse633-windows-release/mouse-631-upgrade/**
+            mouse633-windows-release/SHA256SUMS.txt
+            mouse633-windows-release/RELEASE_NOTES.md
+          retention-days: 14
