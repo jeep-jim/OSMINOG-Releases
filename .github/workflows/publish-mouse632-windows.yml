@@ -4,7 +4,7 @@ on:
     paths: ['.gitattributes','tools/mouse632-windows-release.py','tools/test_mouse632_windows_release.py','tools/mouse632-task-evidence.py','tools/test_mouse632_task_evidence.py','tools/test_mouse632_native_report.py','tools/mouse632-ui-evidence.py','tools/test-mouse632-ui-evidence.py','tools/mouse632-feedback-evidence.py','tools/test_mouse632_feedback_evidence.py','.github/workflows/publish-mouse632-windows.yml','staging/mouse/6.0.32-windows-x64/**']
   push:
     branches: [main]
-    paths: ['staging/mouse/6.0.32-windows-x64/PUBLISH_OWNER']
+    paths: ['staging/mouse/6.0.32-windows-x64/PUBLISH_OWNER', '.github/workflows/publish-mouse632-windows.yml']
   workflow_dispatch:
 permissions:
   contents: read
@@ -39,6 +39,9 @@ jobs:
     env:
       GH_TOKEN: ${{ github.token }}
     steps:
+      - name: Preserve exact publisher source bytes on Windows
+        shell: pwsh
+        run: git config --global core.autocrlf false
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:

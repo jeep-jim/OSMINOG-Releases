@@ -19,5 +19,20 @@ archive member, validates its Windows632 identity and restoration state, then
 checks its unchanged scrollbar payload and rendered frames. The temporary
 standalone JSON is not an uploaded source artifact.
 
+The first publisher run44686632337 stopped during import with `Accepted Mouse629
+evidence validator changed`, before installation or publication. A controlled
+Git checkout reproduced the same rejection with `core.autocrlf=true`; the
+unchanged dependency chain passes with `false`. The Windows publisher now sets
+this value before checkout. A real-checkout regression preserves the existing
+frozen hashes and confirms the failure/success boundary; all60 Windows contract
+tests pass. Source packages, artifact pins and the owner trigger are unchanged.
+
+The main-branch push paths are limited to this version's `PUBLISH_OWNER` and
+`.github/workflows/publish-mouse632-windows.yml`. Merging a repair to that
+workflow retries the same pinned Windows release through every contract,
+source, fresh-installation, public-byte and anonymous-channel gate. The exact
+owner file and ready pin are still required; concurrency and downgrade guards
+remain active. This retry does not require rewriting the owner file or pins.
+
 The actual published 6.0.29 baseline remains pinned. Retained 631 task/stress
 report filenames and markers continue to be validated with version 6.0.32.

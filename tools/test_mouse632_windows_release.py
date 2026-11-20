@@ -7,10 +7,13 @@ updater, inspect native windows, or constitute Windows release evidence.
 from pathlib import Path
 from copy import deepcopy
 from contextlib import redirect_stdout
+import ast
 import io
 import json
+import os
 import runpy
 import subprocess
+import sys
 import tempfile
 import unittest
 from unittest.mock import patch
@@ -92,11 +95,12 @@ def pin_fixture():
 
 
 class WindowsPublisherSourceBranch(unittest.TestCase):
-    def validate_pin(self, value):
+    def validate_pin(self, value, owner='Publish verified Mouse Browser 6.0.32 Windows x64'):
         with tempfile.TemporaryDirectory(prefix='mouse-publisher-pin-fixture-') as temporary:
             stage = Path(temporary)
             (stage / 'pin.json').write_text(json.dumps(value), encoding='utf-8')
-            (stage / 'PUBLISH_OWNER').write_text('Publish verified Mouse Browser 6.0.32 Windows x64', encoding='utf-8')
+            if owner is not None:
+                (stage / 'PUBLISH_OWNER').write_text(owner, encoding='utf-8')
             with patch.dict(PUBLISHER['pin'].__globals__, {'STAGE': stage}):
                 return PUBLISHER['pin']()
 
@@ -104,6 +108,13 @@ class WindowsPublisherSourceBranch(unittest.TestCase):
         value = pin_fixture()
         self.assertEqual(self.validate_pin(value), value)
         self.assertEqual(PUBLISHER['SOURCE_BRANCH'], 'main')
+
+    def test_pipeline_retry_still_requires_the_exact_owner_trigger(self):
+        for owner in ['', 'UNSET', 'Publish verified Mouse Browser 6.0.31 Windows x64']:
+            with self.subTest(owner=owner), self.assertRaisesRegex(ValueError, 'publication trigger'):
+                self.validate_pin(pin_fixture(), owner=owner)
+        with self.assertRaises(FileNotFoundError):
+            self.validate_pin(pin_fixture(), owner=None)
 
     def test_unready_staging_cannot_publish_placeholder_provenance(self):
         stage = SCRIPT.parents[1] / 'staging/mouse/6.0.32-windows-x64/pin.json'
@@ -564,6 +575,74 @@ class WindowsPublisherDraftPublication(unittest.TestCase):
         self.assertTrue(command.call_args.kwargs['check'])
         self.assertEqual(command.call_args.kwargs['timeout'], 300)
         self.assertEqual((self.out / PUBLISHER['INSTALLER']).read_bytes(), self.files[PUBLISHER['INSTALLER']])
+
+
+class WindowsCanonicalCheckout(unittest.TestCase):
+    def test_pipeline_retry_is_scoped_to_this_windows_version_on_main(self):
+        path = SCRIPT.parents[1] / '.github/workflows/publish-mouse632-windows.yml'
+        workflow = path.read_text()
+        push = workflow.split('  push:\n', 1)[1].split('  workflow_dispatch:\n', 1)[0]
+        fields = dict(line.strip().split(': ', 1) for line in push.splitlines() if line.strip())
+        self.assertEqual(fields['branches'], '[main]')
+        self.assertEqual(ast.literal_eval(fields['paths']), [
+            'staging/mouse/6.0.32-windows-x64/PUBLISH_OWNER',
+            '.github/workflows/publish-mouse632-windows.yml'])
+        publisher = workflow.split('  publish-windows:\n', 1)[1]
+        for gate in ["    if: github.event_name != 'pull_request'\n", '    needs: contract\n',
+                     '      group: mouse-windows-x64-release\n', '      cancel-in-progress: false\n']:
+            self.assertIn(gate, publisher)
+
+    def test_windows_publisher_disables_crlf_conversion_before_checkout(self):
+        workflow = SCRIPT.parents[1] / '.github/workflows/publish-mouse632-windows.yml'
+        publisher = workflow.read_text().split('  publish-windows:\n', 1)[1]
+        steps = publisher.split('    steps:\n', 1)[1]
+        before_checkout = steps.split('      - uses: actions/checkout@v4\n', 1)[0]
+        self.assertIn('      - name: Preserve exact publisher source bytes on Windows\n', before_checkout)
+        self.assertIn('        shell: pwsh\n', before_checkout)
+        self.assertIn('        run: git config --global core.autocrlf false\n', before_checkout)
+
+    def test_actual_git_checkout_keeps_the_unchanged_frozen_dependency_chain(self):
+        # Controlled Git fixture, not a native Windows or publication result.
+        # The real shared checker and its historical hashes run unmodified.
+        root = SCRIPT.parents[1]
+        sources = [root / '.gitattributes', *sorted(SCRIPT.parent.glob('*.py'))]
+        canonical = {path.relative_to(root): path.read_bytes() for path in sources}
+        frozen = Path('tools/mouse629-evidence.py')
+        with tempfile.TemporaryDirectory(prefix='mouse632-canonical-checkout-') as directory:
+            checkout = Path(directory)
+
+            def git(*args):
+                return subprocess.run(['git', *args], cwd=checkout, check=True,
+                                      capture_output=True, text=True)
+
+            git('init', '-q')
+            git('config', 'core.autocrlf', 'false')
+            for name, raw in canonical.items():
+                path = checkout / name
+                path.parent.mkdir(parents=True, exist_ok=True)
+                path.write_bytes(raw)
+            git('add', '--', '.gitattributes', 'tools')
+            for autocrlf in ['true', 'false']:
+                with self.subTest(autocrlf=autocrlf):
+                    git('config', 'core.autocrlf', autocrlf)
+                    for name in canonical:
+                        (checkout / name).unlink()
+                    git('checkout-index', '--all', '--force')
+                    actual = (checkout / frozen).read_bytes()
+                    result = subprocess.run([sys.executable, '-c',
+                        "import runpy; runpy.run_path('tools/mouse632-ui-evidence.py', "
+                        "run_name='controlled_frozen_checker')"], cwd=checkout,
+                        env={**os.environ, 'PYTHONDONTWRITEBYTECODE':'1'},
+                        capture_output=True, text=True)
+                    if autocrlf == 'true':
+                        self.assertNotEqual(actual, canonical[frozen])
+                        self.assertEqual(actual.replace(b'\r\n', b'\n'), canonical[frozen])
+                        self.assertNotEqual(result.returncode, 0)
+                        self.assertIn('Accepted Mouse629 evidence validator changed', result.stderr)
+                    else:
+                        self.assertEqual(actual, canonical[frozen])
+                        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+                        self.assertIn('MOUSE627_REVIEWED_PUBLISHER_TEMPLATE_GATES_PASS', result.stdout)
 
 
 class WindowsCurrentFeedbackGate(unittest.TestCase):
