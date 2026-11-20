@@ -59,7 +59,9 @@ jobs:
         run: python3 tools/mouse633-linux-release.py import
       - name: Verify exact packages on a fresh Linux desktop
         run: |
-          dbus-run-session -- xvfb-run -a -s '-screen 0 1600x1200x24' bash -euo pipefail -c '
+          # Match the pinned source job's X11 desktop. Dense native capture sizes
+          # and every pixel/input acceptance criterion remain unchanged.
+          dbus-run-session -- xvfb-run -a -s '-screen 0 1600x1100x24' bash -euo pipefail -c '
             openbox > "$RUNNER_TEMP/mouse633-openbox.log" 2>&1 &
             pulseaudio --start --exit-idle-time=-1
             python3 tools/mouse633-linux-release.py verify
