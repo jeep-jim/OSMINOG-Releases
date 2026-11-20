@@ -57,6 +57,10 @@ def adapted_tree(name):
             if isinstance(node.value, str):
                 value = node.value.replace('6.0.32', '6.0.33')
                 value = value.replace('mouse632-', 'mouse633-').replace('test_mouse632_', 'test_mouse633_')
+                # Native scrollbar HTTP fixtures retain their published632
+                # route identities, including URLs and the cross-frame regexp.
+                for route in ('/mouse632-encapsulated', '/mouse632-frame', '/mouse632-cross-frame'):
+                    value = value.replace(route.replace('mouse632-', 'mouse633-'), route)
                 value = value.replace('MOUSE632_', 'MOUSE633_')
                 value = value.replace('MOUSE_632_REAL_629_TO_632_REPLACE_RELAUNCH_PROFILE_PASS',
                                       'MOUSE_633_REAL_629_TO_633_REPLACE_RELAUNCH_PROFILE_PASS')
