@@ -567,9 +567,16 @@ class WindowsPublisherDraftPublication(unittest.TestCase):
 
 
 class WindowsCurrentFeedbackGate(unittest.TestCase):
+    @staticmethod
+    def wrapper():
+        return {'version':'6.0.32', 'platform':'win32', 'arch':'x64', 'restored':True,
+                'scrollbars':{'version':'6.0.32', 'synthetic':True}}
+
     def test_both_independent_contracts_receive_the_actual_archive_reader(self):
-        raw = b'{"version":"6.0.32","synthetic":true}\n'
-        files = {'mouse-629-scrollbars.json':raw}
+        report = self.wrapper()
+        raw = json.dumps(report).encode() + b'\n'
+        # The source uploads this wrapper, never its temporary standalone JSON.
+        files = {'mouse-629-ui-regressions.json':raw}
         read, calls = files.__getitem__, []
 
         def checker(path, run_name):
@@ -580,7 +587,7 @@ class WindowsCurrentFeedbackGate(unittest.TestCase):
                 return {'synthetic':True}
 
             def scrollbars(facts, actual_read):
-                self.assertEqual(facts, json.loads(raw))
+                self.assertEqual(facts, report['scrollbars'])
                 self.assertIs(actual_read, read)
                 calls.append('scrollbars')
                 return {'nativeWheelScrolls':12}
@@ -593,6 +600,7 @@ class WindowsCurrentFeedbackGate(unittest.TestCase):
         with patch.object(runpy, 'run_path', side_effect=checker):
             result = PUBLISHER['verify_feedback_evidence'](read)
         self.assertEqual(calls, ['feedback', 'scrollbars'])
+        self.assertEqual(result['scrollbarReport'], 'mouse-629-ui-regressions.json')
         self.assertEqual(result['scrollbarSHA256'], PUBLISHER['sha'](raw))
         self.assertEqual(result['scrollbars']['nativeWheelScrolls'], 12)
 
@@ -607,7 +615,25 @@ class WindowsCurrentFeedbackGate(unittest.TestCase):
 
             with self.subTest(failed=failed), patch.object(runpy, 'run_path', side_effect=checker):
                 with self.assertRaisesRegex(ValueError, 'independent '+failed+' rejection'):
-                    PUBLISHER['verify_feedback_evidence'](lambda name:b'{}')
+                    PUBLISHER['verify_feedback_evidence'](lambda name:json.dumps(self.wrapper()).encode())
+
+    def test_wrong_platform_or_failed_ui_wrapper_cannot_supply_scrollbar_evidence(self):
+        changes = [{'version':'6.0.29'}, {'platform':'darwin'}, {'arch':'arm64'},
+                   {'restored':False}, {'error':'native scrollbar fixture failed'},
+                   {'scrollbars':None}, {'scrollbars':[]}]
+        for change in changes:
+            report = {**self.wrapper(), **change}
+            with self.subTest(change=change), patch.object(runpy, 'run_path',
+                    return_value={'verify':lambda *args, **kwargs:{'synthetic':True}}):
+                with self.assertRaisesRegex(ValueError, 'installed Windows UI report'):
+                    PUBLISHER['verify_feedback_evidence'](lambda name:json.dumps(report).encode())
+
+    def test_missing_or_nonobject_actual_wrapper_is_rejected(self):
+        for raw in [b'', b'null', b'[]', b'{}', '{}']:
+            with self.subTest(raw=raw), patch.object(runpy, 'run_path',
+                    return_value={'verify':lambda *args, **kwargs:{'synthetic':True}}):
+                with self.assertRaises(ValueError):
+                    PUBLISHER['verify_feedback_evidence'](lambda name:raw)
 
 
 class WindowsPublisherContract(unittest.TestCase):

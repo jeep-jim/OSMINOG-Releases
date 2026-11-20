@@ -193,13 +193,23 @@ def verify_feedback_evidence(read):
     result = feedback['verify'](read, expected_platform='win32', expected_arch='x64')
     # The retained full UI wrapper is Mac-specific. Its standalone scrollbar
     # contract is shared by both installed runtimes and must also gate Windows.
-    raw = read('mouse-629-scrollbars.json')
+    # The installed smoke embeds these facts in the retained UI report. Its
+    # standalone temporary JSON is not an uploaded artifact; bind the actual
+    # archive report and pass its unchanged scrollbar facts to the shared gate.
+    report_name = 'mouse-629-ui-regressions.json'
+    raw = read(report_name)
     if not isinstance(raw, bytes) or not 0 < len(raw) <= 16 * 1024**2:
         raise ValueError('Mouse632 hidden scrollbar evidence missing or oversized')
+    report = json.loads(raw)
+    if (not isinstance(report, dict) or report.get('error')
+            or (report.get('version'), report.get('platform'), report.get('arch')) != (VERSION, 'win32', 'x64')
+            or report.get('restored') is not True or not isinstance(report.get('scrollbars'), dict)):
+        raise ValueError('Mouse632 installed Windows UI report failed or has the wrong identity')
     ui = runpy.run_path(str(Path(__file__).with_name('mouse632-ui-evidence.py')),
                        run_name='mouse632_ui_evidence')
-    scrollbars = ui['verify_scrollbars'](json.loads(raw), read)
-    return {'feedback': result, 'scrollbars': scrollbars, 'scrollbarSHA256': sha(raw)}
+    scrollbars = ui['verify_scrollbars'](report['scrollbars'], read)
+    return {'feedback': result, 'scrollbars': scrollbars,
+            'scrollbarReport': report_name, 'scrollbarSHA256': sha(raw)}
 
 
 def verify_source_merge(p):
