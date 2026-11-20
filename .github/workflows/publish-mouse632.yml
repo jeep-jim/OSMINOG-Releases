@@ -1,0 +1,143 @@
+name: Publish verified Mouse Browser 6.0.32
+on:
+  pull_request:
+    paths: ['.gitattributes','tools/mouse632-*.py','tools/test-mouse632-*.py','tools/test_mouse632_task_evidence.py','tools/test_mouse632_native_report.py','tools/test_mouse632_release_bytes.py','tools/test_mouse632_feedback_evidence.py','.github/workflows/publish-mouse632.yml','staging/mouse/6.0.32-arm64/**']
+  push:
+    branches: [main]
+    paths: ['staging/mouse/6.0.32-arm64/PUBLISH_OWNER']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    steps:
+      - uses: actions/checkout@v4
+      # Frozen AST digests use Python 3.12's representation, including empty lists.
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - run: python3 -m py_compile tools/mouse632-release.py tools/mouse632-evidence.py tools/mouse632-ui-evidence.py tools/mouse632-task-evidence.py tools/mouse632-feedback-evidence.py tools/mouse628-motion-trace.py
+      - run: python3 tools/test-mouse632-evidence.py
+      - run: python3 tools/test-mouse632-ui-evidence.py
+      - name: Verify task and fifty-tab native evidence contracts
+        run: python3 tools/test_mouse632_task_evidence.py -v
+      - name: Verify native process report and immutable byte bindings
+        run: python3 tools/test_mouse632_native_report.py -v
+      - name: Reject changed packages before publication and channel updates
+        run: python3 tools/test_mouse632_release_bytes.py -v
+      - name: Verify owner feedback evidence contracts
+        run: python3 tools/test_mouse632_feedback_evidence.py -v
+      - run: python3 tools/mouse632-release.py validate-template
+  mouse-release:
+    if: github.event_name != 'pull_request'
+    needs: contract
+    runs-on: macos-15
+    timeout-minutes: 45
+    permissions:
+      contents: write
+    concurrency:
+      group: quadro-macos-release
+      cancel-in-progress: false
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Import exact merged native-tested packages
+        run: python3 tools/mouse632-release.py import
+      - name: Verify installed DMG and actual previous-version replacement
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(uname -m)" = arm64
+          cmp mouse632-release/Mouse-Browser-6.0.32-mac-arm64.dmg mouse632-release/Quadro-Browser-6.0.32-mac-arm64.dmg
+          MOUNT="$RUNNER_TEMP/mouse628-dmg"
+          mkdir -p "$MOUNT"
+          hdiutil attach mouse632-release/Mouse-Browser-6.0.32-mac-arm64.dmg -nobrowse -readonly -mountpoint "$MOUNT"
+          trap 'hdiutil detach "$MOUNT" || true' EXIT
+          APP="$RUNNER_TEMP/Установка Mouse/Mouse Browser.app"
+          mkdir -p "$(dirname "$APP")"
+          ditto "$MOUNT/Mouse Browser.app" "$APP"
+          test "$(lipo -archs "$APP/Contents/MacOS/Mouse Browser")" = arm64
+          codesign --verify --deep --strict "$APP"
+          ditto -x -k mouse632-release/Mouse-Browser-6.0.32-mac-arm64.zip "$RUNNER_TEMP/mouse628-zip"
+          codesign --verify --deep --strict "$RUNNER_TEMP/mouse628-zip/Mouse Browser.app"
+          cmp "$APP/Contents/Resources/app.asar" "$RUNNER_TEMP/mouse628-zip/Mouse Browser.app/Contents/Resources/app.asar"
+          diff -qr "$APP/Contents/Resources/mouse-agent-node_modules" "$RUNNER_TEMP/mouse628-zip/Mouse Browser.app/Contents/Resources/mouse-agent-node_modules"
+          test -x "$APP/Contents/Resources/mouse-agent-node_modules/node_modules/node-pty/prebuilds/darwin-arm64/spawn-helper"
+          test -x "$RUNNER_TEMP/mouse628-zip/Mouse Browser.app/Contents/Resources/mouse-agent-node_modules/node_modules/node-pty/prebuilds/darwin-arm64/spawn-helper"
+          hdiutil detach "$MOUNT"
+          trap - EXIT
+          cd mouse632-release
+          rm -f mouse-628-motion-trace.json mouse-628-motion.json mouse-628-motion-trace-report.json
+          env -u GH_TOKEN python3 mouse-verify.py "$APP/Contents/MacOS/Mouse Browser"
+          grep -q MOUSE_632_REAL_629_TO_632_REPLACE_RELAUNCH_PROFILE_PASS mouse-update-roundtrip.log
+          grep -q MOUSE_632_FOOTER_LAYOUT_BOTH_THEMES_PASS mouse-smoke-write.log
+          grep -q MOUSE_632_WEBSITE_OFFER_NEW_TAB_PASS mouse-smoke-write.log
+          grep -q MOUSE_632_OPTIONAL_HELPER_MANUAL_ONLY_PASS mouse-smoke-write.log
+          grep -q MOUSE_632_DOCUMENTS_VIEW_ONLY_PASS mouse-smoke-write.log
+          grep -q MOUSE_632_STATIONARY_MEDIA_PASS mouse-631-native.log
+          grep -q MOUSE_628_PER_PANE_PROGRESS_NATIVE_PASS mouse-smoke-write.log
+          grep -q MOUSE_630_DOWNLOAD_ACTIVITY_PASS mouse-smoke-write.log
+          grep -q MOUSE_630_CAPTURE_FEEDBACK_PASS mouse-smoke-write.log
+          grep -q MOUSE_630_NORA_NATIVE_FOREGROUND_PASS mouse-smoke-write.log
+          grep -q MOUSE_629_TWO_FINGER_WHEEL_TUTORIAL_WRITE_PASS mouse-smoke-write.log
+          grep -q MOUSE_629_TWO_FINGER_WHEEL_TUTORIAL_NATIVE_PASS mouse-smoke-read.log
+          grep -q MOUSE_629_UI_REGRESSIONS_NATIVE_PASS mouse-smoke-write.log
+          grep -q MOUSE_630_NATIVE_WHEEL_DESKTOPS_PASS mouse-smoke-write.log
+          grep -q MOUSE_630_PAGE_SCROLL_PRESERVED_PASS mouse-smoke-write.log
+          grep -q MOUSE_630_PRIVATE_DOWNLOAD_SCOPE_PASS mouse-smoke-write.log
+          grep -q MOUSE_628_LOCAL_MCP_NATIVE_PASS mouse-smoke-write.log
+          grep -q MOUSE_628_OPEN_NORA_DESKTOP_SLIDE_NATIVE_PASS mouse-smoke-write.log
+          grep -q MOUSE_628_BORDERLESS_NATIVE_PASS mouse-smoke-write.log
+          grep -q MOUSE_628_NORA_CONTENT_FIT_NATIVE_PASS mouse-smoke-write.log
+          grep -q MOUSE_PROFILE_COOKIE_RESTART_PASS mouse-smoke-read.log
+      - name: Recompute fresh installed evidence and publish exact packages
+        run: python3 tools/mouse632-release.py publish
+      - name: Advance static update channel after public package verification
+        run: python3 tools/mouse632-release.py channel
+      - name: Verify shipped 6.0.29 updater discovers and downloads 6.0.32 anonymously
+        shell: bash
+        run: |
+          env -u GH_TOKEN node - <<'NODE'
+          const assert=require('node:assert/strict'),fs=require('node:fs/promises'),os=require('node:os');
+          const {MouseUpdates:Old}=require('./mouse632-release/legacy629-update.cjs');
+          const {MouseUpdates,CHANNEL}=require('./mouse632-release/mouse-update.cjs');
+          const pin=require('./staging/mouse/6.0.32-arm64/pin.json');
+          const sleep=ms=>new Promise(resolve=>setTimeout(resolve,ms));
+          (async()=>{
+            let old,error,observations=[];
+            for(let i=0;i<48;i++){
+              try{
+                old=new Old({app:{getVersion:()=> '6.0.29',getPath:()=>os.tmpdir()},shell:{}});
+                const state=await old.run('check');
+                observations.push({attempt:i+1,phase:state.phase,channel:state.channel,availableVersion:state.availableVersion});
+                assert.equal(state.phase,'available');assert.equal(state.channel,'static');assert.equal(state.availableVersion,'6.0.32');error=null;break;
+              }catch(e){error=e;observations.push({attempt:i+1,error:String(e.message)});await sleep(5000)}
+            }
+            await fs.writeFile('mouse632-release/channel-discovery-diagnostics.json',JSON.stringify({channel:CHANNEL,observations},null,2));
+            if(error)throw error;
+            const candidate=pin.packages['Mouse-Browser-6.0.32-mac-arm64.dmg'];
+            assert.equal(old.candidate.hash,candidate.sha256);assert.equal(old.candidate.size,candidate.size);
+            assert.equal((await old.run('download')).phase,'ready');await old.verified();
+            const current=new MouseUpdates({app:{getVersion:()=> '6.0.32'},shell:{}});
+            assert.equal((await current.run('check')).phase,'current');assert.equal(current.state.channel,'static');
+            await fs.writeFile('mouse632-release/channel-verification.json',JSON.stringify({channel:CHANNEL,actualOldModuleVersion:'6.0.29',version:'6.0.32',hash:old.candidate.hash,size:old.candidate.size,anonymousDiscovery:true,verifiedDownload:true,currentVersionCheck:true},null,2));
+            console.log('MOUSE630_ACTUAL_629_UPDATER_STATIC_DISCOVERY_DOWNLOAD_PASS');
+          })().catch(error=>{console.error(error);process.exit(1)});
+          NODE
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: mouse632-release-verification-attempt-${{ github.run_attempt }}
+          path: |
+            mouse632-release/*.log
+            mouse632-release/*.png
+            mouse632-release/*.json
+            mouse632-release/*.md
+            mouse632-release/SHA256SUMS.txt
+          retention-days: 14
