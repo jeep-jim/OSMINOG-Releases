@@ -66,8 +66,8 @@
     "MOUSE_636_RETAINED_OWNER_FEEDBACK_PASS"
   ],
   "x-motionTraceGate": {
-    "validator": "tools/mouse628-motion-trace.py",
-    "algorithm": "mouse628-motion-trace-evidence-v2",
+    "validator": "tools/mouse636-motion-trace.py",
+    "algorithm": "mouse636-motion-trace-evidence-v1",
     "maxTraceBytes": 75497472,
     "inputFiles": [
       "mouse-628-motion-trace.json",
@@ -75,7 +75,15 @@
     ],
     "directIdentityLink": false,
     "attribution": "temporal-correlation",
-    "savedReportAcceptedAsInput": false
+    "savedReportAcceptedAsInput": false,
+    "sha256": "ea140e6ce40b20cf075a4eb5c36482b5a6a423c127bd81583c84df4c766ebe56",
+    "sourceAndFreshInstalled": true,
+    "baseValidator": {
+      "validator": "tools/mouse628-motion-trace.py",
+      "sha256": "76715b9ff5951e92bae4771da644341d3de988edce24dab0f6a4eb73aa7720a9",
+      "algorithm": "mouse628-motion-trace-evidence-v2"
+    },
+    "activationFinish": "Two exact same-group transform/opacity END and RUNNING-to-FINISHED events inside one renderer compositor ActivateAnimations, enclosed by one ActivateSyncTree with ACTIVATE main-frame provenance; original 20 ms completion correlation and all model/DOM/startup checks remain mandatory. No natural compositor finish is claimed."
   },
   "x-feedbackGate": {
     "validator": "tools/mouse636-evidence.py",
