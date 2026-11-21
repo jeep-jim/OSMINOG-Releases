@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "Mouse Browser 6.0.35 native evidence bundle",
-  "$comment": "Current635 requires installed selected-engine native SERP navigation, independently parsed organic DOM, original result order and actual OS engine-menu/source/tile frames. The exact original Russian query and common browser preference bind the provider page to returned cards. Honest CAPTCHA, unavailable or empty outcomes cannot authorize publication. Agent conversation, pinned panes, stable owned-file libraries and all retained634/633 native gates remain mandatory. This publication is macOS arm64 only; deferred Windows/Linux pins stay unready.",
+  "$comment": "Current635 requires installed selected-engine native SERP navigation, independently parsed organic DOM, original result order and actual OS engine-menu/source/tile frames. Same-WebContents readbacks before and after each OS capture independently bind stable informative pixels to the source document and first visible live sites; an empty browser shell cannot pass. The exact original Russian query and common browser preference bind the provider page to returned cards. Honest CAPTCHA, unavailable or empty outcomes cannot authorize publication. Agent conversation, pinned panes, stable owned-file libraries and all retained634/633 native gates remain mandatory. This publication is macOS arm64 only; deferred Windows/Linux pins stay unready.",
   "type": "object",
   "required": [
     "mouse-628-local.json",
@@ -648,7 +648,7 @@
       "mouse635-download-evidence.py": "b26d44420be2521f4b74fbcf195d90d1a16e478eae57635f2275c5a437cebe47",
       "mouse635-capture-evidence.py": "130afc087f3f0e8fc5912f0d1446b9be04bf57a957fd3569a71cc80b7194e78a",
       "mouse635-focused-evidence.py": "18cd810f7bfec2a2b1bb763309ef477ad60cf975a3f205f64471c0b956bdaa7a",
-      "mouse635-search-evidence.py": "0cd1c24dff28232f2d0a8fc3a8860d94ee0e55625d80d5590d8df32ba99b7633",
+      "mouse635-search-evidence.py": "1e66d73a17f1978841360cd6b170958db568d2ad741125462d9bd7e6f5e71a40",
       "mouse635-reuse.py": "b20717bb29488b2061a4469728055e3669c7369af12a3b2d6f40008c9d253193"
     },
     "search": {
@@ -702,17 +702,23 @@
     ],
     "separateNativeProcess": true,
     "physicalUserDeviceVerified": false,
-    "sha256": "1292aa36f545dd770ee53b74dcb5f1bb5f7dcfdf59e96af9f95fa4bc4c5b9006",
+    "sha256": "c8f7686941fe709a62c7ef665ec98b22b71d7bb58036394dc4deff8f8f5f3afb",
     "dependencies": {
       "mouse635-native-evidence.py": "79cbd8bf2d1774cc2b5b7076c0c32d8b9fda793c720e865a5c53dbf66364d6dc",
       "mouse635-library-evidence.py": "8e54690e48746c680f1e16d6784dacc49bdb1f133a2a16a803301f6fc728d6e3",
-      "mouse635-public-search-evidence.py": "a59e3c00c65e58027219634ddde6e23fb7bd8db7569905a7e58132279a78e861",
+      "mouse635-public-search-evidence.py": "bbe2f6a0460a5f3d8a333f686dc5e3655ffb31cc076597c579f133247d0216f2",
       "mouse635-reuse.py": "b20717bb29488b2061a4469728055e3669c7369af12a3b2d6f40008c9d253193",
       "mouse635-agent-chat-evidence.py": "e84ea9f43eea6aa0624d4c8bbd9cbbe0b2e026d8d398d8ed1fe48f2db9fc9af5",
       "mouse635-pane-layout-evidence.py": "951c22baa677075444c5b80387b40e05b96410bd7cd49aac92416273584d8ca4",
       "mouse635-context-evidence.py": "6347ec72bacfc57bfbf3236fa3b5fbc2ed1995b1d6892e082b7a27383008bfaa"
     },
-    "nativeCaptures": 17
+    "nativeCaptures": {
+      "minimum": 17,
+      "maximum": 55,
+      "allRejectedPaintAttemptsRetained": true,
+      "exactChildLedgerOrder": true
+    },
+    "canonicalCaptures": 17
   },
   "x-publicSearchGate": {
     "validator": "tools/mouse635-public-search-evidence.py",
@@ -752,7 +758,12 @@
     "challengeBypass": false,
     "automaticProviderFallback": false,
     "automaticTranslation": false,
-    "nativeCaptures": 3,
+    "nativeCaptures": {
+      "minimum": 3,
+      "maximum": 41,
+      "allRejectedPaintAttemptsRetained": true,
+      "exactAttemptLedgerOrder": true
+    },
     "sameSourceWebContentsAndEpoch": true,
     "sourceViewVisibleAttachedTopmost": true,
     "sourceBoundsZoomAndOwnedHoldRestored": true,
@@ -760,7 +771,7 @@
       "MOUSE_635_PUBLIC_SEARCH_CONTRACT_PASS",
       "MOUSE_635_PUBLIC_SEARCH_PASS"
     ],
-    "sha256": "a59e3c00c65e58027219634ddde6e23fb7bd8db7569905a7e58132279a78e861",
+    "sha256": "bbe2f6a0460a5f3d8a333f686dc5e3655ffb31cc076597c579f133247d0216f2",
     "nativeEngineChooser": {
       "opener": ".mouse-search-engine",
       "modal": "#choice-dialog",
@@ -770,6 +781,44 @@
       "exactVisibleFourOptionsAndCurrentSelection": true,
       "syntheticApplicationChangeIsNotInputProof": true,
       "modalBarrierReleased": true
+    },
+    "canonicalCaptures": 3,
+    "sameWebContentsPaint": {
+      "referenceSource": "WebContents.capturePage",
+      "finalFrameSource": "globalCapture.acquire(display)",
+      "beforeAndAfterActualPNG": true,
+      "independentDecodedPixelComparison": true,
+      "rawReferenceAndDisplaySHA256": true,
+      "unscaledNativeMapping": true,
+      "sourceAndTilesRequired": true,
+      "budgetMsPerSurface": 4500,
+      "maximumAttemptsPerSurface": 20,
+      "firstAcceptedAttemptOnly": true,
+      "allAttemptsByteBound": true,
+      "geometryAndIdentityFailuresDoNotRetry": true,
+      "policy": {
+        "stepDIP": 4,
+        "insetDIP": 16,
+        "tolerance": 3,
+        "minimumSamples": 256,
+        "minimumStableFraction": 0.25,
+        "minimumColors": 4,
+        "minimumInformative": 64,
+        "minimumMatchFraction": 0.99,
+        "minimumInformativeMatchFraction": 0.95,
+        "minimumQuadrantSamples": 16
+      }
+    },
+    "liveTileDocuments": {
+      "readinessBudgetMs": 15000,
+      "selection": "first min(2, actual organic result count) visible sites in original registry order",
+      "noReplacementByFasterSites": true,
+      "visibleInteractiveDocument": true,
+      "minimumBodyTextUTF16Units": 80,
+      "ownerTopicInActualTitleOrBody": true,
+      "originalResultURLAndActualRedirectNavigation": true,
+      "sameWebContentsEpochURLTimeOriginBoundsZoomDuringPaint": true,
+      "loadingFlagAloneIsNotReadiness": true
     }
   },
   "x-libraryStabilityGate": {

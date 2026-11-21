@@ -5,6 +5,7 @@ from datetime import datetime
 from html.parser import HTMLParser
 import ipaddress
 import json
+import math
 from pathlib import Path
 import re
 import runpy
@@ -29,6 +30,85 @@ ERRORS={'SEARCH_ENGINE_CHALLENGE','SEARCH_ENGINE_LAYOUT','SEARCH_ENGINE_REDIRECT
 SELECTORS={'google':'#search h3, #rso h3','bing':'#b_results .b_algo','duckduckgo':'article[data-testid="result"], .result.results_links','yandex':'.serp-item'}
 SNIPPETS={'google':['.VwiC3b','.IsZvec','[data-sncf]','.aCOpRe','.yXK7lf'],'bing':['.b_caption p','p.b_lineclamp2','.b_snippet'],'duckduckgo':['[data-testid="result-snippet"]','[data-result="snippet"]','.result__snippet'],'yandex':['.OrganicTextContentSpan','.Organic-Text','.TextContainer','.text-container']}
 VOID={'area','base','br','col','embed','hr','img','input','link','meta','param','source','track','wbr'}
+PAINT_SOURCE='same-WebContents readbacks matched to actual native display'
+PAINT_POLICY={'stepDIP':4,'insetDIP':16,'tolerance':3,'minimumSamples':256,'minimumStableFraction':.25,'minimumColors':4,'minimumInformative':64,'minimumMatchFraction':.99,'minimumInformativeMatchFraction':.95,'minimumQuadrantSamples':16}
+SOURCE_IDENTITY=('source','navigationEpoch','webContentsId','url','bounds','zoom','visible','attached','topmost','surfaceHeld','tilesHidden','window','organicSignature')
+TILE_IDENTITY=('id','resultURL','recordURL','url','webContentsId','navigationEpoch','bounds','visible','viewVisible','attached','zoom')
+
+
+def rgba(image,x,y):
+ need(type(x) is int and type(y) is int and 0<=x<image['width'] and 0<=y<image['height'],'paint sample is outside the actual image')
+ channels=image['channels'];need(channels in (3,4),'paint reference must decode to RGB or RGBA')
+ at=(y*image['width']+x)*channels;value=list(image['pixels'][at:at+channels])
+ if channels==3:value.append(255)
+ return value
+
+
+def compare_paint(before,after,candidate,bounds,mapping):
+ """Recompute stable, informative native pixels; no image resizing or masking."""
+ N['rect'](bounds);need(bounds['width']>0 and bounds['height']>0,'paint view has no native area')
+ width,height=before['width'],before['height']
+ need(positive(width) and positive(height) and (width,height)==(after['width'],after['height']),'same-WebContents readback dimensions changed')
+ need(all(finite(mapping.get(key)) for key in ('originX','originY','scaleX','scaleY')) and 0<mapping['scaleX']<=8 and 0<mapping['scaleY']<=8,'paint native mapping is invalid')
+ sx,sy=width/bounds['width'],height/bounds['height'];need(0<sx<=8 and 0<sy<=8,'paint readback scale is invalid')
+ trim_x=math.ceil(min(PAINT_POLICY['insetDIP'],bounds['width']/4)*sx);trim_y=math.ceil(min(PAINT_POLICY['insetDIP'],bounds['height']/4)*sy)
+ step_x=max(1,math.ceil(PAINT_POLICY['stepDIP']*sx));step_y=max(1,math.ceil(PAINT_POLICY['stepDIP']*sy))
+ quadrants=[{'samples':0,'stable':0,'matched':0} for _ in range(4)];histogram={};stable=[];total=matched=0
+ close=lambda left,right:all(abs(left[index]-right[index])<=PAINT_POLICY['tolerance'] for index in range(3))
+ for y in range(trim_y,height-trim_y,step_y):
+  for x in range(trim_x,width-trim_x,step_x):
+   total+=1;quadrant=quadrants[(2 if y>=height/2 else 0)+(1 if x>=width/2 else 0)];quadrant['samples']+=1
+   first,last=rgba(before,x,y),rgba(after,x,y)
+   px=math.floor(mapping['originX']+(bounds['x']+(x+.5)/sx)*mapping['scaleX']);py=math.floor(mapping['originY']+(bounds['y']+(y+.5)/sy)*mapping['scaleY'])
+   actual=rgba(candidate,px,py)
+   if first[3]!=255 or last[3]!=255 or not close(first,last):continue
+   quadrant['stable']+=1;bucket=tuple(channel>>4 for channel in first[:3]);histogram[bucket]=histogram.get(bucket,0)+1
+   hit=actual[3]==255 and close(actual,first) and close(actual,last);stable.append((bucket,hit))
+   if hit:matched+=1;quadrant['matched']+=1
+ count=len(stable);dominant=max(histogram,key=histogram.get) if histogram else None
+ informative=sum(bucket!=dominant for bucket,_ in stable);informative_matched=sum(bucket!=dominant and hit for bucket,hit in stable)
+ accepted=(count>=PAINT_POLICY['minimumSamples'] and count/total>=PAINT_POLICY['minimumStableFraction'] and len(histogram)>=PAINT_POLICY['minimumColors'] and informative>=PAINT_POLICY['minimumInformative'] and matched/count>=PAINT_POLICY['minimumMatchFraction'] and informative_matched/informative>=PAINT_POLICY['minimumInformativeMatchFraction'] and all(row['stable']>=PAINT_POLICY['minimumQuadrantSamples'] for row in quadrants))
+ return {'policy':dict(PAINT_POLICY),'totalSamples':total,'stableSamples':count,'matchedSamples':matched,'mismatchedSamples':count-matched,'informativeSamples':informative,'informativeMatchedSamples':informative_matched,'referenceColors':len(histogram),'quadrants':quadrants,'accepted':accepted}
+
+
+def same_fields(before,after,fields,label):
+ need(isinstance(before,dict) and isinstance(after,dict) and all(key in before and before[key]==after.get(key) for key in fields),label)
+
+
+def interval(value,budget,label):
+ need(isinstance(value,dict) and value.get('budgetMs')==budget and all(finite(value.get(key)) for key in ('startedAt','finishedAt','elapsedMs')) and 0<=value['startedAt']<=value['finishedAt'] and 0<=value['elapsedMs']<=budget and abs(value['elapsedMs']-value['finishedAt']+value['startedAt'])<=1,label+' timing differs')
+
+
+def paint_evidence(evidence,frame,kind,validate_state,stable_state,inputs):
+ paint=frame.get('paint');interval(paint,4500,kind+' actual paint')
+ need(not paint.get('error') and paint.get('source')==PAINT_SOURCE and paint.get('maxFrames')==20 and finite(paint.get('deadline')) and paint['startedAt']<paint['deadline']<=paint['startedAt']+4500 and paint['finishedAt']<=paint['deadline'],'paint acquisition lacks its single bounded deadline')
+ attempts=paint.get('attempts');need(isinstance(attempts,list) and 1<=len(attempts)<=20 and type(paint.get('acceptedIndex')) is int and paint['acceptedIndex']==len(attempts)-1,'paint attempts or last accepted frame missing')
+ need(frame.get('before')==attempts[-1].get('before') and frame.get('after')==attempts[-1].get('after'),'canonical paint states do not belong to the accepted native frame')
+ validate_state(frame.get('before'));validate_state(frame.get('after'));stable_state(frame['before'],frame['after'])
+ captures=[];previous=paint['startedAt'];reference_names=set()
+ for index,attempt in enumerate(attempts,1):
+  need(isinstance(attempt,dict) and not attempt.get('error') and attempt.get('sequence')==index and all(finite(attempt.get(key)) for key in ('startedAt','finishedAt','elapsedMs')) and previous<=attempt['startedAt']<=attempt['finishedAt']<=paint['finishedAt'] and abs(attempt['elapsedMs']-attempt['finishedAt']+attempt['startedAt'])<=1,'paint attempt order or timing differs')
+  previous=attempt['finishedAt'];first,last=attempt.get('before'),attempt.get('after');validate_state(first);validate_state(last)
+  stable_state(frame['before'],first);stable_state(first,last);stable_state(last,frame['after'])
+  subjects=[{'id':'source','webContentsId':first['webContentsId'],'bounds':first['bounds']}] if kind=='source' else first['pages']
+  before,after,comparisons=attempt.get('referencesBefore'),attempt.get('referencesAfter'),attempt.get('comparisons')
+  need(all(isinstance(rows,list) and len(rows)==len(subjects) for rows in (before,after,comparisons)),'paint references do not cover the exact native subjects')
+  capture=attempt.get('capture');need(isinstance(capture,dict),'paint attempt OS receipt missing')
+  canonical=CAPTURES[1 if kind=='source' else 2];expected=canonical if index==len(attempts) else canonical[:-4]+'-attempt-'+str(index).zfill(2)+'.png'
+  need(capture.get('filename')==expected and capture.get('contentBounds')==first['window']['contentBounds'],'paint attempt native filename/window differs')
+  image=evidence.screen(capture);inputs[capture['filename']]=capture['sha256'];inputs[capture['displayFilename']]=capture['displaySha256'];captures.append(capture);accepted=[]
+  for subject_index,(subject,left,right,saved) in enumerate(zip(subjects,before,after,comparisons),1):
+   decoded=[]
+   for suffix,row in (('before',left),('after',right)):
+    need(isinstance(row,dict) and all(row.get(key)==subject.get(key) for key in ('id','webContentsId','bounds')),'paint readback belongs to another native view')
+    meta=row.get('image');name='mouse-635-public-search-'+kind+'-reference-'+str(index).zfill(2)+'-'+str(subject_index).zfill(2)+'-'+suffix+'.png'
+    need(isinstance(meta,dict) and meta.get('source')=='WebContents.capturePage' and meta.get('filename')==name and name not in reference_names,'same-WebContents PNG reference identity differs')
+    reference_names.add(name);decoded.append(evidence.png(meta));inputs[name]=meta['sha256']
+   actual=compare_paint(*decoded,image,subject['bounds'],capture['mapping'])
+   need(isinstance(saved,dict) and saved.get('id')==subject['id'] and saved.get('webContentsId')==subject['webContentsId'] and all(saved.get(key)==value for key,value in actual.items()),'saved paint metrics differ from independently decoded actual pixels')
+   accepted.append(actual['accepted'])
+  actual_accepted=all(accepted);need(type(attempt.get('accepted')) is bool and attempt['accepted']==actual_accepted and actual_accepted==(index==len(attempts)),'native paint failed or the accepted frame was not the first matching attempt')
+ return captures
 
 
 def jslen(value):
@@ -274,6 +354,55 @@ def reply_proof(reply,receipt,query,engine,request_id,topic,page=1,previous=()):
  return {'outcome':reply['outcome'],**identity,'topicMatches':topics,'sourceNodeRanks':ranks,'resultCount':len(results),'originalQueryPreserved':True}
 
 
+def source_state(state,receipt,engine):
+ need(isinstance(state,dict),'actual visible source state missing')
+ N['flags'](state,('visible','attached','topmost','surfaceHeld','tilesHidden'),'source view was hidden, covered or mixed with live tile views')
+ need(state.get('webContentsId')==receipt['webContentsId'] and state.get('navigationEpoch')==receipt['navigationEpoch'] and state.get('url')==receipt['finalURL'] and state.get('organicSignature')==receipt['organicSignature'],'native source frame belongs to another document or organic content')
+ expected={key:receipt[key] for key in ('requestId','engine','engineName','query','page','filter','requestedURL','finalURL','webContentsId','private','preference','navigationEpoch')}
+ expected.update({key:receipt[key] for key in ('project','desk') if key in receipt})
+ need(state.get('source')==expected,'read-only native source handle differs from actual request ownership')
+ N['rect'](state.get('bounds'));window=state.get('window',{});N['flags'](window,('visible','focused'),'source window was not foreground');N['rect'](window.get('contentBounds'))
+ need(window.get('minimized') is False and state['bounds']=={'x':0,'y':0,'width':window['contentBounds']['width'],'height':window['contentBounds']['height']} and finite(state.get('zoom')) and state['zoom']>0,'actual source bounds/zoom missing')
+ snapshot=state.get('snapshot',{});need(snapshot.get('engine')==engine and snapshot.get('documentURL')==receipt['finalURL'] and snapshot.get('documentReadyState') in ('interactive','complete') and snapshot.get('visibilityState')=='visible' and signature(snapshot.get('rows',[]))==receipt['organicSignature'],'visible source DOM does not match extracted organic text')
+
+
+def stable_source(before,after):
+ same_fields(before,after,SOURCE_IDENTITY,'native source changed during actual paint')
+ same_fields(before['snapshot'],after['snapshot'],('viewport',),'native source viewport changed during actual paint')
+
+
+def tile_state(state,entry,selected_ids):
+ need(isinstance(state,dict) and state.get('query')==entry['query'] and state.get('revision')==entry['pages'][0]['result']['revision'] and state.get('active') is True and state.get('blocked') is False,'live tile query/revision or foreground surface differs')
+ window=state.get('window',{});N['flags'](window,('visible','focused'),'tile window was not foreground');content=N['rect'](window.get('contentBounds'));need(window.get('minimized') is False,'tile window was minimized')
+ registry=state.get('registry',{});need(registry.get('active') is True and registry.get('suspended') is False and registry.get('reason')=='' and registry.get('revision')==state['revision'],'actual live tile registry was blocked or stale')
+ results=entry['pages'][0]['result']['results'];registered=registry.get('pages');pages=state.get('pages')
+ count=min(2,len(results));need(count>0 and isinstance(registered,list) and [row.get('id') for row in registered]==[row['id'] for row in results] and isinstance(pages,list) and len(pages)==count,'actual first result registry or live tile subjects missing')
+ visible=[row for row in registered if row.get('visible') is True][:count]
+ need(len(visible)==count and [row.get('id') for row in pages]==selected_ids==[row.get('id') for row in visible],'live tile proof skipped or replaced the first visible results')
+ result_by_id={row['id']:row for row in results}
+ for page,record in zip(pages,visible):
+  N['flags'](page,('visible','viewVisible','attached'),'a selected live site was hidden or detached')
+  need(record.get('live') is True and record.get('error')=='' and page.get('error')=='' and type(page.get('loading')) is bool and type(record.get('loading')) is bool,'actual live site has an error or missing load state')
+  need(page.get('resultURL')==result_by_id[page['id']]['url'] and page.get('recordURL')==page.get('url')==page.get('document',{}).get('url'),'tile URL lost its original organic result or actual redirect ownership')
+  web_url(page.get('url'));need(positive(page.get('webContentsId')) and type(page.get('navigationEpoch')) is int and page['navigationEpoch']>=0 and finite(page.get('zoom')) and page['zoom']>0,'actual site WebContents identity/zoom missing')
+  need(all(page.get(key)==record.get(key) for key in ('id','url','webContentsId','navigationEpoch','bounds')),'live site differs from its native registry')
+  bounds=N['rect'](page.get('bounds'));need(bounds['width']>0 and bounds['height']>0 and bounds['x']>=0 and bounds['y']>=0 and bounds['x']+bounds['width']<=content['width'] and bounds['y']+bounds['height']<=content['height'],'live tile bounds leave the visible native window')
+  doc=page.get('document');need(isinstance(doc,dict) and doc.get('readyState') in ('interactive','complete') and doc.get('visibilityState')=='visible' and finite(doc.get('timeOrigin')) and doc['timeOrigin']>0,'live site document has not become visible/interactive')
+  text=doc.get('bodyText');need(isinstance(doc.get('title'),str) and isinstance(text,str) and 80<=jslen(text)<=2000 and type(doc.get('bodyTextLength')) is int and doc['bodyTextLength']>=jslen(text),'live site document has no substantive actual body text')
+  viewport=doc.get('viewport',{});need(positive(viewport.get('width')) and positive(viewport.get('height')),'live site viewport missing')
+  need(any(term in (doc['title']+'\n'+text).lower() for term in entry['expectedTopic']),'actual visible tile document does not cover the owner topic')
+  navigation=page.get('navigation');need(isinstance(navigation,list) and 2<=len(navigation)<=100 and any(row.get('event')=='start' and row.get('url')==page['resultURL'] for row in navigation) and any(row.get('event')=='commit' and row.get('url')==page['url'] for row in navigation),'actual tile navigation does not bind the organic URL to the current document')
+  need(all(row.get('event') in ('start','redirect','commit','dom-ready','failed') and isinstance(row.get('url'),str) and finite(row.get('at')) for row in navigation),'actual tile navigation ledger malformed')
+
+
+def stable_tiles(before,after):
+ same_fields(before,after,('query','revision','active','blocked','window'),'tile query/window changed during actual paint')
+ need(1<=len(before['pages'])==len(after['pages'])<=2,'tile subjects changed during actual paint')
+ for first,last in zip(before['pages'],after['pages']):
+  same_fields(first,last,TILE_IDENTITY,'live tile identity, navigation or bounds changed during actual paint')
+  same_fields(first['document'],last['document'],('url','timeOrigin','viewport'),'live tile document changed during actual paint')
+
+
 def verify(read,*,expected_platform=None,expected_arch=None,owner=None):
  evidence=N['Evidence'](read);raw,facts=evidence.json(NAME)
  if owner is None:_,owner=evidence.json('mouse-635-owner-feedback.json')
@@ -339,7 +468,7 @@ def verify(read,*,expected_platform=None,expected_arch=None,owner=None):
     actual=reply_proof(extra.get('result',{}),receipts[extra['requestId']],query,engine,extra['requestId'],topic,extra['page'],previous)
     need(extra.get('proof')==actual,'additional page proof differs');previous.extend(row['url'] for row in extra['result'].get('results',[]))
  need(used==set(receipts),'unclaimed or unrelated native source receipt')
- captures=facts.get('nativeCaptures');need(isinstance(captures,list) and [row.get('filename') for row in captures]==CAPTURES,'real engine chooser, source and tile OS frames missing')
+ captures=facts.get('nativeCaptures');need(isinstance(captures,list) and 3<=len(captures)<=41 and facts.get('canonicalCaptures')==CAPTURES and captures[0].get('filename')==CAPTURES[0] and len({row.get('filename') for row in captures})==len(captures),'real engine chooser, source and tile OS frames missing')
  for frame in captures:
   need(frame in owner.get('captures',[]),'actual search frame missing from owner ledger');evidence.screen(frame);inputs[frame['filename']]=frame['sha256'];inputs[frame['displayFilename']]=frame['displaySha256']
  menu=preference.get('menu',{});before_menu,after_menu=menu.get('before',{}),menu.get('after',{})
@@ -359,17 +488,12 @@ def verify(read,*,expected_platform=None,expected_arch=None,owner=None):
  need(facts.get('liveTopicalCapabilityVerified') is True and facts.get('ownerQueryCovered') is True and facts.get('verifiedEngines')==[engine] and facts.get('blockers')==[] and all(entry['ownerTopicCovered'] for entry in cases) and LIVE_MARKER in log.decode().splitlines() and UNVERIFIED_MARKER not in log.decode().splitlines(),'live selected-engine topical capability is unverified; publication remains blocked')
  owner_case=cases[0];frame=owner_case.get('sourceFrame',{});request=owner_case['pages'][0]['requestId'];receipt=receipts[request]
  need(frame.get('available') is True and frame.get('requestId')==request and frame.get('sourceFile')==next(row['filename'] for row in sources if row['requestId']==request),'OS source frame is not the queried native document')
- before,after=frame.get('before',{}),frame.get('after',{})
- for state in (before,after):
-  N['flags'](state,('visible','attached','topmost','surfaceHeld','tilesHidden'),'source view was hidden, covered or mixed with live tile views')
-  need(state.get('webContentsId')==receipt['webContentsId'] and state.get('navigationEpoch')==receipt['navigationEpoch'] and state.get('url')==receipt['finalURL'] and state.get('organicSignature')==receipt['organicSignature'],'native source frame belongs to another document or organic content')
-  expected={key:receipt[key] for key in ('requestId','engine','engineName','query','page','filter','requestedURL','finalURL','webContentsId','private','preference','navigationEpoch')}
-  expected.update({key:receipt[key] for key in ('project','desk') if key in receipt})
-  need(state.get('source')==expected,'read-only native source handle differs from actual request ownership')
-  N['rect'](state.get('bounds'));window=state.get('window',{});N['flags'](window,('visible','focused'),'source window was not foreground');need(window.get('minimized') is False and window.get('contentBounds')==captures[1]['contentBounds'],'actual source window geometry differs from OS frame')
-  need(state['bounds']=={'x':0,'y':0,'width':window['contentBounds']['width'],'height':window['contentBounds']['height']} and finite(state.get('zoom')) and state['zoom']>0,'actual source bounds/zoom missing')
-  snapshot=state.get('snapshot',{});need(snapshot.get('engine')==engine and snapshot.get('documentURL')==receipt['finalURL'] and snapshot.get('visibilityState')=='visible' and signature(snapshot.get('rows',[]))==receipt['organicSignature'],'visible source DOM does not match extracted organic text')
- for key in ('source','navigationEpoch','webContentsId','url','bounds','zoom','visible','attached','topmost','surfaceHeld','tilesHidden','window','organicSignature'):need(before.get(key)==after.get(key),'native source changed during OS acquisition: '+key)
+ source_captures=paint_evidence(evidence,frame,'source',lambda state:source_state(state,receipt,engine),stable_source,inputs)
  need(frame.get('restored')=={'attached':False,'visible':False,'query':CASES[0][1],'active':True,'surfaceHoldRestored':True},'native source proof did not restore ordinary tile presentation')
  restored_ui=owner_case.get('uiAfterSource',{});need(restored_ui.get('query')==CASES[0][1] and [(row.get('id'),row.get('title'),row.get('source')) for row in restored_ui.get('cards',[])]==[(row['id'],row['title'],row['source']) for row in owner_case['ui']['cards']],'restored tile feed changed its original organic order')
- return {'ok':True,'version':'6.0.35','platform':platform,'arch':arch,'pid':pid,'reportSha256':sha(raw),'contract':CONTRACT,'ownerTopicCovered':True,'liveTopicalCapabilityVerified':True,'verifiedEngines':[engine],'resultCounts':counts,'originalResultOrderPreserved':True,'nativeCaptures':CAPTURES,'inputs':inputs,'physicalUserDeviceVerified':False}
+ tile=owner_case.get('tileFrame');need(isinstance(tile,dict) and isinstance(tile.get('selectedIds'),list) and len(tile['selectedIds'])==len(set(tile['selectedIds']))==min(2,len(owner_case['pages'][0]['result']['results'])),'actual live sites paint receipt missing')
+ ready=tile.get('readiness');interval(ready,15000,'live site readiness');tile_state(ready.get('lastState'),owner_case,tile['selectedIds'])
+ tile_captures=paint_evidence(evidence,tile,'tiles',lambda state:tile_state(state,owner_case,tile['selectedIds']),stable_tiles,inputs);stable_tiles(ready['lastState'],tile['before'])
+ need(owner_case['pages'][0]['completedAt']<=frame['paint']['startedAt']<=frame['paint']['finishedAt']<=ready['startedAt']<=ready['finishedAt']<=tile['paint']['startedAt']<=tile['paint']['finishedAt']<=owner_case['cleanupStartedAt'],'source/tile readback occurred outside the actual live query lifetime')
+ need(captures==[captures[0],*source_captures,*tile_captures],'actual OS attempt ledger was reordered, omitted or substituted')
+ return {'ok':True,'version':'6.0.35','platform':platform,'arch':arch,'pid':pid,'reportSha256':sha(raw),'contract':CONTRACT,'ownerTopicCovered':True,'liveTopicalCapabilityVerified':True,'verifiedEngines':[engine],'resultCounts':counts,'originalResultOrderPreserved':True,'sourcePaintVerified':True,'liveTilePaintVerified':True,'liveTileIds':tile['selectedIds'],'nativeCaptures':[row['filename'] for row in captures],'canonicalCaptures':list(CAPTURES),'inputs':inputs,'physicalUserDeviceVerified':False}

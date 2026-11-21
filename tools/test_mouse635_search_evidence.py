@@ -37,7 +37,7 @@ def fixture(platform='win32',owners=None,original_native=None):
  decorate(facts)
  facts['stages']=[{'name':name,'elapsedMs':(i+1)*900} for i,name in enumerate(S['STAGES'])]
  facts['inputs']=[row for row in facts['inputs'] if row['selector']!='.mouse-search-vision-toggle']
- for selector in ('#mouse-search-button','.mouse-search-error button','.mouse-search-error button','.mouse-search-back'):
+ for selector in ('#mouse-search-button','.mouse-search-retry','.mouse-search-retry','.mouse-search-back'):
   event=copy.deepcopy(next(row for row in facts['inputs'] if row['selector']=='#mouse-search-button'));event['selector']=selector;facts['inputs'].append(event)
  for number,model in enumerate(facts['models']):
   prompt=model['payload']['messages'][-1]['content'].split('\nТЕКУЩАЯ СТРУКТУРА СТРАНИЦЫ')[0].replace('Describe only the explicitly shared selected page','Compare the selected site using only search metadata');model['payload']['messages'][-1]['content']=prompt
@@ -65,6 +65,12 @@ def fixture(platform='win32',owners=None,original_native=None):
 
 class SearchEvidence635(unittest.TestCase):
  def setUp(self):self.files,self.facts,self.refresh=fixture()
+ def test_retry_requires_the_actual_specific_button_and_not_an_ambiguous_error_action(self):
+  self.verify()
+  for row in self.facts['inputs']:
+   if row['selector']=='.mouse-search-retry':row['selector']='.mouse-search-error button'
+  self.reject()
+
  def verify(self):
   self.refresh();return S['verify'](S['N']['Evidence'](self.files.__getitem__),self.facts,self.facts['platform'],self.facts['arch'],self.facts['pid'],self.facts['original']['before']['identities'])
  def reject(self):

@@ -16,8 +16,10 @@ D=runpy.run_path(str(HERE/'test_mouse635_pane_layout_evidence.py'))
 encode=L['encode'];sha=L['sha']
 
 
-def fixture(platform='linux',arch='x64'):
- library=L['fixture']();public=P['fixture'](platform,arch);agent=A['fixture'](platform,arch);panes=D['fixture'](platform,arch);native=library['owner']['nativeInputs']+public['owner']['nativeInputs']+agent['owner']['nativeInputs']+panes['owner']['nativeInputs']
+def fixture(platform='linux',arch='x64',paint_retry=False):
+ library=L['fixture']();public=P['fixture'](platform,arch);agent=A['fixture'](platform,arch);panes=D['fixture'](platform,arch)
+ if paint_retry:P['reject_then_accept'](public);P['reject_then_accept'](public,'tiles')
+ native=library['owner']['nativeInputs']+public['owner']['nativeInputs']+agent['owner']['nativeInputs']+panes['owner']['nativeInputs']
  for i in range(9):native.append({'selector':'#library-'+('list' if i%2 else 'grid'),'source':'XTest','point':{'x':12,'y':24},'at':i+1,'navigates':False,'events':[{'type':'click','trusted':True,'matches':True}]})
  for row in native:row['source']={'linux':'XTest','win32':'User32','darwin':'CGEvent'}[platform]
  facts={'schema':1,'version':'6.0.35','platform':platform,'arch':arch,'pid':80,'budgetMs':240000,'elapsedMs':30000,'ok':True,'packaged':True,'profileIsolated':True,'restored':True,'stage':'complete','source':'Installed Electron production public-search IPC and owned local file updates with actual native input','physicalUserDeviceVerified':False,'cleanup':{'restored':True,'desktopStateRestored':True,'ownedPagesClosed':0,'originalPagesPreserved':1},'nativeInputs':native,'captures':library['facts']['captures']}
@@ -60,6 +62,14 @@ class Owner635(unittest.TestCase):
   for mutate in [lambda f:f.__setitem__('elapsedMs',240001),lambda f:f.__setitem__('cleanupErrors',['error']),lambda f:f['cleanup'].__setitem__('restored',False),lambda f:f['captures'].append({'filename':'unexpected.png'}),lambda f:f.__setitem__('physicalUserDeviceVerified',True)]:
    raw,facts,wrapper=fixture();mutate(facts)
    with self.assertRaises(ValueError):C['verify'](repack(raw,facts,wrapper).__getitem__)
+ def test_rejected_search_frames_remain_in_owner_ledger_with_seventeen_canonical_frames(self):
+  raw,facts,wrapper=fixture('darwin','arm64',paint_retry=True);result=C['verify'](raw.__getitem__)
+  self.assertEqual(len(result['nativeCaptures']),19);self.assertEqual(len(result['canonicalCaptures']),17);self.assertEqual(len(result['publicSearch']['nativeCaptures']),5);self.assertEqual([row['filename'] if isinstance(row,dict) else row for row in result['nativeCaptures']],[row['filename'] for row in facts['captures']]);self.assertEqual(result['canonicalCaptures'],[row['filename'] for row in facts['captures'] if '-attempt-' not in row['filename']]);self.assertTrue(result['publicSearch']['sourcePaintVerified']);self.assertTrue(result['publicSearch']['liveTilePaintVerified'])
+  rejected=next(index for index,row in enumerate(facts['captures']) if '-attempt-' in row['filename']);facts['captures'].pop(rejected)
+  with self.assertRaisesRegex(ValueError,'ledger'):C['verify'](repack(raw,facts,wrapper).__getitem__)
+ def test_refreshed_child_hash_does_not_bypass_independent_guest_pixel_gate(self):
+  raw,facts,wrapper=fixture();public=json.loads(raw[P['C']['NAME']]);public['cases'][0]['sourceFrame'].pop('paint');raw[P['C']['NAME']]=encode(public);facts['publicSearch']={**public,'reportFile':P['C']['NAME'],'reportSha256':sha(raw[P['C']['NAME']])}
+  with self.assertRaisesRegex(ValueError,'actual paint'):C['verify'](repack(raw,facts,wrapper).__getitem__)
  def test_composition_requires_retained_and_current_process(self):
   module=runpy.run_path(str(HERE/'mouse635-feedback-evidence.py'));calls=[];scope=module['verify'].__globals__
   def retained(read,**kwargs):calls.append('retained');return{'platform':'linux','arch':'x64','inputs':{'old.json':'a'}}
