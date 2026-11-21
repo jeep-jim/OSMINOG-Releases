@@ -705,11 +705,11 @@
     "sha256": "b594235d30c8578e7333062d054fefdea3b3eacb15ba14415b92bb95c26d5401",
     "dependencies": {
       "mouse635-native-evidence.py": "79cbd8bf2d1774cc2b5b7076c0c32d8b9fda793c720e865a5c53dbf66364d6dc",
-      "mouse635-library-evidence.py": "c951312e014024b17eefb74272fe2e98fb5c0d74775e680287f9282f424ac2f6",
+      "mouse635-library-evidence.py": "8e54690e48746c680f1e16d6784dacc49bdb1f133a2a16a803301f6fc728d6e3",
       "mouse635-public-search-evidence.py": "26e0798b6ef9e846e151a5efd3b731fd8053b53c9697e7279be1e69d6326c68f",
       "mouse635-reuse.py": "b20717bb29488b2061a4469728055e3669c7369af12a3b2d6f40008c9d253193",
       "mouse635-agent-chat-evidence.py": "e84ea9f43eea6aa0624d4c8bbd9cbbe0b2e026d8d398d8ed1fe48f2db9fc9af5",
-      "mouse635-pane-layout-evidence.py": "7a2019f3a7808bec445a5c8648c73e6bc075855a734baeecfb86e2945ceffd90",
+      "mouse635-pane-layout-evidence.py": "951c22baa677075444c5b80387b40e05b96410bd7cd49aac92416273584d8ca4",
       "mouse635-context-evidence.py": "6347ec72bacfc57bfbf3236fa3b5fbc2ed1995b1d6892e082b7a27383008bfaa"
     }
   },
@@ -768,7 +768,13 @@
     "fixtureOnly": true,
     "realTransfer": false,
     "defaultAutoCollection": false,
-    "sha256": "c951312e014024b17eefb74272fe2e98fb5c0d74775e680287f9282f424ac2f6"
+    "sha256": "8e54690e48746c680f1e16d6784dacc49bdb1f133a2a16a803301f6fc728d6e3",
+    "controlledDelayedPreviewScenes": 4,
+    "placeholderRowsPerScene": 14,
+    "placeholderGeometryToleranceCSSPixels": 1,
+    "placeholderListImageHeight": 30,
+    "placeholderGridImageHeight": 112,
+    "actualDelayedArchiveRequestSequenceBinding": true
   },
   "x-agentChatGate": {
     "validator": "tools/mouse635-agent-chat-evidence.py",
@@ -832,13 +838,26 @@
     "privateIsolation": true,
     "livePagePreserved": true,
     "nativeCaptures": 2,
-    "sha256": "7a2019f3a7808bec445a5c8648c73e6bc075855a734baeecfb86e2945ceffd90",
+    "sha256": "951c22baa677075444c5b80387b40e05b96410bd7cd49aac92416273584d8ca4",
     "rawMenuSnapshots": 5,
     "rawLiveGuests": 2,
     "rawNativeBoundsPreserved": true,
     "rawSavedTreeAndSlotsRehydrated": true,
     "rawIPCRejections": 5,
     "rawRendererAndCommittedLayouts": true,
-    "rawPrivatePinOwnership": true
+    "rawPrivatePinOwnership": true,
+    "rawNativeDividerPointer": true,
+    "rawTrustedResizeKeys": [
+      "RIGHT",
+      "LEFT",
+      "RIGHT"
+    ],
+    "observedResizeRatios": [
+      0.5,
+      0.53,
+      0.5,
+      0.53
+    ],
+    "focusedDividerAfterEachRebuild": true
   }
 }

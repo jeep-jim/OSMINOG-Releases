@@ -40,6 +40,19 @@ def fixture():
   name='mouse-635-library-file-'+suffix+'.png';images[name]=raw;files[field]={'filename':name,'source':'fs.readFile of owned installed-app fixture','bytes':len(raw),'sha256':sha(raw),'pixelSize':{'width':160,'height':96}}
  timestamp=1795248000000
  facts={'schema':1,'version':'6.0.35','platform':'linux','arch':'x64','pid':80,'ok':True,'completed':True,'restored':True,'packaged':True,'profileIsolated':True,'fixtureOnly':True,'realTransfer':False,'scenario':'installed-library-stability','startedAt':'2026-11-21T08:00:00.000Z','finishedAt':'2026-11-21T08:00:20.000Z','autoCollection':{'before':False,'after':False,'clipboardReadsBefore':0,'clipboardReadsAfter':0},'owned':{'downloadIds':downloads,'captureIds':copies,'activeId':'active','fileHashes':[{'id':identifier,'filename':'image-'+str(i)+'.png','sha256':sha(before)} for i,identifier in enumerate(downloads)]},'phases':phases,'captures':captures,'files':files,'previews':{'firstPreview':{'title':'Mouse635 image 8','src':uri(before)},'latest':{'title':'Mouse635 image 7','src':uri(after)},'staleClosed':{'open':False,'kind':'downloads'},'realArchiveReads':True},'previewRequests':[{'sequence':i+1,'id':copies[8],'startedAt':timestamp+10+i*100,'finishedAt':timestamp+90+i*100,'controlledDelay':True,'type':'image'} for i in range(3)],'notifications':[]}
+ requests=[];facts['placeholderGeometryChecks']=[]
+ def held(identifier):
+  sequence=len(requests)+1;requests.append({'sequence':sequence,'id':identifier,'startedAt':timestamp+sequence*100,'finishedAt':timestamp+sequence*100+80,'controlledDelay':True,'type':'image'});return sequence
+ for phase in phases:
+  if phase['kind']!='captures': continue
+  height=30 if phase['view']=='list' else 112;width=30 if phase['view']=='list' else 150
+  rows=[{'id':identifier,'row':{'x':0,'y':i*200,'width':190,'height':180},'image':{'x':5,'y':i*200+30,'width':width,'height':height},'checkbox':{'x':170,'y':i*200+8,'width':16,'height':16},'thumbnail':False,'decoded':False} for i,identifier in enumerate(copies[:14])]
+  old={'kind':'captures','view':phase['view'],'scrollTop':400,'rows':rows};current=copy.deepcopy(old);delayed=[copies[7],copies[8]]
+  for row in current['rows']:
+   if row['id'] in delayed: row.update(thumbnail=True,decoded=True)
+  receipt={'controlledDelay':True,'before':old,'after':current,'delayedIds':delayed,'requestSequences':[held(identifier) for identifier in delayed]};phase['placeholderGeometry']=receipt;facts['placeholderGeometryChecks'].append({'theme':phase['theme'],**receipt})
+ for _ in range(3): held(copies[8])
+ facts['previewRequests']=requests
  for reason,count in [('other-kind download progress',24),('same-kind download progress',24),('actual owned image bytes replaced',1),('actual owned download file removed',1),('download update while explicit capture preview pending',1)]: facts['notifications'].extend({'reason':reason,'at':timestamp+100+i} for i in range(count))
  native=[]
  for identifier,suffix,count in [(downloads[5],'check',5),(copies[8],'check',4),(copies[8],'name',3),(copies[7],'name',1)]:
@@ -56,9 +69,9 @@ class LibraryEvidence(unittest.TestCase):
  def verify(self,value):
   raw,owner=packed(value);return C['verify'](raw.__getitem__,expected_platform='linux',expected_arch='x64',owner=owner)
  def test_complete_byte_bound_library_fixture(self):
-  result=self.verify(fixture());self.assertTrue(result['ok']);self.assertEqual(result['phases'],8);self.assertEqual(len(result['nativeCaptures']),8)
+  result=self.verify(fixture());self.assertTrue(result['ok']);self.assertEqual(result['phases'],8);self.assertEqual(result['placeholderGeometryScenes'],4);self.assertEqual(len(result['nativeCaptures']),8)
  def test_rejects_recreated_nodes_focus_selection_and_thumbnail(self):
-  for field,value in [('sameRow',False),('sameImage',False),('sameCheckbox',False),('sameFocus',False),('focusedCheckbox',False),('selected',False),('sameSource',False),('removed',1),('sourceWrites',1),('scrollTop',404),('rowTop',104),('order',['foreign']),('kind','captures'),('view','grid'),('theme','dark')]:
+  for field,value in [('sameRow',False),('sameImage',False),('sameCheckbox',False),('sameFocus',False),('focusedCheckbox',False),('selected',False),('sameSource',False),('thumbnail',False),('removed',1),('sourceWrites',1),('scrollTop',404),('rowTop',104),('order',['foreign']),('kind','captures'),('view','grid'),('theme','dark')]:
    with self.subTest(field=field):
     data=fixture();data['facts']['phases'][0]['after'][field]=value
     with self.assertRaises(ValueError): self.verify(data)
@@ -68,6 +81,28 @@ class LibraryEvidence(unittest.TestCase):
    with self.subTest(index=index):
     data=fixture();mutate(data['facts'])
     with self.assertRaises(ValueError): self.verify(data)
+ def test_real_preview_completion_cannot_move_controls_or_use_file_icons(self):
+  for box in ('row','image','checkbox'):
+   for axis in ('x','y','width','height'):
+    with self.subTest(box=box,axis=axis):
+     data=fixture();receipt=data['facts']['phases'][2]['placeholderGeometry'];receipt['after']['rows'][7][box][axis]+=2
+     with self.assertRaisesRegex(ValueError,'moved a row, image or checkbox'): self.verify(data)
+  changes=[lambda r:r['after'].__setitem__('scrollTop',402),lambda r:r['before']['rows'][7].__setitem__('thumbnail',True),lambda r:r['after']['rows'][7].__setitem__('decoded',False),lambda r:r['after']['rows'][7].__setitem__('thumbnail',False),lambda r:r['before']['rows'][0]['image'].__setitem__('width',0),lambda r:r['before']['rows'][0]['row'].__setitem__('x',float('nan'))]
+  for change in changes:
+   data=fixture();change(data['facts']['phases'][2]['placeholderGeometry'])
+   with self.assertRaises(ValueError): self.verify(data)
+  data=fixture();receipt=data['facts']['phases'][3]['placeholderGeometry']
+  for sample in ('before','after'):
+   for row in receipt[sample]['rows']: row['image']['height']=36
+  with self.assertRaisesRegex(ValueError,'reserve its actual'): self.verify(data)
+ def test_placeholder_proof_requires_every_scene_and_the_actual_held_reads(self):
+  mutations=[lambda f:f['phases'][2].pop('placeholderGeometry'),lambda f:f['placeholderGeometryChecks'].pop(),lambda f:f['phases'][2]['placeholderGeometry'].__setitem__('delayedIds',[]),lambda f:f['phases'][2]['placeholderGeometry']['requestSequences'].__setitem__(0,1000),lambda f:f['phases'][2]['placeholderGeometry']['after']['rows'].reverse(),lambda f:f['previewRequests'][0].__setitem__('controlledDelay',False),lambda f:f['previewRequests'][0].__setitem__('id','copy-6'),lambda f:f['previewRequests'][-1].__setitem__('id','copy-7')]
+  for index,mutate in enumerate(mutations):
+   with self.subTest(index=index):
+    data=fixture();mutate(data['facts'])
+    with self.assertRaises(ValueError): self.verify(data)
+  data=fixture();earlier=data['facts']['phases'][2]['placeholderGeometry'];later=data['facts']['phases'][3]['placeholderGeometry'];later['requestSequences'][:]=earlier['requestSequences']
+  with self.assertRaisesRegex(ValueError,'reused'): self.verify(data)
  def test_real_changed_and_deleted_files_cannot_be_replaced_by_boolean_claims(self):
   for key,value in [('replacementSha256','f'*64),('missingOnDisk',False),('entryRetained',False),('missingOpenError','Opened successfully')]:
    with self.subTest(field=key):

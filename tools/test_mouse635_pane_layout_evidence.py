@@ -60,6 +60,17 @@ def fixture(platform='linux', arch='x64'):
     native = [{'selector': '#layout-menu-button', 'source': {'linux': 'XTest', 'win32': 'User32', 'darwin': 'CGEvent'}[platform],
                'point': {'x': 50, 'y': 650}, 'at': 1234, 'navigates': False,
                'events': [{'type': 'click', 'trusted': True, 'matches': True}]}]
+    pointer = {'selector': C['DIVIDER'], 'source': native[0]['source'], 'point': {'x': 400, 'y': 300},
+               'at': 1350, 'navigates': False, 'events': [{'type': 'click', 'trusted': True, 'matches': True}]}
+    native.append(pointer); facts['resizePointer'] = pointer
+    state = lambda ratio: {'ratio': ratio, 'focused': True, 'activeElement': {'tag': 'DIV', 'id': '', 'path': ''},
+                           'locked': False, 'dragging': False}
+    facts['resizeAfterClick'] = state(.5); facts['resizeInputs'] = []
+    for index, key, old, new in [(0, 'RIGHT', .5, .53), (1, 'LEFT', .53, .5), (2, 'RIGHT', .5, .53)]:
+        facts['resizeInputs'].append({'key': key, 'source': native[0]['source'], 'before': state(old), 'after': state(new),
+                                      'events': [{'type': 'keydown', 'key': 'ArrowRight' if key == 'RIGHT' else 'ArrowLeft',
+                                                  'trusted': True, 'matches': True, 'selector': C['DIVIDER'],
+                                                  'target': 'DIV', 'at': 1360 + index * 10}]})
     raw['mouse-635-owner-feedback.log'] = (C['MARKER'] + '\n').encode()
     return {'raw': raw, 'owner': {'pid': 80, 'platform': platform, 'arch': arch, 'budgetMs': 240000,
                                 'panes': facts, 'nativeInputs': native, 'captures': captures}}
@@ -101,6 +112,23 @@ class PaneLayoutEvidence(unittest.TestCase):
                        lambda p: p['menuSnapshots'][0]['items'][1].update(checked=False),
                        lambda p: p['menuSnapshots'][4]['items'][1].update(enabled=True),
                        lambda p: p['guardResults'][0].update(rejected=False)]:
+            value = fixture(); mutate(value['owner']['panes'])
+            with self.assertRaises(ValueError): self.verify(value)
+
+    def test_custom_resize_requires_trusted_keys_and_focus_after_every_rebuild(self):
+        for mutate in [lambda p: p.pop('resizePointer'),
+                       lambda p: p['resizeAfterClick'].update(focused=False),
+                       lambda p: p['resizeInputs'].pop(),
+                       lambda p: p['resizeInputs'][0].update(source='synthetic'),
+                       lambda p: p['resizeInputs'][1].update(key='RIGHT'),
+                       lambda p: p['resizeInputs'][0]['events'][0].update(trusted=False),
+                       lambda p: p['resizeInputs'][0]['events'][0].update(matches=False),
+                       lambda p: p['resizeInputs'][0]['events'][0].update(key='ArrowLeft'),
+                       lambda p: p['resizeInputs'][0]['events'][0].update(target='BODY'),
+                       lambda p: p['resizeInputs'][0]['after'].update(focused=False),
+                       lambda p: p['resizeInputs'][1]['before'].update(ratio=.5),
+                       lambda p: p['resizeInputs'][2]['after'].update(locked=True),
+                       lambda p: p['resizeInputs'][2]['after'].update(dragging=True)]:
             value = fixture(); mutate(value['owner']['panes'])
             with self.assertRaises(ValueError): self.verify(value)
 

@@ -12,6 +12,14 @@ SOURCE = 'Installed native Electron Menu, live pane identities and explicit pin 
 CAPTURES = ['mouse-635-layout-native-menu.png', 'mouse-635-pane-pinned.png']
 GUARDS = ('close', 'replace', 'split', 'resize', 'preset', 'drag', 'transfer')
 GRID = ['mouse-context-layout-' + value for value in ('1', '2-x', '2-y', '3', '4', '6', '8', '9', '12')]
+DIVIDER = '.divider[data-path=""]'
+
+
+def resize_state(state, ratio):
+    need(isinstance(state, dict) and N['finite'](state.get('ratio')) and abs(state['ratio'] - ratio) < .0001
+         and state.get('focused') is True and state.get('activeElement') == {'tag': 'DIV', 'id': '', 'path': ''}
+         and state.get('locked') is False and state.get('dragging') is False,
+         'native keyboard resize lost divider focus, geometry or unlocked state')
 
 
 def pin_path(tree, pane):
@@ -54,6 +62,27 @@ def verify(read, *, owner):
     need(initial['tree'] == {'axis': 'x', 'ratio': .5, 'a': {'id': 'p1'}, 'b': {'id': 'p2'}}
          and pinned['tree'].get('axis') == 'x' and abs(pinned['tree'].get('ratio', 0) - .53) < .0001,
          'native default and custom geometry were not actually exercised')
+    pointer = facts.get('resizePointer')
+    need(isinstance(pointer, dict) and pointer in owner.get('nativeInputs', []),
+         'divider focus was not acquired through the recorded native pointer')
+    N['input_event'](pointer, owner['platform'], DIVIDER)
+    resize_state(facts.get('resizeAfterClick'), .5)
+    inputs = facts.get('resizeInputs')
+    need(isinstance(inputs, list) and len(inputs) == 3, 'native repeated keyboard resize receipts missing')
+    previous = facts['resizeAfterClick']
+    for row, key, before_ratio, after_ratio in zip(inputs, ('RIGHT', 'LEFT', 'RIGHT'), (.5, .53, .5), (.53, .5, .53)):
+        need(isinstance(row, dict) and row.get('key') == key and row.get('source') == N['source'](owner['platform'])
+             and row.get('before') == previous, 'keyboard resize source, key order or focus continuity differs')
+        resize_state(row.get('before'), before_ratio); resize_state(row.get('after'), after_ratio)
+        events = row.get('events')
+        need(isinstance(events, list) and 0 < len(events) <= 300
+             and any(isinstance(event, dict) and event.get('type') == 'keydown'
+                     and event.get('key') == ('ArrowRight' if key == 'RIGHT' else 'ArrowLeft')
+                     and event.get('trusted') is True and event.get('matches') is True
+                     and event.get('selector') == DIVIDER and event.get('target') == 'DIV'
+                     and N['finite'](event.get('at')) for event in events),
+             'custom geometry lacks the actual trusted focused-divider keydown')
+        previous = row['after']
     need(initial['slots'] == pinned['slots'] == {'p1': before[0]['id'], 'p2': before[1]['id']}
          and split['slots'].get('p2') == before[1]['id'] and pin_path(pinned['tree'], 'p2') == pin_path(split['tree'], 'p2'),
          'free-sibling edit changed the pinned tab or ancestor geometry')
@@ -121,6 +150,7 @@ def verify(read, *, owner):
         evidence.screen(frames[0])
     log = read('mouse-635-owner-feedback.log')
     need(isinstance(log, bytes) and MARKER in log.decode('utf-8').splitlines(), 'native pinned-pane process marker missing')
-    return {'ok': True, 'nativeLayoutMenu': True, 'explicitPinAndUnpin': True, 'guards': list(GUARDS),
+    return {'ok': True, 'nativeLayoutMenu': True, 'nativeKeyboardResizeWithRetainedFocus': True,
+            'explicitPinAndUnpin': True, 'guards': list(GUARDS),
             'desktopAndPrivateIsolation': True, 'nativeCaptures': list(evidence.receipts.values()),
             'inputs': {name: N['sha'](read(name)) for name in [*CAPTURES, *[name[:-4] + '-display.png' for name in CAPTURES]]}}
