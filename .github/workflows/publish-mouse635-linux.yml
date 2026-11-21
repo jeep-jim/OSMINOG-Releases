@@ -1,0 +1,102 @@
+name: Publish verified Mouse Browser 6.0.35 Linux x64
+on:
+  pull_request:
+    paths: ['.gitattributes','tools/mouse635-*.py','tools/test_mouse635_*.py','tools/test-mouse635-*.py','.github/workflows/publish-mouse635-linux.yml','staging/mouse/6.0.35-linux-x64/**']
+  push:
+    branches: [main]
+    paths: ['staging/mouse/6.0.35-linux-x64/PUBLISH_OWNER', '.github/workflows/publish-mouse635-linux.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - name: Verify current635 frozen reuse and native predicates
+        run: python3 tools/test_mouse635_reuse.py -v
+      - name: Verify Linux publication and actual634 baseline contracts
+        run: python3 tools/test_mouse635_linux_release.py -v
+      - name: Verify real Linux installation evidence contracts
+        run: python3 tools/test_mouse635_linux_evidence.py -v
+      - name: Verify task and native pixel evidence contracts
+        run: python3 tools/test_mouse635_task_evidence.py -v
+      - name: Verify native settings, Agent, zoom and import witnesses
+        run: python3 tools/test_mouse635_633_owner_evidence.py -v
+      - name: Verify current634 downloads, preview, capture and focused chrome
+        run: python3 tools/test_mouse635_retained_owner_evidence.py -v
+      - name: Verify native context menus and private favorite isolation
+        run: python3 tools/test_mouse635_context_evidence.py -v
+      - name: Verify current owner and retained feedback evidence
+        run: python3 tools/test_mouse635_feedback_evidence.py -v
+      - name: Verify workspace spacing, all corners and native input
+        run: python3 tools/test_mouse635_workspace_evidence.py -v
+      - name: Verify hidden scrollbar input preservation
+        run: python3 tools/test-mouse635-ui-evidence.py -v
+      - run: python3 tools/mouse635-linux-release.py validate-template
+      - name: Verify current635 search UI, request states and metadata privacy
+        run: python3 tools/test_mouse635_search_evidence.py -v
+      - name: Reject empty, irrelevant or fabricated public API results
+        run: python3 tools/test_mouse635_public_search_evidence.py -v
+      - name: Verify stable real file DOM and actual replacement bytes
+        run: python3 tools/test_mouse635_library_evidence.py -v
+      - name: Verify real Agent chat input, conversation and native frames
+        run: python3 tools/test_mouse635_agent_chat_evidence.py -v
+      - name: Verify native layout menu and explicit pinned-pane guards
+        run: python3 tools/test_mouse635_pane_layout_evidence.py -v
+      - name: Bind the separate installed635 process and all mandatory gates
+        run: python3 tools/test_mouse635_owner_feedback_evidence.py -v
+  publish-linux:
+    if: github.event_name != 'pull_request'
+    needs: contract
+    runs-on: ubuntu-22.04
+    timeout-minutes: 60
+    permissions:
+      contents: write
+    concurrency:
+      group: mouse-linux-x64-release
+      cancel-in-progress: false
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Prepare native Linux desktop dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y xvfb openbox xdotool dbus-x11 pulseaudio libfuse2 libgtk-3-0 libnss3 libxss1 libasound2 libgbm1 libsecret-1-0 libnotify4 libatspi2.0-0 libxtst6 libxext6
+      - name: Import immutable successful Linux CI packages
+        run: python3 tools/mouse635-linux-release.py import
+      - name: Verify exact packages on a fresh Linux desktop
+        env:
+          MOUSE_TEST_BRAVE_SEARCH_API_KEY: ${{ secrets.BRAVE_SEARCH_API_KEY }}
+        run: |
+          # Match the pinned source job's X11 desktop. Dense native capture sizes
+          # and every pixel/input acceptance criterion remain unchanged.
+          dbus-run-session -- xvfb-run -a -s '-screen 0 1600x1100x24' bash -euo pipefail -c '
+            openbox > "$RUNNER_TEMP/mouse635-openbox.log" 2>&1 &
+            pulseaudio --start --exit-idle-time=-1
+            python3 tools/mouse635-linux-release.py verify
+          '
+      - name: Publish and verify both immutable public packages
+        run: python3 tools/mouse635-linux-release.py publish
+      - name: Advance Linux feed and verify anonymous updater downloads
+        run: python3 tools/mouse635-linux-release.py channel
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: mouse635-linux-release-verification-${{ github.run_attempt }}
+          path: |
+            mouse635-linux-release/*.json
+            mouse635-linux-release/*.log
+            mouse635-linux-release/*.png
+            mouse635-linux-release/mouse-linux-appimage/**
+            mouse635-linux-release/SHA256SUMS.txt
+            mouse635-linux-release/RELEASE_NOTES.md
+          retention-days: 14

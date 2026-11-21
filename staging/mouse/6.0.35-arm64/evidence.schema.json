@@ -1,0 +1,844 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Mouse Browser 6.0.35 native evidence bundle",
+  "$comment": "Current635 requires actual installed public API search, stable owned-file libraries and Agent conversation through a separate model worker on source and fresh release runners. The exact original Russian query, any explicitly disclosed MyMemory translation, and provider results are bound to raw Chromium response bytes. Retained634 and633 checks remain mandatory except the owner-requested635 footer/toolbar arrangement. Actual published634 replacement is separate from the frozen629 updater gate. No published artifacts or reports are rewritten.",
+  "type": "object",
+  "required": [
+    "mouse-628-local.json",
+    "mouse-628-progress.json",
+    "mouse-628-borderless.json",
+    "mouse-628-motion.json",
+    "mouse-628-desktop-transition.json",
+    "mouse-629-swipe-tutorial.json",
+    "mouse-628-motion-trace.json",
+    "mouse-629-ui-regressions.json",
+    "mouse-630-feedback-evidence.json",
+    "mouse-630-wheel-pages.json",
+    "mouse-630-nora-foreground.json",
+    "mouse-631-native.json",
+    "mouse-631-task.json",
+    "mouse-631-stress.json",
+    "mouse-632-media.json",
+    "mouse-632-footer.json",
+    "mouse-632-documents.json",
+    "mouse-633-owner-feedback.json",
+    "mouse-635-upgrade.json",
+    "mouse-635-upgrade-write.json",
+    "mouse-635-upgrade-read.json",
+    "mouse-633-context-menu.json",
+    "mouse-634-owner-feedback.json",
+    "mouse-634-download-widget.json",
+    "mouse-634-ai-download-widget.json",
+    "mouse-634-focused-chrome.json",
+    "mouse-635-search.json",
+    "mouse-635-owner-feedback.json",
+    "mouse-635-public-search.json",
+    "mouse-635-library.json"
+  ],
+  "x-nativeMarkers": [
+    "MOUSE_628_LOCAL_MCP_NATIVE_PASS",
+    "MOUSE_628_PER_PANE_PROGRESS_NATIVE_PASS",
+    "MOUSE_628_BORDERLESS_NATIVE_PASS",
+    "MOUSE_628_NORA_CONTENT_FIT_NATIVE_PASS",
+    "MOUSE_628_OPEN_NORA_DESKTOP_SLIDE_NATIVE_PASS",
+    "MOUSE_628_BURROW_CONTENT_FIT_CONTROLS_PASS",
+    "MOUSE_628_ACTIVE_TAB_FLOW_BORDERLESS_BOTH_THEMES_PASS",
+    "MOUSE_628_BORDERLESS_UPDATE_BADGE_BOTH_THEMES_PASS",
+    "MOUSE_630_DOWNLOAD_ACTIVITY_PASS",
+    "MOUSE_630_PRIVATE_DOWNLOAD_SCOPE_PASS",
+    "MOUSE_630_CAPTURE_FEEDBACK_PASS",
+    "MOUSE_629_TWO_FINGER_WHEEL_TUTORIAL_WRITE_PASS",
+    "MOUSE_629_TWO_FINGER_WHEEL_TUTORIAL_NATIVE_PASS",
+    "MOUSE_630_NATIVE_WHEEL_DESKTOPS_PASS",
+    "MOUSE_630_PAGE_SCROLL_PRESERVED_PASS",
+    "MOUSE_630_NORA_NATIVE_FOREGROUND_PASS",
+    "MOUSE_629_UI_REGRESSIONS_NATIVE_PASS",
+    "MOUSE_632_DOCUMENTS_VIEW_ONLY_PASS",
+    "MOUSE_632_FOOTER_LAYOUT_BOTH_THEMES_PASS",
+    "MOUSE_632_WEBSITE_OFFER_NEW_TAB_PASS",
+    "MOUSE_632_STATIONARY_MEDIA_PASS",
+    "MOUSE_633_OWNER_FEEDBACK_PASS",
+    "MOUSE_634_REAL_633_TO_634_PROFILE_PASS",
+    "MOUSE_633_NATIVE_CONTEXT_MENU_PASS",
+    "MOUSE_634_OWNER_FEEDBACK_PASS"
+  ],
+  "x-motionTraceGate": {
+    "validator": "tools/mouse628-motion-trace.py",
+    "algorithm": "mouse628-motion-trace-evidence-v2",
+    "maxTraceBytes": 75497472,
+    "inputFiles": [
+      "mouse-628-motion-trace.json",
+      "mouse-628-motion.json"
+    ],
+    "directIdentityLink": false,
+    "attribution": "temporal-correlation",
+    "savedReportAcceptedAsInput": false
+  },
+  "x-feedbackGate": {
+    "validator": "tools/mouse635-evidence.py",
+    "file": "mouse-630-feedback-evidence.json",
+    "runtimeVersion": "6.0.35",
+    "downloads": "actual Electron DownloadItem events",
+    "editorPixels": "BrowserWindow.capturePage",
+    "globalEditorInput": "synthetic fixture",
+    "copyAttempt": {
+      "required": true,
+      "path": "capture.copyAttempt",
+      "source": "one actual copy export and one BrowserWindow.capturePage during the natural CSS visibility plateau",
+      "copyExports": 1,
+      "nativeReadbacks": 1,
+      "barrierReason": "plateau",
+      "maxBarrierSamples": 128,
+      "rendererObservations": [
+        "barrier.before",
+        "after"
+      ],
+      "animation": {
+        "name": "mouse-capture-confirm",
+        "durationMs": 1400,
+        "playState": "running",
+        "currentTimeRangeMsInclusive": [
+          224,
+          1064
+        ],
+        "minimumOpacity": 0.99,
+        "sameRendererTimeOrigin": true,
+        "sameAnimationStartTime": true,
+        "monotonicSampleAndAnimationTimes": true,
+        "replayed": false,
+        "durationModified": false
+      },
+      "mainClock": "performance.now() with recorded mainTimeOrigin",
+      "mainClockOrder": [
+        "copyStartedAt",
+        "copyResolvedAt",
+        "requestedAt",
+        "receivedAt",
+        "afterSampledAt",
+        "encodedAt"
+      ],
+      "rendererAndMainClocksComparedSeparately": true,
+      "beforeFeedbackBoundTo": "capture.copied.feedback",
+      "nativeFrameBoundTo": "capture.copied.frame",
+      "pixelProof": "Exact export result, PNG SHA-256 and capture clocks, unchanged viewport, matching changedRegion and changedPixels, badge-to-bitmap geometry and independently recomputed PNG pixel differences",
+      "savedReportAcceptedAsInput": false
+    },
+    "savedReportAcceptedAsInput": false
+  },
+  "x-noraForegroundGate": {
+    "validator": "tools/mouse635-evidence.py",
+    "file": "mouse-630-nora-foreground.json",
+    "runtimeVersion": "6.0.35",
+    "visibility": "actual native page and clip Views",
+    "pixels": "OS display framebuffer plus exact window crop",
+    "savedReportAcceptedAsInput": false,
+    "fractionalLayout": {
+      "requiredCases": 1,
+      "theme": "light",
+      "panels": 7,
+      "windowWidth": 971,
+      "bounds": "actual native roots versus separately rounded DOM endpoints",
+      "snapshots": "seven decoded PNGs with independently checked bounds and SHA-256",
+      "identity": "same WebContents, URL, epoch, DOM marker, viewport, scroll and native root order before/during/after Nora"
+    },
+    "freshDisplayReadiness": {
+      "scope": "all eight settled-state OS display captures",
+      "timeoutMs": 4000,
+      "maxAttempts": 20,
+      "allRawAttemptFramesRetained": true,
+      "stabilitySnapshotsPerAttempt": 3,
+      "pixelTolerance": 2,
+      "regions": [
+        "Nora title",
+        "Nora actions",
+        "opaque fill",
+        "three original foreground probes"
+      ],
+      "animationReplayed": false
+    }
+  },
+  "x-wheelGate": {
+    "validator": "tools/mouse635-evidence.py",
+    "files": [
+      "mouse-630-wheel-pages.json"
+    ],
+    "runtimeVersion": "6.0.35",
+    "recognizer": "horizontal-wheel-and-desktop-controls",
+    "packetSource": "trusted-wheel",
+    "surfaces": [
+      "page",
+      "control"
+    ],
+    "input": "native mouseWheel injection and trusted DOM events",
+    "horizontalThreshold": 112,
+    "controlThreshold": 64,
+    "quietMs": 280,
+    "cooldownMs": 420,
+    "pageScrollOwnershipPreserved": true,
+    "normalPrivateSessionsIsolated": true,
+    "physicalTwoFingerHardwareVerified": false,
+    "savedReportAcceptedAsInput": false
+  },
+  "x-motionMediaGate": {
+    "validator": "tools/mouse635-evidence.py",
+    "normal": false,
+    "requiresRestoredOriginalQuery": true,
+    "scopes": [
+      "Nora foreground",
+      "main capture editor",
+      "global capture editor"
+    ],
+    "reducedMotionExportRequiredInBothEditors": true,
+    "productOrOSPreferencesModified": false
+  },
+  "x-runtimeVersions": {
+    "mouse-628-local.json": "6.0.35",
+    "mouse-628-progress.json": "6.0.35",
+    "mouse-628-borderless.json": "6.0.28",
+    "mouse-628-motion.json": "6.0.28",
+    "mouse-628-desktop-transition.json": "6.0.28",
+    "mouse-629-swipe-tutorial.json": "6.0.35",
+    "mouse-629-ui-regressions.json": "6.0.35",
+    "mouse-630-feedback-evidence.json": "6.0.35",
+    "mouse-630-wheel-pages.json": "6.0.35",
+    "mouse-630-nora-foreground.json": "6.0.35",
+    "mouse-631-native.json": "6.0.35",
+    "mouse-631-task.json": "6.0.35",
+    "mouse-631-stress.json": "6.0.35",
+    "mouse-632-media.json": "6.0.35",
+    "mouse-632-footer.json": "6.0.35",
+    "mouse-632-documents.json": "6.0.35",
+    "mouse-633-owner-feedback.json": "6.0.35",
+    "mouse-633-context-menu.json": "6.0.35",
+    "mouse-634-owner-feedback.json": "6.0.35",
+    "mouse-634-download-widget.json": "6.0.35",
+    "mouse-634-ai-download-widget.json": "6.0.35",
+    "mouse-634-focused-chrome.json": "6.0.35",
+    "mouse-635-search.json": "6.0.35",
+    "mouse-635-owner-feedback.json": "6.0.35",
+    "mouse-635-public-search.json": "6.0.35",
+    "mouse-635-library.json": "6.0.35"
+  },
+  "x-gesture": {
+    "file": "mouse-629-swipe-tutorial.json",
+    "recognizer": "two-finger-or-wheel",
+    "source": "nora-wheel",
+    "physicalTrackpadVerified": false,
+    "validator": "tools/mouse635-ui-evidence.py",
+    "runtimeVersion": "6.0.35",
+    "persistenceKey": "mouseDesktopWheelHintV2",
+    "sameHintAcrossNativeRestartRequired": true,
+    "normalPrivateLearningIsolated": true,
+    "savedReportAcceptedAsInput": false
+  },
+  "x-uiRegressions": {
+    "file": "mouse-629-ui-regressions.json",
+    "baselineVersion": "6.0.27",
+    "paneCount": 7,
+    "separatorScenes": 4,
+    "noraThemes": 2,
+    "nativeSource": "globalCapture.acquire(display)",
+    "exactSeparatorPalette": {
+      "light": "#c7cfdf",
+      "dark": "#43536b"
+    },
+    "scrollbarSource": "installed guest WebContents + bundled preload",
+    "scrollbarCaptureSource": "guest WebContents.capturePage",
+    "scrollbarNativeComposite": false,
+    "physicalTrackpadVerified": false,
+    "validator": "tools/mouse635-ui-evidence.py",
+    "runtimeVersion": "6.0.35",
+    "nativeWheelScrolls": 12,
+    "trustedScrollEnds": 16,
+    "savedReportAcceptedAsInput": false,
+    "scrollbars": "hidden, native wheel and keyboard scrolling preserved",
+    "nativeKeyboardScrolls": 4,
+    "encapsulatedScrollCases": 8
+  },
+  "x-noraTransitions": {
+    "file": "mouse-628-desktop-transition.json",
+    "schemaVersion": "6.0.28",
+    "tutorialFile": "mouse-629-swipe-tutorial.json",
+    "dispatchSource": "nora-wheel",
+    "themes": [
+      "light",
+      "dark"
+    ],
+    "directions": [
+      -1,
+      1
+    ],
+    "nativeIdentityViewportScrollPreserved": true,
+    "sharedNoraHoldRetained": true,
+    "inputAndTransitionRecordsBound": true,
+    "savedReportAcceptedAsInput": false
+  },
+  "x-taskStressGate": {
+    "validator": "tools/mouse635-task-evidence.py",
+    "sha256": "375257845b265cb1cb329d0cac6ac6336b58e949c85ce7e90c498048d2e12c96",
+    "runtimeVersion": "6.0.35",
+    "platform": "darwin",
+    "arch": "arm64",
+    "inputFiles": [
+      "mouse-631-native.json",
+      "mouse-631-task.json",
+      "mouse-631-stress.json",
+      "mouse-632-media.json"
+    ],
+    "nativeMarkers": [
+      "MOUSE_631_TASK_ONLY_NATIVE_PASS",
+      "MOUSE_631_FIFTY_TABS_FIVE_DESKTOPS_NATIVE_PASS",
+      "MOUSE_631_INSTALLED_TASK_STRESS_PASS",
+      "MOUSE_632_STATIONARY_MEDIA_PASS"
+    ],
+    "sourceAndFreshInstalled": true,
+    "nativePixels": "independently decoded OS display PNGs with owner/DPI/bounds and SHA-256",
+    "savedReportAcceptedAsInput": false,
+    "stages": [
+      "taskOnly",
+      "fiftyTabs",
+      "stationaryMedia"
+    ],
+    "processBudgetMs": 350000
+  },
+  "x-ownerFeedbackGate": {
+    "validator": "tools/mouse635-feedback-evidence.py",
+    "sha256": "eb97cd13b88e1e90a693d9ff0ca470bec9ca9cb7b762088c624cb73f53ec6a9f",
+    "runtimeVersion": "6.0.35",
+    "platform": "darwin",
+    "arch": "arm64",
+    "inputFiles": [
+      "mouse-632-media.json",
+      "mouse-632-footer.json",
+      "mouse-632-documents.json",
+      "mouse-623-verification.json",
+      "mouse-624-verification.json",
+      "mouse-633-owner-feedback.json",
+      "mouse-633-context-menu.json",
+      "mouse-629-ui-regressions.json",
+      "mouse-634-owner-feedback.json",
+      "mouse-634-download-widget.json",
+      "mouse-634-ai-download-widget.json",
+      "mouse-634-focused-chrome.json",
+      "mouse-635-search.json",
+      "mouse-635-owner-feedback.json",
+      "mouse-635-public-search.json",
+      "mouse-635-library.json"
+    ],
+    "sourceAndFreshInstalled": true,
+    "savedReportAcceptedAsInput": false,
+    "footer": {
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "widths": [
+        800,
+        1100,
+        1440
+      ],
+      "brandLogicalSize": [
+        19,
+        17
+      ],
+      "standardIconLogicalSize": [
+        15,
+        15
+      ],
+      "centerBurrowRetained": true,
+      "logoOffersWebsite": true,
+      "documentsEntry": "Nora settings menu",
+      "rightmostControl": "settings-button",
+      "settingsCount": 1,
+      "closePaneCount": 0,
+      "left": [
+        "website"
+      ],
+      "libraryActions": [
+        "tile-search",
+        "emoji",
+        "zoom",
+        "history",
+        "bookmarks",
+        "downloads",
+        "screenshot"
+      ],
+      "themeImmediatelyBeforeSettings": true,
+      "privacyPlacement": "toolbar upper left after macOS traffic-space",
+      "privacyIconLogicalSize": [
+        24,
+        14
+      ],
+      "privacyNativeHitRequired": true,
+      "accessibleLabel": "Поиск, эмодзи, масштаб, история, закладки, загрузки и скриншот"
+    },
+    "assistant": {
+      "homeEntry": true,
+      "providerEntry": true,
+      "settingsEntry": true,
+      "rememberedPanelRestored": true,
+      "backendDefaultDisabled": true,
+      "connectionsNotRestored": true,
+      "actualShellReloadRequired": true
+    },
+    "documents": {
+      "types": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "text"
+      ],
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "ordinaryTabsAndPanels": true,
+      "editing": false,
+      "originalBytesUnchanged": true,
+      "pdfAnnotationOverlays": false,
+      "formats": [
+        "pdf",
+        "docx",
+        "xlsx",
+        "txt",
+        "md",
+        "csv",
+        "tsv",
+        "json"
+      ],
+      "sideBySideCaptureRequired": true
+    },
+    "media": {
+      "physicalMediaKeysVerified": false,
+      "externalMusicAccountVerified": false,
+      "scenarios": [
+        "native site next-button",
+        "automatic audio ended",
+        "registered MediaSession nexttrack callback",
+        "repeated title and media metadata burst"
+      ],
+      "unrelatedPaneMutations": 0,
+      "nativeGeometryChanges": 0
+    }
+  },
+  "x-supersededContracts": {
+    "documentEditing": {
+      "versions": [
+        "6.0.25",
+        "6.0.27"
+      ],
+      "markers": [
+        "MOUSE_625_DOCUMENTS_NATIVE_EDIT_SAVE_PRESERVE_PASS"
+      ],
+      "replacement": "MOUSE_632_DOCUMENTS_VIEW_ONLY_PASS",
+      "proof": "mouse-632-documents.json"
+    },
+    "visibleScrollbars": {
+      "replacement": "hidden scrollbars with trusted native scrolling",
+      "proof": "mouse-629-ui-regressions.json"
+    },
+    "assistantPromotion": {
+      "version": "6.0.32",
+      "replacement": "Restored home, provider and Settings Agent entries with remembered UI and explicit backend opt-in",
+      "proof": "mouse-633-owner-feedback.json"
+    },
+    "downloadHeaderStrip": {
+      "replacement": "16px bottom widget plus6px gap only while native transfer is active; exact viewport restored at terminal events",
+      "proof": "mouse-634-owner-feedback.json"
+    },
+    "focusedBottomCorners": {
+      "replacement": "Expanded main/AI bottom radius0 and gap0; regular layout/top remain12/6",
+      "proof": "mouse-634-focused-chrome.json"
+    },
+    "plainFooterBackground": {
+      "replacement": "actual upper-toolbar gradient in both themes and with Nora open",
+      "proof": "mouse-634-focused-chrome.json"
+    }
+  },
+  "x-currentOwnerGate": {
+    "validator": "tools/mouse635-633-owner-evidence.py",
+    "sha256": "0fc2ee5e7809cf9fae7b86b46db6a19a04434f3272a24bba4ecdce8d91a8ade3",
+    "runtimeVersion": "6.0.35",
+    "sourceAndFreshInstalled": true,
+    "savedReportAcceptedAsInput": false,
+    "file": "mouse-633-owner-feedback.json",
+    "processBudgetMs": 240000,
+    "nativeShellCaptures": 9,
+    "guestZoomCaptures": 8,
+    "fullDisplayCropPixelsRecomputed": true,
+    "settingsSections": 10,
+    "settingsToggles": 6,
+    "currentTargets": [
+      "darwin-arm64",
+      "win32-x64",
+      "linux-x64"
+    ],
+    "passwordStorageUnavailableMustRejectWrites": true,
+    "nativeContextReportRequired": true
+  },
+  "x-currentUpgradeGate": {
+    "validator": "tools/mouse635-upgrade-evidence.py",
+    "sha256": "6d0e10e417714e941840ab6f7342a25115502c085b4fa255849feb7841a9124f",
+    "sourceAndFreshInstalled": true,
+    "savedReportAcceptedAsInput": false,
+    "fromVersion": "6.0.34",
+    "toVersion": "6.0.35",
+    "method": "verified package replacement; real updater is tested separately from629",
+    "oldPackage": {
+      "name": "Mouse-Browser-6.0.34-mac-arm64.dmg",
+      "size": 139344967,
+      "sha256": "fd7bd882aaf948e623b8cb6affec0f9890be959add178cb88250b0a24f45dfab"
+    },
+    "distinctNativeProcesses": true,
+    "retained629GateUnchanged": true
+  },
+  "x-currentContextGate": {
+    "validator": "tools/mouse635-context-evidence.py",
+    "runtimeVersion": "6.0.35",
+    "sourceAndFreshInstalled": true,
+    "savedReportAcceptedAsInput": false,
+    "file": "mouse-633-context-menu.json",
+    "ownerBinding": {
+      "file": "mouse-633-owner-feedback.json",
+      "field": "contextMenu",
+      "rawSHA256": true,
+      "samePID": true,
+      "sameOriginalPages": true
+    },
+    "processBudgetMs": 60000,
+    "scenarios": [
+      "favorite-light",
+      "split-x",
+      "split-y",
+      "grid-2-y",
+      "grid-4",
+      "grid-12",
+      "private-favorite-dark"
+    ],
+    "nativeMenuObservation": "original Electron Menu.popup, show and close events",
+    "input": "trusted guest contextmenu from OS right-click; native menu keyboard selection",
+    "nativeDisplayCaptures": 6,
+    "pixelProof": "full original before/open OS frames; independently decoded SHA256, RGB difference, actual display/DPI and popup anchor",
+    "pixelDifferenceAloneAcceptedAsMenuProof": false,
+    "iconLogicalSize": [
+      16,
+      16
+    ],
+    "iconPNGSize": [
+      32,
+      32
+    ],
+    "privateBookmarksEphemeral": true,
+    "normalPagesPreserved": true,
+    "physicalUserDeviceVerified": false,
+    "sha256": "6347ec72bacfc57bfbf3236fa3b5fbc2ed1995b1d6892e082b7a27383008bfaa"
+  },
+  "x-workspaceGeometryGate": {
+    "validator": "tools/mouse635-workspace-evidence.py",
+    "sha256": "128b3a232246687e3e806900f629d7932f73482a9a452109ad97173355b24b03",
+    "runtimeVersion": "6.0.35",
+    "sourceAndFreshInstalled": true,
+    "savedReportAcceptedAsInput": false,
+    "file": "mouse-629-ui-regressions.json",
+    "supplement": "workspace633",
+    "currentTargets": [
+      "darwin-arm64",
+      "win32-x64",
+      "linux-x64"
+    ],
+    "themes": [
+      "light",
+      "dark"
+    ],
+    "mainPaneScenes": 4,
+    "mainPanes": 7,
+    "aiScenes": 2,
+    "workspacePadding": {
+      "top": 6,
+      "right": 0,
+      "bottom": 6,
+      "left": 0
+    },
+    "dividerWidth": 6,
+    "allCornerRadii": 12,
+    "nativeDisplayCaptures": 6,
+    "legacyBottomCornerChecksRetained": true,
+    "pixelProof": "independently decoded original display and viewport pixels; fixed palette, all corners and interior witnesses",
+    "nativeCornerInputs": 4,
+    "nativeInputLocations": [
+      "main internal right painted cutout",
+      "AI internal left painted cutout"
+    ],
+    "pagesAndWindowRestored": true,
+    "linuxActualOwnedMappedMasksHaveEmptyInputShape": true,
+    "physicalUserDeviceVerified": false,
+    "outerPaneToStageCSSEndpointTolerance": 0.0625,
+    "roundedNativeOuterEndpointsMustMatch": true
+  },
+  "x-current634OwnerGate": {
+    "validator": "tools/mouse635-retained-owner-evidence.py",
+    "runtimeVersion": "6.0.35",
+    "sourceAndFreshInstalled": true,
+    "savedReportAcceptedAsInput": false,
+    "file": "mouse-634-owner-feedback.json",
+    "processBudgetMs": 240000,
+    "currentTargets": [
+      "darwin-arm64",
+      "win32-x64",
+      "linux-x64"
+    ],
+    "nativeProcessWrapperKey": "ownerFeedback634",
+    "downloads": {
+      "placement": "bottom",
+      "height": 16,
+      "gap": 6,
+      "reservedHeight": 22,
+      "independentNativeOwners": 4,
+      "bothCompletedFilesPerPair": true,
+      "greenUnreadBadge": true,
+      "actualBytesAndItemEvents": true,
+      "themes": [
+        "light",
+        "dark"
+      ]
+    },
+    "aiPreview": {
+      "sameRightColumn": true,
+      "upperChatPreserved": true,
+      "lowerPreviewReused": true,
+      "mainTabsUnchanged": true,
+      "closeRestoresChat": true
+    },
+    "captureCorners": {
+      "targets": 4,
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "phases": [
+        "before",
+        "composed",
+        "after"
+      ],
+      "radius": 12,
+      "gap": 6,
+      "decodedProbesPerCapture": 89
+    },
+    "focusedChrome": {
+      "captureGroups": 8,
+      "regularGap": 6,
+      "regularRadius": 12,
+      "focusedBottomGap": 0,
+      "focusedBottomRadius": 0,
+      "topRadius": 12,
+      "topGap": 6,
+      "actualHeaderFooterPixelsCompared": true,
+      "noraOpenIncluded": true,
+      "measuredProbeWindow": {
+        "darwinBottomClearance": 32,
+        "otherPlatformsUnchanged": true,
+        "nativeMinimumSizePreserved": true
+      },
+      "callerWindowNativeGeometryAndCornersRestored": true
+    },
+    "physicalUserDeviceVerified": false,
+    "sha256": "22528ca013237ea4950e0240e800e2349a994c19764db797067b2604009b3728",
+    "dependencies": {
+      "mouse635-retained-native-evidence.py": "a52ea3260566103972d8402ca105f32e9219c6be13e3588249f2d9dfa75a5949",
+      "mouse635-download-evidence.py": "b26d44420be2521f4b74fbcf195d90d1a16e478eae57635f2275c5a437cebe47",
+      "mouse635-capture-evidence.py": "130afc087f3f0e8fc5912f0d1446b9be04bf57a957fd3569a71cc80b7194e78a",
+      "mouse635-focused-evidence.py": "18cd810f7bfec2a2b1bb763309ef477ad60cf975a3f205f64471c0b956bdaa7a",
+      "mouse635-search-evidence.py": "0cd1c24dff28232f2d0a8fc3a8860d94ee0e55625d80d5590d8df32ba99b7633",
+      "mouse635-reuse.py": "b20717bb29488b2061a4469728055e3669c7369af12a3b2d6f40008c9d253193"
+    },
+    "search": {
+      "required": true,
+      "file": "mouse-635-search.json",
+      "marker": "MOUSE_635_SEARCH_NATIVE_PASS",
+      "stage": "visual-search",
+      "afterStage": "focused-chrome",
+      "nativeFooterMagnifierImmediatelyBefore": "#emoji-button",
+      "nativeViewBudget": 8,
+      "roundedNativeRadius": 16,
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "rawOSPixelsAndActualViewClipping": true,
+      "ownedHTTPQueryAndOpenGraph": true,
+      "nativeWheelPagination": true,
+      "ownedModelFixtureGrounding": true,
+      "explicitSelectedPageVision": false,
+      "privateFormContentExcluded": true,
+      "navigationOverlayCloseRevocation": "native page lifecycle; no screen-sharing activation",
+      "originalDeskTabsProfileRestored": true,
+      "livePublicSearchVerified": false,
+      "livePublicModelVerified": false,
+      "publicBackendRequiresSeparateActualWorkflowEvidence": false,
+      "actualOSCapturesMinimum": 9,
+      "realHTTPTrustedClickAndWheelReceipts": true,
+      "emptyQueryRevocation": true,
+      "completeNativeSnapshotsForScreenshotOverlay": true,
+      "searchScreenSharingAbsent": true,
+      "loadingErrorNativeRetryBothThemes": true,
+      "publicSearchRequiresSeparateInstalled635Process": true
+    }
+  },
+  "x-current635OwnerGate": {
+    "validator": "tools/mouse635-owner-feedback-evidence.py",
+    "runtimeVersion": "6.0.35",
+    "sourceAndFreshInstalled": true,
+    "savedReportAcceptedAsInput": false,
+    "file": "mouse-635-owner-feedback.json",
+    "processBudgetMs": 240000,
+    "verifierBudgetMs": 270000,
+    "nativeProcessWrapperKey": "ownerFeedback635",
+    "requiredMarkers": [
+      "MOUSE_635_PUBLIC_SEARCH_PASS",
+      "MOUSE_635_LIBRARY_STABLE_PASS",
+      "MOUSE_635_AGENT_CHAT_PASS",
+      "MOUSE_635_PINNED_PANES_PASS",
+      "MOUSE_635_OWNER_FEEDBACK_PASS"
+    ],
+    "separateNativeProcess": true,
+    "physicalUserDeviceVerified": false,
+    "sha256": "b594235d30c8578e7333062d054fefdea3b3eacb15ba14415b92bb95c26d5401",
+    "dependencies": {
+      "mouse635-native-evidence.py": "79cbd8bf2d1774cc2b5b7076c0c32d8b9fda793c720e865a5c53dbf66364d6dc",
+      "mouse635-library-evidence.py": "c951312e014024b17eefb74272fe2e98fb5c0d74775e680287f9282f424ac2f6",
+      "mouse635-public-search-evidence.py": "26e0798b6ef9e846e151a5efd3b731fd8053b53c9697e7279be1e69d6326c68f",
+      "mouse635-reuse.py": "b20717bb29488b2061a4469728055e3669c7369af12a3b2d6f40008c9d253193",
+      "mouse635-agent-chat-evidence.py": "e84ea9f43eea6aa0624d4c8bbd9cbbe0b2e026d8d398d8ed1fe48f2db9fc9af5",
+      "mouse635-pane-layout-evidence.py": "7a2019f3a7808bec445a5c8648c73e6bc075855a734baeecfb86e2945ceffd90",
+      "mouse635-context-evidence.py": "6347ec72bacfc57bfbf3236fa3b5fbc2ed1995b1d6892e082b7a27383008bfaa"
+    }
+  },
+  "x-publicSearchGate": {
+    "validator": "tools/mouse635-public-search-evidence.py",
+    "sourceAndFreshInstalled": true,
+    "savedReportAcceptedAsInput": false,
+    "file": "mouse-635-public-search.json",
+    "owner": "mouse-635-owner-feedback.json",
+    "samePID": true,
+    "rawSHA256": true,
+    "actualAPIResponseBytes": true,
+    "chromiumTransport": true,
+    "apiOnly": true,
+    "htmlSERPAccepted": false,
+    "defaultSearXAccepted": false,
+    "ownerQuery": "новости про антропик",
+    "relevantOwnerFirstPageRequired": true,
+    "ownerAndControlDistinctSecondPages": true,
+    "controlledPrimaryFailureRealFallback": true,
+    "absenceOfKeyIsNotSuccess": true,
+    "missingOrEmptyResultsPass": false,
+    "sha256": "26e0798b6ef9e846e151a5efd3b731fd8053b53c9697e7279be1e69d6326c68f",
+    "queryExpansionProvider": "MyMemory lookup-only GET",
+    "queryExpansionEndpoint": "https://api.mymemory.translated.net/get",
+    "originalQueryPreserved": true,
+    "originalTranslationAndProviderRawResponseBytes": true,
+    "translatedQueryDisclosed": true
+  },
+  "x-libraryStabilityGate": {
+    "validator": "tools/mouse635-library-evidence.py",
+    "sourceAndFreshInstalled": true,
+    "savedReportAcceptedAsInput": false,
+    "file": "mouse-635-library.json",
+    "owner": "mouse-635-owner-feedback.json",
+    "samePID": true,
+    "rawSHA256": true,
+    "themes": [
+      "light",
+      "dark"
+    ],
+    "sections": [
+      "downloads",
+      "captures"
+    ],
+    "views": [
+      "list",
+      "grid"
+    ],
+    "actualRendererModeObserved": true,
+    "nativeCaptures": 8,
+    "unchangedDOMRowsImagesCheckboxes": true,
+    "scrollFocusSelectionPreserved": true,
+    "actualChangedAndDeletedFileBytes": true,
+    "latestPreviewWins": true,
+    "fixtureOnly": true,
+    "realTransfer": false,
+    "defaultAutoCollection": false,
+    "sha256": "c951312e014024b17eefb74272fe2e98fb5c0d74775e680287f9282f424ac2f6"
+  },
+  "x-agentChatGate": {
+    "validator": "tools/mouse635-agent-chat-evidence.py",
+    "sourceAndFreshInstalled": true,
+    "savedReportAcceptedAsInput": false,
+    "owner": "mouse-635-owner-feedback.json",
+    "field": "agentChat",
+    "requiredMarker": "MOUSE_635_AGENT_CHAT_PASS",
+    "ownedHTTPFixture": true,
+    "externalModelVerified": false,
+    "nativeTransport": "mouse:agent → utilityProcess → HTTP/SSE",
+    "nativeCaptures": 4,
+    "chatThemeWidths": [
+      [
+        "dark",
+        400
+      ],
+      [
+        "light",
+        400
+      ],
+      [
+        "dark",
+        300
+      ]
+    ],
+    "settingsHiddenByDefault": true,
+    "technicalDetailsHiddenByDefault": true,
+    "terminalHiddenByDefault": true,
+    "chatWithoutBrowserControl": true,
+    "separateWorker": true,
+    "streamingHistoryStopClearAndError": true,
+    "actualTrustedNativeInput": true,
+    "rawNativeFrames": true,
+    "minimumObservedTextContrast": 4.5,
+    "sha256": "e84ea9f43eea6aa0624d4c8bbd9cbbe0b2e026d8d398d8ed1fe48f2db9fc9af5"
+  },
+  "x-paneLayoutGate": {
+    "validator": "tools/mouse635-pane-layout-evidence.py",
+    "sourceAndFreshInstalled": true,
+    "savedReportAcceptedAsInput": false,
+    "owner": "mouse-635-owner-feedback.json",
+    "field": "panes",
+    "requiredMarker": "MOUSE_635_PINNED_PANES_PASS",
+    "actualNativeElectronMenu": true,
+    "actualPresetChecked": true,
+    "preservesTabOrder": true,
+    "explicitPinAndUnpin": true,
+    "guardedActions": [
+      "close",
+      "replace",
+      "split",
+      "resize",
+      "preset",
+      "drag",
+      "transfer"
+    ],
+    "freeSiblingEditable": true,
+    "persisted": true,
+    "desktopIsolation": true,
+    "privateIsolation": true,
+    "livePagePreserved": true,
+    "nativeCaptures": 2,
+    "sha256": "7a2019f3a7808bec445a5c8648c73e6bc075855a734baeecfb86e2945ceffd90",
+    "rawMenuSnapshots": 5,
+    "rawLiveGuests": 2,
+    "rawNativeBoundsPreserved": true,
+    "rawSavedTreeAndSlotsRehydrated": true,
+    "rawIPCRejections": 5,
+    "rawRendererAndCommittedLayouts": true,
+    "rawPrivatePinOwnership": true
+  }
+}
