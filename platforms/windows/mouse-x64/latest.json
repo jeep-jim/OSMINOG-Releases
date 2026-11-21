@@ -1,10 +1,10 @@
 {
   "schema": 1,
-  "version": "6.0.33",
+  "version": "6.0.34",
   "platform": "win32",
   "arch": "x64",
-  "url": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/mouse-windows-v6.0.33-x64/Mouse-Browser-6.0.33-Windows-x64.exe",
-  "size": 125765703,
-  "digest": "sha256:3a864fcdbc2f4d3cc5c3c295abcd1f66ac7411a0b8e4ca235e0ab65fc0ccbab8",
-  "publishedAt": "2026-11-20T11:24:42Z"
+  "url": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/mouse-windows-v6.0.34-x64/Mouse-Browser-6.0.34-Windows-x64.exe",
+  "size": 126570020,
+  "digest": "sha256:ab0762924e28151b66728cf79a024c5fa7956e11b724d7fbe015491d15fb11a0",
+  "publishedAt": "2026-11-21T04:19:05Z"
 }
