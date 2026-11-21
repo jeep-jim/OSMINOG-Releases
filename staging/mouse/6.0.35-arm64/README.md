@@ -1,6 +1,6 @@
 # Mouse 6.0.35 staging
 
-`pin.json` is deliberately unready with no source, run, job, artifact or package claims. There is no `PUBLISH_OWNER` trigger.
+`pin.json` binds verified source `9feabe59aaad4ebbfd01733a0e59c3127f7b3842`, source PR187 merge `17ba263c6b34c0ba83b422ddda743af95a7ff159`, and successful Mac run44893434036 attempt1/job136813950935. Both artifact ZIP hashes and the exact DMG/ZIP bytes passed the full independent source audit. `PUBLISH_OWNER` authorizes the Mac publisher to import these packages and perform its mandatory fresh installed verification before publication. Windows/Linux pins remain unready without owner triggers.
 
 Retained 6.0.34 acceptance remains mandatory. The owner's explicit 6.0.35 toolbar/footer changes have a version-scoped contract: privacy at upper left after macOS window controls; screenshot after downloads; theme immediately before settings. Old published validators are unchanged.
 
