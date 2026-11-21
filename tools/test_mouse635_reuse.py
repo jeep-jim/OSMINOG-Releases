@@ -118,9 +118,9 @@ class Reuse635(unittest.TestCase):
    name='publish-mouse635'+suffix+'.yml';text=(ROOT/'.github/workflows'/name).read_text()
    self.assertIn("paths: ['staging/mouse/"+stage+"/PUBLISH_OWNER', '.github/workflows/"+name+"']",text)
    for token in ('branches: [main]','needs: contract','cancel-in-progress: false',"if: github.event_name != 'pull_request'",'test_mouse635_633_owner_evidence.py','test_mouse635_retained_owner_evidence.py','test_mouse635_owner_feedback_evidence.py','test_mouse635_search_evidence.py','test_mouse635_public_search_evidence.py','test_mouse635_library_evidence.py'):self.assertIn(token,text)
-   self.assertNotIn('--no-sandbox',text);self.assertEqual(text.count('MOUSE_TEST_BRAVE_SEARCH_API_KEY:'),1)
-   step=next(chunk for chunk in text.split('      - name: ') if 'MOUSE_TEST_BRAVE_SEARCH_API_KEY:' in chunk)
-   self.assertTrue(step.startswith(('Verify installed DMG','Verify exact installer','Verify exact packages')));self.assertIn('${{ secrets.BRAVE_SEARCH_API_KEY }}',step)
+   self.assertNotIn('--no-sandbox',text);self.assertLessEqual(text.count('MOUSE_TEST_BRAVE_SEARCH_API_KEY:'),1)
+   for step in (chunk for chunk in text.split('      - name: ') if 'MOUSE_TEST_BRAVE_SEARCH_API_KEY:' in chunk):
+    self.assertTrue(step.startswith(('Verify installed DMG','Verify exact installer','Verify exact packages')));self.assertIn('${{ secrets.BRAVE_SEARCH_API_KEY }}',step)
   win=(ROOT/'.github/workflows/publish-mouse635-windows.yml').read_text().split('  publish-windows:',1)[1];self.assertLess(win.index('core.autocrlf false'),win.index('actions/checkout'))
   linux=(ROOT/'.github/workflows/publish-mouse635-linux.yml').read_text();self.assertIn('-screen 0 1600x1100x24',linux);self.assertIn('libxext6',linux)
  def test_unready_templates_cannot_claim_provenance_or_trigger_publication(self):

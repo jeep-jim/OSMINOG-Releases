@@ -10,6 +10,8 @@ permissions:
   contents: read
 jobs:
   contract:
+    outputs:
+      publish: ${{ steps.publish_plan.outputs.publish }}
     runs-on: ubuntu-latest
     timeout-minutes: 4
     steps:
@@ -17,6 +19,8 @@ jobs:
       # Frozen AST digests use Python 3.12's representation, including empty lists.
       - uses: actions/setup-python@v5
         with: {python-version: '3.12'}
+      - name: Verify independent platform publication selection
+        run: python3 tools/test_mouse635_publish_plan.py -v
       - name: Verify current635 frozen reuse and native predicates
         run: python3 tools/test_mouse635_reuse.py -v
       - run: python3 -m py_compile tools/mouse635-release.py tools/mouse635-evidence.py tools/mouse635-ui-evidence.py tools/mouse635-task-evidence.py tools/mouse635-feedback-evidence.py tools/mouse628-motion-trace.py
@@ -43,7 +47,7 @@ jobs:
       - run: python3 tools/mouse635-release.py validate-template
       - name: Verify current635 search UI, request states and metadata privacy
         run: python3 tools/test_mouse635_search_evidence.py -v
-      - name: Reject empty, irrelevant or fabricated public API results
+      - name: Verify selected-engine DOM, original result order and live source evidence
         run: python3 tools/test_mouse635_public_search_evidence.py -v
       - name: Verify stable real file DOM and actual replacement bytes
         run: python3 tools/test_mouse635_library_evidence.py -v
@@ -53,8 +57,11 @@ jobs:
         run: python3 tools/test_mouse635_pane_layout_evidence.py -v
       - name: Bind the separate installed635 process and all mandatory gates
         run: python3 tools/test_mouse635_owner_feedback_evidence.py -v
+      - name: Read this platform owner publication trigger
+        id: publish_plan
+        run: python3 tools/mouse635-publish-plan.py macos-arm64 >> "$GITHUB_OUTPUT"
   mouse-release:
-    if: github.event_name != 'pull_request'
+    if: github.event_name != 'pull_request' && needs.contract.outputs.publish == 'true'
     needs: contract
     runs-on: macos-15
     timeout-minutes: 45
@@ -74,8 +81,6 @@ jobs:
       - name: Import exact merged native-tested packages
         run: python3 tools/mouse635-release.py import
       - name: Verify installed DMG and actual previous-version replacement
-        env:
-          MOUSE_TEST_BRAVE_SEARCH_API_KEY: ${{ secrets.BRAVE_SEARCH_API_KEY }}
         shell: bash
         run: |
           set -euo pipefail
