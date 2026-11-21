@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "Mouse Browser 6.0.36 native evidence bundle",
-  "$comment": "Current635 requires installed selected-engine native SERP navigation, independently parsed organic DOM, original result order and actual OS engine-menu/source/tile frames. Same-WebContents readbacks before and after each OS capture independently bind stable informative pixels to the source document and first visible live sites; an empty browser shell cannot pass. The exact original Russian query and common browser preference bind the provider page to returned cards. Honest CAPTCHA, unavailable or empty outcomes cannot authorize publication. Agent conversation, pinned panes, stable owned-file libraries and all retained634/633 native gates remain mandatory. This publication is macOS arm64 only; deferred Windows/Linux pins stay unready.",
+  "$comment": "Current636 requires tiled search to be absent from the packaged runtime, ordinary native address search to remain functional, Agent settings to open within the same panel, and live desktop switching to improve against the exact published predecessor on the same native runner. Raw process reports and independently decoded OS frames bind these checks to installed packages. Existing document identity, conversation, pinned-pane, library, profile-upgrade and retained634/633 checks remain mandatory. Each platform imports its own pinned source artifacts and repeats installed verification; publication requires all three platform pins to identify the same merged source.",
   "type": "object",
   "required": [
     "mouse-628-local.json",
@@ -61,9 +61,9 @@
     "MOUSE_632_WEBSITE_OFFER_NEW_TAB_PASS",
     "MOUSE_632_STATIONARY_MEDIA_PASS",
     "MOUSE_633_OWNER_FEEDBACK_PASS",
-    "MOUSE_634_REAL_633_TO_634_PROFILE_PASS",
+    "MOUSE_636_REAL_635_TO_636_PROFILE_PASS",
     "MOUSE_633_NATIVE_CONTEXT_MENU_PASS",
-    "MOUSE_634_OWNER_FEEDBACK_PASS"
+    "MOUSE_636_RETAINED_OWNER_FEEDBACK_PASS"
   ],
   "x-motionTraceGate": {
     "validator": "tools/mouse628-motion-trace.py",
@@ -213,14 +213,17 @@
     "mouse-632-documents.json": "6.0.36",
     "mouse-633-owner-feedback.json": "6.0.36",
     "mouse-633-context-menu.json": "6.0.36",
-    "mouse-634-owner-feedback.json": "6.0.36",
+    "mouse-636-retained-owner-feedback.json": "6.0.36",
     "mouse-634-download-widget.json": "6.0.36",
     "mouse-634-ai-download-widget.json": "6.0.36",
     "mouse-634-focused-chrome.json": "6.0.36",
-    "mouse-635-search.json": "6.0.36",
-    "mouse-635-owner-feedback.json": "6.0.36",
-    "mouse-635-public-search.json": "6.0.36",
-    "mouse-635-library.json": "6.0.36"
+    "mouse-636-owner-feedback.json": "6.0.36",
+    "mouse-635-library.json": "6.0.36",
+    "mouse-636-agent-inline.json": "6.0.36",
+    "mouse-636-search-removal.json": "6.0.36",
+    "mouse-636-performance.json": "6.0.36",
+    "mouse-636-baseline-performance.json": "6.0.36",
+    "mouse-636-desktop-transition.json": "6.0.36"
   },
   "x-gesture": {
     "file": "mouse-629-swipe-tutorial.json",
@@ -323,10 +326,16 @@
       "mouse-634-download-widget.json",
       "mouse-634-ai-download-widget.json",
       "mouse-634-focused-chrome.json",
-      "mouse-635-search.json",
       "mouse-636-owner-feedback.json",
-      "mouse-635-public-search.json",
-      "mouse-635-library.json"
+      "mouse-635-library.json",
+      "mouse-636-agent-inline.json",
+      "mouse-636-search-removal.json",
+      "mouse-636-performance.json",
+      "mouse-636-baseline-performance.json",
+      "mouse-636-baseline-performance/mouse-631-native.json",
+      "mouse-636-baseline-performance/mouse-631-task.json",
+      "mouse-636-baseline-performance/mouse-631-stress.json",
+      "mouse-636-baseline-performance/mouse-632-media.json"
     ],
     "sourceAndFreshInstalled": true,
     "savedReportAcceptedAsInput": false,
@@ -358,7 +367,6 @@
         "website"
       ],
       "libraryActions": [
-        "tile-search",
         "emoji",
         "zoom",
         "history",
@@ -373,7 +381,7 @@
         14
       ],
       "privacyNativeHitRequired": true,
-      "accessibleLabel": "Поиск, эмодзи, масштаб, история, закладки, загрузки и скриншот"
+      "accessibleLabel": "Эмодзи, масштаб, история, закладки, загрузки и скриншот"
     },
     "assistant": {
       "homeEntry": true,
@@ -689,7 +697,7 @@
     "dependencies": {
       "mouse636-native-evidence.py": "157f4bc90b6b7f427dc9f996a92e905adea3a832f7f3ef850b75e586641e878a",
       "mouse636-library-evidence.py": "226e939a21ed09cb044da0e5e2ef2d3274264173f23f2d92d28ac9e107d17f8e",
-      "mouse636-search-removal-evidence.py": "5ada86c7ecd5d5c96b1f919be40ff399e4ff6c6c2d15c061a6f05078afdf972b",
+      "mouse636-search-removal-evidence.py": "2a5bcf1642350813ab088d85ccd0f29aeb7b2662e410a50954a489b416fd3338",
       "mouse636-performance-evidence.py": "2548d1fe02bcc9a16816948089ac9773c5bd70a89c3108390a68c84290fe2777",
       "mouse636-agent-inline-evidence.py": "02c3d40f21092d998444693d115b617697a70a9554e415abc92d34dc11587159",
       "mouse636-pane-layout-evidence.py": "898a8f843a67de4ae3cc090cd2d50588c4efcfd71748d81c91c87189a477aa2a",
@@ -745,7 +753,7 @@
     "savedReportAcceptedAsInput": false,
     "owner": "mouse-636-owner-feedback.json",
     "field": "panes",
-    "requiredMarker": "MOUSE_635_PINNED_PANES_PASS",
+    "requiredMarker": "MOUSE_636_PINNED_PANES_PASS",
     "actualNativeElectronMenu": true,
     "actualPresetChecked": true,
     "preservesTabOrder": true,
@@ -810,7 +818,7 @@
     "actualNativeAddressSubmission": true,
     "externalEngineVerified": false,
     "ownedRequestSubstitution": true,
-    "sha256": "5ada86c7ecd5d5c96b1f919be40ff399e4ff6c6c2d15c061a6f05078afdf972b"
+    "sha256": "2a5bcf1642350813ab088d85ccd0f29aeb7b2662e410a50954a489b416fd3338"
   },
   "x-agentInlineGate": {
     "validator": "tools/mouse636-agent-inline-evidence.py",

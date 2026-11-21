@@ -3,6 +3,7 @@
 from pathlib import Path
 import re
 import runpy
+from types import FunctionType
 from urllib.parse import parse_qs, urlsplit
 
 N = runpy.run_path(str(Path(__file__).with_name('mouse636-native-evidence.py')))
@@ -19,6 +20,24 @@ RETIRED = ['mouse-634-smoke.cjs', 'mouse-634-search-smoke.cjs', 'mouse-635-smoke
 ENGINES = {'google': ('www.google.com', '/search', 'q'), 'bing': ('www.bing.com', '/search', 'q'),
            'duckduckgo': ('duckduckgo.com', '/', 'q'), 'yandex': ('yandex.ru', '/search/', 'text')}
 FOOTER = ['emoji', 'zoom', 'history', 'bookmarks', 'downloads', 'screenshot']
+
+
+def read_search_png(read, name, claimed_digest, claimed_size):
+    # Keep the shared task decoder and all crop/ownership/pixel checks, with
+    # this gate's two exact native filenames instead of the task631 prefix.
+    need(name in ('mouse-636-search-removal.png', 'mouse-636-search-removal-display.png'),
+         'unexpected search-removal native screenshot name')
+    blob = read(name)
+    need(T['digest'](blob) == claimed_digest, name + ' SHA-256 differs from the native capture')
+    image = T['decode_png'](blob, name)
+    expected = T['size'](claimed_size, name)
+    need(all(image[key] == expected[key] for key in ('width', 'height')), name + ' dimensions differ')
+    return image
+
+
+verify_capture = FunctionType(T['verify_capture'].__code__,
+    {**T['verify_capture'].__globals__, 'read_png': read_search_png})
+verify_capture.__kwdefaults__ = T['verify_capture'].__kwdefaults__
 
 
 def ui(value):
@@ -122,7 +141,7 @@ def verify(read, *, owner):
             N['native'](native, page)
     captures = facts.get('captures', [])
     need(len(captures) == 1 and captures[0] in owner.get('captures', []), 'ordinary navigation OS frame missing')
-    T['verify_capture'](read, captures[0], 'mouse-636-search-removal.png', [rows[-1]['after'], rows[-1]['otherAfter']])
+    verify_capture(read, captures[0], 'mouse-636-search-removal.png', [rows[-1]['after'], rows[-1]['otherAfter']])
     names = [NAME, captures[0]['filename'], captures[0]['displayFilename']]
     return {'ok': True, 'reportSha256': sha(raw), 'externalEngineVerified': False,
             'ordinaryEngines': list(ENGINES), 'tileSearchRemoved': True,

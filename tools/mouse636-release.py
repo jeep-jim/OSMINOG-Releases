@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Exact package publication through retained gates and mandatory635 evidence."""
+"""Exact package publication through retained gates and mandatory636 evidence."""
 import runpy
 from pathlib import Path
 _reuse=runpy.run_path(str(Path(__file__).with_name('mouse636-reuse.py')))
@@ -11,16 +11,16 @@ CURRENT_DEPENDENCIES=('mouse636-native-evidence.py','mouse636-library-evidence.p
 
 
 def validate_template():
- if PIN.get('version')!=V or type(PIN.get('ready')) is not bool:raise ValueError('Mouse635 pin template identity/state invalid')
+ if PIN.get('version')!=V or type(PIN.get('ready')) is not bool:raise ValueError('Mouse636 pin template identity/state invalid')
  if not (STAGE/'RELEASE_NOTES.md').read_text().startswith('# Mouse Browser 6.0.36'):raise ValueError('Release notes version mismatch')
  schema=json.loads((STAGE/'evidence.schema.json').read_text())
  required=set(_evidence.JSON_NAMES)|{'mouse-631-native.json','mouse-631-task.json','mouse-631-stress.json','mouse-632-media.json','mouse-632-footer.json','mouse-632-documents.json','mouse-633-owner-feedback.json','mouse-633-context-menu.json','mouse-636-retained-owner-feedback.json','mouse-634-download-widget.json','mouse-634-ai-download-widget.json','mouse-634-focused-chrome.json','mouse-636-upgrade.json','mouse-636-upgrade-write.json','mouse-636-upgrade-read.json','mouse-636-owner-feedback.json','mouse-636-search-removal.json','mouse-636-agent-inline.json','mouse-636-performance.json','mouse-636-baseline-performance.json','mouse-636-desktop-transition.json','mouse-635-library.json'}
  if set(schema['required'])!=required or schema['x-motionTraceGate']['algorithm']!='mouse628-motion-trace-evidence-v2':raise ValueError('Evidence schema mismatch')
  for key,module in GATES:
   gate=schema[key]
-  if gate['validator']!='tools/'+module or gate['sha256']!=sha(Path(__file__).with_name(module).read_bytes()) or gate['sourceAndFreshInstalled'] is not True:raise ValueError('Independent635 checker contract mismatch: '+module)
+  if gate['validator']!='tools/'+module or gate['sha256']!=sha(Path(__file__).with_name(module).read_bytes()) or gate['sourceAndFreshInstalled'] is not True:raise ValueError('Independent636 checker contract mismatch: '+module)
  for key,names in [('x-current634OwnerGate',RETAINED_DEPENDENCIES),('x-current635OwnerGate',CURRENT_DEPENDENCIES)]:
-  if schema[key].get('dependencies')!={name:sha(Path(__file__).with_name(name).read_bytes()) for name in names}:raise ValueError('Independent635 dependency hashes differ: '+key)
+  if schema[key].get('dependencies')!={name:sha(Path(__file__).with_name(name).read_bytes()) for name in names}:raise ValueError('Independent636 dependency hashes differ: '+key)
  if PIN['ready'] is False:
   for key in ('source','run','artifact','archiveSHA256','verificationArtifact','verificationSHA256','sourcePR','sourceMerge','sourceAttempt','sourceJob'):
    if PIN.get(key) is not None:raise ValueError('Unready template contains provenance claims: '+key)
