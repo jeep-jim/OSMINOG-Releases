@@ -4,7 +4,7 @@ on:
     paths: ['.gitattributes','tools/mouse635-*.py','tools/test_mouse635_*.py','tools/test-mouse635-*.py','.github/workflows/publish-mouse635.yml','staging/mouse/6.0.35-arm64/**']
   push:
     branches: [main]
-    paths: ['staging/mouse/6.0.35-arm64/PUBLISH_OWNER', '.github/workflows/publish-mouse635.yml']
+    paths: ['staging/mouse/6.0.35-arm64/PUBLISH_OWNER', 'staging/mouse/6.0.35-arm64/pin.json', '.github/workflows/publish-mouse635.yml']
   workflow_dispatch:
 permissions:
   contents: read

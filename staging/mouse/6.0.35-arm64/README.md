@@ -1,6 +1,6 @@
 # Mouse 6.0.35 staging
 
-`pin.json` binds verified source `9feabe59aaad4ebbfd01733a0e59c3127f7b3842`, source PR187 merge `17ba263c6b34c0ba83b422ddda743af95a7ff159`, and successful Mac run44893434036 attempt1/job136813950935. Both artifact ZIP hashes and the exact DMG/ZIP bytes passed the full independent source audit. `PUBLISH_OWNER` authorizes the Mac publisher to import these packages and perform its mandatory fresh installed verification before publication. Windows/Linux pins remain unready without owner triggers.
+`pin.json` binds verified source `0d4a1390fced54b59c2cf7b49c9d9394549456ac`, source PR188 merge `33287e68b6335bdbb9af9f7c98434de0cce6030b`, and successful Mac run44896578294 attempt1/job136823418273. Both artifact ZIP hashes and exact DMG/ZIP bytes passed all five independent source gates. `PUBLISH_OWNER` authorizes the Mac publisher to import these packages and perform mandatory fresh installed verification before publication. Windows/Linux pins remain unready without owner triggers.
 
 Retained 6.0.34 acceptance remains mandatory. The owner's explicit 6.0.35 toolbar/footer changes have a version-scoped contract: privacy at upper left after macOS window controls; screenshot after downloads; theme immediately before settings. Old published validators are unchanged.
 
@@ -13,3 +13,7 @@ The current native layout/pin stage must prove the actual preset checkmark, stab
 The source and first two visible sites in provider order must also be painted on the actual OS display. The independent checker decodes each PNG and compares stable informative pixels against before/after readbacks of the same WebContents, preserving navigation, query, window and geometry identity. Blank matching backgrounds cannot pass. Each acquisition has one 4500ms deadline and at most20 attempts; all rejected OS and reference frames remain byte-bound in evidence. Seventeen canonical frames may therefore require up to55 actual OS frames. A DOM-only success or a cropped shell frame cannot authorize publication.
 
 Actual 6.0.34 package replacement must preserve the test profile. Publication requires successful source and fresh installed checks and exact package provenance. A skipped gate or old fixture report cannot authorize publication. Only macOS Apple Silicon is authorized for this release; the Windows/Linux 6.0.35 pins remain unready without owner triggers, and their published 6.0.34 channels stay unchanged.
+
+The prior 9feabe source passed its source CI, but fresh publisher44895271630 stopped before publication on a Dock-shadow mismatch in the temporary source proof window. The replacement source0d4a uses the existing 32 DIP clearance for this test stage and restores exact original geometry. Its actual source and tile frames passed on the first acquisition. Matcher thresholds, frame/readiness budgets and all package gates are unchanged.
+
+A change to this exact Mac pin now triggers the same fresh publisher on main; the owner trigger and independent gates remain mandatory. The workflow and its current Mac-only path expectation were updated together.
