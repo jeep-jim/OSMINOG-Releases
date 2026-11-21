@@ -25,7 +25,7 @@ def read_plan(root=ROOT):
     pins = {}
     for platform, (folder, _, _, trigger) in PLATFORMS.items():
         stage = root / 'staging/mouse' / folder
-        value = json.loads((stage / 'pin.json').read_text())
+        value = json.loads((stage / 'pin.json').read_text(encoding='utf-8'))
         owner = stage / 'PUBLISH_OWNER'
         if value.get('version') != '6.0.36' or type(value.get('ready')) is not bool:
             raise ValueError('Invalid636 platform identity/readiness: ' + platform)
@@ -35,7 +35,7 @@ def read_plan(root=ROOT):
             packages = value.get('packages') or {'installer': value.get('package')}
             if not packages or any(not isinstance(p, dict) or p.get('size') is not None or p.get('sha256') is not None for p in packages.values()):
                 raise ValueError('Unready636 platform has package claims: ' + platform)
-        elif not owner.is_file() or owner.is_symlink() or owner.read_text().strip() != trigger:
+        elif not owner.is_file() or owner.is_symlink() or owner.read_text(encoding='utf-8').strip() != trigger:
             raise ValueError('Ready636 platform lacks its exact owner trigger: ' + platform)
         pins[platform] = value
     return pins

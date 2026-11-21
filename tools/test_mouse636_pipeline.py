@@ -4,10 +4,15 @@ import base64
 import copy
 import hashlib
 import json
+import os
 from pathlib import Path
+import re
 import runpy
+import subprocess
+import sys
 import tempfile
 import unittest
+from unittest import mock
 
 TOOLS = Path(__file__).resolve().parent
 PLAN = runpy.run_path(str(TOOLS / 'mouse636-publish-plan.py'))
@@ -279,6 +284,38 @@ class MotionActivationEvidence(unittest.TestCase):
 
 
 class HelpersAndContracts(unittest.TestCase):
+    def test_current_mac_template_uses_utf8_under_windows_cp1252(self):
+        release = runpy.run_path(str(TOOLS/'mouse636-release.py'))
+        original = Path.read_text
+
+        def windows_read_text(path, encoding=None, errors=None):
+            return original(path, encoding=encoding or 'cp1252', errors=errors)
+
+        # These are the real UTF-8 release notes and schema. The Windows
+        # publisher's all-platform preflight must not decode them as cp1252.
+        with mock.patch.object(Path, 'read_text', windows_read_text):
+            release['validate_template']()
+
+    def test_windows_job_utf8_mode_reaches_retained_readers_and_python_children(self):
+        workflow = (TOOLS.parent/'.github/workflows/publish-mouse636-windows.yml').read_text(encoding='utf-8')
+        publish = workflow.split('  publish-windows:', 1)[1].split('    steps:', 1)[0]
+        modes = re.findall(r'''(?m)^      PYTHONUTF8: ['"](1)['"]$''', publish)
+        self.assertEqual(modes, ['1'])
+        environment = dict(os.environ, PYTHONUTF8=modes[0], PYTHONCOERCECLOCALE='0', LC_ALL='C')
+        script = """
+import runpy, sys
+from pathlib import Path
+assert sys.flags.utf8_mode == 1
+for path in Path('staging/mouse').glob('6.0.36-*/RELEASE_NOTES.md'):
+    assert path.read_text().startswith('# Mouse Browser 6.0.36')
+plan = runpy.run_path('tools/mouse636-publish-plan.py')
+expected = all(pin['ready'] for pin in plan['read_plan']().values())
+assert plan['publication_ready']('windows-x64') is expected
+"""
+        result = subprocess.run([sys.executable, '-c', script], cwd=TOOLS.parent, env=environment,
+                                capture_output=True, text=True, encoding='utf-8', timeout=30)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
     def test_source_helper_git_blob_identity_is_mandatory(self):
         raw = b'owned helper bytes\n'
         blob = hashlib.sha1(b'blob '+str(len(raw)).encode()+b'\0'+raw).hexdigest()
