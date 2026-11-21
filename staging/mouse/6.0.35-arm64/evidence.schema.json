@@ -275,7 +275,7 @@
   },
   "x-taskStressGate": {
     "validator": "tools/mouse635-task-evidence.py",
-    "sha256": "375257845b265cb1cb329d0cac6ac6336b58e949c85ce7e90c498048d2e12c96",
+    "sha256": "8071da5a72c840f762daa43ee0edca6fc484ed4ba83c16d960025018839d19bb",
     "runtimeVersion": "6.0.35",
     "platform": "darwin",
     "arch": "arm64",

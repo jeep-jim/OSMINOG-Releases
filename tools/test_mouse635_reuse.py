@@ -89,6 +89,21 @@ class Reuse635(unittest.TestCase):
    self.assertIn(pattern,values)
   native=R['load']('mouse634-upgrade-evidence.py');self.assertEqual(native['BASELINES'],R['BASELINES'])
   values=[n.value for n in ast.walk(R['adapted_tree']('mouse634-upgrade-evidence.py')) if isinstance(n,ast.Constant)];self.assertIn('6.0.34',values);self.assertIn('6.0.35',values)
+ def test_task_checker_is_full_source_form_with_unchanged_native_predicates(self):
+  # All three actual importers require exact source-file bytes. A runpy-only
+  # adapter can pass unit verification yet is never equal to that source file.
+  original=R['adapted_tree']('mouse634-task-evidence.py')
+  current=ast.parse((ROOT/'tools/mouse635-task-evidence.py').read_bytes())
+  class WithoutApprovedPNGDecoder(ast.NodeTransformer):
+   def visit_FunctionDef(self,node):
+    if node.name=='decode_png':node.body=[ast.Pass()]
+    return node
+  self.assertEqual(ast.dump(WithoutApprovedPNGDecoder().visit(original)),ast.dump(WithoutApprovedPNGDecoder().visit(current)))
+  for module in ('mouse632-release.py','mouse632-windows-release.py','mouse633-linux-release.py'):
+   tree=R['adapted_tree'](module);fn=next(node for node in tree.body if isinstance(node,ast.FunctionDef) and node.name=='import_candidate')
+   text=ast.unparse(fn)
+   self.assertIn('tools/mouse-631-acceptance.py',text)
+   self.assertIn("with_name('mouse635-task-evidence.py').read_bytes()",text)
  def test_source_and_fresh_publisher_paths_require_composed_feedback_and_upgrade(self):
   current=runpy.run_path(str(ROOT/'tools/mouse635-feedback-evidence.py'));self.assertNotEqual(current['verify'],current['_verify_634'])
   for name in ('mouse632-windows-release.py','mouse633-release.py','mouse634-linux-release.py'):
