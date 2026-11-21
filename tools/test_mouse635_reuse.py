@@ -116,7 +116,9 @@ class Reuse635(unittest.TestCase):
  def test_version_scoped_pipeline_and_key_only_in_installed_step(self):
   for suffix,stage in [('', '6.0.35-arm64'),('-windows','6.0.35-windows-x64'),('-linux','6.0.35-linux-x64')]:
    name='publish-mouse635'+suffix+'.yml';text=(ROOT/'.github/workflows'/name).read_text()
-   self.assertIn("paths: ['staging/mouse/"+stage+"/PUBLISH_OWNER', '.github/workflows/"+name+"']",text)
+   expected="paths: ['staging/mouse/"+stage+"/PUBLISH_OWNER', '.github/workflows/"+name+"']"
+   if not suffix:expected="paths: ['staging/mouse/"+stage+"/PUBLISH_OWNER', 'staging/mouse/"+stage+"/pin.json', '.github/workflows/"+name+"']"
+   self.assertIn(expected,text)
    for token in ('branches: [main]','needs: contract','cancel-in-progress: false',"if: github.event_name != 'pull_request'",'test_mouse635_633_owner_evidence.py','test_mouse635_retained_owner_evidence.py','test_mouse635_owner_feedback_evidence.py','test_mouse635_search_evidence.py','test_mouse635_public_search_evidence.py','test_mouse635_library_evidence.py'):self.assertIn(token,text)
    self.assertNotIn('--no-sandbox',text);self.assertLessEqual(text.count('MOUSE_TEST_BRAVE_SEARCH_API_KEY:'),1)
    for step in (chunk for chunk in text.split('      - name: ') if 'MOUSE_TEST_BRAVE_SEARCH_API_KEY:' in chunk):
