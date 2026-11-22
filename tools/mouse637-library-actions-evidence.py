@@ -90,6 +90,64 @@ def guest_probe(native):
             'point': {'x': native['bounds']['x'] + 98, 'y': native['bounds']['y'] + 230}, 'expectedRGB': [32, 123, 164]}
 
 
+def native_gesture(value, event, file, pid, platform):
+    need(isinstance(value, dict) and value.get('schema') == 1
+         and value.get('method') == 'independent-native-input-process'
+         and value.get('platform') == platform and value.get('source') == N['source'](platform)
+         and value.get('parentPid') == pid and type(value.get('childPid')) is int
+         and value['childPid'] > 0 and value['childPid'] != pid
+         and type(value.get('exitCode')) is int and value['exitCode'] == 0
+         and value.get('released') is True and value.get('ok') is True
+         and not value.get('error') and not value.get('releaseError'), 'file gesture did not exit in an independent native process')
+    nonce = value.get('nonce')
+    need(isinstance(nonce, str) and re.fullmatch(r'[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}', nonce),
+         'file gesture nonce missing')
+    clock = ('forkedAt', 'startedAt', 'completedAt', 'exitAt', 'deadlineAt', 'elapsedMs', 'budgetMs')
+    need(all(type(value.get(key)) is int and value[key] > 0 for key in clock)
+         and value['forkedAt'] <= value['startedAt'] < value['completedAt'] <= value['exitAt']
+         and value['completedAt'] <= value['deadlineAt'] <= value['forkedAt'] + value['budgetMs']
+         and value['elapsedMs'] == value['completedAt'] - value['startedAt']
+         and 0 < value['elapsedMs'] <= value['budgetMs'] <= 10000
+         and value.get('driverCallLimitMs') == (None if platform == 'darwin' else 7000)
+         and value.get('lifecycleLimitMs') == 53000 and value.get('terminationRequested') is False
+         and value['exitAt'] - value['forkedAt'] <= 53000,
+         'file gesture exceeded or changed its independent process budget')
+    handshake = value.get('handshake', {})
+    native_file = {'name': file['dragName'], 'size': file['size'], 'sha256': file['sha256'], 'hasIcon': True, 'keys': ['file', 'icon']}
+    need(handshake.get('schema') == 1 and handshake.get('nonce') == nonce
+         and handshake.get('parentPid') == pid and handshake.get('childPid') == value['childPid']
+         and handshake.get('nativeFile') == native_file
+         and all(type(handshake.get(key)) is int for key in ('at', 'observedAt'))
+         and value['startedAt'] <= handshake['at'] <= handshake['observedAt'] <= value['completedAt'],
+         'native startDrag handshake belongs to another process, gesture or file')
+    start = {key: N['jsround'](event['from'][key]) for key in ('x', 'y')}
+    end = {key: N['jsround'](event['to'][key]) for key in ('x', 'y')}
+    logical = [start, {'x': start['x'] - 14, 'y': start['y'] + 8}]
+    logical += [{key: N['jsround'](start[key] + (end[key] - start[key]) * step / 10) for key in ('x', 'y')}
+                for step in range(1, 11)]
+    logical.append(end)
+    coordinates, rows = value.get('coordinates', {}), value.get('events', [])
+    samples = coordinates.get('samples', [])
+    need(coordinates.get('source') == ('Electron screen.dipToScreenPoint' if platform == 'win32' else 'native screen coordinates')
+         and len(samples) == len(rows) == 13, 'native gesture coordinate conversion or complete pointer sequence missing')
+    previous = value['startedAt']
+    for index, (sample, row, point) in enumerate(zip(samples, rows, logical)):
+        physical = sample.get('physical', {})
+        need(sample.get('logical') == point and set(physical) == {'x', 'y'}
+             and all(type(physical[key]) is int and abs(physical[key]) < 2**53 for key in ('x', 'y'))
+             and (platform == 'win32' or physical == point)
+             and all(row.get(key) == physical[key] for key in ('x', 'y'))
+             and row.get('phase') == (0 if index == 0 else 2 if index == 12 else 1)
+             and row.get('accepted') is True and type(row.get('at')) is int
+             and previous <= row['at'] <= value['completedAt'], 'native file gesture points, phases or actual driver receipt differ')
+        previous = row['at']
+    need(samples[11]['physical'] == samples[12]['physical']
+         and rows[0]['at'] <= handshake['at']
+         and rows[1]['at'] <= handshake['observedAt'] <= rows[2]['at'],
+         'native file movement did not wait for its exact startDrag handshake')
+    return nonce
+
+
 def verify(value, owners, *, evidence, pid, platform, inputs, input_check, origin, captures):
     need(value.get('schema') == 1 and value.get('source') == 'Owned local files, native context menu and OS file drops into live panes'
          and value.get('ok') is True and not value.get('error') and value.get('query') == QUERY, 'native library file proof incomplete')
@@ -180,6 +238,7 @@ def verify(value, owners, *, evidence, pid, platform, inputs, input_check, origi
     transfers = value.get('transfers', [])
     need([(row.get('fileKey'), row.get('targetTabId'), row.get('pane')) for row in transfers]
          == [('archive-image', before[0]['id'], 'p1'), ('archive-text', before[1]['id'], 'p2'), ('download-image', before[0]['id'], 'p1')], 'real files did not reach both intended browser panes')
+    nonces = set()
     for transfer in transfers:
         file = by_key[transfer['fileKey']]
         owner = next(row for row in before if row['id'] == transfer['targetTabId'])
@@ -188,6 +247,9 @@ def verify(value, owners, *, evidence, pid, platform, inputs, input_check, origi
         event = transfer.get('input', {})
         need(event in inputs and event.get('action') == 'file-drag' and event.get('selector') == '.library-row[data-id=' + json.dumps(file['id']) + '] .library-file-open', 'file transfer lacks its native source gesture')
         input_check(event, platform, {pid}); source_point(transfer, event['from'], file, 'sourceState')
+        nonce = native_gesture(transfer.get('gesture'), event, file, pid, platform)
+        need(nonce not in nonces, 'file transfers reused a native gesture handshake')
+        nonces.add(nonce)
         box, content = transfer['nativeBefore']['bounds'], transfer['contentBounds']
         need(event.get('to') == {'x': N['jsround'](content['x'] + box['x'] + 98), 'y': N['jsround'](content['y'] + box['y'] + 198)}, 'file gesture ended outside the intended receiver')
         received = transfer.get('received', {})

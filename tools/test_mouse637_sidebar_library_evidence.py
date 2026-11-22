@@ -37,6 +37,28 @@ def click(selector, tab_id=None):
     return H['click'](selector, tab_id)
 
 
+def gesture_fixture(event, file, index=0, platform='linux'):
+    start, end = event['from'], event['to']
+    points = [copy.deepcopy(start), {'x': start['x'] - 14, 'y': start['y'] + 8}]
+    points += [{key: L['N']['jsround'](start[key] + (end[key] - start[key]) * step / 10) for key in ('x', 'y')}
+               for step in range(1, 11)]
+    points.append(copy.deepcopy(end))
+    # Synthetic contract fixture: exercise non-identity Windows conversion,
+    # without presenting these generated coordinates as native evidence.
+    physical = [{key: point[key] * 2 + 20 for key in ('x', 'y')} if platform == 'win32' else copy.deepcopy(point) for point in points]
+    nonce = '10000000-0000-4000-8000-' + str(index + 1).zfill(12)
+    return {'schema': 1, 'method': 'independent-native-input-process', 'platform': platform, 'source': L['N']['source'](platform),
+            'parentPid': 11, 'childPid': 100 + index, 'nonce': nonce, 'budgetMs': 10000,
+            'driverCallLimitMs': None if platform == 'darwin' else 7000, 'lifecycleLimitMs': 53000, 'terminationRequested': False,
+            'forkedAt': 900, 'startedAt': 1000, 'completedAt': 2500, 'exitAt': 2600, 'deadlineAt': 10900,
+            'elapsedMs': 1500, 'exitCode': 0, 'released': True, 'ok': True,
+            'coordinates': {'source': 'Electron screen.dipToScreenPoint' if platform == 'win32' else 'native screen coordinates',
+                            'samples': [{'logical': point, 'physical': target} for point, target in zip(points, physical)]},
+            'events': [{**point, 'phase': 0 if i == 0 else 2 if i == 12 else 1, 'at': 1100 + i * 100, 'accepted': True} for i, point in enumerate(physical)],
+            'handshake': {'schema': 1, 'nonce': nonce, 'parentPid': 11, 'childPid': 100 + index, 'at': 1200, 'observedAt': 1250,
+                          'nativeFile': {'name': file['dragName'], 'size': file['size'], 'sha256': file['sha256'], 'hasIcon': True, 'keys': ['file', 'icon']}}}
+
+
 class FakeFrames:
     """Frame decoding is covered by the immutable primitive tests, not mocked as CI."""
     def __init__(self, raw):
@@ -123,7 +145,7 @@ def library_fixture():
         inputs.append(event)
         report['transfers'].append({'fileKey': file['key'], 'targetTabId': before[index]['id'], 'pane': 'p' + str(index + 1),
                                    'before': owner(index, 5), 'after': owner(index, 6), 'nativeBefore': copy.deepcopy(pair[index]), 'nativeAfter': copy.deepcopy(pair[index]),
-                                   'input': event, 'sourceState': source_state, 'contentBounds': content,
+                                   'input': event, 'gesture': gesture_fixture(event, file, files.index(file)), 'sourceState': source_state, 'contentBounds': content,
                                    'received': {'trusted': True, 'types': ['Files'], 'files': [{'name': file['dragName'], 'type': file['type'], 'size': file['size'], 'bytes': list(raw[file['artifact']])}]},
                                    'over': [{'trusted': True, 'at': 100}], 'nativeFile': {'name': file['dragName'], 'size': file['size'], 'sha256': file['sha256'], 'hasIcon': True, 'keys': ['file', 'icon']},
                                    'clipboardBefore': 'a' * 64, 'clipboardAfter': 'a' * 64, 'libraryStillOpen': True})
@@ -141,6 +163,39 @@ class LibraryAcceptance(unittest.TestCase):
         self.assertEqual(len(result['witnesses']), 5)
         self.assertEqual(len(result['inputs']), 3)
         self.assertTrue(result['summary']['nativeFilesToBothPanes'])
+
+    def test_independent_native_file_gesture_preserves_platform_coordinate_conversion(self):
+        report, *_rest = library_fixture()
+        event, file = report['transfers'][0]['input'], report['files'][0]
+        for platform in ('darwin', 'linux', 'win32'):
+            receipt = gesture_fixture(event, file, platform=platform)
+            with self.subTest(platform=platform):
+                self.assertEqual(L['native_gesture'](receipt, event, file, 11, platform), receipt['nonce'])
+
+    def test_native_file_gesture_requires_actual_child_and_owned_nonce_handshake(self):
+        mutations = [lambda g: g.update(childPid=11), lambda g: g.update(parentPid=12),
+                     lambda g: g.update(exitCode=1), lambda g: g.update(released=False),
+                     lambda g: g.update(budgetMs=10001), lambda g: g.update(deadlineAt=2499),
+                     lambda g: g.update(terminationRequested=True), lambda g: g.update(lifecycleLimitMs=54000),
+                     lambda g: g['handshake'].update(childPid=9), lambda g: g['handshake'].update(nonce='a' * 36),
+                     lambda g: g['handshake']['nativeFile'].update(sha256='a' * 64),
+                     lambda g: g['handshake'].update(observedAt=2400)]
+        for mutate in mutations:
+            fixture = library_fixture(); mutate(fixture[0]['transfers'][0]['gesture'])
+            with self.assertRaises(ValueError): verify_library(fixture)
+        fixture = library_fixture(); del fixture[0]['transfers'][0]['gesture']
+        with self.assertRaises(ValueError): verify_library(fixture)
+        fixture = library_fixture(); first, second = fixture[0]['transfers'][:2]
+        second['gesture']['nonce'] = second['gesture']['handshake']['nonce'] = first['gesture']['nonce']
+        with self.assertRaises(ValueError): verify_library(fixture)
+
+    def test_native_file_gesture_requires_complete_ordered_pointer_trace(self):
+        for mutate in [lambda g: g['events'].pop(), lambda g: g['events'][12].update(phase=1),
+                       lambda g: g['events'][2].update(accepted=False), lambda g: g['events'][2].update(at=1000),
+                       lambda g: g['events'][2].update(x=0), lambda g: g['coordinates']['samples'][2]['logical'].update(x=0),
+                       lambda g: g['coordinates']['samples'][2]['physical'].update(x=0)]:
+            fixture = library_fixture(); mutate(fixture[0]['transfers'][0]['gesture'])
+            with self.assertRaises(ValueError): verify_library(fixture)
 
     def test_native_file_data_mime_names_clipboard_and_target_forgery_rejected(self):
         for mutate in [lambda r: r['transfers'][0]['received'].update(trusted=False),
