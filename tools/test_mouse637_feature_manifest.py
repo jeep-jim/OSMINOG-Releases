@@ -19,7 +19,9 @@ FEATURES = runpy.run_path(str(ROOT / 'tools/mouse637-features-evidence.py'))
 class FeatureManifest(unittest.TestCase):
     def source_build_tokens(self):
         fixture = json.loads((ROOT / 'tools/fixtures/mouse637-macos-build-feature-tokens.json').read_text(encoding='utf-8'))
-        self.assertEqual(fixture['source'], '5a13d620e66e8b25792b3ba26de907c6b66fc422')
+        self.assertEqual(fixture['sourceBase'], '554fbd5c1da7dbe385fab1385d8f51dc06595d4f')
+        self.assertEqual(fixture['change'], 'owner-requested-agent-removal')
+        self.assertRegex(fixture['workflowSHA256'], r'^[0-9a-f]{64}$')
         self.assertEqual(fixture['path'], '.github/workflows/mouse-macos.yml')
         return fixture['tests']
 
@@ -80,11 +82,11 @@ class FeatureManifest(unittest.TestCase):
         schema = self.schema()
         self.check_schema(schema)
         gate = schema['x-current637FeaturesGate']
-        self.assertEqual(gate['nativeCaptures'], 38)
-        self.assertEqual(gate['writeNativeCaptures'], 36)
+        self.assertEqual(gate['nativeCaptures'], 36)
+        self.assertEqual(gate['writeNativeCaptures'], 34)
         self.assertEqual(gate['readNativeCaptures'], 2)
         self.assertEqual(gate['nativeCaptureNames'], FEATURES['CAPTURES'])
-        self.assertEqual(len(set(gate['nativeCaptureNames'])), 38)
+        self.assertEqual(len(set(gate['nativeCaptureNames'])), 36)
         self.assertTrue({'mouse637-presets-evidence.py', 'mouse637-sidebar-focus-evidence.py', 'mouse637-library-actions-evidence.py', 'mouse637-update-ui-evidence.py'} <= set(gate['dependencies']))
 
     def test_old_counts_missing_frames_and_stale_dependency_bytes_fail(self):

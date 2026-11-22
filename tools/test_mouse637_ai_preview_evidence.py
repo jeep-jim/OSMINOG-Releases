@@ -124,7 +124,7 @@ class AIPreviewAcceptance(unittest.TestCase):
     def test_all_modes_themes_navigation_transfers_and_parent_close(self):
         witnesses = self.check(*fixture())
         self.assertEqual(len(witnesses), 6)
-        self.assertEqual(len(F['CAPTURES']), 38)
+        self.assertEqual(len(F['CAPTURES']), 36)
         self.assertEqual([name for name in F['CAPTURES'] if name.startswith('mouse-637-ai-preview-')], [
             'mouse-637-ai-preview-rounded-light.png', 'mouse-637-ai-preview-rounded-dark.png',
             'mouse-637-ai-preview-square-light.png', 'mouse-637-ai-preview-square-dark.png',

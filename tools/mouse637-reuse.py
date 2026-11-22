@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """Byte-frozen636 gates with scoped637 identities, palette and populated modes.
 
-Old artifacts and validators remain byte-for-byte immutable. Current637 still
-emits retained636 owner, Agent, search-removal and desktop-transition reports.
-Only new upgrade/performance reports and the current executable identity move.
+Old artifacts and validators remain byte-for-byte immutable. Current637 retains
+the browser evidence and explicitly replaces the removed Agent feature with
+installed absence evidence, according to the owner's latest instruction.
 """
 import ast
 import hashlib
@@ -170,7 +170,8 @@ def adapted_tree(name, *, current_native=False):
         if len(assignments) != 1:
             raise ValueError('Frozen Linux predecessor assignment changed')
         assignments[0].value = ast.parse(repr(PREVIOUS_LINUX), mode='eval').body
-    return ast.fix_missing_locations(tree)
+    removal = runpy.run_path(str(Path(__file__).with_name('mouse637-agent-removal-adapter.py')))
+    return removal['apply'](name, ast.fix_missing_locations(tree))
 
 
 def load(name, *, namespace=None, current_native=False):

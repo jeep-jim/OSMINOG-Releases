@@ -20,7 +20,6 @@ CAPTURES = ['mouse-637-' + part + '.png' for part in (
     'extensions-pane', 'media-full', 'media-compact', 'media-replacement',
     'ai-preview-rounded-light', 'ai-preview-rounded-dark', 'ai-preview-square-light', 'ai-preview-square-dark',
     'ai-preview-moved', 'ai-preview-dragged',
-    'localhost-light', 'localhost-dark',
     'sidebar-before-light', 'sidebar-settings-light', 'sidebar-library-light', 'sidebar-restored-light',
     'sidebar-before-dark', 'sidebar-settings-dark', 'sidebar-library-dark', 'sidebar-restored-dark',
     'library-captures-list-light', 'library-captures-grid-light', 'library-context',

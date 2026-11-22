@@ -67,6 +67,7 @@ jobs:
             mouse637-windows-release/*.json
             mouse637-windows-release/*.log
             mouse637-windows-release/*.png
+            mouse637-windows-release/mouse-637-agent-code-*.cjs
             mouse637-windows-release/mouse-637-library-source.txt
             mouse637-windows-release/mouse-631-upgrade/**
             mouse637-windows-release/mouse-637-baseline-performance/**

@@ -25,7 +25,7 @@ def trees():
     return {'trader': split('x', .66, leaf(1), column(2, 3, 4)),
             'support': split('x', .64, split('x', .5, column(1, 2), column(3, 4)), leaf(5)),
             'design': split('x', .64, split('y', .66, leaf(1), split('x', .5, leaf(2), leaf(3))), column(4, 5)),
-            'content': columns(*(column(i, i + 1) for i in range(1, 13, 2))), 'agents': leaf(1)}
+            'content': columns(*(column(i, i + 1) for i in range(1, 13, 2)))}
 
 
 def png(rgb, width=1000, height=800):
@@ -37,9 +37,6 @@ def png(rgb, width=1000, height=800):
 
 def fixture(platform='linux'):
     all_trees = trees()
-    automatic = {'enabled': False, 'running': False, 'port': 0, 'autonomous': True, 'terminal': False,
-                 'connectionUrl': '', 'writeAllowed': False, 'commandsAllowed': False, 'devEnabled': False,
-                 'devRunning': False, 'workerRunning': False, 'modelRequests': 0}
     report = {'schema': 1, 'version': '6.0.37', 'platform': platform, 'arch': 'arm64' if platform == 'darwin' else 'x64',
               'pid': 71, 'packaged': True, 'ok': True, 'source': P['SOURCE'], 'fixtureOrigin': ORIGIN,
               'catalog': [{'id': mode, 'sites': sites[:], 'tree': copy.deepcopy(all_trees[mode])} for mode, sites in P['CATALOG'].items()],
@@ -68,7 +65,7 @@ def fixture(platform='linux'):
 
     original = None
     for index, mode in enumerate(P['SEQUENCE']):
-        if index == 6:
+        if index == len(P['SEQUENCE']) - 1:
             pages, cached = {}, {}
             ai_only = add(ORIGIN + '/ai-only')
             only_before = snapshot()
@@ -83,51 +80,21 @@ def fixture(platform='linux'):
             row = pages[cached[canonical]]
             selected.append({'pane': 'p' + str(number), 'url': canonical, 'id': row['id'], 'webContentsId': row['webContentsId'],
                              'observedURL': row['url'], 'identity': row['identity'], 'internal': row['internal']})
-        application = {'mode': mode, 'desk': 'desk-4' if index == 6 else 'desk-2', 'tree': copy.deepcopy(all_trees[mode]),
+        application = {'mode': mode, 'desk': 'desk-4' if index == len(P['SEQUENCE']) - 1 else 'desk-2', 'tree': copy.deepcopy(all_trees[mode]),
                        'slots': {row['pane']: row['id'] for row in selected}, 'selected': selected,
                        'beforePages': before, 'afterPages': copy.deepcopy(before), 'requestBefore': offset,
                        'requestAfter': len(report['selectedRequests']), 'requestDelta': len(report['selectedRequests']) - offset,
-                       'input': input_click('#desk-modes [data-mode="' + mode + '"]'),
-                       'automaticBefore': copy.deepcopy(automatic), 'automaticAfter': copy.deepcopy(automatic)}
+                       'input': input_click('#desk-modes [data-mode="' + mode + '"]')}
         report['applications'].append(application)
         if index == 0:
             add(ORIGIN + '/owned-ai')
             original = snapshot()
-        if mode == 'agents':
-            identifier = selected[0]['id']
-            initial, before_ids = copy.deepcopy(pages[identifier]), sorted(pages)
-            navigation = {'id': identifier, 'internal': False, 'url': ORIGIN + '/', 'webContentsId': 600,
-                          'identity': .9, 'timeOrigin': 12345698.25, 'navigationEpoch': 1,
-                          'field': 'preserved-preset-' + identifier, 'scrollX': 0, 'scrollY': 0}
-            pages[identifier] = navigation
-            themes = []
-            for theme, color in [('light', [246, 247, 249]), ('dark', [17, 23, 31])]:
-                raw = png(color)
-                name = 'mouse-637-localhost-' + theme + '.png'
-                files[name] = files[name[:-4] + '-display.png'] = raw
-                bounds = {'x': 0, 'y': 0, 'width': 1000, 'height': 800}
-                capture = {'filename': name, 'displayFilename': name[:-4] + '-display.png', 'source': 'globalCapture.acquire(display)',
-                           'backend': 'synthetic-unit-fixture', 'kind': 'screen', 'pid': 71, 'sha256': hashlib.sha256(raw).hexdigest(),
-                           'displaySha256': hashlib.sha256(raw).hexdigest(), 'bytes': len(raw),
-                           'screenPixelSize': {'width': 1000, 'height': 800}, 'pixelSize': {'width': 1000, 'height': 800},
-                           'contentBounds': bounds, 'display': {'bounds': bounds, 'scaleFactor': 1}, 'cropPixels': bounds,
-                           'mapping': {'scaleX': 1, 'scaleY': 1, 'originX': 0, 'originY': 0}}
-                background = 'rgb(%d, %d, %d)' % tuple(color)
-                themes.append({'theme': theme, 'id': identifier, 'slot': identifier,
-                               'pane': {'x': 0, 'y': 0, 'width': 600, 'height': 700},
-                               'agent': {'x': 606, 'y': 0, 'width': 394, 'height': 700}, 'agentHidden': False,
-                               'background': background, 'resolvedBackground': background, 'color': 'rgb(212, 212, 212)',
-                               'readOnly': False, 'disabled': False, 'value': 'http://127.0.0.1:3000/', 'capture': capture})
-            report['agentLanding'] = {'id': identifier, 'initial': initial, 'themes': themes,
-                                      'input': input_click('.localhost-start-open'), 'navigation': copy.deepcopy(navigation),
-                                      'restored': copy.deepcopy(navigation), 'beforeIds': before_ids, 'afterIds': before_ids[:],
-                                      'automaticBefore': copy.deepcopy(automatic), 'automaticAfter': copy.deepcopy(automatic)}
-        if index == 5:
+        if index == len(P['SEQUENCE']) - 2:
             repeat = snapshot()
             report['repeat'] = {'mode': 'support', 'beforePages': repeat, 'afterPages': copy.deepcopy(repeat),
                                 'requestBefore': 22, 'requestAfter': 22, 'newRequests': 0}
             report['preservation'] = {'beforePages': original, 'afterPages': copy.deepcopy(original)}
-        if index == 6:
+        if index == len(P['SEQUENCE']) - 1:
             report['aiOnly'] = {'id': ai_only['id'], 'beforePages': only_before, 'afterPages': copy.deepcopy(only_before),
                                 'application': copy.deepcopy(application), 'requestBefore': 22, 'requestAfter': 27}
     return report, inputs, files
@@ -137,10 +104,13 @@ class PresetAcceptance(unittest.TestCase):
     def check(self, value, inputs, files):
         return P['verify'](value, P['N']['Evidence'](files.__getitem__), value['platform'], 71, inputs)
 
-    def test_all_platforms_require_real_counts_and_both_theme_pixels(self):
+    def test_all_platforms_require_four_presets_and_real_counts(self):
         for platform in ('darwin', 'win32', 'linux'):
             proof = self.check(*fixture(platform))
-            self.assertEqual(set(proof), {'mouse-637-localhost-light.png', 'mouse-637-localhost-dark.png'})
+            self.assertEqual(proof, {})
+            report = fixture(platform)[0]
+            self.assertEqual(len(report['catalog']), 4)
+            self.assertEqual(len(report['selectedRequests']), 27)
 
     def test_wrong_web_app_catalog_order_and_layout_fail(self):
         mutations = [lambda r: r['catalog'][1]['sites'].__setitem__(1, 'https://faq.whatsapp.com/'),
@@ -159,23 +129,15 @@ class PresetAcceptance(unittest.TestCase):
     def test_fake_counts_duplicate_requests_and_replaced_documents_fail(self):
         self.reject([lambda r: r['selectedRequests'].pop(),
                      lambda r: r['applications'][1].update(requestDelta=0),
-                     lambda r: r['applications'][5]['selected'][0].update(webContentsId=999),
+                     lambda r: r['applications'][4]['selected'][0].update(webContentsId=999),
                      lambda r: r['preservation']['afterPages'][0].update(field='lost draft'),
                      lambda r: r['repeat']['afterPages'][0].update(timeOrigin=123),
                      lambda r: r['applications'][-1].update(desk='desk-2')])
 
-    def test_permissions_worker_or_listener_cannot_start_with_presets(self):
-        self.reject([lambda r: r['applications'][0]['automaticAfter'].update(enabled=True),
-                     lambda r: r['applications'][2]['automaticAfter'].update(writeAllowed=True),
-                     lambda r: r['agentLanding']['automaticAfter'].update(modelRequests=1),
-                     lambda r: r['agentLanding']['automaticAfter'].update(terminal=True)])
-
-    def test_localhost_placement_theme_navigation_and_retention_are_mandatory(self):
-        self.reject([lambda r: r['agentLanding']['themes'][1].update(background='rgb(255, 255, 255)', resolvedBackground='rgb(255, 255, 255)'),
-                     lambda r: r['agentLanding']['themes'][0].update(readOnly=True),
-                     lambda r: r['agentLanding']['themes'][0]['agent'].update(x=300),
-                     lambda r: r['agentLanding']['restored'].update(webContentsId=998),
-                     lambda r: r['agentLanding']['afterIds'].pop()])
+    def test_retired_agent_preset_and_landing_are_rejected(self):
+        self.reject([lambda r: r['catalog'].append({'id': 'agents', 'sites': ['mouse://start'], 'tree': leaf(1)}),
+                     lambda r: r.update(agentLanding={}),
+                     lambda r: r['applications'][0].update(mode='agents')])
 
     def test_native_input_requires_real_ledger_and_trusted_event(self):
         report, inputs, files = fixture()
@@ -183,17 +145,6 @@ class PresetAcceptance(unittest.TestCase):
         with self.assertRaises(ValueError): self.check(report, inputs, files)
         report, inputs, files = fixture()
         report['applications'][2]['input']['trusted'] = False
-        with self.assertRaises(ValueError): self.check(report, inputs, files)
-
-    def test_raw_os_png_hash_pixel_and_crop_must_match(self):
-        report, inputs, files = fixture()
-        files['mouse-637-localhost-dark.png'] = png([255, 255, 255])
-        with self.assertRaises(ValueError): self.check(report, inputs, files)
-        report, inputs, files = fixture()
-        capture = report['agentLanding']['themes'][1]['capture']
-        raw = png([255, 255, 255])
-        files[capture['filename']] = files[capture['displayFilename']] = raw
-        capture.update(sha256=hashlib.sha256(raw).hexdigest(), displaySha256=hashlib.sha256(raw).hexdigest(), bytes=len(raw))
         with self.assertRaises(ValueError): self.check(report, inputs, files)
 
     def test_legacy_adaptation_is_exact_and_frozen_files_are_unchanged(self):
@@ -204,32 +155,23 @@ class PresetAcceptance(unittest.TestCase):
                  and node.func.id == '_mouse637_verify_mode_requests']
         self.assertEqual(len(calls), 1)
         constants = [node.value for node in ast.walk(tree) if isinstance(node, ast.Constant)]
-        self.assertIn('five-mode-populated-presets-preserve-live-pages', constants)
+        self.assertIn('four-mode-populated-presets-preserve-live-pages', constants)
+        self.assertNotIn('five-mode-populated-presets-preserve-live-pages', constants)
         self.assertNotIn('five-mode-layouts-empty-only-suggestions', constants)
         with tempfile.TemporaryDirectory() as output:
             with self.assertRaises(ValueError): P['verify_legacy_facts']({'suggestedRequests': 7}, output)
 
-    def test_legacy_actual_count_and_pngs_require_the_complete_new_contract(self):
-        report, _, files = fixture('darwin')
-        landing = report['agentLanding']
-        local = {**landing['navigation'], 'id': 'settings-local', 'webContentsId': 900, 'field': 'preserved-preset-settings-local'}
-        identifiers = sorted(landing['beforeIds'] + [local['id']])
-        landing['settingsLaunch'] = {'before': local, 'after': copy.deepcopy(local), 'previousId': landing['id'],
-                                    'previousRetained': True, 'beforeIds': identifiers, 'afterIds': identifiers[:]}
+    def test_legacy_actual_count_and_preservation_require_the_complete_current_contract(self):
+        report, _, _ = fixture('darwin')
+        facts = {'suggestedRequests': 27, 'preservedTabs': 23, 'presetEvidence': report}
         with tempfile.TemporaryDirectory() as output:
-            for row in landing['themes']:
-                raw = files[row['capture']['filename']]
-                rgb = P['rgb'](row['background'])
-                name = 'mouse-622-localhost-' + row['theme'] + '.png'
-                row['capture'] = {'filename': name, 'source': 'win.capturePage()', 'sha256': hashlib.sha256(raw).hexdigest(),
-                                  'bytes': len(raw), 'pixelSize': {'width': 1000, 'height': 800},
-                                  'contentBounds': {'x': 0, 'y': 0, 'width': 1000, 'height': 800},
-                                  'point': {'x': 12, 'y': 12}, 'x': 12, 'y': 12, 'expectedRGB': rgb, 'actualRGBA': rgb + [255]}
-                (Path(output) / name).write_bytes(raw)
-            facts = {'suggestedRequests': 27, 'preservedTabs': 24, 'presetEvidence': report}
             self.assertTrue(P['verify_legacy_facts'](facts, output))
-            (Path(output) / 'mouse-622-localhost-dark.png').write_bytes(png([255, 255, 255]))
-            with self.assertRaises(ValueError): P['verify_legacy_facts'](facts, output)
+            for key, bad in [('suggestedRequests', 7), ('preservedTabs', 24)]:
+                changed = copy.deepcopy(facts); changed[key] = bad
+                with self.assertRaises(ValueError): P['verify_legacy_facts'](changed, output)
+            changed = copy.deepcopy(facts)
+            changed['presetEvidence']['repeat']['afterPages'][0]['field'] = 'lost draft'
+            with self.assertRaises(ValueError): P['verify_legacy_facts'](changed, output)
 
 
 if __name__ == '__main__': unittest.main()

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Independent637 populated presets, page retention and localhost evidence.
+"""Independent637 four populated presets and live-page retention evidence.
 
 The637 contract replaces the obsolete seven empty-desktop suggestions with
 actual service requests on populated desktops. It never rewrites frozen gates
@@ -27,10 +27,9 @@ CATALOG = {
                 'https://www.facebook.com/', 'https://www.reddit.com/', 'https://www.threads.com/',
                 'https://web.telegram.org/k/', 'https://web.wechat.com/',
                 'https://web.whatsapp.com/', 'https://web.max.ru/'],
-    'agents': ['mouse://start'],
 }
-SEQUENCE = ['support', 'trader', 'design', 'content', 'agents', 'support', 'support']
-DELTAS = [5, 4, 5, 8, 0, 0, 5]
+SEQUENCE = ['support', 'trader', 'design', 'content', 'support', 'support']
+DELTAS = [5, 4, 5, 8, 0, 5]
 
 
 def tree_rects(tree, bounds=(0, 0, 1, 1), depth=0):
@@ -60,8 +59,7 @@ def expected_rects(mode):
     if mode == 'design':
         return {'p1': (0, 0, .64, .66), 'p2': (0, .66, .32, .34), 'p3': (.32, .66, .32, .34),
                 'p4': (.64, 0, .36, .5), 'p5': (.64, .5, .36, .5)}
-    need(mode == 'agents', 'unknown preset mode')
-    return {'p1': (0, 0, 1, 1)}
+    raise ValueError('unknown current preset mode: ' + str(mode))
 
 
 def geometry(tree, mode):
@@ -101,13 +99,6 @@ def preserved(before, after, origin, *, count=None):
         page(item, origin)
 
 
-def disconnected(value):
-    need(isinstance(value, dict) and all(value.get(key) is False for key in
-         ('enabled', 'running', 'writeAllowed', 'commandsAllowed', 'devRunning', 'workerRunning'))
-         and value.get('port') == 0 and value.get('connectionUrl') == '' and value.get('modelRequests') == 0,
-         'opening a preset enabled an Agent permission, worker, listener or model request')
-
-
 def trusted(value, selector, platform, inputs=None):
     need(isinstance(value, dict) and value.get('selector') == selector and value.get('source') == N['source'](platform)
          and value.get('trusted') is True and positive(value.get('at'))
@@ -125,15 +116,6 @@ def trusted(value, selector, platform, inputs=None):
              and e.get('matches') is True for e in matches[0].get('events', [])), 'preset click is absent from the native ledger')
 
 
-def rgb(value):
-    need(isinstance(value, str), 'localhost theme color absent')
-    match = re.fullmatch(r'rgb\((\d+), (\d+), (\d+)\)', value)
-    need(match is not None, 'localhost theme color is not opaque RGB')
-    result = [int(v) for v in match.groups()]
-    need(all(0 <= v <= 255 for v in result), 'localhost color invalid')
-    return result
-
-
 def verify_contract(value, platform, pid, inputs=None):
     need(value.get('schema') == 1 and value.get('version') == '6.0.37' and value.get('platform') == platform
          and value.get('pid') == pid and positive(pid) and value.get('packaged') is True
@@ -145,14 +127,14 @@ def verify_contract(value, platform, pid, inputs=None):
          and parsed.path == '' and not parsed.username and not parsed.password and not parsed.query and not parsed.fragment,
          'preset fixture origin is not an isolated loopback server')
     catalog = value.get('catalog', [])
-    need([item.get('id') for item in catalog] == list(CATALOG), 'five preset catalog/order missing')
+    need([item.get('id') for item in catalog] == list(CATALOG), 'four preset catalog/order missing')
     for entry in catalog:
         need(entry.get('sites') == CATALOG[entry['id']], 'preset service URL differs; use the actual web application')
         geometry(entry.get('tree'), entry['id'])
     apps, requests = value.get('applications', []), value.get('selectedRequests', [])
     need([row.get('mode') for row in apps] == SEQUENCE and isinstance(requests, list)
          and len(requests) == sum(DELTAS), 'populated and repeated preset application sequence/count differs')
-    need(all(row.get('desk') == 'desk-2' for row in apps[:6]) and apps[-1].get('desk') == 'desk-4',
+    need(all(row.get('desk') == 'desk-2' for row in apps[:-1]) and apps[-1].get('desk') == 'desk-4',
          'preset application desktop ownership differs')
     selected_by_desk, request_at = {}, 0
     for index, sample in enumerate(apps):
@@ -161,9 +143,6 @@ def verify_contract(value, platform, pid, inputs=None):
         need(sample.get('requestBefore') == request_at and sample.get('requestDelta') == delta
              and sample.get('requestAfter') == request_at + delta, 'actual preset request delta differs')
         preserved(sample.get('beforePages'), sample.get('afterPages'), origin)
-        for key in ('automaticBefore', 'automaticAfter'):
-            disconnected(sample.get(key))
-        need(sample['automaticBefore'] == sample['automaticAfter'], 'preset changed the Agent configuration')
         trusted(sample.get('input'), '#desk-modes [data-mode="' + mode + '"]', platform, inputs)
         slots, rows = sample.get('slots', {}), sample.get('selected', [])
         panes = list(expected_rects(mode))
@@ -174,19 +153,15 @@ def verify_contract(value, platform, pid, inputs=None):
         for pane_id, canonical, row in zip(panes, CATALOG[mode], rows):
             need(row.get('pane') == pane_id and row.get('url') == canonical and identifier(row.get('id'))
                  and slots.get(pane_id) == row['id'], 'preset page is assigned to the wrong tile')
-            if canonical == 'mouse://start':
-                need(row.get('internal') is True and row.get('observedURL') == canonical
-                     and row.get('webContentsId') is None and row.get('identity') is None, 'Agent landing is not a dedicated internal page')
+            need(row.get('internal') is False and positive(row.get('webContentsId')) and finite(row.get('identity'))
+                 and row.get('observedURL') == origin + '/suggested/' + quote(canonical, safe="~()*!.'-_"),
+                 'preset service did not open the owned redirected document')
+            if canonical not in known:
+                missing.append(canonical)
             else:
-                need(row.get('internal') is False and positive(row.get('webContentsId')) and finite(row.get('identity'))
-                     and row.get('observedURL') == origin + '/suggested/' + quote(canonical, safe="~()*!.'-_"),
-                     'preset service did not open the owned redirected document')
-                if canonical not in known:
-                    missing.append(canonical)
-                else:
-                    prior = known[canonical]
-                    need(all(row.get(k) == prior.get(k) for k in ('id', 'webContentsId', 'identity')),
-                         'revisiting a shared service replaced its live page')
+                prior = known[canonical]
+                need(all(row.get(k) == prior.get(k) for k in ('id', 'webContentsId', 'identity')),
+                     'revisiting a shared service replaced its live page')
             known[canonical] = row
         need(len(missing) == delta and Counter(requests[request_at:request_at + delta]) == Counter(missing),
              'raw intercepted requests do not match newly opened services')
@@ -197,7 +172,7 @@ def verify_contract(value, platform, pid, inputs=None):
     repeat = value.get('repeat', {})
     need(repeat.get('mode') == 'support' and repeat.get('requestBefore') == repeat.get('requestAfter') == 22
          and repeat.get('newRequests') == 0, 'repeated mode opened duplicate service pages')
-    preserved(repeat.get('beforePages'), repeat.get('afterPages'), origin, count=24)
+    preserved(repeat.get('beforePages'), repeat.get('afterPages'), origin, count=23)
     preservation = value.get('preservation', {})
     preserved(preservation.get('beforePages'), preservation.get('afterPages'), origin, count=6)
     only = value.get('aiOnly', {})
@@ -205,82 +180,18 @@ def verify_contract(value, platform, pid, inputs=None):
     need(only.get('id') == only['beforePages'][0]['id'] and only.get('application') == apps[-1]
          and only.get('requestBefore') == 22 and only.get('requestAfter') == 27
          and only['beforePages'][0]['url'] == origin + '/ai-only', 'AI-only desktop did not retain its chat')
-    landing = value.get('agentLanding', {})
-    identifier_value = landing.get('id')
-    need(identifier_value == apps[4]['selected'][0]['id'] and landing.get('initial') ==
-         {'id': identifier_value, 'internal': True, 'url': 'mouse://start', 'webContentsId': None, 'identity': None},
-         'localhost did not start in its dedicated pane')
-    for key in ('automaticBefore', 'automaticAfter'):
-        disconnected(landing.get(key))
-    need(landing['automaticBefore'] == landing['automaticAfter'], 'localhost landing changed the Agent configuration')
-    trusted(landing.get('input'), '.localhost-start-open', platform, inputs)
-    need(landing.get('beforeIds') == landing.get('afterIds') and isinstance(landing.get('beforeIds'), list)
-         and len(set(landing['beforeIds'])) == len(landing['beforeIds']) == 24 and identifier_value in landing['beforeIds'],
-         'opening localhost replaced or added another tab')
-    navigation = page(landing.get('navigation'), origin)
-    need(navigation['id'] == identifier_value and navigation['internal'] is False and navigation['url'] == origin + '/',
-         'localhost input did not navigate its existing pane')
-    preserved([navigation], [landing.get('restored')], origin, count=1)
-    themes = landing.get('themes', [])
-    need([row.get('theme') for row in themes] == ['light', 'dark'], 'localhost both themes missing')
-    witnesses = {}
-    for row in themes:
-        pane_bounds, agent_bounds = rect(row.get('pane')), rect(row.get('agent'))
-        color = rgb(row.get('background'))
-        need(row.get('id') == row.get('slot') == identifier_value and row.get('agentHidden') is False
-             and pane_bounds['x'] + pane_bounds['width'] <= agent_bounds['x'] + 1.1
-             and row.get('background') == row.get('resolvedBackground')
-             and (max(color) < 90 if row['theme'] == 'dark' else min(color) > 180)
-             and row.get('readOnly') is False and row.get('disabled') is False and row.get('value') == 'http://127.0.0.1:3000/',
-             'localhost landing theme, left placement or editable address differs')
-        witnesses[row['theme']] = {'name': 'Localhost landing background',
-                                  'point': {'x': pane_bounds['x'] + 12, 'y': pane_bounds['y'] + 12}, 'expectedRGB': color}
-    return witnesses
+    need('agentLanding' not in value, 'removed Agent landing must not be reported as a current preset')
+    return {}
 
 
 def verify(value, evidence, platform, pid, inputs=None):
     need(value.get('ok') is True, 'portable preset scenario did not complete')
-    witnesses = verify_contract(value, platform, pid, inputs)
-    result = {}
-    for row in value['agentLanding']['themes']:
-        capture = row.get('capture', {})
-        name = 'mouse-637-localhost-' + row['theme'] + '.png'
-        need(capture.get('filename') == name and capture.get('pid') == pid, 'localhost native frame owner/name differs')
-        image = evidence.screen(capture)
-        probe = witnesses[row['theme']]
-        x, y, actual = evidence.pixel(image, capture['mapping'], probe['point'])
-        need(actual[3] == 255 and all(abs(a - b) <= 3 for a, b in zip(actual[:3], probe['expectedRGB'])),
-             'actual OS localhost pixels ignore the selected theme')
-        result[name] = [probe]
-    return result
+    return verify_contract(value, platform, pid, inputs)
 
 
 def verify_legacy_facts(facts, output):
-    need(facts.get('suggestedRequests') == 27 and facts.get('preservedTabs') == 24,
-         'legacy report must keep its actual populated-preset request/page counts')
+    need(facts.get('suggestedRequests') == 27 and facts.get('preservedTabs') == 23,
+         'legacy report must keep its actual four-preset request/page counts')
     value = facts.get('presetEvidence', {})
-    witnesses = verify_contract(value, 'darwin', value.get('pid'))
-    launch = value['agentLanding'].get('settingsLaunch', {})
-    preserved([launch.get('before')], [launch.get('after')], value['fixtureOrigin'], count=1)
-    need(launch.get('previousId') == value['agentLanding']['id'] and launch.get('previousRetained') is True
-         and launch.get('beforeIds') == launch.get('afterIds') and len(launch.get('beforeIds', [])) == 25
-         and launch['previousId'] in launch['beforeIds'] and launch['after']['url'] == value['fixtureOrigin'] + '/',
-         'existing Agent localhost action lost its previous page or identity')
-    for row in value['agentLanding']['themes']:
-        capture = row.get('capture', {})
-        name = 'mouse-622-localhost-' + row['theme'] + '.png'
-        need(capture.get('filename') == name and capture.get('source') == 'win.capturePage()', 'legacy localhost capture name/source differs')
-        raw = (Path(output) / name).read_bytes()
-        need(0 < len(raw) <= 16 * 1024**2 and capture.get('bytes') == len(raw) and capture.get('sha256') == sha(raw),
-             'legacy localhost raw PNG bytes/hash differ')
-        image = N['T']['decode_png'](raw, name)
-        need(capture.get('pixelSize') == {'width': image['width'], 'height': image['height']}, 'legacy localhost PNG dimensions differ')
-        content = rect(capture.get('contentBounds'))
-        probe = witnesses[row['theme']]
-        need(capture.get('point') == probe['point'] and capture.get('expectedRGB') == probe['expectedRGB'], 'legacy localhost probe moved')
-        mapping = {'scaleX': image['width'] / content['width'], 'scaleY': image['height'] / content['height'], 'originX': 0, 'originY': 0}
-        x, y, actual = N['Evidence'](lambda _: b'').pixel(image, mapping, probe['point'])
-        need(capture.get('x') == x and capture.get('y') == y and capture.get('actualRGBA') == actual
-             and actual[3] == 255 and all(abs(a - b) <= 3 for a, b in zip(actual[:3], probe['expectedRGB'])),
-             'legacy localhost actual PNG pixel differs')
+    verify_contract(value, 'darwin', value.get('pid'))
     return True

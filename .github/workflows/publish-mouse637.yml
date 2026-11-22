@@ -67,9 +67,8 @@ jobs:
           ditto -x -k mouse637-release/Mouse-Browser-6.0.37-mac-arm64.zip "$RUNNER_TEMP/mouse628-zip"
           codesign --verify --deep --strict "$RUNNER_TEMP/mouse628-zip/Mouse Browser.app"
           cmp "$APP/Contents/Resources/app.asar" "$RUNNER_TEMP/mouse628-zip/Mouse Browser.app/Contents/Resources/app.asar"
-          diff -qr "$APP/Contents/Resources/mouse-agent-node_modules" "$RUNNER_TEMP/mouse628-zip/Mouse Browser.app/Contents/Resources/mouse-agent-node_modules"
-          test -x "$APP/Contents/Resources/mouse-agent-node_modules/node_modules/node-pty/prebuilds/darwin-arm64/spawn-helper"
-          test -x "$RUNNER_TEMP/mouse628-zip/Mouse Browser.app/Contents/Resources/mouse-agent-node_modules/node_modules/node-pty/prebuilds/darwin-arm64/spawn-helper"
+          test ! -e "$APP/Contents/Resources/mouse-agent-node_modules"
+          test ! -e "$RUNNER_TEMP/mouse628-zip/Mouse Browser.app/Contents/Resources/mouse-agent-node_modules"
           hdiutil detach "$MOUNT"
           trap - EXIT
           cd mouse637-release
@@ -81,7 +80,7 @@ jobs:
           grep -q MOUSE_633_OWNER_FEEDBACK_PASS mouse-633-owner-feedback.log
           grep -q MOUSE_636_RETAINED_OWNER_FEEDBACK_PASS mouse-636-retained-owner-feedback.log
           grep -q MOUSE_635_LIBRARY_STABLE_PASS mouse-636-owner-feedback.log
-          grep -q MOUSE_636_AGENT_INLINE_PASS mouse-636-owner-feedback.log
+          grep -q MOUSE_637_AGENT_REMOVAL_PASS mouse-636-owner-feedback.log
           grep -q MOUSE_636_PINNED_PANES_PASS mouse-636-owner-feedback.log
           grep -q MOUSE_636_OWNER_FEEDBACK_PASS mouse-636-owner-feedback.log
           grep -q MOUSE_636_SEARCH_REMOVAL_PASS mouse-636-owner-feedback.log
@@ -103,7 +102,6 @@ jobs:
           grep -q MOUSE_630_NATIVE_WHEEL_DESKTOPS_PASS mouse-smoke-write.log
           grep -q MOUSE_630_PAGE_SCROLL_PRESERVED_PASS mouse-smoke-write.log
           grep -q MOUSE_630_PRIVATE_DOWNLOAD_SCOPE_PASS mouse-smoke-write.log
-          grep -q MOUSE_628_LOCAL_MCP_NATIVE_PASS mouse-smoke-write.log
           grep -q MOUSE_628_OPEN_NORA_DESKTOP_SLIDE_NATIVE_PASS mouse-smoke-write.log
           grep -q MOUSE_628_BORDERLESS_NATIVE_PASS mouse-smoke-write.log
           grep -q MOUSE_628_NORA_CONTENT_FIT_NATIVE_PASS mouse-smoke-write.log
@@ -149,6 +147,7 @@ jobs:
           path: |
             mouse637-release/*.log
             mouse637-release/*.png
+            mouse637-release/mouse-637-agent-code-*.cjs
             mouse637-release/*.json
             mouse637-release/*.md
             mouse637-release/mouse-637-library-source.txt
