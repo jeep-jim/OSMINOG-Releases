@@ -50,7 +50,13 @@ typedef struct {
   bool alive;
 } Owned;
 
-enum Kind { IDENTITY = 1, SAMPLE, HOST, EXITED, REPARENTED, REUSED, IMAGE_CHANGED, ERROR_RECORD };
+typedef struct {
+  Process value;
+  uint64_t begin, end;
+  bool present;
+} ParentWitness;
+
+enum Kind { IDENTITY = 1, SAMPLE, HOST, EXITED, REPARENTED, REUSED, IMAGE_CHANGED, ERROR_RECORD, IMAGE_REJECTED };
 typedef struct {
   enum Kind kind;
   int index, code, other, image;
@@ -82,6 +88,8 @@ typedef struct {
   char kernel[128], machine[64];
   bool ok, root_gone;
   bool within_self_cpu_limit;
+  bool root_runtime;
+  ParentWitness parent_initial, parent_recheck;
   const char *reason;
   int error_code;
 } State;
@@ -97,6 +105,14 @@ static bool same_birth(const Process *a, const Process *b) {
 
 static bool same_image(const Image *a, const Process *b) {
   return strcmp(a->path, b->path) == 0 && memcmp(a->uuid, b->uuid, 16) == 0;
+}
+
+static bool same_process_image(const Process *a, const Process *b) {
+  return strcmp(a->path, b->path) == 0 && memcmp(a->uuid, b->uuid, 16) == 0;
+}
+
+static bool python_parent_policy(const State *s) {
+  return strcmp(s->phase, "baseline") == 0 || strcmp(s->phase, "fixture") == 0;
 }
 
 static int child_count_result(int count, int error) {
@@ -138,6 +154,16 @@ static int read_process(State *s, int pid, Process *p, uint64_t *begin, uint64_t
   return error;
 }
 
+static int read_parent(State *s, ParentWitness *witness) {
+  int error=read_process(s,s->parent_pid,&witness->value,&witness->begin,&witness->end);
+  if (!error) {
+    witness->present=true;
+    uint64_t width=witness->end-witness->begin;
+    if (width>s->max_read_ticks) s->max_read_ticks=width;
+  }
+  return error;
+}
+
 static int add_image(State *s, int owner, const Process *p) {
   if (s->image_count >= MAX_IMAGES) { fail(s, "image-cap", EOVERFLOW); return -1; }
   int index = (int)s->image_count++;
@@ -168,6 +194,32 @@ static int known_pid(const State *s, int pid) {
   return -1;
 }
 
+static void reject_root_image(State *s, const Process *p, uint64_t begin, uint64_t end,
+                              const char *reason, int code) {
+  int image=add_image(s,0,p);
+  if (image>=0)
+    record(s,(Record){.kind=IMAGE_REJECTED,.index=0,.image=image,.begin=begin,.end=end,.code=code});
+  fail(s,reason,code);
+}
+
+static bool allow_root_handoff(State *s, const Owned *owned, const Process *p,
+                                uint64_t begin, uint64_t end) {
+  if (!python_parent_policy(s) || !s->parent_initial.present || s->root_runtime ||
+      owned->image!=owned->initial_image ||
+      strcmp(s->images[owned->image].path,s->root_path) || p->ppid!=s->parent_pid ||
+      !same_process_image(&s->parent_initial.value,p)) {
+    reject_root_image(s,p,begin,end,"root-image-changed",EPROTO); return false;
+  }
+  int error=read_parent(s,&s->parent_recheck);
+  if (error || !same_birth(&s->parent_initial.value,&s->parent_recheck.value) ||
+      s->parent_initial.value.ppid!=s->parent_recheck.value.ppid ||
+      !same_process_image(&s->parent_initial.value,&s->parent_recheck.value)) {
+    reject_root_image(s,p,begin,end,"root-runtime-parent-changed",error?error:EPROTO); return false;
+  }
+  s->root_runtime=true;
+  return true;
+}
+
 static bool inspect_owned(State *s, int index, Process *p, bool emit_sample) {
   Owned *owned = &s->owned[index];
   if (!owned->alive) return false;
@@ -193,10 +245,13 @@ static bool inspect_owned(State *s, int index, Process *p, bool emit_sample) {
   if (p->ppid != owned->last_ppid) {
     record(s, (Record){.kind=REPARENTED,.index=index,.begin=begin,.end=end,
       .other=p->ppid,.code=owned->last_ppid});
+    if (index==0) {
+      reject_root_image(s,p,begin,end,"root-parent-changed",EPROTO); return false;
+    }
     owned->last_ppid = p->ppid;
   }
   if (!same_image(&s->images[owned->image], p)) {
-    if (index == 0) { fail(s, "root-image-changed", EPROTO); return false; }
+    if (index == 0 && !allow_root_handoff(s,owned,p,begin,end)) return false;
     int image = add_image(s, index, p);
     if (image < 0) return false;
     owned->image = image;
@@ -249,6 +304,7 @@ static void sample_cycle(State *s, uint64_t scheduled) {
   for (size_t i = 0; i < s->owned_count && s->ok; ++i) {
     Process p;
     inspect_owned(s, (int)i, &p, true);
+    if (!s->ok) return;
     if (i == 0 && s->root_gone) return;
     if (s->owned[i].alive) discover(s, (int)i);
   }
@@ -258,12 +314,22 @@ static bool initialize_root(State *s) {
   Process p; uint64_t begin, end;
   int error = read_process(s, s->root_pid, &p, &begin, &end);
   if (error) { fail(s, "root-initial-read", error); return false; }
+  s->begin = begin;
   __uint128_t start_us = (__uint128_t)p.start_sec * 1000000u + p.start_usec;
-  if (p.ppid != s->parent_pid || strcmp(p.path, s->root_path) ||
+  if (p.ppid != s->parent_pid ||
       start_us < s->launch_before_us || start_us > s->launch_after_us) {
     fail(s, "root-launch-identity", EPROTO); return false;
   }
-  s->begin = begin;
+  if (python_parent_policy(s)) {
+    error=read_parent(s,&s->parent_initial);
+    if (error || s->parent_initial.value.start_abs>p.start_abs) {
+      fail(s,"root-runtime-parent-read",error?error:EPROTO); return false;
+    }
+    s->root_runtime=same_process_image(&p,&s->parent_initial.value);
+  }
+  if (strcmp(p.path,s->root_path) && !s->root_runtime) {
+    reject_root_image(s,&p,begin,end,"root-launch-identity",EPROTO); return false;
+  }
   s->interval = ticks_for_ms(s, INTERVAL_MS);
   uint64_t duration = ticks_for_ms(s, s->budget_ms);
   if (!s->interval || !duration || UINT64_MAX - p.start_abs < duration) {
@@ -316,6 +382,19 @@ static void uuid_hex(const unsigned char uuid[16], char out[33]) {
   out[32] = 0;
 }
 
+static bool parent_json(char *out, size_t cap, const ParentWitness *witness) {
+  if (!witness->present) {
+    if (cap<5) return false;
+    memcpy(out,"null",5); return true;
+  }
+  const Process *p=&witness->value;
+  char path[PATH_BYTES*6+3],uuid[33];
+  if (!quote(path,sizeof(path),p->path)) return false;
+  uuid_hex(p->uuid,uuid);
+  int n=snprintf(out,cap,"{\"pid\":%d,\"ppid\":%d,\"uid\":%d,\"startSec\":%" PRIu64 ",\"startUsec\":%" PRIu64 ",\"startAbstime\":%" PRIu64 ",\"uuid\":\"%s\",\"path\":%s,\"readStartMach\":%" PRIu64 ",\"readEndMach\":%" PRIu64 "}",p->pid,p->ppid,p->uid,p->start_sec,p->start_usec,p->start_abs,uuid,path,witness->begin,witness->end);
+  return n>=0 && (size_t)n<cap;
+}
+
 static bool line(FILE *out, size_t *bytes, const char *format, ...) {
   char buffer[32768];
   va_list args; va_start(args, format);
@@ -329,15 +408,22 @@ static bool dump(State *s, FILE *out) {
   size_t bytes = 0, written = 0;
   uint64_t dump_begin=s->ops.now(s->ops.context);
   char path[PATH_BYTES*6+3], kernel[800], machine[400];
+  char parent_initial[PATH_BYTES*6+512],parent_recheck[PATH_BYTES*6+512];
   if (!quote(path,sizeof(path),s->root_path) || !quote(kernel,sizeof(kernel),s->kernel) ||
-      !quote(machine,sizeof(machine),s->machine)) return false;
-  if (!line(out,&bytes,"{\"type\":\"header\",\"sequence\":0,\"schema\":1,\"kind\":\"mouse637-host-observer\",\"phase\":\"%s\",\"nonce\":\"%s\",\"samplerPid\":%d,\"rootPid\":%d,\"expectedRootParentPid\":%d,\"uid\":%d,\"expectedRootPath\":%s,\"launchBeforeEpochUs\":%" PRIu64 ",\"launchAfterEpochUs\":%" PRIu64 ",\"budgetMs\":%" PRIu64 ",\"intervalMs\":250,\"limits\":{\"maxOwned\":256,\"maxImages\":512,\"maxRecords\":65536,\"maxOutputBytes\":67108864},\"clock\":\"mach_absolute_time\",\"counterUnits\":\"mach_absolute_time\",\"timebaseNumer\":%" PRIu64 ",\"timebaseDenom\":%" PRIu64 ",\"logicalCpus\":%d,\"kernel\":%s,\"machine\":%s}\n",s->phase,s->nonce,s->sampler_pid,s->root_pid,s->parent_pid,s->uid,path,s->launch_before_us,s->launch_after_us,s->budget_ms,s->numer,s->denom,s->logical_cpus,kernel,machine)) return false;
+      !quote(machine,sizeof(machine),s->machine) ||
+      !parent_json(parent_initial,sizeof(parent_initial),&s->parent_initial) ||
+      !parent_json(parent_recheck,sizeof(parent_recheck),&s->parent_recheck)) return false;
+  if (!line(out,&bytes,"{\"type\":\"header\",\"sequence\":0,\"schema\":2,\"kind\":\"mouse637-host-observer\",\"phase\":\"%s\",\"nonce\":\"%s\",\"samplerPid\":%d,\"rootPid\":%d,\"expectedRootParentPid\":%d,\"uid\":%d,\"expectedRootPath\":%s,\"rootImagePolicy\":{\"kind\":\"%s\",\"parentInitial\":%s,\"parentRecheck\":%s},\"launchBeforeEpochUs\":%" PRIu64 ",\"launchAfterEpochUs\":%" PRIu64 ",\"budgetMs\":%" PRIu64 ",\"intervalMs\":250,\"limits\":{\"maxOwned\":256,\"maxImages\":512,\"maxRecords\":65536,\"maxOutputBytes\":67108864},\"clock\":\"mach_absolute_time\",\"counterUnits\":\"mach_absolute_time\",\"timebaseNumer\":%" PRIu64 ",\"timebaseDenom\":%" PRIu64 ",\"logicalCpus\":%d,\"kernel\":%s,\"machine\":%s}\n",s->phase,s->nonce,s->sampler_pid,s->root_pid,s->parent_pid,s->uid,path,python_parent_policy(s)?"python-parent-runtime":"fixed",parent_initial,parent_recheck,s->launch_before_us,s->launch_after_us,s->budget_ms,s->numer,s->denom,s->logical_cpus,kernel,machine)) return false;
   for (size_t n=0;n<s->count;++n) {
     Record *r=&s->records[n]; bool good=false;
     if (r->kind==IDENTITY || r->kind==IMAGE_CHANGED) {
       const Owned *o=&s->owned[r->index]; const Image *im=&s->images[r->image]; char uuid[33];
       uuid_hex(im->uuid,uuid); if (!quote(path,sizeof(path),im->path)) return false;
       good=line(out,&bytes,"{\"type\":\"%s\",\"sequence\":%zu,\"identityIndex\":%d,\"imageIndex\":%d,\"pid\":%d,\"ppid\":%d,\"uid\":%d,\"parentIndex\":%d,\"startSec\":%" PRIu64 ",\"startUsec\":%" PRIu64 ",\"startAbstime\":%" PRIu64 ",\"uuid\":\"%s\",\"path\":%s,\"readStartMach\":%" PRIu64 ",\"readEndMach\":%" PRIu64 "}\n",r->kind==IDENTITY?"identity":"image",n+1,r->index,r->image,o->birth.pid,o->birth.ppid,o->birth.uid,o->parent_index,o->birth.start_sec,o->birth.start_usec,o->birth.start_abs,uuid,path,r->begin,r->end);
+    } else if (r->kind==IMAGE_REJECTED) {
+      const Image *im=&s->images[r->image]; char uuid[33];
+      uuid_hex(im->uuid,uuid); if (!quote(path,sizeof(path),im->path)) return false;
+      good=line(out,&bytes,"{\"type\":\"image-rejected\",\"sequence\":%zu,\"identityIndex\":%d,\"imageIndex\":%d,\"readStartMach\":%" PRIu64 ",\"readEndMach\":%" PRIu64 ",\"path\":%s,\"uuid\":\"%s\",\"code\":%d}\n",n+1,r->index,r->image,r->begin,r->end,path,uuid,r->code);
     } else if (r->kind==SAMPLE) {
       good=line(out,&bytes,"{\"type\":\"sample\",\"sequence\":%zu,\"identityIndex\":%d,\"imageIndex\":%d,\"readStartMach\":%" PRIu64 ",\"readEndMach\":%" PRIu64 ",\"userTime\":%" PRIu64 ",\"systemTime\":%" PRIu64 ",\"runnableTime\":%" PRIu64 ",\"startAbstime\":%" PRIu64 "}\n",n+1,r->index,r->image,r->begin,r->end,r->values[0],r->values[1],r->values[2],r->values[3]);
     } else if (r->kind==HOST) {

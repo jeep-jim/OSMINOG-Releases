@@ -262,16 +262,36 @@ def build_identity(inputs, summary, tools_root, code):
     return build
 
 
+def parent_witness(value, launch, eof, label):
+    keys(value, 'pid ppid uid startSec startUsec startAbstime uuid path readStartMach readEndMach', label)
+    need(integer(value['pid'], 1, (1 << 31) - 1) and value['pid'] == launch['parentPid'] and
+         integer(value['ppid'], 1, (1 << 31) - 1) and integer(value['uid'], 0, (1 << 31) - 1) and
+         value['uid'] == launch['uid'] and len({value['pid'], launch['pid'], launch['helperPid']}) == 3,
+         label + ' PID/UID differs from the actual original parent')
+    need(integer(value['startSec'], 1) and integer(value['startUsec'], 0, 999999) and
+         integer(value['readStartMach']) and integer(value['readEndMach']) and
+         eof['samplingStartMach'] <= value['readStartMach'] <= value['readEndMach'] <= eof['samplingEndMach'] and
+         integer(value['startAbstime'], 1, value['readEndMach']), label + ' birth/read interval invalid')
+    need(absolute(value['path']) and isinstance(value['uuid'], str) and re.fullmatch('[0-9a-f]{32}', value['uuid']),
+         label + ' executable image invalid')
+    return value
+
+
 def phase_records(data, launch):
     """Validate the actual bounded stream; no native workload or clock fitting."""
     rows = json_lines(data)
     header, eof = rows[0], rows[-1]
-    keys(header, 'type sequence schema kind phase nonce samplerPid rootPid expectedRootParentPid uid expectedRootPath launchBeforeEpochUs launchAfterEpochUs budgetMs intervalMs limits clock counterUnits timebaseNumer timebaseDenom logicalCpus kernel machine', 'header')
-    exact(header, {'type': 'header', 'sequence': 0, 'schema': 1, 'kind': 'mouse637-host-observer',
+    phase = launch.get('phase')
+    need(phase in (*PHASES, 'fixture'), 'unsupported observation phase')
+    budget = launch.get('budgetMs') if phase == 'fixture' else BUDGETS[phase]
+    need(integer(budget, 500, 10000) if phase == 'fixture' else launch.get('budgetMs') == budget,
+         'original observation phase budget differs')
+    keys(header, 'type sequence schema kind phase nonce samplerPid rootPid expectedRootParentPid uid expectedRootPath launchBeforeEpochUs launchAfterEpochUs budgetMs intervalMs limits clock counterUnits timebaseNumer timebaseDenom logicalCpus kernel machine rootImagePolicy', 'header')
+    exact(header, {'type': 'header', 'sequence': 0, 'schema': 2, 'kind': 'mouse637-host-observer',
                    'phase': launch['phase'], 'nonce': launch['nonce'], 'samplerPid': launch['helperPid'],
                    'rootPid': launch['pid'], 'expectedRootParentPid': launch['parentPid'], 'uid': launch['uid'],
                    'expectedRootPath': launch['expectedRootPath'], 'launchBeforeEpochUs': launch['launchBeforeEpochUs'],
-                   'launchAfterEpochUs': launch['launchAfterEpochUs'], 'budgetMs': BUDGETS[launch['phase']],
+                   'launchAfterEpochUs': launch['launchAfterEpochUs'], 'budgetMs': budget,
                    'intervalMs': INTERVAL_MS, 'limits': LIMITS, 'clock': 'mach_absolute_time',
                    'counterUnits': 'mach_absolute_time', 'machine': 'arm64'}, 'header')
     need(integer(header['timebaseNumer'], 1, (1 << 32) - 1) and integer(header['timebaseDenom'], 1, (1 << 32) - 1) and
@@ -296,8 +316,24 @@ def phase_records(data, launch):
     need(eof['selfCpuUs'] == eof['selfUserUs'] + eof['selfSystemUs'] and
          eof['selfCpuUs'] * 1000 * 100 * header['timebaseDenom'] <= eof['observedDurationMach'] * header['timebaseNumer'],
          'sampler CPU exceeds one percent of one core')
+    policy = header['rootImagePolicy']
+    keys(policy, 'kind parentInitial parentRecheck', 'root image policy')
+    if phase == 'candidate':
+        exact(policy, {'kind': 'fixed', 'parentInitial': None, 'parentRecheck': None}, 'candidate image policy')
+    else:
+        need(policy['kind'] == 'python-parent-runtime', 'Python parent-runtime policy required only for baseline/fixture')
+        parent_witness(policy['parentInitial'], launch, eof, 'initial parent witness')
+        if policy['parentRecheck'] is not None:
+            parent_witness(policy['parentRecheck'], launch, eof, 'rechecked parent witness')
+            for field in ('pid', 'ppid', 'uid', 'startSec', 'startUsec', 'startAbstime', 'uuid', 'path'):
+                need(policy['parentRecheck'][field] == policy['parentInitial'][field], 'rechecked parent identity/image changed: ' + field)
+            need(policy['parentRecheck']['readStartMach'] >= policy['parentInitial']['readEndMach'],
+                 'parent recheck precedes its initial witness')
     identities, images, active, hosts, samples, events = [], [], {}, [], [], []
-    max_read, root_exit = 0, False
+    max_read = max([0] + [w['readEndMach'] - w['readStartMach'] for w in
+                         (policy['parentInitial'], policy['parentRecheck']) if w is not None])
+    root_exit, root_initial_runtime, root_transitions = False, False, 0
+    root_transition_read = None
     common = 'type sequence identityIndex readStartMach readEndMach'
     identity_keys = common + ' imageIndex pid ppid uid parentIndex startSec startUsec startAbstime uuid path'
     for sequence, row in enumerate(rows[1:-1], 1):
@@ -336,9 +372,18 @@ def phase_records(data, launch):
                      'retired PID was silently reintroduced with its old birth')
                 if index == 0:
                     exact(row, {'pid': launch['pid'], 'ppid': launch['parentPid'], 'parentIndex': -1,
-                                'path': launch['expectedRootPath'], 'readStartMach': eof['samplingStartMach']}, 'root identity')
+                                'readStartMach': eof['samplingStartMach']}, 'root identity')
                     birth_us = row['startSec'] * 1000000 + row['startUsec']
                     need(launch['launchBeforeEpochUs'] <= birth_us <= launch['launchAfterEpochUs'], 'root birth outside original Popen bracket')
+                    if policy['kind'] == 'fixed':
+                        need(row['path'] == launch['expectedRootPath'], 'fixed root executable differs')
+                    else:
+                        parent = policy['parentInitial']
+                        need(parent['readStartMach'] >= end and parent['startAbstime'] <= row['startAbstime'],
+                             'initial parent witness is not after the root read or parent birth is later')
+                        root_initial_runtime = (row['path'], row['uuid']) == (parent['path'], parent['uuid'])
+                        need(row['path'] == launch['expectedRootPath'] or root_initial_runtime,
+                             'initial root is neither its exact launch path nor its witnessed parent runtime')
                 else:
                     parent = row['parentIndex']
                     need(integer(parent, 0, index - 1) and identities[parent]['alive'] and row['ppid'] == identities[parent]['birth']['pid'] and
@@ -348,12 +393,23 @@ def phase_records(data, launch):
                 identities.append(state)
                 active[row['pid']] = index
             else:
-                need(0 < index < len(identities) and identities[index]['alive'], 'unowned or root image change')
+                need(index < len(identities) and identities[index]['alive'], 'unowned image change')
                 state = identities[index]
                 for field in ('pid', 'ppid', 'uid', 'parentIndex', 'startSec', 'startUsec', 'startAbstime'):
                     need(type(row[field]) is int and row[field] == state['birth'][field], 'image changed process birth: ' + field)
                 previous = images[state['image']]
                 need((row['path'], row['uuid']) != (previous['path'], previous['uuid']), 'image change did not change image')
+                if index == 0:
+                    need(policy['kind'] == 'python-parent-runtime' and not root_initial_runtime and root_transitions == 0,
+                         'fixed, reverse or repeated root image transition')
+                    parent, recheck = policy['parentInitial'], policy['parentRecheck']
+                    need(state['ppid'] == launch['parentPid'] and previous['path'] == launch['expectedRootPath'] and
+                         (row['path'], row['uuid']) == (parent['path'], parent['uuid']),
+                         'root handoff is not from its launch image to the exact current parent runtime')
+                    need(recheck is not None and recheck['readStartMach'] >= end,
+                         'root handoff lacks a subsequent exact parent recheck')
+                    root_transitions += 1
+                    root_transition_read = (start, end)
                 state['image'] = row['imageIndex']
                 state['images'].append(row['imageIndex'])
             images.append(row.copy())
@@ -385,6 +441,7 @@ def phase_records(data, launch):
                     active.pop(state['birth']['pid'])
                     root_exit = root_exit or index == 0
                 elif kind == 'reparent':
+                    need(index > 0, 'original root parent changed')
                     need(row['code'] == state['ppid'] and row['otherPid'] > 0 and row['otherPid'] != state['ppid'] and
                          [row[k] for k in ('observedStartSec', 'observedStartUsec', 'observedStartAbstime')] == [0, 0, 0], 'reparent receipt invalid')
                     state['ppid'] = row['otherPid']
@@ -399,17 +456,29 @@ def phase_records(data, launch):
                 events.append(row)
         state = identities[index]
         need(start >= state['lastStart'] and end >= state['lastEnd'], 'per-identity read intervals regress')
+        if index == 0 and root_transition_read is not None and (start, end) != root_transition_read:
+            # The image and its immediately emitted sample share the root read
+            # taken before synchronous parent revalidation. A later, distinct
+            # root read starts only after that revalidation has completed.
+            need(start >= policy['parentRecheck']['readEndMach'],
+                 'parent recheck overlaps a subsequent distinct root read')
         state['lastStart'], state['lastEnd'] = start, end
     need(identities and root_exit and hosts and samples and identities[0]['samples'] > 0, 'root/host/process coverage incomplete')
+    if policy['kind'] == 'python-parent-runtime':
+        need(policy['parentInitial']['readEndMach'] <= hosts[0]['scheduledMach'],
+             'initial parent witness overlaps the first scheduled sample')
+        need((policy['parentRecheck'] is not None) == (root_transitions == 1),
+             'parent recheck is not bound to exactly one accepted root handoff')
     need(eof['ownedCount'] == len(identities) and eof['imageCount'] == len(images) and eof['maxReadTicks'] == max_read,
          'EOF identity/image/read counts differ')
     missed = sum((b['scheduledMach'] - a['scheduledMach']) // interval - 1 for a, b in zip(hosts, hosts[1:]))
     need(eof['missedIntervals'] == missed and eof['maxLagTicks'] == max(h['readStartMach'] - h['scheduledMach'] for h in hosts),
          'EOF sampling gaps/lag differ')
     need(eof['selfUserUs'] >= hosts[-1]['selfUserUs'] and eof['selfSystemUs'] >= hosts[-1]['selfSystemUs'], 'final sampler CPU regresses')
-    deadline = identities[0]['birth']['startAbstime'] + BUDGETS[launch['phase']] * 1000000 * header['timebaseDenom'] // header['timebaseNumer']
+    deadline = identities[0]['birth']['startAbstime'] + budget * 1000000 * header['timebaseDenom'] // header['timebaseNumer']
     need(eof['deadlineMach'] == deadline and all(h['readStartMach'] < deadline for h in hosts), 'original phase deadline differs')
-    return {'header': header, 'eof': eof, 'identities': identities, 'images': images, 'samples': samples, 'hosts': hosts, 'events': events}
+    return {'header': header, 'eof': eof, 'identities': identities, 'images': images, 'samples': samples, 'hosts': hosts, 'events': events,
+            'rootInitialImageWasParentRuntime': root_initial_runtime, 'acceptedRootImageTransitions': root_transitions}
 
 
 def launch_identity(inputs, row, summary, phase, build):
@@ -593,6 +662,9 @@ def verify(directory, *, tools_root=None, publisher_sha=None):
             'phases': {phase: {**native[phase], 'rootPid': phases[phase]['header']['rootPid'],
                                'samplerPid': phases[phase]['header']['samplerPid'], 'nonce': phases[phase]['header']['nonce'],
                                'timebaseNumer': phases[phase]['header']['timebaseNumer'], 'timebaseDenom': phases[phase]['header']['timebaseDenom'],
+                               'rootImagePolicy': phases[phase]['header']['rootImagePolicy'],
+                               'rootInitialImageWasParentRuntime': phases[phase]['rootInitialImageWasParentRuntime'],
+                               'acceptedRootImageTransitions': phases[phase]['acceptedRootImageTransitions'],
                                'hostSamples': len(phases[phase]['hosts']), 'processSamples': len(phases[phase]['samples']),
                                'eof': phases[phase]['eof']} for phase in PHASES},
             'counterMeaning': 'Raw Mach cumulative CPU and runnable timers; runnable is not pure waiting time.',

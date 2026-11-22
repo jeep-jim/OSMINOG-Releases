@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Synthetic adversarial contracts, never native execution or release acceptance."""
+import ast
 import copy
 import datetime
 import hashlib
@@ -53,13 +54,14 @@ def stream_fixture(launch):
     end = start + 1000000000
     root_birth = start - 100000
     epoch = launch['launchBeforeEpochUs'] + 100
-    rows = [{'type': 'header', 'sequence': 0, 'schema': 1, 'kind': 'mouse637-host-observer',
+    rows = [{'type': 'header', 'sequence': 0, 'schema': 2, 'kind': 'mouse637-host-observer',
              'phase': phase, 'nonce': launch['nonce'], 'samplerPid': launch['helperPid'], 'rootPid': launch['pid'],
              'expectedRootParentPid': launch['parentPid'], 'uid': launch['uid'], 'expectedRootPath': launch['expectedRootPath'],
              'launchBeforeEpochUs': launch['launchBeforeEpochUs'], 'launchAfterEpochUs': launch['launchAfterEpochUs'],
              'budgetMs': launch['budgetMs'], 'intervalMs': 250, 'limits': copy.deepcopy(E['LIMITS']),
              'clock': 'mach_absolute_time', 'counterUnits': 'mach_absolute_time', 'timebaseNumer': 1, 'timebaseDenom': 1,
-             'logicalCpus': 3, 'kernel': '24.6.0', 'machine': 'arm64'}]
+             'logicalCpus': 3, 'kernel': '24.6.0', 'machine': 'arm64',
+             'rootImagePolicy': {'kind': 'fixed', 'parentInitial': None, 'parentRecheck': None}}]
 
     def identity(index, pid, parent, path, at, birth):
         return {'type': 'identity', 'identityIndex': index, 'imageIndex': index, 'pid': pid,
@@ -70,6 +72,16 @@ def stream_fixture(launch):
 
     states = [identity(0, launch['pid'], -1, launch['expectedRootPath'], start, root_birth)]
     rows.append(states[0])
+    if phase == 'baseline':
+        rows[0]['rootImagePolicy'] = {
+            'kind': 'python-parent-runtime', 'parentRecheck': None,
+            'parentInitial': {'pid': launch['parentPid'], 'ppid': 7, 'uid': launch['uid'],
+                              'startSec': (epoch - 10000000) // 1000000, 'startUsec': 0,
+                              'startAbstime': root_birth - 100000000,
+                              'uuid': 'e' * 32,
+                              'path': '/Library/Frameworks/Python.framework/Versions/3.11/Resources/Python.app/Contents/MacOS/Python',
+                              'readStartMach': start + 200, 'readEndMach': start + 300},
+        }
     child_path = BASE_EXE if phase == 'baseline' else TEMP + '/Установка Mouse/Mouse Browser.app/Contents/Frameworks/Mouse Browser Helper (Renderer).app/Contents/MacOS/Mouse Browser Helper (Renderer)'
     states.append(identity(1, 101 if phase == 'baseline' else 201, 0, child_path, start + 1400, start + 1200))
     if phase == 'baseline':
@@ -105,6 +117,29 @@ def stream_fixture(launch):
                  'dumpEndMach': end + 1000000, 'selfCpuAccounting': 'startup+collection+flushed-data-before-eof',
                  'unmeasuredResidual': 'eof-write-close-free', 'payloadBytesBeforeEOF': 0})
     return json.loads(ENC(launch)), [json.loads(line) for line in serial_stream(rows).splitlines()]
+
+
+def runtime_handoff(rows, *, initially_runtime=False):
+    """Synthetic actual-schema witnesses; no Python/native process is launched."""
+    rows = copy.deepcopy(rows)
+    policy = rows[0]['rootImagePolicy']
+    parent = policy['parentInitial']
+    root = rows[1]
+    if initially_runtime:
+        root.update(path=parent['path'], uuid=parent['uuid'])
+        return rows
+    sample_at = next(i for i, row in enumerate(rows) if row['type'] == 'sample' and
+                     row['identityIndex'] == 0 and row['userTime'] == 11000)
+    sample = rows[sample_at]
+    image = {**root, 'type': 'image', 'imageIndex': rows[-1]['imageCount'], 'path': parent['path'], 'uuid': parent['uuid'],
+             'readStartMach': sample['readStartMach'], 'readEndMach': sample['readEndMach']}
+    rows.insert(sample_at, image)
+    policy['parentRecheck'] = {**parent, 'readStartMach': image['readEndMach'] + 10, 'readEndMach': image['readEndMach'] + 110}
+    for row in rows[sample_at + 1:]:
+        if row['type'] == 'sample' and row['identityIndex'] == 0:
+            row['imageIndex'] = image['imageIndex']
+    rows[-1]['imageCount'] += 1
+    return rows
 
 
 def fixture(code_root, publisher):
@@ -287,7 +322,7 @@ class EvidenceTests(unittest.TestCase):
 
     def test_deep_header_and_launch_identity_mutations_reject(self):
         name = PREFIX + 'baseline.jsonl'
-        cases = [('phase', 'candidate'), ('nonce', 'c' * 64), ('rootPid', 999), ('samplerPid', 999),
+        cases = [('schema', 1), ('phase', 'candidate'), ('nonce', 'c' * 64), ('rootPid', 999), ('samplerPid', 999),
                  ('expectedRootParentPid', 999), ('uid', 0), ('expectedRootPath', '/foreign/python'),
                  ('budgetMs', 900001), ('intervalMs', 500), ('machine', 'x86_64'), ('timebaseNumer', 0),
                  ('timebaseDenom', 0), ('clock', 'epoch'), ('counterUnits', 'nanoseconds'), ('logicalCpus', True),
@@ -311,7 +346,7 @@ class EvidenceTests(unittest.TestCase):
         name = PREFIX + 'candidate.jsonl'
         raw = self.good[name]
         cases = {'no-newline': raw[:-1], 'missing-eof': raw[:raw.rfind(b'\n', 0, len(raw) - 1) + 1],
-                 'extra': raw + b'{}\n', 'blank': raw + b'\n', 'duplicate-key': raw.replace(b'"schema": 1', b'"schema": 1, "schema": 1', 1),
+                 'extra': raw + b'{}\n', 'blank': raw + b'\n', 'duplicate-key': raw.replace(b'"schema": 2', b'"schema": 2, "schema": 2', 1),
                  'nan': raw.replace(b'"logicalCpus": 3', b'"logicalCpus": NaN', 1),
                  'oversize-line': raw.splitlines(keepends=True)[0] + b' ' * (E['MAX_LINE_BYTES'] + 1) + b'\n',
                  'out-of-order': raw.replace(b'"sequence": 2', b'"sequence": 999', 1)}
@@ -415,6 +450,175 @@ class EvidenceTests(unittest.TestCase):
         self.assertTrue(result['eof']['rootGone'])
         self.assertFalse(result['identities'][0]['alive'])
         self.assertFalse(result['identities'][1]['alive'])
+
+    def test_python_parent_runtime_initial_and_single_forward_handoff(self):
+        name = PREFIX + 'baseline.jsonl'
+        original = [json.loads(line) for line in self.good[name].splitlines()]
+        launch = json.loads(self.good[PREFIX + 'summary.json'])['launches'][0]
+        for initially_runtime in (False, True):
+            with self.subTest(initially_runtime=initially_runtime):
+                rows = runtime_handoff(original, initially_runtime=initially_runtime)
+                result = E['phase_records'](serial_stream(rows), launch)
+                self.assertEqual(result['rootInitialImageWasParentRuntime'], initially_runtime)
+                self.assertEqual(result['acceptedRootImageTransitions'], 0 if initially_runtime else 1)
+                data = copy.deepcopy(self.good); data[name] = serial_stream(rows)
+                full = self.verify(rebind(data))
+                self.assertEqual(full['phases']['baseline']['acceptedRootImageTransitions'], 0 if initially_runtime else 1)
+                self.assertFalse(full['releaseAcceptance'])
+        # The bounded native sampler fixture can use the same witnessed policy;
+        # verify() still accepts only the two original baseline/candidate phases.
+        fixture_launch = {**launch, 'phase': 'fixture', 'budgetMs': 8000}
+        rows = runtime_handoff(original)
+        rows[0].update(phase='fixture', budgetMs=8000)
+        rows[-1]['deadlineMach'] = rows[1]['startAbstime'] + 8000 * 1000000
+        self.assertEqual(E['phase_records'](serial_stream(rows), fixture_launch)['acceptedRootImageTransitions'], 1)
+        # Same launch and parent image means runtime was already final.
+        rows = runtime_handoff(original, initially_runtime=True)
+        launch_same = {**launch, 'expectedRootPath': rows[1]['path']}
+        rows[0]['expectedRootPath'] = rows[1]['path']
+        self.assertTrue(E['phase_records'](serial_stream(rows), launch_same)['rootInitialImageWasParentRuntime'])
+
+    def test_parent_witness_birth_image_and_bracket_mutations_reject(self):
+        name = PREFIX + 'baseline.jsonl'
+        launch = json.loads(self.good[PREFIX + 'summary.json'])['launches'][0]
+        original = [json.loads(line) for line in self.good[name].splitlines()]
+        accepted = runtime_handoff(original)
+        root = accepted[1]
+        parent = accepted[0]['rootImagePolicy']['parentInitial']
+        image = next(row for row in accepted if row['type'] == 'image' and row['identityIndex'] == 0)
+        cases = [
+            ('parentInitial', 'pid', 999), ('parentInitial', 'uid', 0), ('parentInitial', 'ppid', 0),
+            ('parentInitial', 'startSec', 0), ('parentInitial', 'startUsec', 1000000),
+            ('parentInitial', 'startAbstime', root['startAbstime'] + 1),
+            ('parentInitial', 'readStartMach', root['readEndMach'] - 1),
+            ('parentInitial', 'readEndMach', accepted[-1]['samplingEndMach'] + 1),
+            ('parentInitial', 'uuid', 'bad'), ('parentInitial', 'path', 'relative'),
+            ('parentRecheck', 'pid', 999), ('parentRecheck', 'ppid', 8), ('parentRecheck', 'uid', 0),
+            ('parentRecheck', 'startSec', parent['startSec'] + 1), ('parentRecheck', 'startUsec', 1),
+            ('parentRecheck', 'startAbstime', parent['startAbstime'] + 1),
+            ('parentRecheck', 'path', '/foreign/runtime'), ('parentRecheck', 'uuid', 'f' * 32),
+            ('parentRecheck', 'readStartMach', image['readEndMach'] - 1),
+            ('parentRecheck', 'readEndMach', image['readEndMach']),
+        ]
+        for witness, key, value in cases:
+            with self.subTest(witness=witness, key=key):
+                rows = copy.deepcopy(accepted); rows[0]['rootImagePolicy'][witness][key] = value
+                data = copy.deepcopy(self.good); data[name] = serial_stream(rows)
+                with self.assertRaises(ValueError): self.verify(rebind(data))
+        for witness in ('parentInitial', 'parentRecheck'):
+            rows = copy.deepcopy(accepted); rows[0]['rootImagePolicy'][witness] = None
+            with self.subTest(missing=witness), self.assertRaises(ValueError): E['phase_records'](serial_stream(rows), launch)
+        # A valid recheck timestamp without a matching accepted image is not proof.
+        rows = copy.deepcopy(original); rows[0]['rootImagePolicy']['parentRecheck'] = copy.deepcopy(accepted[0]['rootImagePolicy']['parentRecheck'])
+        with self.assertRaises(ValueError): E['phase_records'](serial_stream(rows), launch)
+        # Parent revalidation must still be included in the original max-read fact.
+        rows = copy.deepcopy(accepted)
+        rows[0]['rootImagePolicy']['parentRecheck']['readEndMach'] += 50
+        with self.assertRaisesRegex(ValueError, 'read counts'): E['phase_records'](serial_stream(rows), launch)
+        # An internally well-formed, rehashed witness cannot be postponed until
+        # after the next fresh root read or its exit. The same-window prefetched
+        # image/sample remains valid in the positive handoff case above.
+        later_root = [row for row in accepted if row.get('identityIndex') == 0 and
+                      row.get('readStartMach', 0) > image['readStartMach']]
+        for later in (later_root[0], later_root[-1]):
+            rows = copy.deepcopy(accepted)
+            rows[0]['rootImagePolicy']['parentRecheck'].update(
+                readStartMach=later['readStartMach'] + 1,
+                readEndMach=later['readStartMach'] + 101)
+            data = copy.deepcopy(self.good); data[name] = serial_stream(rows)
+            with self.subTest(late_recheck=later['type']), self.assertRaisesRegex(ValueError, 'subsequent distinct root read'):
+                self.verify(rebind(data))
+
+    def test_candidate_fixed_and_reverse_third_or_rejected_root_images_reject(self):
+        name = PREFIX + 'baseline.jsonl'
+        launch = json.loads(self.good[PREFIX + 'summary.json'])['launches'][0]
+        original = [json.loads(line) for line in self.good[name].splitlines()]
+        accepted = runtime_handoff(original)
+        at = next(i for i, row in enumerate(accepted) if row['type'] == 'image' and row['identityIndex'] == 0)
+        for path, uuid in [(launch['expectedRootPath'], original[1]['uuid']), ('/foreign/third-image', 'f' * 32)]:
+            with self.subTest(path=path):
+                rows = copy.deepcopy(accepted)
+                second = {**rows[at], 'imageIndex': rows[-1]['imageCount'], 'path': path, 'uuid': uuid,
+                          'readStartMach': rows[at]['readEndMach'] + 200, 'readEndMach': rows[at]['readEndMach'] + 300}
+                rows.insert(at + 2, second); rows[-1]['imageCount'] += 1
+                with self.assertRaises(ValueError): E['phase_records'](serial_stream(rows), launch)
+        rows = runtime_handoff(original, initially_runtime=True)
+        forged = {**rows[1], 'type': 'image', 'imageIndex': rows[-1]['imageCount'], 'path': launch['expectedRootPath'],
+                  'readStartMach': rows[2]['readStartMach'] + 200, 'readEndMach': rows[2]['readStartMach'] + 300}
+        rows.insert(3, forged); rows[-1]['imageCount'] += 1
+        with self.assertRaises(ValueError): E['phase_records'](serial_stream(rows), launch)
+        # A parent-shaped path with another UUID is not the parent runtime.
+        rows = copy.deepcopy(accepted); rows[at]['uuid'] = 'f' * 32
+        with self.assertRaises(ValueError): E['phase_records'](serial_stream(rows), launch)
+        # Root reparenting cannot grant a new runtime capability.
+        rows = copy.deepcopy(accepted)
+        reparent = {'type': 'reparent', 'identityIndex': 0, 'readStartMach': rows[at]['readStartMach'],
+                    'readEndMach': rows[at]['readEndMach'], 'code': launch['parentPid'], 'otherPid': 1,
+                    'observedStartSec': 0, 'observedStartUsec': 0, 'observedStartAbstime': 0}
+        rows.insert(at, reparent)
+        with self.assertRaises(ValueError): E['phase_records'](serial_stream(rows), launch)
+        # The original parent is invariant on every read, including a fixed
+        # candidate or a baseline that never changes executable image.
+        for phase in ('baseline', 'candidate'):
+            rows = [json.loads(line) for line in self.good[PREFIX + phase + '.jsonl'].splitlines()]
+            fixed_launch = json.loads(self.good[PREFIX + 'summary.json'])['launches'][E['PHASES'].index(phase)]
+            last_sample = next(row for row in reversed(rows) if row['type'] == 'sample' and row['identityIndex'] == 0)
+            rows.insert(-2, {**reparent, 'code': fixed_launch['parentPid'],
+                             'readStartMach': last_sample['readEndMach'] + 10,
+                             'readEndMach': last_sample['readEndMach'] + 110})
+            with self.subTest(root_reparent=phase), self.assertRaisesRegex(ValueError, 'original root parent changed'):
+                E['phase_records'](serial_stream(rows), fixed_launch)
+        rows = copy.deepcopy(original)
+        rejected = {'type': 'image-rejected', 'identityIndex': 0, 'imageIndex': 0,
+                    'readStartMach': rows[2]['readStartMach'] + 200, 'readEndMach': rows[2]['readStartMach'] + 300,
+                    'path': '/foreign/image', 'uuid': 'f' * 32, 'code': 100}
+        rows.insert(3, rejected)
+        with self.assertRaises(ValueError): E['phase_records'](serial_stream(rows), launch)
+        candidate = [json.loads(line) for line in self.good[PREFIX + 'candidate.jsonl'].splitlines()]
+        candidate_launch = json.loads(self.good[PREFIX + 'summary.json'])['launches'][1]
+        candidate[0]['rootImagePolicy'] = copy.deepcopy(original[0]['rootImagePolicy'])
+        with self.assertRaises(ValueError): E['phase_records'](serial_stream(candidate), candidate_launch)
+        candidate = [json.loads(line) for line in self.good[PREFIX + 'candidate.jsonl'].splitlines()]
+        changed = {**candidate[1], 'type': 'image', 'imageIndex': candidate[-1]['imageCount'], 'path': '/foreign/runtime',
+                   'readStartMach': candidate[2]['readStartMach'] + 200, 'readEndMach': candidate[2]['readStartMach'] + 300}
+        candidate.insert(3, changed); candidate[-1]['imageCount'] += 1
+        with self.assertRaises(ValueError): E['phase_records'](serial_stream(candidate), candidate_launch)
+
+    def test_actual_c_writer_parent_runtime_and_fixed_candidate_parity(self):
+        # Compile the unchanged portable production core with the author's
+        # synthetic Ops driver. Only harness metadata selects real phase budgets
+        # and the declared target architecture; no dumped JSON is rewritten.
+        tree = ast.parse((TOOLS / 'test_mouse637_host_observer.py').read_text())
+        driver = ast.literal_eval(next(node.value for node in tree.body if isinstance(node, ast.Assign) and
+                                      any(isinstance(target, ast.Name) and target.id == 'DRIVER' for target in node.targets)))
+        for before, after in [
+            ('strcpy(s->phase,"fixture");', 'strcpy(s->phase,"baseline");s->budget_ms=900000;'),
+            ('strcpy(s->machine,"fixture");', 'strcpy(s->machine,"arm64");'),
+        ]:
+            self.assertEqual(driver.count(before), 1)
+            driver = driver.replace(before, after)
+        self.assertEqual(driver.count('#include SOURCE'), 1)
+        driver = driver.replace('#include SOURCE', '#include ' + json.dumps(str(TOOLS / 'mouse637-host-observer.c')))
+        compiler = shutil.which('cc')
+        self.assertIsNotNone(compiler, 'actual portable C writer parity requires a C compiler')
+        with tempfile.TemporaryDirectory(prefix='mouse-host-reader-c-writer-') as directory:
+            source, binary = Path(directory) / 'driver.c', Path(directory) / 'driver'
+            source.write_text(driver)
+            subprocess.run([compiler, '-std=c11', '-O2', '-Wall', '-Wextra', '-Werror', '-Wno-unused-function',
+                            str(source), '-o', str(binary)], check=True, capture_output=True, timeout=30)
+            for mode, phase, initially_runtime, transitions in [
+                (0, 'baseline', False, 0), (18, 'baseline', False, 1),
+                (19, 'baseline', True, 0), (34, 'candidate', False, 0),
+            ]:
+                with self.subTest(mode=mode, phase=phase):
+                    raw = subprocess.run([str(binary), str(mode)], check=True, capture_output=True, timeout=5).stdout
+                    launch = {'phase': phase, 'nonce': 'a' * 64, 'pid': 101, 'parentPid': 9, 'helperPid': 202,
+                              'uid': 1000, 'expectedRootPath': '/owned/root', 'launchBeforeEpochUs': 100000000,
+                              'launchAfterEpochUs': 100000010, 'budgetMs': E['BUDGETS'][phase]}
+                    result = E['phase_records'](raw, launch)
+                    self.assertEqual(result['rootInitialImageWasParentRuntime'], initially_runtime)
+                    self.assertEqual(result['acceptedRootImageTransitions'], transitions)
+                    self.assertEqual(result['header']['budgetMs'], 900000 if phase == 'baseline' else 400000)
 
     def test_config_build_binary_and_original_helper_mutations_reject(self):
         for label, filename, change in [

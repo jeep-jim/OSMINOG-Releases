@@ -28,18 +28,37 @@ spec.loader.exec_module(M)
 DRIVER = r'''
 #define MOUSE_HOST_OBSERVER_TEST 1
 #include SOURCE
-typedef struct { uint64_t now; int cycles, mode, root_reads; Process root, child; } Fake;
+typedef struct { uint64_t now; int cycles, mode, root_reads; Process root, child, parent; } Fake;
 static uint64_t fake_now(void *p) { Fake *f=p; return ++f->now; }
 static int fake_read(void *p,int pid,Process *out) {
  Fake *f=p;
  if (f->cycles>=4 && pid==101) return ESRCH;
  if (pid==101) { *out=f->root; ++f->root_reads; }
  else if (pid==102) { *out=f->child; }
+ else if (pid==9) { *out=f->parent; f->now+=7; }
  else return ESRCH;
  if (f->mode==4 && pid==102 && f->cycles>=2) out->ppid=1;
  if (f->mode==5 && pid==102 && f->cycles>=2) { out->start_abs+=500;out->start_usec++; }
  if (f->mode==6 && pid==102 && f->cycles>=2) { strcpy(out->path,"/owned/new-image");out->uuid[0]=2; }
  if (f->mode==7 && pid==102 && f->cycles>=2) return EACCES;
+ if (pid==101 && f->cycles>=2) {
+  if (f->mode==18 || f->mode==20 || f->mode==22 || f->mode==23 || f->mode==24 || f->mode==28) {
+   strcpy(out->path,"/owned/python-runtime");out->uuid[0]=3;
+  }
+  if (f->mode==21 || f->mode==32) { strcpy(out->path,"/unowned/unknown-runtime");out->uuid[0]=4; }
+  if ((f->mode==22 && f->cycles>=3) || f->mode==25) { strcpy(out->path,"/owned/root");out->uuid[0]=1; }
+  if (f->mode==26) { strcpy(out->path,"/owned/python-runtime");out->uuid[0]=4; }
+  if (f->mode==28) out->ppid=1;
+  if (f->mode==35) out->ppid=1;
+ }
+ if (pid==101 && f->mode==36 && f->cycles==1) out->ppid=1;
+ if (pid==9) {
+  if (f->mode==23 && f->cycles>=2) { out->start_abs+=500;out->start_usec++; }
+  if (f->mode==24 && f->cycles>=2) { strcpy(out->path,"/unowned/changed-parent");out->uuid[0]=4; }
+  if (f->mode==29) return ESRCH;
+  if (f->mode==30) out->uid++;
+  if (f->mode==31) out->start_abs=f->root.start_abs+1;
+ }
  out->user=f->now/10;out->system=f->now/20;out->runnable=1; /* no runnable >= CPU assumption */
  return 0;
 }
@@ -66,12 +85,17 @@ int main(int argc,char **argv) {
  Fake f={.now=1000000000u,.mode=atoi(argv[1])};
  f.root=(Process){.pid=101,.ppid=9,.uid=1000,.start_sec=100,.start_usec=1,.start_abs=999000000u};
  f.child=(Process){.pid=102,.ppid=101,.uid=1000,.start_sec=100,.start_usec=2,.start_abs=999500000u};
+ f.parent=(Process){.pid=9,.ppid=8,.uid=1000,.start_sec=99,.start_usec=1,.start_abs=900000000u};
  strcpy(f.root.path,"/owned/root");strcpy(f.child.path,"/owned/child");f.root.uuid[0]=1;f.child.uuid[0]=1;
+ strcpy(f.parent.path,"/owned/python-runtime");f.parent.uuid[0]=3;
+ if(f.mode==19 || f.mode==25 || f.mode==27) { strcpy(f.root.path,f.parent.path);memcpy(f.root.uuid,f.parent.uuid,16); }
+ if(f.mode==32) { strcpy(f.parent.path,f.root.path);memcpy(f.parent.uuid,f.root.uuid,16); }
  State *s=calloc(1,sizeof(*s));s->records=calloc(MAX_RECORDS,sizeof(Record));
  s->ok=true;s->reason="started";s->root_pid=101;s->parent_pid=9;s->sampler_pid=202;s->uid=1000;
  s->numer=1;s->denom=1;s->budget_ms=10000;s->logical_cpus=4;
  s->launch_before_us=100000000u;s->launch_after_us=100000010u;
  strcpy(s->root_path,"/owned/root");strcpy(s->phase,"fixture");memset(s->nonce,'a',64);
+ if(f.mode==20 || f.mode==27 || f.mode==34) { strcpy(s->phase,"candidate");s->budget_ms=400000; }
  strcpy(s->kernel,"fixture");strcpy(s->machine,"fixture");
  s->ops=(Ops){fake_now,fake_read,fake_children,fake_host,fake_self,fake_sleep,&f};
  if(f.mode==1)strcpy(s->root_path,"/foreign/root");
@@ -150,6 +174,66 @@ class CoreTests(unittest.TestCase):
         image = next(r for r in rows if r['type'] == 'image')
         self.assertEqual(image['path'], '/owned/new-image')
         self.assertTrue(any(r['type'] == 'sample' and r['imageIndex'] == image['imageIndex'] for r in rows))
+
+    def test_python_forward_handoff_and_already_runtime_use_exact_parent_image(self):
+        for mode in (18,19):
+            with self.subTest(mode=mode):
+                _,rows=self.core(mode)
+                header,eof=rows[0],rows[-1]
+                self.assertTrue(eof['ok'])
+                self.assertEqual(header['schema'],2)
+                policy=header['rootImagePolicy']
+                self.assertEqual(policy['kind'],'python-parent-runtime')
+                parent=policy['parentInitial']
+                self.assertEqual((parent['pid'],parent['uid'],parent['path'],parent['uuid']),
+                                 (9,1000,'/owned/python-runtime','03'+'00'*15))
+                root=next(r for r in rows if r['type']=='identity' and r['identityIndex']==0)
+                self.assertGreaterEqual(parent['readStartMach'],root['readEndMach'])
+                changes=[r for r in rows if r['type']=='image' and r['identityIndex']==0]
+                self.assertEqual(len(changes),1 if mode==18 else 0)
+                if mode==18:
+                    check=policy['parentRecheck']
+                    self.assertEqual({k:v for k,v in check.items() if not k.startswith('read')},
+                                     {k:v for k,v in parent.items() if not k.startswith('read')})
+                    self.assertGreaterEqual(check['readStartMach'],changes[0]['readEndMach'])
+                    self.assertEqual(changes[0]['path'],parent['path'])
+                    self.assertEqual(changes[0]['uuid'],parent['uuid'])
+                else:
+                    self.assertIsNone(policy['parentRecheck'])
+                    self.assertEqual(root['path'],parent['path'])
+                windows=[r['readEndMach']-r['readStartMach'] for r in rows[1:-1]]
+                windows.extend(w['readEndMach']-w['readStartMach'] for w in
+                               (parent,policy['parentRecheck']) if w is not None)
+                self.assertEqual(eof['maxReadTicks'],max(windows))
+                self.assertEqual(eof['deadlineMach'],root['startAbstime']+10000*1000000)
+
+    def test_fixed_candidate_unknown_reverse_and_changed_parent_images_fail(self):
+        for mode in (20,21,22,23,24,25,26,27,28,32,35,36):
+            with self.subTest(mode=mode):
+                _,rows=self.core(mode)
+                self.assertFalse(rows[-1]['ok'])
+                rejected=[r for r in rows if r['type']=='image-rejected']
+                self.assertEqual(len(rejected),1)
+                self.assertEqual(rejected[0]['identityIndex'],0)
+                self.assertTrue(rejected[0]['path'])
+                self.assertEqual(len(rejected[0]['uuid']),32)
+                changes=[r for r in rows if r['type']=='image' and r['identityIndex']==0]
+                self.assertEqual(len(changes),1 if mode==22 else 0)
+                if mode in (20,27):
+                    self.assertEqual(rows[0]['rootImagePolicy'],
+                                     {'kind':'fixed','parentInitial':None,'parentRecheck':None})
+                if mode in (28,35,36):
+                    self.assertEqual(rows[-1]['reason'],'root-parent-changed')
+                    self.assertTrue(any(r['type']=='reparent' and r['otherPid']==1 for r in rows))
+        for mode in (29,30,31):
+            _,rows=self.core(mode)
+            self.assertFalse(rows[-1]['ok'])
+            self.assertEqual(rows[-1]['reason'],'root-runtime-parent-read')
+            self.assertFalse(any(r['type']=='identity' for r in rows))
+        _,rows=self.core(34)
+        self.assertTrue(rows[-1]['ok'])
+        self.assertEqual(rows[0]['rootImagePolicy'],
+                         {'kind':'fixed','parentInitial':None,'parentRecheck':None})
 
     def test_api_permission_caps_and_original_phase_budget_fail_closed(self):
         _, normalized=self.core(17)
@@ -416,9 +500,11 @@ def native_contract(sampler):
         facts['helper']['pid']=helper.pid
         out,err=helper.communicate(timeout=10)
         captured['helper']=(out,err)
+        if helper.returncode:
+            raise RuntimeError(f'Owned helper fixture failed: helper={helper.returncode} {err!r}')
         child_out,child_err=child.communicate(timeout=2)
         captured['child']=(child_out,child_err)
-        if helper.returncode or child.returncode:
+        if child.returncode:
             raise RuntimeError(f'Owned helper fixture failed: helper={helper.returncode} child={child.returncode} {err!r} {child_err!r}')
         rows=[json.loads(line) for line in raw.read_text().splitlines()]
         identities=[r for r in rows if r['type']=='identity']
@@ -483,6 +569,45 @@ def native_contract(sampler):
     print(json.dumps({'marker':'MOUSE_637_HOST_OBSERVER_NATIVE_CONTRACT_PASS','rootPid':child.pid,
                       'helperPid':helper.pid,'ownedCount':facts['ownedCount'],'eof':facts['eof'],
                       'receipt':{'filename':receipt.name,**M.binding(receipt)}},sort_keys=True))
+
+
+class NativeContractTests(unittest.TestCase):
+    def test_helper_failure_precedes_child_wait_and_preserves_partial_raw(self):
+        events=[]
+        class FixtureProcess(FakeProcess):
+            def __init__(self,pid,name,exit_code=None):
+                super().__init__(pid);self.name=name;self.returncode=exit_code
+            def communicate(self,timeout=None):
+                events.append((self.name,'communicate',timeout))
+                if self.returncode is None:
+                    raise subprocess.TimeoutExpired(self.name,timeout)
+                return b'',b'actual helper failure' if self.name=='helper' else b''
+            def kill(self):
+                events.append((self.name,'kill'))
+                super().kill()
+        child=FixtureProcess(8001,'child')
+        helper=FixtureProcess(8002,'helper',1)
+        with tempfile.TemporaryDirectory(prefix='mouse-host-contract-failure-') as directory:
+            sampler=Path(directory)/'sampler';sampler.write_bytes(b'only a synthetic helper path')
+            def launch(argv,**_):
+                if argv[0]==str(sampler):
+                    Path(argv[-2]).write_bytes(b'{"type":"partial","ok":false}\n')
+                    return helper
+                return child
+            with patch.object(sys,'platform','darwin'),patch.object(subprocess,'Popen',launch):
+                with self.assertRaisesRegex(RuntimeError,'Owned helper fixture failed: helper=1'):
+                    native_contract(sampler)
+            self.assertEqual(events,[('helper','communicate',10),('child','kill'),('child','communicate',2)])
+            receipt=json.loads((sampler.parent/'mouse-637-host-observer-native-contract.json').read_text())
+            self.assertFalse(receipt['ok'])
+            self.assertFalse(receipt['assertionsPassed'])
+            self.assertEqual(receipt['helper']['exitCode'],1)
+            self.assertEqual(receipt['child']['exitCode'],-9)
+            self.assertIn('helper=1',receipt['error'])
+            raw=sampler.parent/receipt['raw']['filename']
+            self.assertEqual(raw.read_bytes(),b'{"type":"partial","ok":false}\n')
+            self.assertEqual(M.binding(raw),{k:receipt['raw'][k] for k in ('size','sha256')})
+            self.assertEqual(base64.b64decode(receipt['helper']['stderr']['data']),b'actual helper failure')
 
 
 if __name__=='__main__':
