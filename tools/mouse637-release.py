@@ -5,6 +5,11 @@ from pathlib import Path
 _reuse=runpy.run_path(str(Path(__file__).with_name('mouse637-reuse.py')))
 _reuse['load']('mouse634-release.py',namespace=globals())
 
+# Match the source manifest's exact published predecessor. This declaration
+# does not replace the separate raw636 upgrade and native update-button gates.
+FEATURE_TOKENS_632.remove('real-published-predecessor-to-637-profile-preserving-replacement')
+FEATURE_TOKENS_632.add('real-636-to-637-profile-preserving-replacement')
+
 GATES=[('x-taskStressGate','mouse637-task-evidence.py'),('x-ownerFeedbackGate','mouse637-feedback-evidence.py'),('x-currentOwnerGate','mouse637-633-owner-evidence.py'),('x-currentContextGate','mouse637-context-evidence.py'),('x-workspaceGeometryGate','mouse637-workspace-evidence.py'),('x-currentUpgradeGate','mouse637-upgrade-evidence.py'),('x-current634OwnerGate','mouse637-retained-owner-evidence.py'),('x-current635OwnerGate','mouse637-owner-feedback-evidence.py'),('x-searchRemovalGate','mouse637-search-removal-evidence.py'),('x-performanceGate','mouse637-performance-evidence.py'),('x-libraryStabilityGate','mouse637-library-evidence.py'),('x-agentInlineGate','mouse637-agent-inline-evidence.py'),('x-paneLayoutGate','mouse637-pane-layout-evidence.py')]
 RETAINED_DEPENDENCIES=('mouse637-retained-native-evidence.py','mouse637-download-evidence.py','mouse637-capture-evidence.py','mouse637-focused-evidence.py','mouse637-reuse.py','mouse637-zoom-evidence.py')
 CURRENT_DEPENDENCIES=('mouse637-native-evidence.py','mouse637-library-evidence.py','mouse637-search-removal-evidence.py','mouse637-performance-evidence.py','mouse637-agent-inline-evidence.py','mouse637-pane-layout-evidence.py','mouse637-context-evidence.py','mouse637-reuse.py','mouse637-zoom-evidence.py')

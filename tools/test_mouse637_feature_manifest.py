@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Reject incomplete637 publication manifests before native runners start."""
 from contextlib import redirect_stdout
+import ast
 import copy
 import io
 import json
@@ -16,6 +17,48 @@ FEATURES = runpy.run_path(str(ROOT / 'tools/mouse637-features-evidence.py'))
 
 
 class FeatureManifest(unittest.TestCase):
+    def source_build_tokens(self):
+        fixture = json.loads((ROOT / 'tools/fixtures/mouse637-macos-build-feature-tokens.json').read_text(encoding='utf-8'))
+        self.assertEqual(fixture['source'], '5a13d620e66e8b25792b3ba26de907c6b66fc422')
+        self.assertEqual(fixture['path'], '.github/workflows/mouse-macos.yml')
+        return fixture['tests']
+
+    def check_source_build_tokens(self, tokens):
+        # Execute the actual retained import predicate against the current
+        # runtime requirements; no native facts or reports are substituted.
+        tree = RELEASE['_reuse']['adapted_tree']('mouse632-release.py')
+        importer = next(node for node in tree.body
+                        if isinstance(node, ast.FunctionDef) and node.name == 'import_candidate')
+        guards = [node for node in importer.body if isinstance(node, ast.If) and any(
+            isinstance(part, ast.Name) and part.id == 'FEATURE_TOKENS_632'
+            for part in ast.walk(node.test))]
+        self.assertEqual(len(guards), 1)
+        scope = RELEASE['import_candidate'].__globals__.copy()
+        scope['b'] = {'tests': tokens}
+        exec(compile(ast.Module(body=guards, type_ignores=[]), '<production-manifest-guard>', 'exec'), scope)
+
+    def test_exact_source_build_declaration_satisfies_current_import_gate(self):
+        self.check_source_build_tokens(self.source_build_tokens())
+
+    def test_missing_or_different_published_predecessor_declaration_is_rejected(self):
+        token = 'real-636-to-637-profile-preserving-replacement'
+        for replacement in (None, 'real-published-predecessor-to-637-profile-preserving-replacement',
+                            'real-635-to-637-profile-preserving-replacement',
+                            'real-634-to-637-profile-preserving-replacement'):
+            with self.subTest(replacement=replacement):
+                tokens = [value for value in self.source_build_tokens() if value != token]
+                if replacement is not None:
+                    tokens.append(replacement)
+                with self.assertRaisesRegex(ValueError, 'owner feedback features incomplete'):
+                    self.check_source_build_tokens(tokens)
+
+    def test_source_build_still_requires_every_retained_owner_feature(self):
+        tokens = self.source_build_tokens()
+        for token in RELEASE['FEATURE_TOKENS_632']:
+            with self.subTest(token=token):
+                with self.assertRaisesRegex(ValueError, 'owner feedback features incomplete'):
+                    self.check_source_build_tokens([value for value in tokens if value != token])
+
     def check_schema(self, schema):
         validator = RELEASE['validate_template']
         scope, previous = validator.__globals__, validator.__globals__['STAGE']
