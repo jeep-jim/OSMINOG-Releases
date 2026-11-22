@@ -12,8 +12,8 @@ import subprocess
 import sys
 
 
-def binding(path, **extra):
-    data = Path(path).read_bytes()
+def binding(file_path, **extra):
+    data = Path(file_path).read_bytes()
     return {**extra, 'size': len(data), 'sha256': hashlib.sha256(data).hexdigest()}
 
 
