@@ -1,5 +1,27 @@
 # Mouse Browser 6.0.37 arm64 candidate
 
+## Current candidate — all platforms accepted, publication authorized
+
+Recorded 2026-11-22T11:32:42.489713+00:00. The owner authorized release of Mouse Browser 6.0.37 with the built-in Agent removed. All three platforms passed native execution and complete independent actual-package verification on the exact same source.
+
+- Tested source: `0021084ccb9537e657d21e6f0c8e812dee6b461f`; source PR [193](https://github.com/jeep-jim/OSMINOG/pull/193).
+- Actual source merge: `e6e27b26ae719f50beeb5a2244dc6d2c6ddcdab1`; reviewed and actual tree `ae5015b493ba74a078b5d13067ddd21ad7ed32b4`. Tested desktop/tools and separately owned website changes are preserved.
+- Native run [45013817897](https://github.com/jeep-jim/OSMINOG/actions/runs/45013817897), attempt `2`, primary job `137186893064`.
+- Candidate artifact `14752416690`, 260569921 bytes, SHA-256 `069ae9df93b148e42b60e71c312f04698e3255b1d15913406a5ec5efc9138f10`.
+- Verification artifact `14751923174`, 67013992 bytes, SHA-256 `b6a1468b641ede8e883539fe7ecd94bf71d503244b15d606ac7221fbe7548cca`. Both artifacts were created inside the exact successful job.
+- Complete independent report `mac-002-attempt2-ae72-independent.json`, 445762 bytes, SHA-256 `f8c7d46cc5e0a7f6a59c48fe2bc3e407cb3c14d1aa74acadef3135459856bb92`; validator checkout `ae72af72836b766b9b04ee883e251c93294db3f2`. Root separately rehashed actual packages, archives and API/report bindings.
+
+| Package | Bytes | SHA-256 |
+|---|---:|---|
+| `Mouse-Browser-6.0.37-mac-arm64.dmg` | 130545757 | `3c8d727eabcec91c4893f94762b6834080344e35320edaaf1f7555bf407ae1a2` |
+| `Mouse-Browser-6.0.37-mac-arm64.zip` | 130555936 | `f4c67a7e710060f2e4466d0f47c1bd707edd6841c9d5b50826d133cc66adb393` |
+
+Attempt 1 failed before the updater because four native capture promises exceeded the unchanged 2500 ms Nora preparation deadline. Its artifact `14751595580` and original logs/API were retained separately. One controlled unchanged attempt 2 passed all original gates; its capture completed in 1248.995 ms. The cause of the earlier latency is unknown. Actual updater evidence records one window fit preserving the 800×600 minimum, exactly three trusted native clicks, installation/relaunch and profile equality. This is not a claim about the physical user device.
+
+The ready pin and exact `PUBLISH_OWNER` line now authorize the existing publisher. Validator algorithms and workflows remain byte-identical to ae72; predecessor pins are preserved. Publication is still pending: the publisher must repeat fresh native installation, verify the actual public package bytes and pass anonymous discovery/download with the shipped updater. No public release is claimed by this staging record.
+
+## Earlier staging history — retained verbatim
+
 This is an unready staging template, not a publication receipt. No PUBLISH_OWNER is present. The exact source, merged PR, successful native run/job/attempt, artifact IDs, archive digests and package bytes must be pinned only after all three platform candidates pass. All three pins must share source, sourceMerge and sourcePR.
 
 Frozen6.0.36 and older tools, workflows, artifacts and channels remain immutable. Source verification and a fresh installed run both enforce retained gates, actual6.0.36-to6.0.37 replacement, native update-button acceptance, the published6.0.36 performance baseline, and two-process637 native feature and appearance evidence.

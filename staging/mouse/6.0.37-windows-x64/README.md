@@ -1,5 +1,26 @@
 # Mouse Browser 6.0.37 windows-x64 candidate
 
+## Current candidate — all platforms accepted, publication authorized
+
+Recorded 2026-11-22T11:32:42.489713+00:00. The owner authorized release of Mouse Browser 6.0.37 with the built-in Agent removed. All three platforms passed native execution and complete independent actual-package verification on the exact same source.
+
+- Tested source: `0021084ccb9537e657d21e6f0c8e812dee6b461f`; source PR [193](https://github.com/jeep-jim/OSMINOG/pull/193).
+- Actual source merge: `e6e27b26ae719f50beeb5a2244dc6d2c6ddcdab1`; reviewed and actual tree `ae5015b493ba74a078b5d13067ddd21ad7ed32b4`. Tested desktop/tools and separately owned website changes are preserved.
+- Native run [45013817864](https://github.com/jeep-jim/OSMINOG/actions/runs/45013817864), attempt `1`, primary job `137181713767`.
+- Candidate artifact `14751348738`, 113423490 bytes, SHA-256 `0ce406e6cffc765f29dac778dffca7e790989b1dab429680fe88137d01142d79`.
+- Verification artifact `14751299029`, 79328147 bytes, SHA-256 `12064db4774ae3282dd4597d3f6fe8304618df218a9918c2361b2ec8bf0e69f6`. Both artifacts were created inside the exact successful job.
+- Complete independent report `windows-002-independent-review-ae72.json`, 494923 bytes, SHA-256 `36af4a3fef8d2f653ccd7c41ecc71980813d8231cf5f54eebe6cbab88110a133`; validator checkout `ae72af72836b766b9b04ee883e251c93294db3f2`. Root separately rehashed actual packages, archives and API/report bindings.
+
+| Package | Bytes | SHA-256 |
+|---|---:|---|
+| `Mouse-Browser-6.0.37-Windows-x64.exe` | 113416843 | `19487826aa51b2027d5a4d497529be62a5e2180402ea24e5d700da48f4cd0e35` |
+
+The same run/attempt also passed modern job `137186174835`; modern artifact `14751517461`, SHA-256 `f8ef7b344eb4dc88224f4b75372ea0bd552b954ce529171b644903c63d627dc3`, was included in the complete independent check. The pin intentionally keeps the primary job only; the existing importer independently requires the modern job.
+
+The ready pin and exact `PUBLISH_OWNER` line now authorize the existing publisher. Validator algorithms and workflows remain byte-identical to ae72; predecessor pins are preserved. Publication is still pending: the publisher must repeat fresh native installation, verify the actual public package bytes and pass anonymous discovery/download with the shipped updater. No public release is claimed by this staging record.
+
+## Earlier staging history — retained verbatim
+
 This is an unready staging template, not a publication receipt. No PUBLISH_OWNER is present. The exact source, merged PR, successful native run/job/attempt, artifact IDs, archive digests and package bytes must be pinned only after all three platform candidates pass. All three pins must share source, sourceMerge and sourcePR.
 
 Frozen6.0.36 and older tools, workflows, artifacts and channels remain immutable. Source verification and a fresh installed run both enforce retained gates, actual6.0.36-to6.0.37 replacement, native update-button acceptance, the published6.0.36 performance baseline, and two-process637 native feature and appearance evidence.
