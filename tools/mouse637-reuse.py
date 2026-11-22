@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Byte-frozen636 gates with explicitly scoped637 identities and seam palette.
+"""Byte-frozen636 gates with scoped637 identities, palette and populated modes.
 
 Old artifacts and validators remain byte-for-byte immutable. Current637 still
 emits retained636 owner, Agent, search-removal and desktop-transition reports.
@@ -71,8 +71,35 @@ def target(name):
 
 def adapted_tree(name, *, current_native=False):
     tree = ast.parse(checked(name), filename=str(Path(__file__).with_name(name))) if name in FROZEN else legacy()['adapted_tree'](name, current_native=current_native)
+    preset_adaptations = {'count': 0, 'token': 0}
+    zoom_adaptations = {'signature': 0, 'palette': 0, 'call': 0}
 
     class Identity(ast.NodeTransformer):
+        def visit_FunctionDef(self, node):
+            node = self.generic_visit(node)
+            if name == 'mouse633-owner-feedback-evidence.py' and node.name == 'meter':
+                expected = ast.parse('def meter(image): pass').body[0].args
+                if ast.dump(node.args) != ast.dump(expected):
+                    raise ValueError('Frozen zoom meter signature changed')
+                node.args.kwonlyargs.append(ast.arg(arg='expected_rgb'))
+                node.args.kw_defaults.append(ast.parse('(235, 40, 155)', mode='eval').body)
+                zoom_adaptations['signature'] += 1
+            return node
+
+        def visit_Tuple(self, node):
+            node = self.generic_visit(node)
+            if name == 'mouse633-owner-feedback-evidence.py' and ast.dump(node) == ast.dump(ast.parse('(235,40,155)', mode='eval').body):
+                zoom_adaptations['palette'] += 1
+                return ast.copy_location(ast.Name(id='expected_rgb', ctx=ast.Load()), node)
+            return node
+
+        def visit_Call(self, node):
+            node = self.generic_visit(node)
+            if name == 'mouse633-owner-feedback-evidence.py' and ast.dump(node) == ast.dump(ast.parse('meter(image)', mode='eval').body):
+                zoom_adaptations['call'] += 1
+                return ast.copy_location(ast.parse('meter(image, expected_rgb=_mouse637_zoom_color(row))', mode='eval').body, node)
+            return node
+
         def visit_Constant(self, node):
             if not isinstance(node.value, str):
                 return node
@@ -99,7 +126,22 @@ def adapted_tree(name, *, current_native=False):
                 value = value.replace('6.0.34', '6.0.36').replace('actual634', 'actual636').replace('published634', 'published636').replace('legacy634-update', 'legacy636-update')
             if current_native and node.value == r'mouse-(?:635|636)-[a-z0-9-]+\.png':
                 value = r'mouse-(?:635|636|637)-[a-z0-9-]+\.png'
+            if name == 'mouse632-release.py' and node.value == 'five-mode-layouts-empty-only-suggestions':
+                value = 'five-mode-populated-presets-preserve-live-pages'
+                preset_adaptations['token'] += 1
             return ast.copy_location(ast.Constant(value=value), node) if value != node.value else node
+
+        def visit_Compare(self, node):
+            node = self.generic_visit(node)
+            expected = ast.parse("facts.get('suggestedRequests') != 7", mode='eval').body
+            if name == 'mouse632-release.py' and ast.dump(node) == ast.dump(expected):
+                # The user explicitly changed preset semantics. Require the
+                # full independent637 evidence, including real27 requests,
+                # retained page state and both localhost PNGs. Do not edit the
+                # emitted count or bypass the other retained622 checks.
+                preset_adaptations['count'] += 1
+                return ast.copy_location(ast.parse('not _mouse637_verify_mode_requests(facts, OUT)', mode='eval').body, node)
+            return node
 
         def visit_Assign(self, node):
             node = self.generic_visit(node)
@@ -119,6 +161,10 @@ def adapted_tree(name, *, current_native=False):
             return node
 
     tree = Identity().visit(tree)
+    if name == 'mouse632-release.py' and preset_adaptations != {'count': 1, 'token': 1}:
+        raise ValueError('Frozen preset count/token adaptation target changed')
+    if name == 'mouse633-owner-feedback-evidence.py' and zoom_adaptations != {'signature': 1, 'palette': 1, 'call': 1}:
+        raise ValueError('Frozen zoom meter adaptation target changed')
     if name == 'mouse634-linux-release.py':
         assignments = [n for n in tree.body if isinstance(n, ast.Assign) and any(isinstance(t, ast.Name) and t.id == 'PREVIOUS' for t in n.targets)]
         if len(assignments) != 1:
@@ -132,6 +178,13 @@ def load(name, *, namespace=None, current_native=False):
     original = scope.get('__name__')
     scope['__file__'] = str(Path(__file__).with_name('mouse637-native-evidence.py' if current_native else target(name)))
     scope['__name__'] = 'retained637_' + name.replace('-', '_')
+    if name == 'mouse632-release.py':
+        def verify_mode_requests(facts, output):
+            checker = runpy.run_path(str(Path(__file__).with_name('mouse637-presets-evidence.py')))
+            return checker['verify_legacy_facts'](facts, output)
+        scope['_mouse637_verify_mode_requests'] = verify_mode_requests
+    if name == 'mouse633-owner-feedback-evidence.py':
+        scope['_mouse637_zoom_color'] = runpy.run_path(str(Path(__file__).with_name('mouse637-zoom-evidence.py')))['expected_rgb']
     try:
         exec(compile(adapted_tree(name, current_native=current_native), scope['__file__'], 'exec'), scope)
     finally:

@@ -72,6 +72,7 @@ jobs:
             mouse637-linux-release/*.json
             mouse637-linux-release/*.log
             mouse637-linux-release/*.png
+            mouse637-linux-release/mouse-637-library-source.txt
             mouse637-linux-release/mouse-linux-appimage/**
             mouse637-linux-release/mouse-637-baseline-performance/**
             mouse637-linux-release/SHA256SUMS.txt

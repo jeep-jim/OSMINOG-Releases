@@ -149,6 +149,7 @@ jobs:
             mouse637-release/*.png
             mouse637-release/*.json
             mouse637-release/*.md
+            mouse637-release/mouse-637-library-source.txt
             mouse637-release/mouse-637-baseline-performance/**
             mouse637-release/SHA256SUMS.txt
           retention-days: 14

@@ -41,8 +41,9 @@
     "mouse-637-features-write.json",
     "mouse-637-features-processes.json",
     "mouse-637-update-button.json",
-    "mouse-637-update-button-write.json",
-    "mouse-637-update-button-read.json"
+    "mouse-637-update-button-profile-write.json",
+    "mouse-637-update-button-profile-read.json",
+    "mouse-637-update-button-native.json"
   ],
   "x-nativeMarkers": [
     "MOUSE_628_LOCAL_MCP_NATIVE_PASS",
@@ -244,8 +245,8 @@
     "mouse-637-features.json": "6.0.37",
     "mouse-637-features-write.json": "6.0.37",
     "mouse-637-update-button.json": "6.0.37",
-    "mouse-637-update-button-write.json": "6.0.37",
-    "mouse-637-update-button-read.json": "6.0.37"
+    "mouse-637-update-button-profile-write.json": "6.0.36",
+    "mouse-637-update-button-profile-read.json": "6.0.37"
   },
   "x-gesture": {
     "file": "mouse-629-swipe-tutorial.json",
@@ -519,7 +520,26 @@
       "linux-x64"
     ],
     "passwordStorageUnavailableMustRejectWrites": true,
-    "nativeContextReportRequired": true
+    "nativeContextReportRequired": true,
+    "zoomPresentation": {
+      "adapter": "tools/mouse637-zoom-evidence.py",
+      "settingsOpacity": 0.14,
+      "settingsRGB": [
+        202,
+        34,
+        133
+      ],
+      "popoverRGB": [
+        235,
+        40,
+        155
+      ],
+      "derivedFromBoundCaptureName": true,
+      "declaredPaletteMustMatch": true,
+      "unchangedRGBTolerance": 2,
+      "unchangedGeometryTolerance": 3,
+      "unchangedDensityRequirement": true
+    }
   },
   "x-currentUpgradeGate": {
     "validator": "tools/mouse637-upgrade-evidence.py",
@@ -693,7 +713,8 @@
       "mouse637-download-evidence.py": "0720aa2ad161af6ce49a817c69939973d908a5a80ccf0865730784279032f255",
       "mouse637-capture-evidence.py": "42015b7a9af9999416b935518e6516056395721920bbcc93bba2dda297c3989f",
       "mouse637-focused-evidence.py": "c5f5f70bc51bb86a510e8fcd64f2a86560b23c62e550ad0f705f316828791c78",
-      "mouse637-reuse.py": "ca1f85ae237f1e8616a701ed6f68bfecbeda5f57a924d9503157bcf9b622063d"
+      "mouse637-reuse.py": "386c3b5af7b9fdd2dbdd10ffdb070306e053c8c72e49d25b3ba55fe7ab9caae2",
+      "mouse637-zoom-evidence.py": "3da3c2c4a42d4e208f3ed9f76a97c35c8f0e030b761f6d3ee1137e00b20f6ccb"
     }
   },
   "x-current635OwnerGate": {
@@ -724,7 +745,8 @@
       "mouse637-agent-inline-evidence.py": "e1b479bc7e061dcca64d4f2d58105ecbaee755e387a58838c28816bd0aa7855c",
       "mouse637-pane-layout-evidence.py": "c9a13ac4163de2d59de4f45794324a437f70ec07fe3494597585eff040303a9f",
       "mouse637-context-evidence.py": "30c095ef0f7c3a7cc3ce9153ea0d634a843eeac898c3a6fd0e84db13048bb969",
-      "mouse637-reuse.py": "ca1f85ae237f1e8616a701ed6f68bfecbeda5f57a924d9503157bcf9b622063d"
+      "mouse637-reuse.py": "386c3b5af7b9fdd2dbdd10ffdb070306e053c8c72e49d25b3ba55fe7ab9caae2",
+      "mouse637-zoom-evidence.py": "3da3c2c4a42d4e208f3ed9f76a97c35c8f0e030b761f6d3ee1137e00b20f6ccb"
     },
     "nativeCaptures": {
       "exact": 19,
@@ -905,7 +927,7 @@
   },
   "x-current637FeaturesGate": {
     "validator": "tools/mouse637-features-evidence.py",
-    "sha256": "bde1d77d6d11d1272abf27424b784ce030e7fd8aed12a2dbf976d4911d9c06fa",
+    "sha256": "ecc1040bb3d27f859cbe6bdd9f85efcc055587559104550e6056bb6f2ea44d2f",
     "sourceAndFreshInstalled": true,
     "savedReportAcceptedAsInput": false,
     "files": [
@@ -913,7 +935,7 @@
       "mouse-637-features-write.json",
       "mouse-637-features-processes.json"
     ],
-    "nativeCaptures": 15,
+    "nativeCaptures": 38,
     "writeProcessBudgetMs": 240000,
     "readProcessBudgetMs": 90000,
     "twoActualProcesses": true,
@@ -936,6 +958,159 @@
       ],
       "localStorage": true,
       "restartWithNondefaultValue": true
+    },
+    "writeNativeCaptures": 36,
+    "readNativeCaptures": 2,
+    "aiPreview": {
+      "required": true,
+      "field": "aiPreview",
+      "sameWriteProcess": true,
+      "ownedCrossOriginPages": true,
+      "modes": [
+        "rounded",
+        "square"
+      ],
+      "themes": [
+        "light",
+        "dark"
+      ],
+      "actualNativeDividerResize": true,
+      "minimumNativeHeightChange": 16,
+      "storedRatioRestoredAcrossDesktops": true,
+      "editableAddressSameWebContents": true,
+      "favicon": {
+        "source": "owned page icon.png",
+        "display": "IPC-normalized data PNG",
+        "pixelSize": [
+          20,
+          20
+        ],
+        "independentlyDecodedRGBA": [
+          37,
+          143,
+          191,
+          255
+        ]
+      },
+      "nativeFullscreenChooserTransfer": true,
+      "nativeHeaderDragTransfer": true,
+      "displacedMainPagesPreserved": true,
+      "detachedPagesSurviveParentClose": true,
+      "nativeFrames": 6,
+      "freshNativeBoundsForEveryFrame": true,
+      "rawGuestPixelProbes": true
+    },
+    "dependencies": {
+      "mouse637-native-evidence.py": "14ba118aab9e8c50601a52212c5564f9141995cde48decd51823963bbe7b7446",
+      "mouse637-presets-evidence.py": "7cdec2731e4edbe9cdbc975c58af42a0fbc0fc11543804b568d68f2bfd825ee2",
+      "mouse637-sidebar-focus-evidence.py": "81d2540c8edfe75ef489b36fb483c45e2aa7b897a2fd8eef3bd636280f9ea6db",
+      "mouse637-library-actions-evidence.py": "48523a65deeee937e90e02a2eeccc623cae5bdd7f63254db7d11ea391cdaf2c2",
+      "mouse637-update-ui-evidence.py": "933d8fe9528b205c8c09c1c1d2310dc8ede7ee1bda56fcfbe5c38dd755fcfad2"
+    },
+    "nativeCaptureNames": [
+      "mouse-637-language-ru.png",
+      "mouse-637-language-en.png",
+      "mouse-637-interface-light.png",
+      "mouse-637-interface-dark.png",
+      "mouse-637-extensions-installed.png",
+      "mouse-637-extensions-pane.png",
+      "mouse-637-media-full.png",
+      "mouse-637-media-compact.png",
+      "mouse-637-media-replacement.png",
+      "mouse-637-ai-preview-rounded-light.png",
+      "mouse-637-ai-preview-rounded-dark.png",
+      "mouse-637-ai-preview-square-light.png",
+      "mouse-637-ai-preview-square-dark.png",
+      "mouse-637-ai-preview-moved.png",
+      "mouse-637-ai-preview-dragged.png",
+      "mouse-637-localhost-light.png",
+      "mouse-637-localhost-dark.png",
+      "mouse-637-sidebar-before-light.png",
+      "mouse-637-sidebar-settings-light.png",
+      "mouse-637-sidebar-library-light.png",
+      "mouse-637-sidebar-restored-light.png",
+      "mouse-637-sidebar-before-dark.png",
+      "mouse-637-sidebar-settings-dark.png",
+      "mouse-637-sidebar-library-dark.png",
+      "mouse-637-sidebar-restored-dark.png",
+      "mouse-637-library-captures-list-light.png",
+      "mouse-637-library-captures-grid-light.png",
+      "mouse-637-library-context.png",
+      "mouse-637-library-captures-list-dark.png",
+      "mouse-637-library-captures-grid-dark.png",
+      "mouse-637-appearance-controls-light.png",
+      "mouse-637-appearance-square-light.png",
+      "mouse-637-appearance-controls-dark.png",
+      "mouse-637-appearance-square-dark.png",
+      "mouse-637-update-burrow-light.png",
+      "mouse-637-update-burrow-dark.png",
+      "mouse-637-appearance-restored.png",
+      "mouse-637-extensions-restore-error.png"
+    ],
+    "presets": {
+      "required": true,
+      "field": "presets",
+      "sameWriteProcess": true,
+      "populatedWebApplicationCatalog": true,
+      "actualSelectedRequests": 27,
+      "repeatedModeNewRequests": 0,
+      "livePagesPreserved": true,
+      "localhostLeftOfAgent": true,
+      "localhostBothThemes": true,
+      "nativeFrames": 2
+    },
+    "sidebarFocus": {
+      "required": true,
+      "field": "sidebarFocus",
+      "sameWriteProcess": true,
+      "opacity": 0.14,
+      "nativeAndBrowserOwnedPanes": true,
+      "strictCSP": true,
+      "authorStylesPreserved": true,
+      "trustedNativeClickThrough": true,
+      "darkToolbarSurface": true,
+      "bothThemes": true,
+      "nativeFrames": 8
+    },
+    "libraryActions": {
+      "required": true,
+      "field": "libraryActions",
+      "sameWriteProcess": true,
+      "bothThemesAndViews": true,
+      "directContentActions": true,
+      "nativeContextMenuMetadata": true,
+      "actualNativeFileTransfers": 3,
+      "receivedExactBytesNameMime": true,
+      "bothNativePanes": true,
+      "clipboardUnchanged": true,
+      "nativeFrames": 5
+    },
+    "updateDialog": {
+      "required": true,
+      "field": "updateDialog",
+      "sameWriteProcess": true,
+      "visualStateFixture": true,
+      "transportExercised": false,
+      "installationExercised": false,
+      "phases": [
+        "current",
+        "available",
+        "downloading",
+        "ready",
+        "installing",
+        "error"
+      ],
+      "bothThemes": true,
+      "circleInSquareWorkspace": true,
+      "existingCenteredLogo": "mouse-update.svg",
+      "ringActions": true,
+      "roundCloseAndMinimize": true,
+      "strongBackdropMinimumAlpha": 0.75,
+      "rawRingAndCorePixelProbes": true,
+      "trustedNativeOpenCloseMinimize": true,
+      "livePagesPreserved": true,
+      "fixtureStateRestored": true,
+      "nativeFrames": 2
     }
   },
   "x-currentUpdateButtonGate": {
@@ -950,7 +1125,14 @@
       "download",
       "install"
     ],
-    "distinctNativeProcesses": true
+    "distinctNativeProcesses": true,
+    "inputFiles": [
+      "mouse-637-update-button.json",
+      "mouse-637-update-button-native.json",
+      "mouse-637-update-button-profile-write.json",
+      "mouse-637-update-button-profile-read.json"
+    ],
+    "nativeReportFromVersion": "6.0.36"
   },
   "x-currentHelpersGate": {
     "validator": "tools/mouse637-current.py",
