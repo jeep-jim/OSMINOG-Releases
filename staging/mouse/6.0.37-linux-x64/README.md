@@ -90,3 +90,76 @@ and633owner readers passed against80 and47 consumed raw files respectively,
 while the overall feedback reader rejected the known removal cookie defect.
 Those subset checks are historical and do not accept newbe86 or any package.
 All three pins remain null/unready with no owner trigger or public release.
+
+## Linux publisher attempt 1 — missing native window dependency
+
+Recorded 2026-11-22 after the exact ready publisher merge
+`a464a5398fa7afca55e1b1116ff8510895ae488f` (tree
+`856121dc303c5a49bd6b3b5bdb0a2792a6859577`). The accepted source remains
+`0021084ccb9537e657d21e6f0c8e812dee6b461f`, merged as
+`e6e27b26ae719f50beeb5a2244dc6d2c6ddcdab1`; the ready pins and package bytes
+are unchanged.
+
+Publisher [run 45018600676](https://github.com/jeep-jim/OSMINOG-Releases/actions/runs/45018600676),
+attempt 1, contract job `137196267139` passed. Native publisher job
+`137196383804` ran from 11:42:33 to 11:47:33 UTC and failed step 7,
+`Verify exact packages on a fresh Linux desktop`. Import of the exact source
+packages and source evidence passed. The fresh published636 performance
+baseline and both AppImage/DEB profile replacements also passed before the
+failure.
+
+The first concrete failure is in the actual636 update-button scene:
+`FileNotFoundError: [Errno 2] No such file or directory: 'xprop'`.
+The preserved `mouse-637-update-button-native.json` records stage
+`predecessor-startup`, owned636 PID `5162`, `nativeInputs: []`, and a 69 ms
+failed helper call. The unchanged native helper invokes
+`xprop -id <owned-window> WM_STATE` while identifying the managed X11 window,
+before its focus and click calls. This was a missing runner executable;
+the record does not demonstrate a rejected browser click.
+
+The accepted source workflow explicitly installs `x11-utils`; the publisher
+workflow omitted it. Ubuntu22.04's official
+[x11-utils file list](https://packages.ubuntu.com/jammy/amd64/x11-utils/filelist)
+includes `/usr/bin/xprop`. The correction adds that package to the existing
+publisher dependency command. The native helper, browser source, installers,
+pins, validators, ownership checks, deadlines, and input sequence are unchanged.
+The source also explicitly configures a PulseAudio null sink; that separate
+environment difference is not changed here and is not the cause recorded by
+this failure.
+
+The original evidence is preserved:
+
+| Evidence | Bytes | SHA-256 |
+|---|---:|---|
+| [Artifact 14752034476](https://github.com/jeep-jim/OSMINOG-Releases/actions/runs/45018600676/artifacts/14752034476), `mouse637-linux-release-verification-1` | 3068715 | `adf90ffe4901dd907521aa2bc2969e1ba921387605eca7ef0d3a6a2e6e2d253a` |
+| Original decoded job log | 54175 | `98b02c8903f3418b28bd7d459c6166cf222ac17dc22da4569f2067a151d7df18` |
+| `mouse-637-update-button-native.json` | 3651 | `7946350f7c6a451913c51020ca914e9163380457ff02616afd2d20be9ebf2eb2` |
+| Independent failure review | 8620 | `16b485125be3329d29e6c1ba8e49845b66609471fb9eed3f8ac1baf8fdcd16cd` |
+
+The artifact's actual bytes match both its GitHub API digest and the upload
+log; ZIP CRC, member paths and critical extracted-file bytes were checked.
+The terminal API snapshot binds it to this exact publisher head, run and job.
+Steps 8 (public packages) and 9 (Linux channel and anonymous downloads) were
+skipped. This attempt did not publish packages or advance the Linux channel.
+
+The new environment contract reads the actual named dependency run block.
+It requires the package in the apt install command, and rejects a missing
+package or a package mentioned only in a comment or unrelated step. On the
+unchanged workflow, the actual-workflow test failed specifically because
+`xprop` was unavailable through the declared dependencies: 3 tests, 1 failure.
+After the one-package correction, all 3 tests passed. The full current
+publisher contract suite passed 122/122 with no failures or skips, using local
+Python 3.12.14. The Linux template check passed and the unchanged publication
+plan returned `publish=true`.
+
+Local RED log SHA-256:
+`8a48e0054ace98fb98762b40e3709d94b7e91c0b7856886aa4144828d4f94c99`.
+Local GREEN log SHA-256:
+`7453c0fa13f5e7bc8227489852a68ec5bf7735be952dac37305d2d8017f4d0f7`.
+Full contract log SHA-256:
+`691d796ed624c98d651cfa0228db50037f431791726120f7027b31f90d23fcc2`.
+
+These local checks do not replace native publisher acceptance. The corrected
+workflow must complete a new fresh installation, public package verification,
+and anonymous shipped636 discovery/download for both Linux formats before
+Linux publication can be accepted. No unchanged retry was performed.

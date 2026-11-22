@@ -48,7 +48,7 @@ jobs:
       - name: Prepare native Linux desktop dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y xvfb openbox xdotool dbus-x11 pulseaudio libfuse2 libgtk-3-0 libnss3 libxss1 libasound2 libgbm1 libsecret-1-0 libnotify4 libatspi2.0-0 libxtst6 libxext6
+          sudo apt-get install -y xvfb openbox xdotool x11-utils dbus-x11 pulseaudio libfuse2 libgtk-3-0 libnss3 libxss1 libasound2 libgbm1 libsecret-1-0 libnotify4 libatspi2.0-0 libxtst6 libxext6
       - name: Import immutable successful Linux CI packages
         run: python3 tools/mouse637-linux-release.py import
       - name: Verify exact packages on a fresh Linux desktop
