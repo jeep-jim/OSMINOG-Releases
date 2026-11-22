@@ -90,6 +90,36 @@ def guest_probe(native):
             'point': {'x': native['bounds']['x'] + 98, 'y': native['bounds']['y'] + 230}, 'expectedRGB': [32, 123, 164]}
 
 
+def nanoseconds(value):
+    need(isinstance(value, str) and re.fullmatch(r'0|[1-9][0-9]{0,19}', value),
+         'native gesture monotonic elapsed value is not an exact bounded decimal')
+    return int(value)
+
+
+def handshake_bytes(handshake, child_pid):
+    receipt = handshake.get('read', {})
+    encoded = receipt.get('base64')
+    need(receipt.get('method') == 'fs.readFileSync' and receipt.get('pid') == child_pid
+         and type(receipt.get('bytes')) is int and 0 < receipt['bytes'] <= 4096
+         and isinstance(encoded, str) and 0 < len(encoded) <= 5464,
+         'native handshake lacks its bounded actual child file read')
+    def unique_object(pairs):
+        result = {}
+        for key, value in pairs:
+            need(key not in result, 'native handshake bytes contain duplicate JSON fields')
+            result[key] = value
+        return result
+    try:
+        raw = base64.b64decode(encoded, validate=True)
+        need(0 < len(raw) <= 4096 and len(raw) == receipt['bytes'] and sha(raw) == receipt.get('sha256'),
+             'native handshake actual bytes/size/hash differ')
+        decoded = json.loads(raw.decode('utf-8'), object_pairs_hook=unique_object)
+    except (UnicodeError, ValueError) as error:
+        raise ValueError('Invalid native handshake file bytes: ' + str(error)) from error
+    expected = {key: handshake.get(key) for key in ('schema', 'nonce', 'parentPid', 'childPid', 'at', 'parentElapsedNs', 'nativeFile')}
+    need(decoded == expected, 'native child read another handshake, timestamp or owned file')
+
+
 def native_gesture(value, event, file, pid, platform):
     need(isinstance(value, dict) and value.get('schema') == 1
          and value.get('method') == 'independent-native-input-process'
@@ -102,24 +132,37 @@ def native_gesture(value, event, file, pid, platform):
     nonce = value.get('nonce')
     need(isinstance(nonce, str) and re.fullmatch(r'[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}', nonce),
          'file gesture nonce missing')
-    clock = ('forkedAt', 'startedAt', 'completedAt', 'exitAt', 'deadlineAt', 'elapsedMs', 'budgetMs')
-    need(all(type(value.get(key)) is int and value[key] > 0 for key in clock)
-         and value['forkedAt'] <= value['startedAt'] < value['completedAt'] <= value['exitAt']
-         and value['completedAt'] <= value['deadlineAt'] <= value['forkedAt'] + value['budgetMs']
-         and value['elapsedMs'] == value['completedAt'] - value['startedAt']
-         and 0 < value['elapsedMs'] <= value['budgetMs'] <= 10000
+    # Wall times remain raw diagnostics. Independent Electron/Node clocks need
+    # not agree, and wall time can move; only local monotonic deltas prove time.
+    clock = ('forkedAt', 'startedAt', 'completedAt', 'exitAt', 'deadlineAt', 'budgetMs')
+    need(all(type(value.get(key)) is int and 0 < value[key] < 2**53 for key in clock)
+         and type(value.get('elapsedMs')) is int and value['elapsedMs'] == value['completedAt'] - value['startedAt']
+         and 0 < value['budgetMs'] <= 10000
          and value.get('driverCallLimitMs') == (None if platform == 'darwin' else 7000)
-         and value.get('lifecycleLimitMs') == 53000 and value.get('terminationRequested') is False
-         and value['exitAt'] - value['forkedAt'] <= 53000,
+         and value.get('lifecycleLimitMs') == 53000 and value.get('terminationRequested') is False,
          'file gesture exceeded or changed its independent process budget')
+    timing = value.get('timing', {})
+    need(timing.get('source') == 'process.hrtime.bigint' and timing.get('scope') == 'per-process elapsed',
+         'native gesture local monotonic clock provenance missing')
+    parent, child = timing.get('parent', {}), timing.get('child', {})
+    preparation_ns, parent_ns, child_ns = (nanoseconds(v) for v in
+                                         (parent.get('preparationNs'), parent.get('elapsedNs'), child.get('elapsedNs')))
+    observed_ns = nanoseconds(child.get('observedHandshakeNs'))
+    event_ns = child.get('eventNs')
+    need(isinstance(event_ns, list) and len(event_ns) == 13, 'native gesture local pointer chronology missing')
+    event_ns = [nanoseconds(v) for v in event_ns]
+    need(0 < parent_ns and preparation_ns + parent_ns <= value['budgetMs'] * 1000000
+         and 0 < child_ns <= value['budgetMs'] * 1000000 and parent_ns <= 53000 * 1000000,
+         'native gesture exceeded its actual parent or child monotonic budget')
     handshake = value.get('handshake', {})
     native_file = {'name': file['dragName'], 'size': file['size'], 'sha256': file['sha256'], 'hasIcon': True, 'keys': ['file', 'icon']}
     need(handshake.get('schema') == 1 and handshake.get('nonce') == nonce
          and handshake.get('parentPid') == pid and handshake.get('childPid') == value['childPid']
          and handshake.get('nativeFile') == native_file
-         and all(type(handshake.get(key)) is int for key in ('at', 'observedAt'))
-         and value['startedAt'] <= handshake['at'] <= handshake['observedAt'] <= value['completedAt'],
+         and all(type(handshake.get(key)) is int and 0 < handshake[key] < 2**53 for key in ('at', 'observedAt'))
+         and nanoseconds(handshake.get('parentElapsedNs')) <= parent_ns and observed_ns <= child_ns,
          'native startDrag handshake belongs to another process, gesture or file')
+    handshake_bytes(handshake, value['childPid'])
     start = {key: N['jsround'](event['from'][key]) for key in ('x', 'y')}
     end = {key: N['jsround'](event['to'][key]) for key in ('x', 'y')}
     logical = [start, {'x': start['x'] - 14, 'y': start['y'] + 8}]
@@ -130,7 +173,7 @@ def native_gesture(value, event, file, pid, platform):
     samples = coordinates.get('samples', [])
     need(coordinates.get('source') == ('Electron screen.dipToScreenPoint' if platform == 'win32' else 'native screen coordinates')
          and len(samples) == len(rows) == 13, 'native gesture coordinate conversion or complete pointer sequence missing')
-    previous = value['startedAt']
+    previous = 0
     for index, (sample, row, point) in enumerate(zip(samples, rows, logical)):
         physical = sample.get('physical', {})
         need(sample.get('logical') == point and set(physical) == {'x', 'y'}
@@ -138,13 +181,15 @@ def native_gesture(value, event, file, pid, platform):
              and (platform == 'win32' or physical == point)
              and all(row.get(key) == physical[key] for key in ('x', 'y'))
              and row.get('phase') == (0 if index == 0 else 2 if index == 12 else 1)
-             and row.get('accepted') is True and type(row.get('at')) is int
-             and previous <= row['at'] <= value['completedAt'], 'native file gesture points, phases or actual driver receipt differ')
-        previous = row['at']
+             and row.get('accepted') is True and type(row.get('at')) is int and 0 < row['at'] < 2**53
+             and previous <= event_ns[index] <= child_ns, 'native file gesture points, phases or actual driver receipt differ')
+        previous = event_ns[index]
     need(samples[11]['physical'] == samples[12]['physical']
-         and rows[0]['at'] <= handshake['at']
-         and rows[1]['at'] <= handshake['observedAt'] <= rows[2]['at'],
+         and event_ns[1] <= observed_ns <= event_ns[2],
          'native file movement did not wait for its exact startDrag handshake')
+    settle = 700 if platform == 'linux' else 120
+    need(value.get('destinationSettleMs') == settle and event_ns[12] - event_ns[11] >= settle * 1000000,
+         'native file release did not retain its platform destination settle')
     return nonce
 
 

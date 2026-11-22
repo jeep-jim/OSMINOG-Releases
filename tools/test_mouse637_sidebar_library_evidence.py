@@ -37,6 +37,14 @@ def click(selector, tab_id=None):
     return H['click'](selector, tab_id)
 
 
+def bind_handshake_bytes(gesture):
+    handshake = gesture['handshake']
+    fields = ('schema', 'nonce', 'parentPid', 'childPid', 'at', 'parentElapsedNs', 'nativeFile')
+    raw = json.dumps({key: handshake[key] for key in fields}, ensure_ascii=False, separators=(',', ':')).encode('utf-8')
+    handshake['read'] = {'method': 'fs.readFileSync', 'pid': gesture['childPid'], 'bytes': len(raw),
+                         'sha256': L['sha'](raw), 'base64': base64.b64encode(raw).decode()}
+
+
 def gesture_fixture(event, file, index=0, platform='linux'):
     start, end = event['from'], event['to']
     points = [copy.deepcopy(start), {'x': start['x'] - 14, 'y': start['y'] + 8}]
@@ -47,16 +55,28 @@ def gesture_fixture(event, file, index=0, platform='linux'):
     # without presenting these generated coordinates as native evidence.
     physical = [{key: point[key] * 2 + 20 for key in ('x', 'y')} if platform == 'win32' else copy.deepcopy(point) for point in points]
     nonce = '10000000-0000-4000-8000-' + str(index + 1).zfill(12)
-    return {'schema': 1, 'method': 'independent-native-input-process', 'platform': platform, 'source': L['N']['source'](platform),
+    settle = 700 if platform == 'linux' else 120
+    released_at = 2200 + settle + 22
+    value = {'schema': 1, 'method': 'independent-native-input-process', 'platform': platform, 'source': L['N']['source'](platform),
             'parentPid': 11, 'childPid': 100 + index, 'nonce': nonce, 'budgetMs': 10000,
             'driverCallLimitMs': None if platform == 'darwin' else 7000, 'lifecycleLimitMs': 53000, 'terminationRequested': False,
-            'forkedAt': 900, 'startedAt': 1000, 'completedAt': 2500, 'exitAt': 2600, 'deadlineAt': 10900,
-            'elapsedMs': 1500, 'exitCode': 0, 'released': True, 'ok': True,
+            'destinationSettleMs': settle, 'forkedAt': 900, 'startedAt': 1000,
+            'completedAt': released_at + 100, 'exitAt': released_at + 200, 'deadlineAt': 10900,
+            'elapsedMs': released_at - 900, 'exitCode': 0, 'released': True, 'ok': True,
             'coordinates': {'source': 'Electron screen.dipToScreenPoint' if platform == 'win32' else 'native screen coordinates',
                             'samples': [{'logical': point, 'physical': target} for point, target in zip(points, physical)]},
-            'events': [{**point, 'phase': 0 if i == 0 else 2 if i == 12 else 1, 'at': 1100 + i * 100, 'accepted': True} for i, point in enumerate(physical)],
+            'events': [{**point, 'phase': 0 if i == 0 else 2 if i == 12 else 1,
+                        'at': released_at if i == 12 else 1100 + i * 100, 'accepted': True} for i, point in enumerate(physical)],
             'handshake': {'schema': 1, 'nonce': nonce, 'parentPid': 11, 'childPid': 100 + index, 'at': 1200, 'observedAt': 1250,
+                          'parentElapsedNs': '300000000',
                           'nativeFile': {'name': file['dragName'], 'size': file['size'], 'sha256': file['sha256'], 'hasIcon': True, 'keys': ['file', 'icon']}}}
+    value['timing'] = {'source': 'process.hrtime.bigint', 'scope': 'per-process elapsed',
+                       'parent': {'preparationNs': '0', 'elapsedNs': str((value['exitAt'] - value['forkedAt']) * 1000000)},
+                       'child': {'elapsedNs': str(value['elapsedMs'] * 1000000),
+                                 'eventNs': [str((row['at'] - value['startedAt']) * 1000000) for row in value['events']],
+                                 'observedHandshakeNs': '250000000'}}
+    bind_handshake_bytes(value)
+    return value
 
 
 class FakeFrames:
@@ -175,11 +195,11 @@ class LibraryAcceptance(unittest.TestCase):
     def test_native_file_gesture_requires_actual_child_and_owned_nonce_handshake(self):
         mutations = [lambda g: g.update(childPid=11), lambda g: g.update(parentPid=12),
                      lambda g: g.update(exitCode=1), lambda g: g.update(released=False),
-                     lambda g: g.update(budgetMs=10001), lambda g: g.update(deadlineAt=2499),
+                     lambda g: g.update(budgetMs=10001), lambda g: g['timing']['parent'].update(preparationNs='10000000000'),
                      lambda g: g.update(terminationRequested=True), lambda g: g.update(lifecycleLimitMs=54000),
                      lambda g: g['handshake'].update(childPid=9), lambda g: g['handshake'].update(nonce='a' * 36),
                      lambda g: g['handshake']['nativeFile'].update(sha256='a' * 64),
-                     lambda g: g['handshake'].update(observedAt=2400)]
+                     lambda g: g['timing']['child'].update(observedHandshakeNs='2400000000')]
         for mutate in mutations:
             fixture = library_fixture(); mutate(fixture[0]['transfers'][0]['gesture'])
             with self.assertRaises(ValueError): verify_library(fixture)
@@ -187,15 +207,115 @@ class LibraryAcceptance(unittest.TestCase):
         with self.assertRaises(ValueError): verify_library(fixture)
         fixture = library_fixture(); first, second = fixture[0]['transfers'][:2]
         second['gesture']['nonce'] = second['gesture']['handshake']['nonce'] = first['gesture']['nonce']
+        bind_handshake_bytes(second['gesture'])
         with self.assertRaises(ValueError): verify_library(fixture)
 
     def test_native_file_gesture_requires_complete_ordered_pointer_trace(self):
         for mutate in [lambda g: g['events'].pop(), lambda g: g['events'][12].update(phase=1),
-                       lambda g: g['events'][2].update(accepted=False), lambda g: g['events'][2].update(at=1000),
+                       lambda g: g['events'][2].update(accepted=False), lambda g: g['timing']['child']['eventNs'].__setitem__(2, '0'),
                        lambda g: g['events'][2].update(x=0), lambda g: g['coordinates']['samples'][2]['logical'].update(x=0),
                        lambda g: g['coordinates']['samples'][2]['physical'].update(x=0)]:
             fixture = library_fixture(); mutate(fixture[0]['transfers'][0]['gesture'])
             with self.assertRaises(ValueError): verify_library(fixture)
+
+    def test_native_file_release_requires_declared_and_observed_platform_settle(self):
+        report, *_rest = library_fixture()
+        event, file = report['transfers'][0]['input'], report['files'][0]
+        for platform, settle in (('linux', 700), ('darwin', 120), ('win32', 120)):
+            for case in ('missing declaration', 'wrong platform declaration', 'short actual settle'):
+                receipt = gesture_fixture(event, file, platform=platform)
+                if case == 'missing declaration': del receipt['destinationSettleMs']
+                if case == 'wrong platform declaration': receipt['destinationSettleMs'] = 120 if platform == 'linux' else 700
+                if case == 'short actual settle':
+                    receipt['timing']['child']['eventNs'][12] = str(int(receipt['timing']['child']['eventNs'][11]) + settle * 1000000 - 1)
+                with self.subTest(platform=platform, case=case), self.assertRaises(ValueError):
+                    L['native_gesture'](receipt, event, file, 11, platform)
+
+    def test_observed_windows_wall_clock_inversion_requires_new_causal_proof(self):
+        report, *_rest = library_fixture()
+        event, file = report['transfers'][0]['input'], report['files'][0]
+        receipt = gesture_fixture(event, file, platform='win32')
+        # The measured90 Windows wall readings are retained verbatim in this
+        # synthetic contract fixture. No missing native receipt is reconstructed.
+        receipt.update(forkedAt=1795321309280, startedAt=1795321309335, completedAt=1795321311522,
+                       exitAt=1795321311537, deadlineAt=1795321319280, elapsedMs=2187)
+        receipt['handshake'].update(at=1795321309687, observedAt=1795321309684)
+        raw_times = [1795321309501, 1795321309684, 1795321309904, 1795321310044, 1795321310187,
+                     1795321310345, 1795321310502, 1795321310658, 1795321310800, 1795321310954,
+                     1795321311095, 1795321311237, 1795321311522]
+        for row, at in zip(receipt['events'], raw_times): row['at'] = at
+        bind_handshake_bytes(receipt)
+        unchanged = copy.deepcopy(receipt)
+        self.assertEqual(L['native_gesture'](receipt, event, file, 11, 'win32'), receipt['nonce'])
+        self.assertEqual(receipt, unchanged)
+        for missing in ('read', 'timing'):
+            invalid = copy.deepcopy(receipt)
+            if missing == 'read': del invalid['handshake']['read']
+            else: del invalid['timing']
+            with self.subTest(missing=missing), self.assertRaises(ValueError):
+                L['native_gesture'](invalid, event, file, 11, 'win32')
+
+    def test_wall_time_rollback_is_diagnostic_without_changing_monotonic_proof(self):
+        report, *_rest = library_fixture()
+        event, file = report['transfers'][0]['input'], report['files'][0]
+        receipt = gesture_fixture(event, file)
+        receipt.update(completedAt=receipt['startedAt'] - 10, elapsedMs=-10, exitAt=receipt['forkedAt'] - 5)
+        for index, row in enumerate(receipt['events']): row['at'] = 900 - index
+        self.assertEqual(L['native_gesture'](receipt, event, file, 11, 'linux'), receipt['nonce'])
+
+    def test_native_causal_read_requires_exact_bounded_bytes_identity_and_hash(self):
+        report, *_rest = library_fixture()
+        event, file = report['transfers'][0]['input'], report['files'][0]
+        mutations = [lambda h: h['read'].update(method='JSON reconstruction'),
+                     lambda h: h['read'].update(pid=11), lambda h: h['read'].update(bytes=0),
+                     lambda h: h['read'].update(bytes=h['read']['bytes'] + 1),
+                     lambda h: h['read'].update(sha256='a' * 64), lambda h: h['read'].update(base64='!'),
+                     lambda h: h.update(at=h['at'] + 1), lambda h: h.update(parentElapsedNs='1')]
+        for mutate in mutations:
+            receipt = gesture_fixture(event, file); mutate(receipt['handshake'])
+            with self.subTest(mutation=mutations.index(mutate)), self.assertRaises(ValueError):
+                L['native_gesture'](receipt, event, file, 11, 'linux')
+        for changed in ('nonce', 'parentPid', 'childPid', 'nativeFile', 'duplicate field', 'oversized'):
+            receipt = gesture_fixture(event, file); saved = receipt['handshake']['read']
+            raw = base64.b64decode(saved['base64']); decoded = json.loads(raw)
+            if changed == 'nonce': decoded['nonce'] = '20000000-0000-4000-8000-000000000001'
+            elif changed in ('parentPid', 'childPid'): decoded[changed] += 1
+            elif changed == 'nativeFile': decoded[changed]['sha256'] = 'b' * 64
+            if changed == 'duplicate field': raw = raw[:-1] + b',"schema":1}'
+            elif changed == 'oversized': raw += b' ' * 4096
+            else: raw = json.dumps(decoded, separators=(',', ':')).encode()
+            saved.update(bytes=len(raw), sha256=L['sha'](raw), base64=base64.b64encode(raw).decode())
+            with self.subTest(changed=changed), self.assertRaises(ValueError):
+                L['native_gesture'](receipt, event, file, 11, 'linux')
+
+    def test_native_causal_read_observation_stays_between_threshold_and_path(self):
+        report, *_rest = library_fixture()
+        event, file = report['transfers'][0]['input'], report['files'][0]
+        for boundary, delta in ((1, -1), (2, 1)):
+            receipt = gesture_fixture(event, file); child = receipt['timing']['child']
+            child['observedHandshakeNs'] = str(int(child['eventNs'][boundary]) + delta)
+            with self.subTest(boundary=boundary), self.assertRaises(ValueError):
+                L['native_gesture'](receipt, event, file, 11, 'linux')
+
+    def test_native_parent_and_child_monotonic_budgets_and_order_are_required(self):
+        report, *_rest = library_fixture()
+        event, file = report['transfers'][0]['input'], report['files'][0]
+        mutations = [lambda g: g['timing'].update(source='Date.now'), lambda g: g['timing'].update(scope='shared origin'),
+                     lambda g: g['timing']['parent'].update(elapsedNs='10000000001'),
+                     lambda g: g['timing']['parent'].update(preparationNs=str(10000000001 - int(g['timing']['parent']['elapsedNs']))),
+                     lambda g: g['timing']['child'].update(elapsedNs='10000000001'),
+                     lambda g: g['timing']['child'].update(elapsedNs='1'),
+                     lambda g: g['timing']['child']['eventNs'].__setitem__(2, str(int(g['timing']['child']['eventNs'][1]) - 1)),
+                     lambda g: g['timing']['child']['eventNs'].pop(),
+                     lambda g: g['handshake'].update(parentElapsedNs=str(int(g['timing']['parent']['elapsedNs']) + 1))]
+        for mutate in mutations:
+            receipt = gesture_fixture(event, file); mutate(receipt); bind_handshake_bytes(receipt)
+            with self.subTest(mutation=mutations.index(mutate)), self.assertRaises(ValueError):
+                L['native_gesture'](receipt, event, file, 11, 'linux')
+        for invalid in ('-1', '1.5', '1e9', '01', '', '9' * 21, 1000000000):
+            receipt = gesture_fixture(event, file); receipt['timing']['child']['elapsedNs'] = invalid
+            with self.subTest(invalid=invalid), self.assertRaises(ValueError):
+                L['native_gesture'](receipt, event, file, 11, 'linux')
 
     def test_native_file_data_mime_names_clipboard_and_target_forgery_rejected(self):
         for mutate in [lambda r: r['transfers'][0]['received'].update(trusted=False),
