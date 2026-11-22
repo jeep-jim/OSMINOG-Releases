@@ -128,3 +128,87 @@ and633owner readers passed against80 and47 consumed raw files respectively,
 while the overall feedback reader rejected the known removal cookie defect.
 Those subset checks are historical and do not accept newbe86 or any package.
 All three pins remain null/unready with no owner trigger or public release.
+
+## 2026-11-22 — external Mac publisher fixture readiness correction
+
+The current ready candidate remains source
+`0021084ccb9537e657d21e6f0c8e812dee6b461f`, with the exact packages and source
+acceptance recorded at the top of this file. The historical unready records
+above are retained. This correction does not change those source/package pins,
+the signed application on disk, Windows/Linux packages, or existing validators.
+
+Publisher run [45018600669](https://github.com/jeep-jim/OSMINOG-Releases/actions/runs/45018600669)
+on `a464a5398fa7afca55e1b1116ff8510895ae488f` failed before publication twice.
+Attempt1/job137196413712 did not observe the first retained guest download click;
+its original artifact14752649465 is5259071bytes, SHA256
+`151217a8aa06063df577ba13924bbb65c6e3352ae7813c13099eb551008f7af7`.
+One recorded, unchanged reproducibility repeat was authorized. Attempt2/job137200371109
+passed all seven retained guest clicks, the predecessor baseline, task/stress,
+current owner/removal/pin/search/performance scenes, then failed before sending
+the extension pin click: `Extension action Закрепить`. Its original
+artifact14753826283 is28503762bytes, SHA256
+`482c10350ac8e0e57e65cde636c8b51e63cfd3cf62a77d4777c3767faf2eeb9d`.
+No further unchanged retry is authorized by this record. Neither result is
+relabelled a pass, and the cause of attempt1's native click loss remains unknown.
+
+The second failure exposed a specific test-driver ordering error. The backend
+publishes the newly loaded extension in its state before its registry save and
+IPC response complete. The renderer creates the row after that response.
+The old fixture waited only for backend state, then queried its pin button once.
+The failed report records the enabled backend entry, no pin input attempt, and
+the later failure screenshot already shows the pin button. A similar ordering
+exists between backend pin state and the renderer's pinned button count.
+
+The new publisher-only driver executes the unmodified, fetched source002
+`mouse-verify.py` through `runpy`. Only its two exact feature-process launches
+receive a loopback, ephemeral `--inspect-brk` endpoint and a dedicated random
+ownership nonce. The original `Popen` object and actual Electron PID return
+immediately; the Inspector sidecar runs asynchronously while the original
+270s/write and120s/read process clocks run. Other native stages and the original
+30s exit-completion rule are unchanged. `NODE_OPTIONS` is not used.
+
+On the exact paused installed main frame, PID, executable, profile environment,
+phase/flag, nonce, application identity and code hashes are checked. A one-shot
+loader handles only the exact CI feature fixture path and restores the prior
+loader before compiling it at the original require point. The Inspector server
+is deactivated, and its absence is observed, before the fixture can produce
+input. No product module, native input driver, renderer state or result is
+substituted. The original49944-byte feature module is bound to Git blob
+`ad6301bbf4d873a199fed6d26b7cfb7861ff0a6f` and SHA256
+`a87573de7ebf2c380dffeaf64246739d68d3b3d8308dca424a90512174e0fd7d`.
+
+Exactly one nested function body changes in memory, with two explicit readiness
+observations under the existing fixture `until` and shared deadline:
+
+1. Observe the actual row with the exact owned extension ID and requested label
+   before the unchanged native hit-target/click path.
+2. Only for the existing Russian pin action, observe that same row's
+   `Открепить` label and the original pinned-button count of exactly one before
+   returning the original click receipt.
+
+The caller's backend pinned-state wait and original count assertion remain
+byte-identical, as do every other fixture byte, native click, trusted-input
+predicate, capture, restart test and budget. There is no repeated click, fixed
+sleep or generic action/remove wait. The adapted module SHA256 is
+`f51b604dcd72b48081b33932718f6a7e185d9bc4e3a13bb9e55718d0de3f7b07`.
+Both actual original and adapted fixture byte strings are retained as evidence.
+
+An additive receipt gate is mandatory before the existing fresh `source=False`
+publication gates. It binds both actual Electron PIDs, phase nonces, controller
+outcomes, exact original/transformed bytes, restored loader, closed Inspector,
+native log/report hashes and first-input ordering. It requires unchanged
+before/after executable, ASAR and both unpacked native-addon hashes, exact addon
+inventory, and successful strict code-signature verification before and after.
+Missing, mismatched or failed adapter evidence prevents publication; no existing
+native gate is removed or reinterpreted.
+
+Focused local regressions execute the actual source002 nested helper, renderer
+and shared wait function. They separately reproduce both old failures with
+delayed renderer responses and pass with the bounded readiness adapter. They
+also reject missing/wrong targets, missing/wrong pins, deadline expiry, native
+input failure, wrong bootstrap identity and altered receipts even after their
+outer hashes are rebound. A real local Node Inspector transport test checks
+paused script identity, actual child PID and server closure with a live child;
+this is not installed Mac acceptance. The revised Mac publisher must still run
+all original installed, profile-upgrade, native-input, public-byte and anonymous
+629/636 updater gates before a Mac release can be claimed.
