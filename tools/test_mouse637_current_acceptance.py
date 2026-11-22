@@ -289,8 +289,12 @@ class CurrentAcceptance(unittest.TestCase):
             self.assertEqual(C['PUBLISHED_UPDATER_BLOB'], '91ab363f926774825caf8055b2d3d81bf0d51264')
             with patch.dict(C['fetch_helpers'].__globals__, PUBLISHED_UPDATER_BLOB=unit_blob):
                 C['fetch_helpers'](api, 'owner/repository', 'a' * 40, Path(temporary))
-            self.assertEqual(len(seen), 8)
+            self.assertEqual(len(seen), 10)
             self.assertIn('contents/desktop/mouse-smoke-hit-target.cjs?ref=' + 'a' * 40, seen)
+            self.assertIn('contents/tools/mouse-637-macos-display.swift?ref=' + 'a' * 40, seen)
+            self.assertEqual((Path(temporary) / 'mouse-637-macos-display.swift').read_bytes(), raw)
+            self.assertIn('contents/tools/mouse-637-windows-display.ps1?ref=' + 'a' * 40, seen)
+            self.assertEqual((Path(temporary) / 'mouse-637-windows-display.ps1').read_bytes(), raw)
             self.assertTrue((Path(temporary) / 'mouse-637-update-window.py').is_file())
             self.assertTrue((Path(temporary) / 'legacy636-update.cjs').is_file())
             self.assertEqual(seen[-1], 'contents/desktop/mouse-update.cjs?ref=7c09b6cb9885ce72be41e8f16a35d4c55c9ecde3')

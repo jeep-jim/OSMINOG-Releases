@@ -927,7 +927,7 @@
   },
   "x-current637FeaturesGate": {
     "validator": "tools/mouse637-features-evidence.py",
-    "sha256": "ecc1040bb3d27f859cbe6bdd9f85efcc055587559104550e6056bb6f2ea44d2f",
+    "sha256": "e7d468ccdfb9ddc5b9c7c7412d8939d45c89987bee0ed9bbac673061f3e35b4b",
     "sourceAndFreshInstalled": true,
     "savedReportAcceptedAsInput": false,
     "files": [
@@ -998,14 +998,22 @@
       "detachedPagesSurviveParentClose": true,
       "nativeFrames": 6,
       "freshNativeBoundsForEveryFrame": true,
-      "rawGuestPixelProbes": true
+      "rawGuestPixelProbes": true,
+      "nativeAddressSubmission": {
+        "focusedPreviewForm": true,
+        "sameNativePage": true,
+        "nativePlatformEnter": true,
+        "trustedKeydownKeypress": true,
+        "exactlyOneTrustedSubmit": true,
+        "exactDestinationValue": true
+      }
     },
     "dependencies": {
       "mouse637-native-evidence.py": "14ba118aab9e8c50601a52212c5564f9141995cde48decd51823963bbe7b7446",
       "mouse637-presets-evidence.py": "7cdec2731e4edbe9cdbc975c58af42a0fbc0fc11543804b568d68f2bfd825ee2",
       "mouse637-sidebar-focus-evidence.py": "81d2540c8edfe75ef489b36fb483c45e2aa7b897a2fd8eef3bd636280f9ea6db",
       "mouse637-library-actions-evidence.py": "48523a65deeee937e90e02a2eeccc623cae5bdd7f63254db7d11ea391cdaf2c2",
-      "mouse637-update-ui-evidence.py": "933d8fe9528b205c8c09c1c1d2310dc8ede7ee1bda56fcfbe5c38dd755fcfad2"
+      "mouse637-update-ui-evidence.py": "4304700c7faa386d90000e06253766330b7fc3df4cc435f4bcd278a7213a2402"
     },
     "nativeCaptureNames": [
       "mouse-637-language-ru.png",
@@ -1110,7 +1118,16 @@
       "trustedNativeOpenCloseMinimize": true,
       "livePagesPreserved": true,
       "fixtureStateRestored": true,
-      "nativeFrames": 2
+      "nativeFrames": 2,
+      "primaryTextTone": {
+        "whiteTone": 0,
+        "selectors": [
+          "#update-status",
+          "#update-check"
+        ],
+        "darkComputedColor": "rgb(160, 160, 160)",
+        "lightComputedColor": "rgb(36, 40, 49)"
+      }
     }
   },
   "x-currentUpdateButtonGate": {
@@ -1136,7 +1153,7 @@
   },
   "x-currentHelpersGate": {
     "validator": "tools/mouse637-current.py",
-    "sha256": "fbeeb355f0d6c7c57be3b2aa450c717a9643b726c4b2ec9fdcb547295d60f6c6",
+    "sha256": "6acf5d74f56563560a9c2387511b0f0769ec4ab243e29372a8ee58bdd35f65e0",
     "sourceAndFreshInstalled": true,
     "savedReportAcceptedAsInput": false,
     "sourceHelpers": "exact tested source Git blob bytes",

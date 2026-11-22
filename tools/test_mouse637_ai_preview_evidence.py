@@ -77,6 +77,13 @@ def fixture():
               'navigation': {'id': preview['id'], 'webContentsId': preview['webContentsId'], 'from': PREVIEW + '/page/3/', 'to': PREVIEW + '/page/4/',
                              'beforeNative': native({**preview, 'index': 3}, initial['previewSlot'], 'rounded'),
                              'afterNative': native(preview, nav['previewSlot'], 'rounded'), 'state': nav}, 'samples': []}
+    report['navigation'].update(
+        beforeInput={'aiId': chat['id'], 'previewId': preview['id'], 'url': PREVIEW + '/page/3/', 'value': PREVIEW + '/page/4/',
+                     'focused': True, 'formId': 'ai-preview-address', 'hasSubmitHandler': True, 'readOnly': False, 'disabled': False},
+        nativeKey={'method': 'nativeInput.testKey', 'key': 'Return', 'source': 'XTest', 'pid': 11, 'at': 200, 'accepted': True},
+        keyboard=[{'type': kind, 'key': None if kind == 'submit' else 'Enter', 'code': None if kind == 'submit' else 'Enter',
+                   'isTrusted': True, 'value': PREVIEW + '/page/4/', 'at': 100 + index}
+                  for index, kind in enumerate(('keydown', 'keypress', 'submit', 'keyup'))])
     ratio = .5
     for i, (mode, theme, dy) in enumerate([('rounded', 'light', -40), ('rounded', 'dark', 40), ('square', 'light', -40), ('square', 'dark', -24)]):
         before = geometry(chat, preview, ratio, mode, theme)
@@ -158,6 +165,39 @@ class AIPreviewAcceptance(unittest.TestCase):
         for mutation in mutations:
             r, owners, inputs = fixture(); mutation(r)
             with self.assertRaises(ValueError): self.check(r, owners, inputs)
+
+    def test_address_requires_complete_trusted_submit_and_exact_preview_owner(self):
+        mutations = [lambda n: n['beforeInput'].update(aiId='foreign-chat'),
+                     lambda n: n['beforeInput'].update(previewId='foreign-preview'),
+                     lambda n: n['beforeInput'].update(focused=False),
+                     lambda n: n['beforeInput'].update(formId='address-form'),
+                     lambda n: n['beforeInput'].update(hasSubmitHandler=False),
+                     lambda n: n['beforeInput'].update(readOnly=True),
+                     lambda n: n['beforeInput'].update(value=n['from']),
+                     lambda n: n['nativeKey'].update(method='sendInputEvent'),
+                     lambda n: n['nativeKey'].update(key='Enter'),
+                     lambda n: n['nativeKey'].update(source='User32'),
+                     lambda n: n['nativeKey'].update(pid=12),
+                     lambda n: n['nativeKey'].update(accepted=False),
+                     lambda n: n['keyboard'].pop(1),
+                     lambda n: n['keyboard'][1].update(isTrusted=False),
+                     lambda n: n['keyboard'][2].update(isTrusted=False),
+                     lambda n: n['keyboard'][2].update(value=n['from']),
+                     lambda n: n['keyboard'].append(copy.deepcopy(n['keyboard'][2])),
+                     lambda n: n['keyboard'].reverse()]
+        for mutation in mutations:
+            report, owners, inputs = fixture(); mutation(report['navigation'])
+            with self.subTest(mutation=mutation), self.assertRaises(ValueError):
+                self.check(report, owners, inputs)
+
+    def test_address_native_key_receipts_are_bound_on_all_three_platforms(self):
+        for platform, key, source in [('linux', 'Return', 'XTest'), ('darwin', 'ENTER', 'CGEvent'), ('win32', 'ENTER', 'User32')]:
+            report, _, _ = fixture(); navigation = report['navigation']
+            navigation['nativeKey'].update(key=key, source=source)
+            F['verify_ai_address'](navigation, report['chatBefore']['id'], navigation['id'], 11, platform)
+            navigation['nativeKey']['source'] = 'foreign input'
+            with self.assertRaises(ValueError):
+                F['verify_ai_address'](navigation, report['chatBefore']['id'], navigation['id'], 11, platform)
 
     def test_trusted_pointer_and_full_control_ledger_are_mandatory(self):
         r, owners, inputs = fixture(); r['samples'][0]['input']['events'][0]['trusted'] = False

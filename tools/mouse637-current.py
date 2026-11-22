@@ -8,7 +8,8 @@ import runpy
 
 HELPERS = ('mouse-637-upgrade.py', 'mouse-637-profile-upgrade.cjs',
            'mouse-637-baseline-performance.py', 'mouse-637-update-button.py',
-           'mouse-637-update-button.cjs', 'mouse-637-update-window.py', 'mouse-smoke-hit-target.cjs')
+           'mouse-637-update-button.cjs', 'mouse-637-update-window.py', 'mouse-smoke-hit-target.cjs',
+           'mouse-637-macos-display.swift', 'mouse-637-windows-display.ps1')
 PUBLISHED_SOURCE = '7c09b6cb9885ce72be41e8f16a35d4c55c9ecde3'
 PUBLISHED_UPDATER_BLOB = '91ab363f926774825caf8055b2d3d81bf0d51264'
 

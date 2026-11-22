@@ -68,6 +68,8 @@ def presentation(value, phase, theme):
                   'existing Mouse logo is not centered on ' + axis, 1.1)
     status = value.get('status', {})
     need(isinstance(status.get('text'), str) and status['text'].strip(), 'update status text is absent')
+    ink = 'rgb(160, 160, 160)' if theme == 'dark' else 'rgb(36, 40, 49)'
+    need(status.get('color') == ink, 'update status ignores the selected primary text tone')
     rect(status.get('bounds'))
     progress = value.get('progress', {})
     need(progress.get('hidden') is (phase != 'downloading')
@@ -87,6 +89,8 @@ def presentation(value, phase, theme):
     center_x, center_y = bounds['x'] + bounds['width'] / 2, bounds['y'] + bounds['height'] / 2
     for control in controls:
         selector = control['selector']
+        if selector == '#update-check':
+            need(control.get('color') == ink, 'update secondary action ignores the selected primary text tone')
         need(control.get('visible') is (selector in expected), 'update control visibility differs: ' + selector)
         if not control['visible']:
             continue

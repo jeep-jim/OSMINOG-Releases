@@ -13,6 +13,7 @@ ORIGIN = 'http://127.0.0.1:12002'
 
 
 def state(phase, theme):
+    ink = 'rgb(160, 160, 160)' if theme == 'dark' else 'rgb(36, 40, 49)'
     expected = set(U['CONTROLS'][3:] + (U['CONTROLS'][:1] if phase == 'available' else U['CONTROLS'][1:3] if phase == 'ready' else []))
     placements = [(560, 500, 80, 32), (430, 350, 80, 32), (690, 350, 80, 32),
                   (560, 182, 80, 32), (440, 250, 32, 32), (728, 250, 32, 32)]
@@ -21,7 +22,7 @@ def state(phase, theme):
         visible = selector in expected
         disabled = selector == '#update-check' and phase in ('downloading', 'installing')
         controls.append({'selector': selector, 'visible': visible, 'hidden': not visible,
-                         'disabled': disabled, 'label': selector, 'radius': '50%',
+                         'disabled': disabled, 'label': selector, 'radius': '50%', 'color': ink,
                          'bounds': {'x': x, 'y': y, 'width': width, 'height': height},
                          'hit': {'ready': visible and not disabled, 'x': x + width / 2, 'y': y + height / 2}})
     percent = 46 if phase == 'downloading' else 100 if phase in ('ready', 'installing') else 0
@@ -33,7 +34,7 @@ def state(phase, theme):
             'surfaces': {name: 'rgb(%d, %d, %d)' % tuple(color) for name, color in zip(('ring', 'core'), U['PALETTE'][theme])},
             'logo': {'visible': True, 'complete': True, 'naturalWidth': 400, 'naturalHeight': 400, 'src': 'mouse-update.svg',
                      'bounds': {'x': 520, 'y': 270, 'width': 160, 'height': 160}},
-            'status': {'text': 'Owned visual state ' + phase, 'bounds': {'x': 530, 'y': 440, 'width': 140, 'height': 32}},
+            'status': {'text': 'Owned visual state ' + phase, 'color': ink, 'bounds': {'x': 530, 'y': 440, 'width': 140, 'height': 32}},
             'progress': {'hidden': phase != 'downloading', 'value': percent},
             'meter': {'pathLength': '100', 'dasharray': str(percent) + ' 100', 'progressVisible': str(percent > 0).lower(), 'opacity': '1' if percent else '0'},
             'controls': controls}
@@ -130,6 +131,14 @@ class UpdatePresentationEvidence(unittest.TestCase):
                      lambda r: r['samples'][0]['states'][2]['controls'][3].update(disabled=False),
                      lambda r: r['samples'][0]['states'][0]['controls'][4].update(radius='0px'),
                      lambda r: r['samples'][0]['states'][0]['controls'][5]['bounds'].update(height=40)])
+
+    def test_primary_text_tone_rejects_fixed_white_and_missing_computed_colors(self):
+        self.reject([lambda r: r['samples'][1]['states'][0]['status'].update(color='rgb(227, 230, 235)'),
+                     lambda r: r['samples'][1]['states'][0]['controls'][3].update(color='rgb(227, 230, 235)'),
+                     lambda r: r['samples'][1]['states'][0]['status'].pop('color'),
+                     lambda r: r['samples'][1]['states'][0]['controls'][3].pop('color'),
+                     lambda r: r['samples'][0]['states'][0]['status'].update(color='rgb(160, 160, 160)'),
+                     lambda r: r['samples'][0]['states'][0]['controls'][3].update(color='rgb(160, 160, 160)')])
 
     def test_native_input_must_match_process_platform_ledger_and_real_controls(self):
         self.reject([lambda r: r['samples'][0]['openInput'].update(selector='#theme-button'),

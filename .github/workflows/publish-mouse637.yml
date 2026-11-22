@@ -52,6 +52,8 @@ jobs:
         run: |
           set -euo pipefail
           test "$(uname -m)" = arm64
+          xcrun swift mouse637-release/mouse-637-macos-display.swift --output mouse637-release/mouse-637-display.json
+          xcrun swift mouse637-release/mouse-637-macos-display.swift --verify mouse637-release/mouse-637-display.json
           cmp mouse637-release/Mouse-Browser-6.0.37-mac-arm64.dmg mouse637-release/Quadro-Browser-6.0.37-mac-arm64.dmg
           MOUNT="$RUNNER_TEMP/mouse628-dmg"
           mkdir -p "$MOUNT"

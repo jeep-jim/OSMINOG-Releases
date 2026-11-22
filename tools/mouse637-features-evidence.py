@@ -286,6 +286,31 @@ def ai_geometry(value, chat_id, preview_id, preview_url, favicon, *, mode=None, 
     return value
 
 
+def verify_ai_address(navigation, chat_id, preview_id, pid, platform):
+    owner = navigation.get('beforeInput', {})
+    need(owner.get('aiId') == chat_id and owner.get('previewId') == preview_id
+         and owner.get('url') == navigation.get('from') and owner.get('value') == navigation.get('to')
+         and owner.get('focused') is True and owner.get('formId') == 'ai-preview-address'
+         and owner.get('hasSubmitHandler') is True and owner.get('readOnly') is False and owner.get('disabled') is False,
+         'AI address native Enter is not bound to its focused editable preview form')
+    key = navigation.get('nativeKey', {})
+    need(key.get('method') == 'nativeInput.testKey' and key.get('key') == ('Return' if platform == 'linux' else 'ENTER')
+         and key.get('source') == N['source'](platform) and key.get('pid') == pid
+         and finite(key.get('at')) and key['at'] > 0 and key.get('accepted') is True,
+         'AI address lacks the exact process/platform native Enter receipt')
+    events = navigation.get('keyboard', [])
+    need(isinstance(events, list) and 0 < len(events) <= 20
+         and all(isinstance(event, dict) and finite(event.get('at')) for event in events),
+         'AI address native keyboard event ledger is absent')
+    def first(kind):
+        return next((index for index, event in enumerate(events) if event.get('type') == kind
+                     and (kind == 'submit' or event.get('key') == 'Enter') and event.get('isTrusted') is True
+                     and event.get('value') == navigation['to']), -1)
+    down, press, submit = (first(kind) for kind in ('keydown', 'keypress', 'submit'))
+    need(0 <= down < press < submit and sum(event.get('type') == 'submit' for event in events) == 1,
+         'AI address requires native keydown, keypress and exactly one trusted form submission in order')
+
+
 def verify_ai_preview(value, owners, pid, platform, inputs):
     need(value.get('schema') == 1 and value.get('ok') is True
          and value.get('source') == 'Owned cross-origin AI source, native resize and native chooser/header transfers', 'AI lower-source native proof missing')
@@ -313,6 +338,7 @@ def verify_ai_preview(value, owners, pid, platform, inputs):
     navigation = value.get('navigation', {})
     need(navigation.get('id') == preview_id and navigation.get('webContentsId') == previous.get('webContentsId')
          and navigation.get('from') == preview_origin + '/page/3/' and navigation.get('to') == preview_origin + '/page/4/', 'AI address navigated a different native page')
+    verify_ai_address(navigation, chat['id'], preview_id, pid, platform)
     ai_geometry(navigation.get('state', {}), chat['id'], preview_id, navigation['to'], favicon)
     N['native'](navigation.get('beforeNative', {}), {**previous, 'index': 3})
     N['native'](navigation.get('afterNative', {}), previous)
