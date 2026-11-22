@@ -102,7 +102,7 @@ def synthetic_capture(name, scale, shade):
 def page(index):
     identity = 'synthetic-document-' + str(index)
     return {'id': 'synthetic-tab-' + str(index), 'index': index, 'desk': 'synthetic-desk',
-            'webContentsId': index + 300, 'url': ORIGIN + '/' + str(index),
+            'webContentsId': index + 300, 'url': ORIGIN + '/page/' + str(index) + '/',
             'navigationEpoch': 1, 'identity': identity, 'timeOrigin': 10000 + index,
             'field': 'preserved-' + str(index) + '-данные', 'scrollX': 0, 'scrollY': 130,
             'cookie': 'mouse631_' + str(index) + '=' + identity, 'ticks': 10}
@@ -361,6 +361,16 @@ class AgentRemovalEvidenceContract(unittest.TestCase):
         self.assertEqual(result['reportSha256'], sha(raw[REPORT]))
         self.reject_fields([(['facts', 'themes', i, 'aiOptions'], choices) for i in range(2)
                             for choices in [AI_SITES, AI_SITES + ['custom', 'custom']]], 'AI website chooser')
+
+    def test_page_urls_use_the_actual_fixture_cookie_scope(self):
+        self.assertTrue(self.check(fixture())['ok'])
+        for index in range(2):
+            value = fixture()
+            for when in ('before', 'after'):
+                page = value['facts']['pages'][when][index]
+                page['url'] = ORIGIN + '/' + str(page['index'])
+            with self.subTest(index=index), self.assertRaisesRegex(ValueError, 'another origin'):
+                self.check(value)
 
     def test_retained_page_identity_state_scroll_cookie_and_clock_cannot_change(self):
         identity_changes = {'id': 'replacement', 'index': 999, 'desk': 'other-desk',

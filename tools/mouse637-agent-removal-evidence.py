@@ -109,8 +109,7 @@ def verify(read, *, owner=None):
     need(isinstance(before, list) and isinstance(after, list) and len(before) == len(after) == 2
          and [row.get('index') for row in before] == [201, 202], 'retained page pair missing')
     for old, new in zip(before, after):
-        N['identity'](old, new)
-        need(old.get('url') == origin + '/' + str(old['index']), 'retained page has another origin')
+        N['identity'](old, new, origin)
     need(len({row['id'] for row in before}) == len({row['webContentsId'] for row in before}) == 2,
          'retained page pair does not contain two distinct native pages')
     apis = facts.get('pageAPIs', [])

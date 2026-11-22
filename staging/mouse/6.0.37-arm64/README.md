@@ -79,3 +79,30 @@ Fresh attempt1 runs are Mac45009214966, Windows45009214976 and
 Linux45009215076. None is claimed accepted here; actual installed evidence
 and all three exact package byte sets must pass before pins can become ready.
 The source workflow fixture is bound to that commit and its actual SHA-256.
+
+## Native8a rejection and canonical cookie proof
+
+Original Linux8a failed the AI-preview trusted-release observation; Mac8a
+failed a missing retained preset path import. Independent98 parsing of the
+actual Linux removal report also rejected empty cookies: the producer opened
+/201 and /202 while unchanged pageHTML declares /page/<index>/. Windows8a
+primary passed, but its actual removal report has the same empty cookies;
+modern was cancelled after the new source superseded8a. No8a package is accepted.
+
+Sourcebe86c86653783f29951fdfb378aa0259837cd1d2 corrects these three
+fixture issues with original native actions, predicates and budgets preserved.
+Fresh attempt1 runs: Mac45010898616, Windows45010898421, Linux45010898422.
+The current independent removal reader now delegates URL and cookie binding to
+the unchanged canonical N.identity(before,after,origin) guard. Frozen
+predecessor validators remain byte-identical. Synthetic fixtures use canonical
+URLs and a new regression rejects the old noncanonical route even with a
+claimed cookie. All existing missing/foreign/changed cookie negatives remain.
+
+Final current local suite:119/119PASS,0failures/skips,14.679s; log
+SHA-256a2258904423decb82a87dccb138faab31706f6ba471f26c24965be015eda45eb.
+All three templates pass, all plans remain publish=false, gate dependency
+hashes and source workflow fixture are updated. Actual Mac8a isolated feature
+and633owner readers passed against80 and47 consumed raw files respectively,
+while the overall feedback reader rejected the known removal cookie defect.
+Those subset checks are historical and do not accept newbe86 or any package.
+All three pins remain null/unready with no owner trigger or public release.
