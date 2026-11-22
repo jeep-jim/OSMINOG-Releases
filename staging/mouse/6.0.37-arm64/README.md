@@ -212,3 +212,114 @@ paused script identity, actual child PID and server closure with a live child;
 this is not installed Mac acceptance. The revised Mac publisher must still run
 all original installed, profile-upgrade, native-input, public-byte and anonymous
 629/636 updater gates before a Mac release can be claimed.
+
+
+## 2026-11-22 — preserved 534 failure and passive retained-input observations
+
+The corrected feature-readiness publisher merged as
+`534f93defd61064ca0cbd8bc40fc670466bf9f42`. Its
+[run 45023380889](https://github.com/jeep-jim/OSMINOG-Releases/actions/runs/45023380889),
+attempt 1 / native job 137211122777, imported the exact accepted packages but
+failed installed step 6 at 12:46:25 UTC on the first retained trusted
+`#download-a` click. Publication, channel advancement and anonymous 6.0.29
+verification were skipped. Original artifact 14755395782 is 5,249,434 bytes,
+79 CRC-checked entries, SHA-256
+`e2799402acb9a665ac8a1854e4e5e7b5e812a8fbe3705800e3687cc8d43deba7`.
+The terminal API, original log and independent 41-check failure review are
+preserved. The installed executable, ASAR and both native modules matched the
+accepted source002 ZIP before and after, with strict codesign success.
+The feature wrapper recorded `launches: []`: its new feature transform was never
+reached in this failed run.
+
+The first prepared point, geometry and recorded focus fields are identical in
+source002 attempt 2 and publisher a464 attempt 2 (retained PASS), and publisher
+a464 attempt 1 and 534 attempt 1 (first retained click FAILURE). Native
+`testClick` already posts mouse move, down and up; its true return is
+`CGPreflightPostEventAccess()`, not delivery acknowledgement. Existing failure
+raw has no down/up trace. Neither the missing delivery boundary nor a product
+root cause is established. The four-run comparison SHA-256 is
+`0b34849806392328d3acda9cfcc9d6dcc073ba45a7165b77ebacca70688763e7`;
+the pinned native-routing review is
+`aa52716f171c901c080595e30efff516fd86a8f86fb8fbc2cda1d3664021ee61`.
+
+The next change adds passive observations to the external publisher. A new outer
+wrapper intercepts only the exact owned retained636 launch and invokes the
+existing feature wrapper and fetched source002 verifier unchanged. It returns
+the actual Popen/PID immediately; setup stays inside the original 270-second
+process limit and a bounded 30-second sidecar limit. The retained fixture keeps
+its original 240-second budget, focus, trusted predicates, readbacks and waits.
+
+Only the exact packaged `mouse-636-retained-smoke.cjs` is adapted in memory:
+original SHA-256 `911a5759675d721414d2a4a98c722f634a1bdc9131ae2bf3882a79e9cbc0200d`,
+Git blob `6548c72795a80a432f531065a5846c28ad5b549d`.
+A reversible transform adds bounded observations of the owned WebContents and
+BrowserWindow, and trusted/untrusted DOM capture events in the existing shell
+setup and owned fixture HTML. The DOM transport is a nonce-marked, bounded
+console message; it adds no awaited IPC or new polling. Both existing native
+click call sites still call the original driver exactly once, with identical
+arguments, receiver, return value or thrown error. The existing read-only
+`primaryDown()` query is recorded as an observation, never an acceptance rule.
+There is no extra focus, click, sleep, input synthesis or native-driver change.
+The observer never calls the native `state()` method, which mutates title chrome.
+Disk snapshots use existing save boundaries; no diagnostic disk write is added
+between the original native post and its original poll. Only owned listeners
+are removed during the existing cleanup.
+
+The controller must bind its endpoint to the actual spawned process before
+resuming it. A real local Node probe found that very early Inspector evaluation
+exposes platform/architecture and environment, while PID, executable and argv
+are not initialized yet. The controller therefore requires a bounded read-only
+OS listener check for the exact loopback port and actual Popen PID, together
+with the available CI/profile/nonce/runtime identity. It then checks full
+PID/executable/argv, package identity and hashes on the exact paused main frame
+before installing the one-shot hook. Missing or ambiguous ownership fails
+bootstrap. The original loader is restored and the Inspector server is closed
+before fixture input. Original and adapted module bytes and actual bootstrap
+receipts are saved. Local protocol checks do not establish Mac runner or native
+acceptance.
+
+An additional fail-closed observer evidence check runs in the Mac publication
+workflow before the unchanged publisher, beside the existing feature-readiness
+check. It must bind actual process, controller, nonce, exact source bytes,
+observations and unchanged installed component/signature receipts. All original
+fresh `source=False`, native, upgrade/profile, public-package and anonymous
+updater gates remain mandatory. Windows/Linux workflows, immutable public
+6.0.37 packages, source002, source pins and existing validator algorithms are
+unchanged.
+
+The observed browser callbacks are routing observations. In Electron 44.5.0,
+`input-event` does not prove renderer dispatch; DOM events are recorded
+separately. Browser/renderer clocks are identified separately. Instrumentation
+and bootstrap can affect timing. A full passing run may satisfy the unchanged
+release gates but cannot explain prior failures or establish a causal repair.
+No physical owner-device verification is claimed.
+
+The reviewed observation decision permits one new instrumented native run after
+exact-code tests and independent review, with no unchanged retry. Decision
+record SHA-256:
+`3b8548a60fca7c47e693285d3533db48cde6533eecb8f9300fbcb35d0dc1ece7`.
+Mac publication remains blocked until all required gates succeed.
+
+
+### Local verification of the passive-observation change
+
+Root ran the complete current Python suite: **142/142 PASS, zero skips**;
+log SHA-256 `2c5517d2887c8588fe2165e780527b2dbe973ae6e1f947cb2ce7fddaa5cc7c2c`.
+Both CJS suites passed **26/26 with zero skips on Node 24.22.3**;
+log SHA-256 `ab643922f59e9c650e9bdc67b1195f66835c593cde7e76a612b5e977715c01bc`.
+The fourteen new CJS cases exercise the actual original/adapted guest and shell
+paths, exact-once native calls, original failure identity and post-to-poll order,
+passive bounded capture, real local Node/lsof ownership and cleanup after native
+WebContents destruction. Five launcher cases retain the original process object
+and timeout; seven evidence cases include 83 semantic mutations whose enclosing
+hashes/logs are rebound. These are local contract tests, not native Mac outcomes.
+
+The final controller SHA-256 is
+`850ac3505d149319227283dbfa7b5597d7e547de2e0c5c98c8e2c45cdd972b56`;
+the exact adapted retained module is 30,068 bytes, SHA-256
+`bfe878dc295a978a6bdf9dcf13eceb15c291ee4af63ce5355e40e3cca3109096`.
+The independent final transport/schema review binds all eight new files,
+author and checker freezes, positive protocol evidence and semantic negatives:
+report SHA-256 `790a4e012d2253f6d528c55c35dc27a3971aa75776585e95a2250ae8762f00f8`.
+All previous README bytes and failed-run history remain intact. A fresh complete
+native Mac publisher and every original publication gate are still required.

@@ -1,7 +1,7 @@
 name: Publish verified Mouse Browser 6.0.37
 on:
   pull_request:
-    paths: ['.gitattributes', 'tools/mouse637-*.py', 'tools/test_mouse637_*.py', 'tools/mouse637-feature-readiness.cjs', 'tools/test_mouse637_feature_readiness.cjs', 'tools/fixtures/mouse637-readiness-002-*', '.github/workflows/publish-mouse637*.yml', 'staging/mouse/6.0.37-*/**']
+    paths: ['.gitattributes', 'tools/mouse637-*.py', 'tools/test_mouse637_*.py', 'tools/mouse637-feature-readiness.cjs', 'tools/test_mouse637_feature_readiness.cjs', 'tools/mouse637-guest-input-observer.cjs', 'tools/test_mouse637_guest_input_observer.cjs', 'tools/fixtures/mouse637-readiness-002-*', 'tools/fixtures/mouse637-retained-002*', '.github/workflows/publish-mouse637*.yml', 'staging/mouse/6.0.37-*/**']
   push:
     branches: [main]
     paths: ['staging/mouse/6.0.37-*/PUBLISH_OWNER', 'staging/mouse/6.0.37-*/pin.json', '.github/workflows/publish-mouse637.yml']
@@ -22,6 +22,8 @@ jobs:
         with: {node-version: '22'}
       - name: Verify exact external feature-readiness driver
         run: node --test tools/test_mouse637_feature_readiness.cjs
+      - name: Verify passive retained input observations and owned bootstrap
+        run: node --test tools/test_mouse637_guest_input_observer.cjs
       - name: Verify immutable reuse, current gates and all-platform publication
         run: python3 -m unittest discover -s tools -p "test_mouse637_*.py" -v
       - name: Compile current publisher and independent validators
@@ -77,7 +79,7 @@ jobs:
           trap - EXIT
           cd mouse637-release
           rm -f mouse-628-motion-trace.json mouse-628-motion.json mouse-628-motion-trace-report.json
-          env -u GH_TOKEN python3 ../tools/mouse637-feature-readiness.py "$APP/Contents/MacOS/Mouse Browser"
+          env -u GH_TOKEN python3 ../tools/mouse637-guest-input-observer.py "$APP/Contents/MacOS/Mouse Browser"
           grep -q MOUSE_637_REAL_629_TO_637_REPLACE_RELAUNCH_PROFILE_PASS mouse-update-roundtrip.log
           grep -q MOUSE_632_FOOTER_LAYOUT_BOTH_THEMES_PASS mouse-smoke-write.log
           grep -q MOUSE_632_WEBSITE_OFFER_NEW_TAB_PASS mouse-smoke-write.log
@@ -113,6 +115,7 @@ jobs:
       - name: Recompute fresh installed evidence and publish exact packages
         run: |
           python3 tools/mouse637-feature-readiness-evidence.py --directory mouse637-release
+          python3 tools/mouse637-guest-input-observer-evidence.py --directory mouse637-release
           python3 tools/mouse637-release.py publish
       - name: Advance static update channel after public package verification
         run: python3 tools/mouse637-release.py channel
@@ -155,6 +158,7 @@ jobs:
             mouse637-release/*.png
             mouse637-release/mouse-637-agent-code-*.cjs
             mouse637-release/mouse-637-feature-readiness-*.cjs
+            mouse637-release/mouse-637-guest-input-observer-*.cjs
             mouse637-release/*.json
             mouse637-release/*.md
             mouse637-release/mouse-637-library-source.txt
