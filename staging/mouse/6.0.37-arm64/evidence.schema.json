@@ -739,7 +739,7 @@
     "sha256": "330bea24813d096b1b14cffad30080c6330c398a6b9f797f0e4ab602495235a6",
     "dependencies": {
       "mouse637-native-evidence.py": "14ba118aab9e8c50601a52212c5564f9141995cde48decd51823963bbe7b7446",
-      "mouse637-library-evidence.py": "32b67f77c28525da0df167d79ae27d9479e1e4b607f42f8a88467c9f9926e1ec",
+      "mouse637-library-evidence.py": "cf6f01542e2381300881018aa17208a9e0220b1138284d7172169fb139942da4",
       "mouse637-search-removal-evidence.py": "853c1f20ef9dd99839468e762f81ef2810f62a40d7f0c46a7b61669ac7cf64c2",
       "mouse637-performance-evidence.py": "9e8a4b0391eb18426bd3a79262139213ab07702386dc343e67d9dfdb5f33a4eb",
       "mouse637-agent-inline-evidence.py": "e1b479bc7e061dcca64d4f2d58105ecbaee755e387a58838c28816bd0aa7855c",
@@ -783,7 +783,7 @@
     "fixtureOnly": true,
     "realTransfer": false,
     "defaultAutoCollection": false,
-    "sha256": "32b67f77c28525da0df167d79ae27d9479e1e4b607f42f8a88467c9f9926e1ec",
+    "sha256": "cf6f01542e2381300881018aa17208a9e0220b1138284d7172169fb139942da4",
     "controlledDelayedPreviewScenes": 4,
     "placeholderRowsPerScene": 14,
     "placeholderGeometryToleranceCSSPixels": 1,
