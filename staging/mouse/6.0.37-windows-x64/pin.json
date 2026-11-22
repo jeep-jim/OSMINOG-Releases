@@ -1,0 +1,40 @@
+{
+  "version": "6.0.37",
+  "ready": true,
+  "sourceBranch": "main",
+  "source": "0021084ccb9537e657d21e6f0c8e812dee6b461f",
+  "sourcePR": 193,
+  "sourceMerge": "e6e27b26ae719f50beeb5a2244dc6d2c6ddcdab1",
+  "run": 45013817864,
+  "attempt": 1,
+  "job": 137181713767,
+  "artifact": 14751348738,
+  "artifactSHA256": "0ce406e6cffc765f29dac778dffca7e790989b1dab429680fe88137d01142d79",
+  "verificationArtifact": 14751299029,
+  "verificationSHA256": "12064db4774ae3282dd4597d3f6fe8304618df218a9918c2361b2ec8bf0e69f6",
+  "package": {
+    "name": "Mouse-Browser-6.0.37-Windows-x64.exe",
+    "size": 113416843,
+    "sha256": "19487826aa51b2027d5a4d497529be62a5e2180402ea24e5d700da48f4cd0e35"
+  },
+  "previous": {
+    "version": "6.0.29",
+    "source": "164462db8d81f614cce9c9a8ab5d1fed0e2b7381",
+    "package": {
+      "name": "Mouse-Browser-6.0.29-Windows-x64.exe",
+      "size": 125623123,
+      "sha256": "18bf6e78eb5519e37d2ceb0e45acd1ea88d8f519e715e1d94d2fbc3c476e2e9d"
+    },
+    "updaterBlobSHA": "a767aa6eb2c1953be6d3fe7d42f0ab277fe438d5"
+  },
+  "currentPrevious": {
+    "version": "6.0.36",
+    "source": "7c09b6cb9885ce72be41e8f16a35d4c55c9ecde3",
+    "updaterBlobSHA": "91ab363f926774825caf8055b2d3d81bf0d51264",
+    "package": {
+      "name": "Mouse-Browser-6.0.36-Windows-x64.exe",
+      "size": 125834363,
+      "sha256": "443496508013d5734e8a81c7eb0ddb33cedad4149440da3c04ff891486c6cf61"
+    }
+  }
+}
