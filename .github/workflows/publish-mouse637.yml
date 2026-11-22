@@ -1,7 +1,7 @@
 name: Publish verified Mouse Browser 6.0.37
 on:
   pull_request:
-    paths: ['.gitattributes', 'tools/mouse637-*.py', 'tools/test_mouse637_*.py', 'tools/mouse637-feature-readiness.cjs', 'tools/test_mouse637_feature_readiness.cjs', 'tools/mouse637-guest-input-observer.cjs', 'tools/test_mouse637_guest_input_observer.cjs', 'tools/fixtures/mouse637-readiness-002-*', 'tools/fixtures/mouse637-retained-002*', '.github/workflows/publish-mouse637*.yml', 'staging/mouse/6.0.37-*/**']
+    paths: ['.gitattributes', 'tools/mouse637-*.py', 'tools/test_mouse637_*.py', 'tools/mouse637-feature-readiness.cjs', 'tools/test_mouse637_feature_readiness.cjs', 'tools/mouse637-guest-input-observer.cjs', 'tools/test_mouse637_guest_input_observer.cjs', 'tools/mouse637-host-observer.c', 'tools/fixtures/mouse637-host-002-*', 'tools/fixtures/mouse637-readiness-002-*', 'tools/fixtures/mouse637-retained-002*', '.github/workflows/publish-mouse637*.yml', 'staging/mouse/6.0.37-*/**']
   push:
     branches: [main]
     paths: ['staging/mouse/6.0.37-*/PUBLISH_OWNER', 'staging/mouse/6.0.37-*/pin.json', '.github/workflows/publish-mouse637.yml']
@@ -33,9 +33,26 @@ jobs:
       - name: Require all three exact native candidates from the same merged source
         id: publish_plan
         run: python3 tools/mouse637-publish-plan.py macos-arm64 >> "$GITHUB_OUTPUT"
+  host-observer-contract:
+    runs-on: macos-15
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - name: Compile the external host observer against actual Mac headers
+        run: python3 -B tools/mouse637-host-observer-build.py --output "$RUNNER_TEMP/mouse637-host-contract/mouse-637-host-observer-sampler.bin" --receipt "$RUNNER_TEMP/mouse637-host-contract/mouse-637-host-observer-build.json"
+      - name: Verify actual owned process accounting without launching Mouse
+        run: python3 -B tools/test_mouse637_host_observer.py --native-sampler "$RUNNER_TEMP/mouse637-host-contract/mouse-637-host-observer-sampler.bin"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: mouse637-host-observer-contract-attempt-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/mouse637-host-contract/
+          retention-days: 14
   mouse-release:
     if: github.event_name != 'pull_request' && needs.contract.outputs.publish == 'true'
-    needs: contract
+    needs: [contract, host-observer-contract]
     runs-on: macos-15
     timeout-minutes: 45
     permissions:
@@ -58,6 +75,7 @@ jobs:
         run: |
           set -euo pipefail
           test "$(uname -m)" = arm64
+          python3 -B tools/mouse637-host-observer-build.py --output mouse637-release/mouse-637-host-observer-sampler.bin --receipt mouse637-release/mouse-637-host-observer-build.json
           xcrun swift mouse637-release/mouse-637-macos-display.swift --output mouse637-release/mouse-637-display.json
           xcrun swift mouse637-release/mouse-637-macos-display.swift --verify mouse637-release/mouse-637-display.json
           cmp mouse637-release/Mouse-Browser-6.0.37-mac-arm64.dmg mouse637-release/Quadro-Browser-6.0.37-mac-arm64.dmg
@@ -79,7 +97,7 @@ jobs:
           trap - EXIT
           cd mouse637-release
           rm -f mouse-628-motion-trace.json mouse-628-motion.json mouse-628-motion-trace-report.json
-          env -u GH_TOKEN python3 ../tools/mouse637-guest-input-observer.py "$APP/Contents/MacOS/Mouse Browser"
+          env -u GH_TOKEN python3 ../tools/mouse637-host-observer.py "$APP/Contents/MacOS/Mouse Browser" --sampler "$PWD/mouse-637-host-observer-sampler.bin"
           grep -q MOUSE_637_REAL_629_TO_637_REPLACE_RELAUNCH_PROFILE_PASS mouse-update-roundtrip.log
           grep -q MOUSE_632_FOOTER_LAYOUT_BOTH_THEMES_PASS mouse-smoke-write.log
           grep -q MOUSE_632_WEBSITE_OFFER_NEW_TAB_PASS mouse-smoke-write.log
@@ -116,6 +134,7 @@ jobs:
         run: |
           python3 tools/mouse637-feature-readiness-evidence.py --directory mouse637-release
           python3 tools/mouse637-guest-input-observer-evidence.py --directory mouse637-release
+          python3 tools/mouse637-host-observer-evidence.py --directory mouse637-release
           python3 tools/mouse637-release.py publish
       - name: Advance static update channel after public package verification
         run: python3 tools/mouse637-release.py channel
@@ -159,6 +178,10 @@ jobs:
             mouse637-release/mouse-637-agent-code-*.cjs
             mouse637-release/mouse-637-feature-readiness-*.cjs
             mouse637-release/mouse-637-guest-input-observer-*.cjs
+            mouse637-release/mouse-637-host-observer-*.jsonl
+            mouse637-release/mouse-637-host-observer-sampler.bin
+            mouse637-release/mouse-verify.py
+            mouse637-release/mouse-637-baseline-performance.py
             mouse637-release/*.json
             mouse637-release/*.md
             mouse637-release/mouse-637-library-source.txt

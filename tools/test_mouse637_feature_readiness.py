@@ -248,7 +248,10 @@ class LaunchTests(unittest.TestCase):
 
     def test_workflow_keeps_frozen_gates_and_additive_verification_before_publish(self):
         text = (TOOLS.parent / '.github/workflows/publish-mouse637.yml').read_text()
-        self.assertIn('python3 ../tools/mouse637-guest-input-observer.py "$APP/Contents/MacOS/Mouse Browser"', text)
+        self.assertIn('python3 ../tools/mouse637-host-observer.py "$APP/Contents/MacOS/Mouse Browser"', text)
+        observer = (TOOLS / 'mouse637-host-observer.py').read_text()
+        self.assertIn("inner = tools / 'mouse637-guest-input-observer.py'", observer)
+        self.assertIn("runpy.run_path(str(inner), run_name='__main__')", observer)
         outer = (TOOLS / 'mouse637-guest-input-observer.py').read_text()
         self.assertIn("inner = tools / 'mouse637-feature-readiness.py'", outer)
         self.assertIn("runpy.run_path(str(inner), run_name='__main__')", outer)
