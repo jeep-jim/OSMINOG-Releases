@@ -54,12 +54,7 @@ jobs:
       - name: Import immutable successful Windows CI installer
         run: python tools/mouse637-windows-release.py import
       - name: Verify exact installer on a fresh Windows machine
-        run: |
-          pwsh -NoProfile -File mouse637-windows-release/mouse-637-windows-display.ps1 -OutputPath mouse637-windows-release/mouse-637-display.json
-          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          pwsh -NoProfile -File mouse637-windows-release/mouse-637-windows-display.ps1 -Verify -OutputPath mouse637-windows-release/mouse-637-display.json
-          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          python tools/mouse637-windows-release.py verify
+        run: python tools/mouse637-windows-release.py verify
       - name: Publish and verify immutable public asset
         run: python tools/mouse637-windows-release.py publish
       - name: Advance Windows feed and verify anonymous discovery and download

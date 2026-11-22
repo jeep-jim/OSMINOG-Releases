@@ -321,6 +321,8 @@ class CurrentAcceptance(unittest.TestCase):
             def dispatch(path, *args, **kwargs):
                 if Path(path).name == 'mouse637-features-evidence.py':
                     return {'verify': feature_gate}
+                if Path(path).name == 'mouse637-windows-display-evidence.py':
+                    return {'verify': lambda _read, _report: {'ok': True, 'syntheticDisplayWiringOnly': True}}
                 return original(path, *args, **kwargs)
             arguments = {'platform': platform, 'arch': 'arm64' if platform == 'darwin' else 'x64',
                          **({'packages': package} if platform == 'linux' else {'package': package})}
@@ -329,6 +331,8 @@ class CurrentAcceptance(unittest.TestCase):
                 self.assertTrue(result['updateFrom636']['ok'])
                 self.assertEqual(observed, [{'expected_platform': platform, 'expected_arch': arguments['arch']}])
                 self.assertTrue(result['features']['ok'])
+                if platform == 'win32':
+                    self.assertTrue(result['displayPreparation']['ok'])
                 files[B['NAME']] += b'changed'
                 observed.clear()
                 with self.assertRaises((ValueError, KeyError)):

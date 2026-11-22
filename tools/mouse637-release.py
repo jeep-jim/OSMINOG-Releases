@@ -38,7 +38,7 @@ def validate_template():
  for key,module in GATES:
   gate=schema[key]
   if gate['validator']!='tools/'+module or gate['sha256']!=sha(Path(__file__).with_name(module).read_bytes()) or gate['sourceAndFreshInstalled'] is not True:raise ValueError('Independent636 checker contract mismatch: '+module)
- for key,names in [('x-current634OwnerGate',RETAINED_DEPENDENCIES),('x-current635OwnerGate',CURRENT_DEPENDENCIES),('x-current637FeaturesGate',FEATURE_DEPENDENCIES)]:
+ for key,names in [('x-current634OwnerGate',RETAINED_DEPENDENCIES),('x-current635OwnerGate',CURRENT_DEPENDENCIES),('x-current637FeaturesGate',FEATURE_DEPENDENCIES),('x-currentHelpersGate',('mouse637-windows-display-evidence.py',))]:
   if schema[key].get('dependencies')!={name:sha(Path(__file__).with_name(name).read_bytes()) for name in names}:raise ValueError('Independent636 dependency hashes differ: '+key)
  features=runpy.run_path(str(Path(__file__).with_name('mouse637-features-evidence.py')))
  feature_gate=schema['x-current637FeaturesGate']

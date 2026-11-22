@@ -59,9 +59,13 @@ def verify_upgrade(read, *, platform, arch, package=None, packages=None):
                     retained.get('requiredMarkers') != ['MOUSE_633_OWNER_FEEDBACK_PASS'] or
                     retained.get('reportSha256') != hashlib.sha256(read('mouse-633-owner-feedback.json')).hexdigest()):
                 raise ValueError('Retained owner process/report byte binding failed')
+            display = runpy.run_path(str(Path(__file__).with_name('mouse637-windows-display-evidence.py')))
+            display_result = display['verify'](read, report)
     checker = runpy.run_path(str(Path(__file__).with_name('mouse637-upgrade-evidence.py')))
     result = checker['verify'](read, expected_platform=platform, expected_arch=arch,
                                expected_package=package, expected_packages=packages)
+    if platform == 'win32':
+        result['displayPreparation'] = display_result
     button = runpy.run_path(str(Path(__file__).with_name('mouse637-update-button-evidence.py')))
     if platform in ('win32', 'linux'):
         child = report.get('checks', {}).get('updateFrom636', {})

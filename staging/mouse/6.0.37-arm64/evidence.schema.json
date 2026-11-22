@@ -1153,11 +1153,14 @@
   },
   "x-currentHelpersGate": {
     "validator": "tools/mouse637-current.py",
-    "sha256": "6acf5d74f56563560a9c2387511b0f0769ec4ab243e29372a8ee58bdd35f65e0",
+    "sha256": "927d0b3f538b5314bff9baeec0e4093b093888d4aa39379d36f1b79fbc3719af",
     "sourceAndFreshInstalled": true,
     "savedReportAcceptedAsInput": false,
     "sourceHelpers": "exact tested source Git blob bytes",
-    "legacy629GateRetained": true
+    "legacy629GateRetained": true,
+    "dependencies": {
+      "mouse637-windows-display-evidence.py": "fcbac37fef8c11b1362e71fffe15b300191eaa6e68336e37fdd6137350ccf407"
+    }
   },
   "x-publicationDependencies": {
     "mouse637-public-channel.py": "2f13192b06953337906b7c391e4a9961e570f957929e66537166d9acdc68fc98"
