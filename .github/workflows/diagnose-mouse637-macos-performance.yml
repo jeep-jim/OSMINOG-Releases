@@ -1,0 +1,97 @@
+name: Diagnose Mouse 6.0.37 Mac performance
+on:
+  push:
+    branches: [diagnostic/mouse637-mac-performance-trace]
+    paths:
+      - .github/workflows/diagnose-mouse637-macos-performance.yml
+      - tools/mouse637-performance-trace.py
+      - tools/mouse637-performance-trace.cjs
+      - tools/mouse637-performance-trace-evidence.py
+      - tools/test_mouse637_performance_trace.py
+      - tools/test_mouse637_performance_trace.cjs
+      - tools/test_mouse637_performance_trace_evidence.py
+      - tools/fixtures/mouse637-performance-002-stress.cjs
+      - tools/fixtures/mouse637-performance-002-native.cjs
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Check the bounded trace recorder and exact fixture transformation
+        run: node --test tools/test_mouse637_performance_trace.cjs
+      - name: Check the diagnostic launcher and evidence reader
+        run: python3 -B -m unittest discover -s tools -p "test_mouse637_performance_trace*.py" -v
+  performance-trace:
+    if: github.repository == 'jeep-jim/OSMINOG-Releases' && github.ref == 'refs/heads/diagnostic/mouse637-mac-performance-trace'
+    needs: contract
+    runs-on: macos-15
+    timeout-minutes: 20
+    concurrency:
+      group: mouse637-macos-performance-diagnostic
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Import the exact accepted source002 packages
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 -B tools/mouse637-release.py import
+      - name: Install and trace the original native task and stress fixture
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(uname -m)" = arm64
+          xcrun swift mouse637-release/mouse-637-macos-display.swift --output mouse637-release/mouse-637-display.json
+          xcrun swift mouse637-release/mouse-637-macos-display.swift --verify mouse637-release/mouse-637-display.json
+          cmp mouse637-release/Mouse-Browser-6.0.37-mac-arm64.dmg mouse637-release/Quadro-Browser-6.0.37-mac-arm64.dmg
+          DIAG_MOUNT="$RUNNER_TEMP/mouse637-performance-dmg"
+          DIAG_ZIP="$RUNNER_TEMP/mouse637-performance-zip"
+          APP="$RUNNER_TEMP/Установка Mouse/Mouse Browser.app"
+          test ! -e "$DIAG_MOUNT"
+          test ! -e "$DIAG_ZIP"
+          test ! -e "$APP"
+          test ! -e mouse637-performance-diagnostic
+          mkdir -p "$DIAG_MOUNT" "$(dirname "$APP")"
+          mkdir mouse637-performance-diagnostic
+          cp mouse637-release/mouse-637-display.json mouse637-performance-diagnostic/mouse-637-performance-trace-display.json
+          hdiutil attach mouse637-release/Mouse-Browser-6.0.37-mac-arm64.dmg -nobrowse -readonly -mountpoint "$DIAG_MOUNT"
+          trap 'hdiutil detach "$DIAG_MOUNT" || true' EXIT
+          ditto "$DIAG_MOUNT/Mouse Browser.app" "$APP"
+          test "$(lipo -archs "$APP/Contents/MacOS/Mouse Browser")" = arm64
+          codesign --verify --deep --strict "$APP"
+          ditto -x -k mouse637-release/Mouse-Browser-6.0.37-mac-arm64.zip "$DIAG_ZIP"
+          codesign --verify --deep --strict "$DIAG_ZIP/Mouse Browser.app"
+          for COMPONENT in \
+            'Contents/MacOS/Mouse Browser' \
+            'Contents/Resources/app.asar' \
+            'Contents/Resources/app.asar.unpacked/mouse-native-menu.node' \
+            'Contents/Resources/app.asar.unpacked/mouse-screen-capture.node'; do
+            cmp "$APP/$COMPONENT" "$DIAG_ZIP/Mouse Browser.app/$COMPONENT"
+          done
+          test ! -e "$APP/Contents/Resources/mouse-agent-node_modules"
+          test ! -e "$DIAG_ZIP/Mouse Browser.app/Contents/Resources/mouse-agent-node_modules"
+          hdiutil detach "$DIAG_MOUNT"
+          trap - EXIT
+          cd mouse637-performance-diagnostic
+          env -u GH_TOKEN -u GITHUB_TOKEN python3 -B ../tools/mouse637-performance-trace.py "$APP/Contents/MacOS/Mouse Browser"
+      - name: Verify diagnostic integrity without release acceptance
+        run: python3 -B tools/mouse637-performance-trace-evidence.py --directory mouse637-performance-diagnostic
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: mouse637-macos-performance-diagnostic-attempt-${{ github.run_attempt }}
+          path: mouse637-performance-diagnostic/**
+          if-no-files-found: warn
+          retention-days: 14
