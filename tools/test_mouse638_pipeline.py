@@ -23,13 +23,29 @@ with redirect_stdout(io.StringIO()):
     RELEASE = runpy.run_path(str(TOOLS / 'mouse638-release.py'))
 
 
+def unready_pin_fixture(value):
+    """Start synthetic scenarios independently of live staging activation."""
+    value = copy.deepcopy(value)
+    value['ready'] = False
+    for key in PLAN['CLAIMS']:
+        if key in value:
+            value[key] = None
+    for package in (value.get('packages') or {'installer': value['package']}).values():
+        package.update(size=None, sha256=None)
+    return value
+
+
 class OrderedPublication(unittest.TestCase):
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
         self.addCleanup(self.temp.cleanup)
         self.root = Path(self.temp.name)
         for folder, *_ in PLAN['PLATFORMS'].values():
-            shutil.copytree(ROOT / 'staging/mouse' / folder, self.root / 'staging/mouse' / folder)
+            stage = self.root / 'staging/mouse' / folder
+            shutil.copytree(ROOT / 'staging/mouse' / folder, stage)
+            pin = unready_pin_fixture(json.loads((stage / 'pin.json').read_text()))
+            (stage / 'pin.json').write_text(json.dumps(pin))
+            (stage / 'PUBLISH_OWNER').unlink(missing_ok=True)
         self.loaded, self.public = [], []
 
     def stage(self, platform):
@@ -147,7 +163,7 @@ class PublicBytes(unittest.TestCase):
 class ExtraProvenance(unittest.TestCase):
     def test_additional_native_jobs_need_pinned_ids_and_hashes(self):
         for platform, prefix, folder in [('linux', 'noble', 'linux-x64'), ('win32', 'modern', 'windows-x64')]:
-            value = json.loads((ROOT / 'staging/mouse' / ('6.0.38-' + folder) / 'pin.json').read_text())
+            value = unready_pin_fixture(json.loads((ROOT / 'staging/mouse' / ('6.0.38-' + folder) / 'pin.json').read_text()))
             EXTRA['validate_pin'](value, platform)
             value['ready'] = True
             with self.assertRaises(ValueError): EXTRA['validate_pin'](value, platform)
