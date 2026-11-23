@@ -95,6 +95,30 @@ def tone_fixture():
     return rows, files, value, receipt
 
 
+def store_control_fixture():
+    # Unit-only receipt and pixels: never copied into native release evidence.
+    ident = 'eimadpbcbfnmbkopoojfekhnkhdbieeh'
+    url = 'https://chromewebstore.google.com/detail/dark-reader/' + ident + '?hl=en'
+    files, detail = captured(canvas(), name='mouse-638-unit-store-detail.png')
+    other, control = captured(canvas(), name='mouse-638-unit-store-control.png')
+    files.update(other)
+    detail['pid'] = control['pid'] = 123
+    selector = '#mouse-extensions-install-page'
+    click = {'action': 'click', 'selector': selector, 'tabId': None, 'pid': 123, 'source': 'CGEvent', 'at': 1001,
+             'point': {'x': 90, 'y': 56}, 'events': [{'type': 'click', 'trusted': True, 'matches': True, 'selector': selector, 'x': 90, 'y': 56}]}
+    installed = {'installPath': 'browser-control', 'pid': 123, 'storeURL': url, 'storePage': {'url': url, 'api': 'undefined', 'button': None},
+                 'storeOwner': {'tabId': 'owned-store', 'webContentsId': 7, 'url': url,
+                                'native': {**native(200, 150), 'tabId': 'owned-store', 'webContentsId': 7}},
+                 'shellWebContentsId': 2, 'storeCapture': detail['filename'], 'installInput': click,
+                 'installControl': {'selector': selector, 'tabId': 'owned-store', 'managerOpen': True, 'visible': True, 'disabled': False,
+                                    'bounds': {'x': 20, 'y': 40, 'width': 140, 'height': 32}, 'capture': control['filename']},
+                 'bridge': {'requestSource': 'browser-control', 'completionSource': 'browser-control', 'tabId': 'owned-store', 'webContentsId': 7,
+                            'nativeGestureWebContentsId': 2, 'extensionId': ident, 'url': url, 'result': 'success',
+                            'nativeGestureType': 'mouseDown', 'nativeGestureAt': 1000, 'beginAt': 1010, 'installedAt': 1200, 'completeAt': 1210}}
+    facts = {'pid': 123, 'platform': 'darwin', 'nativeInputs': [click]}
+    return ident, files, installed, facts, {detail['filename']: detail, control['filename']: control}
+
+
 class NativePixels(unittest.TestCase):
     def test_actual_png_hash_crop_mapping_and_full_screen_are_bound(self):
         rows = canvas()
@@ -173,9 +197,60 @@ class NativeProvenance(unittest.TestCase):
                 V.verify_input(bad, 'linux', 123)
 
     def test_success_booleans_do_not_replace_signed_live_store_bytes(self):
-        facts = {'webStore': {'write': {'liveStore': True, 'installed': True}, 'restart': {'restored': True, 'removed': True}}}
+        facts = {'webStore': {'write': {'liveStore': True, 'installed': True, 'installPath': 'browser-control'}, 'restart': {'restored': True, 'removed': True}}}
         with self.assertRaisesRegex(ValueError, 'extension identity'):
             V.verify_webstore(lambda _: b'', facts)
+
+
+class BrowserControlReceipt(unittest.TestCase):
+    def test_real_mouse_control_does_not_require_google_chrome_install_eligibility(self):
+        ident, files, installed, facts, captures = store_control_fixture()
+        for google_button in (None, {'disabled': True, 'text': 'Add to Chrome'}):
+            installed['storePage']['button'] = google_button
+            self.assertEqual(V.verify_webstore_install_control(files.__getitem__, installed, facts, captures, ident), installed['bridge'])
+
+    def test_store_source_and_native_owner_cannot_be_swapped(self):
+        cases = [('installPath', 'webstore-private'), ('storeURL', 'https://example.test/detail/' + 'eimadpbcbfnmbkopoojfekhnkhdbieeh'),
+                 ('storePage.url', 'https://chromewebstore.google.com/'), ('storeOwner.url', 'https://example.test/'),
+                 ('storeOwner.native.webContentsId', 99), ('storeOwner.native.tabId', 'another-tab'),
+                 ('storeOwner.native.attached', False), ('shellWebContentsId', 7), ('pid', 456)]
+        self.reject_mutations(cases)
+
+    def test_mouse_button_and_trusted_click_must_match_the_observed_shell_point(self):
+        cases = [('installControl.tabId', 'another-tab'), ('installControl.managerOpen', False), ('installControl.visible', False),
+                 ('installControl.disabled', True), ('installControl.bounds.x', -20),
+                 ('installInput.tabId', 'owned-store'), ('installInput.selector', 'button.add-to-chrome'),
+                 ('installInput.point.x', 190), ('installInput.events.0.trusted', False),
+                 ('installInput.events.0.x', 100), ('installInput.events.0.selector', 'button.add-to-chrome')]
+        self.reject_mutations(cases)
+
+    def test_production_receipt_must_bind_guest_shell_route_and_time(self):
+        cases = [('bridge.requestSource', 'webstore-private'), ('bridge.completionSource', 'completeInstall'),
+                 ('bridge.tabId', 'another-tab'), ('bridge.webContentsId', 8), ('bridge.nativeGestureWebContentsId', 7),
+                 ('bridge.extensionId', 'a' * 32), ('bridge.url', 'https://example.test/'), ('bridge.result', 'user_cancelled'),
+                 ('bridge.nativeGestureType', 'keyDown'), ('bridge.nativeGestureAt', 4000), ('bridge.completeAt', 1100)]
+        self.reject_mutations(cases)
+
+    def test_control_images_and_native_input_remain_bound(self):
+        ident, files, installed, facts, captures = store_control_fixture()
+        facts['nativeInputs'] = []
+        with self.assertRaisesRegex(ValueError, 'bound native shell click'):
+            V.verify_webstore_install_control(files.__getitem__, installed, facts, captures, ident)
+        facts['nativeInputs'] = [installed['installInput']]
+        files[installed['installControl']['capture']] = png(200, 150, canvas(color=(0, 0, 0)))
+        with self.assertRaisesRegex(ValueError, 'hash differs'):
+            V.verify_webstore_install_control(files.__getitem__, installed, facts, captures, ident)
+
+    def reject_mutations(self, cases):
+        for path, value in cases:
+            ident, files, installed, facts, captures = store_control_fixture()
+            target = installed
+            keys = path.split('.')
+            for key in keys[:-1]:
+                target = target[int(key)] if isinstance(target, list) else target[key]
+            target[keys[-1]] = value
+            with self.subTest(path=path), self.assertRaises(ValueError):
+                V.verify_webstore_install_control(files.__getitem__, installed, facts, captures, ident)
 
 
 if __name__ == '__main__':

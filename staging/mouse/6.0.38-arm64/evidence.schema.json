@@ -1173,7 +1173,7 @@
   },
   "x-current638RenderingGate": {
     "validator": "tools/mouse638-rendering-evidence.py",
-    "sha256": "1de0f1edbe786ddd0bb80b4e70f60b0b1d2aa7426c53207e95f840d47e91f3cf",
+    "sha256": "bc46e7f7d979b92da2ce7ccc9c01828821df7f6c141666d686be9b0bed51142b",
     "sourceAndFreshInstalled": true,
     "required": [
       "mouse-638-acceptance.json",
