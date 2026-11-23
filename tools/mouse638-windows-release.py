@@ -17,8 +17,9 @@ def pin():
 
 
 def validate_template():
-    _original638_validate_template()
-    _extra638['validate_pin'](json.loads((STAGE / 'pin.json').read_text()), 'win32')
+    value = _original638_validate_template()
+    _extra638['validate_pin'](value, 'win32')
+    return value
 
 
 def import_candidate():

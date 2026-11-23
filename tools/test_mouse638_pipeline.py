@@ -120,6 +120,79 @@ class OrderedPublication(unittest.TestCase):
             self.run_plan('macos-arm64')
 
 
+class ReadyPublisherContracts(unittest.TestCase):
+    """Actual publisher functions over synthetic local pins; no CI or network."""
+    def fixture(self, platform):
+        folder, filename, _, owner = PLAN['PLATFORMS'][platform]
+        temporary = tempfile.TemporaryDirectory()
+        self.addCleanup(temporary.cleanup)
+        stage = Path(temporary.name) / folder
+        shutil.copytree(ROOT / 'staging/mouse' / folder, stage)
+        value = unready_pin_fixture(json.loads((stage / 'pin.json').read_text()))
+        value.update(ready=True, source='a' * 40, sourceMerge='b' * 40, sourcePR=123,
+                     run=456, attempt=1, job=789, artifact=790, artifactSHA256='c' * 64,
+                     verificationArtifact=791, verificationSHA256='d' * 64)
+        for package in (value.get('packages') or {'installer': value['package']}).values():
+            package.update(size=60 * 1024**2, sha256='e' * 64)
+        prefix = 'noble' if platform == 'linux-x64' else 'modern'
+        value.update({prefix + 'Job': 792, prefix + 'Artifact': 793, prefix + 'SHA256': 'f' * 64})
+        (stage / 'pin.json').write_text(json.dumps(value))
+        (stage / 'PUBLISH_OWNER').write_text(owner + '\n')
+        module = runpy.run_path(str(TOOLS / filename))
+        scoped_stage = patch.dict(module['pin'].__globals__, {'STAGE': stage})
+        scoped_stage.start()
+        self.addCleanup(scoped_stage.stop)
+        return module, value, stage, owner, prefix
+
+    def test_actual_ready_template_and_pin_return_retained_validated_mapping(self):
+        for platform in ('linux-x64', 'windows-x64'):
+            with self.subTest(platform=platform):
+                module, value, _, _, _ = self.fixture(platform)
+                # This executes the inherited pin(), including its global
+                # validate_template dispatch, rather than a mocked plan loader.
+                self.assertEqual(module['pin'](), value)
+                original = module['_original638_validate_template']
+                returned = []
+                def retain():
+                    checked = original()
+                    returned.append(checked)
+                    return checked
+                with patch.dict(module['validate_template'].__globals__, {'_original638_validate_template': retain}):
+                    actual = module['validate_template']()
+                self.assertEqual(actual, value)
+                self.assertIs(actual, returned[0])
+
+    def test_actual_ready_pin_keeps_base_and_additional_native_rejections(self):
+        for platform in ('linux-x64', 'windows-x64'):
+            module, original, stage, owner, prefix = self.fixture(platform)
+            for defect in ('owner', 'source', 'merge', 'previous', 'currentPrevious',
+                           'extra-job', 'extra-artifact', 'extra-sha', 'package-sha'):
+                value = copy.deepcopy(original)
+                if defect == 'source': value['source'] = 'invalid-source'
+                if defect == 'merge': value['sourceMerge'] = 'invalid-merge'
+                if defect in ('previous', 'currentPrevious'): value[defect]['version'] = '6.0.36'
+                if defect == 'extra-job': value[prefix + 'Job'] = 0
+                if defect == 'extra-artifact': value[prefix + 'Artifact'] = None
+                if defect == 'extra-sha': value[prefix + 'SHA256'] = 'invalid-digest'
+                if defect == 'package-sha':
+                    next(iter((value.get('packages') or {'installer': value['package']}).values()))['sha256'] = 'invalid-digest'
+                (stage / 'pin.json').write_text(json.dumps(value))
+                (stage / 'PUBLISH_OWNER').write_text(('wrong owner' if defect == 'owner' else owner) + '\n')
+                with self.subTest(platform=platform, defect=defect), self.assertRaises(ValueError):
+                    module['pin']()
+
+    def test_actual_unready_template_returns_mapping_without_enabling_publication(self):
+        for platform in ('linux-x64', 'windows-x64'):
+            with self.subTest(platform=platform):
+                module, value, stage, _, _ = self.fixture(platform)
+                value = unready_pin_fixture(value)
+                (stage / 'pin.json').write_text(json.dumps(value))
+                (stage / 'PUBLISH_OWNER').unlink()
+                self.assertEqual(module['validate_template'](), value)
+                with self.assertRaises(ValueError):
+                    module['pin']()
+
+
 class PublicBytes(unittest.TestCase):
     def fixture(self, platform):
         path, os_name, arch, tag = PLAN['CHANNELS'][platform]
