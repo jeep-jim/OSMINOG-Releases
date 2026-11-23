@@ -157,7 +157,10 @@
       "theme": "light",
       "panels": 7,
       "windowWidth": 971,
-      "bounds": "actual native roots versus separately rounded DOM endpoints",
+      "layoutContract": "integer-dom-native-endpoints-638",
+      "integerDOMPanes": 7,
+      "endpointRoundingDifferences": 0,
+      "bounds": "all DOM x/y/width/height are integers and exactly match actual native shared endpoints",
       "snapshots": "seven decoded PNGs with independently checked bounds and SHA-256",
       "identity": "same WebContents, URL, epoch, DOM marker, viewport, scroll and native root order before/during/after Nora"
     },
@@ -712,7 +715,7 @@
       "mouse638-download-evidence.py": "c11bf71b8b30c34023e105379b3922100a8661d425817d492ccb8eed73cdf3b0",
       "mouse638-capture-evidence.py": "3798ec6aac019f40d26b78e1b07cd1660e82c1afac68871ac2fc24eebe0b22a6",
       "mouse638-focused-evidence.py": "145157abaff8d4d2026eeb4b713353bd9c08aab3c7c249ecbd3af73fc86eb777",
-      "mouse638-reuse.py": "4791aef38d4e625a39109b47bb467ae2261b3cbc71ce9242f18b7d9ac184d159",
+      "mouse638-reuse.py": "b3555ee9882c2cac6e0e6f75748ff1ccf7835aebad2465fe0040f64d050ddbb9",
       "mouse638-zoom-evidence.py": "bb2788d1501fc825f908b349f285307420ec516e479d8fd45a1998a66f7451b1",
       "mouse638-agent-removal-adapter.py": "3cdd0b94bdf8d63e1eefcfe696a0320780e609af1481130e1511c5d2a81bd6be"
     }
@@ -745,7 +748,7 @@
       "mouse638-agent-removal-evidence.py": "969bb6ac0c36dae9b5299adfa1afba74c0eda0cac503fdd1fdf4aa2813a3e4b7",
       "mouse638-pane-layout-evidence.py": "27cdb730e901c857d30242ad56888bd8a616e378d421053eb29c16ae2cf951dd",
       "mouse638-context-evidence.py": "584be1c089cc1e31111c5b4b31e2b02f005c6061d6f0e10994cef151c5091ebe",
-      "mouse638-reuse.py": "4791aef38d4e625a39109b47bb467ae2261b3cbc71ce9242f18b7d9ac184d159",
+      "mouse638-reuse.py": "b3555ee9882c2cac6e0e6f75748ff1ccf7835aebad2465fe0040f64d050ddbb9",
       "mouse638-zoom-evidence.py": "bb2788d1501fc825f908b349f285307420ec516e479d8fd45a1998a66f7451b1",
       "mouse638-agent-removal-adapter.py": "3cdd0b94bdf8d63e1eefcfe696a0320780e609af1481130e1511c5d2a81bd6be"
     },
@@ -1186,7 +1189,7 @@
       "mouse638-task-evidence.py": "22df86a619ae3014103963ad5182066ef8cc3a7cc91e3b363902259d503d885e",
       "mouse-638-crx-proof.cjs": "5b0ac13325b55faa647f9d02c5c862db5e6e6e276fdef00b3c6788fff54dd829",
       "mouse638-extra-evidence.py": "27e7d15c81a69741d1b466fb9245682c4478a09d9923d6161518cab4477d82d2",
-      "mouse638-reuse.py": "4791aef38d4e625a39109b47bb467ae2261b3cbc71ce9242f18b7d9ac184d159",
+      "mouse638-reuse.py": "b3555ee9882c2cac6e0e6f75748ff1ccf7835aebad2465fe0040f64d050ddbb9",
       "mouse638-frozen.json": "a6923bd7d3d1aa435d56a2427e77e300d82bd359cdb40504f4916ff9e5bd6560"
     }
   },
