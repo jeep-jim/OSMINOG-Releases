@@ -354,6 +354,65 @@ def verify_webstore_runtime(read, runtime, captures, ident, version):
     return result
 
 
+def verify_webstore_install_control(read, installed, facts, captures, ident):
+    # Google's page may deliberately hide/disable its Chrome-only button.
+    # Require Mouse's real shell control and bind it to the owned Store guest;
+    # diagnostics from Google's button/API do not authorize an installation.
+    need(installed.get('installPath') == 'browser-control', 'Store installation did not use the production Mouse control')
+    url = installed.get('storeURL', '')
+    source = urllib.parse.urlsplit(url)
+    need(source.scheme == 'https' and source.netloc == 'chromewebstore.google.com'
+         and re.fullmatch(r'/detail/(?:[^/]+/)?' + re.escape(ident) + r'/?', source.path), 'installation did not originate in the real Store detail page')
+    need(installed.get('storePage', {}).get('url') == url, 'real Store document differs from the installation source')
+    owner = installed.get('storeOwner', {})
+    need(isinstance(owner.get('tabId'), str) and owner['tabId'] and P.integer(owner.get('webContentsId'), 1)
+         and owner.get('url') == url, 'owned Store page identity missing')
+    native = owner.get('native', {})
+    need(native.get('tabId') == owner['tabId'] and native.get('webContentsId') == owner['webContentsId'], 'Store guest differs from its owned native page')
+    detail = captures[installed['storeCapture']]
+    need(detail.get('pid') == facts['pid'] and installed.get('pid') == facts['pid'], 'Store detail belongs to another process')
+    capture(read, detail)
+    native_geometry(native, detail['contentBounds'])
+    shell_id = installed.get('shellWebContentsId')
+    need(P.integer(shell_id, 1) and shell_id != owner['webContentsId'], 'Mouse install control is not separate from the Store guest')
+    control = installed.get('installControl', {})
+    selector = '#mouse-extensions-install-page'
+    need(control.get('selector') == selector and control.get('tabId') == owner['tabId']
+         and control.get('managerOpen') is True and control.get('visible') is True and control.get('disabled') is False,
+         'production Mouse install control was unavailable or targeted another page')
+    bounds = P.rectangle(control.get('bounds'), 'Mouse installation control')
+    shot = captures[control['capture']]
+    need(shot.get('pid') == facts['pid'], 'Mouse install control belongs to another process')
+    capture(read, shot)
+    content = shot['contentBounds']
+    need(bounds['x'] >= 0 and bounds['y'] >= 0 and bounds['x'] + bounds['width'] <= content['width']
+         and bounds['y'] + bounds['height'] <= content['height'], 'Mouse installation control lies outside the native window')
+    click = installed.get('installInput', {})
+    need(click in facts.get('nativeInputs', []) and click.get('action') == 'click' and click.get('selector') == selector
+         and 'tabId' in click and click['tabId'] is None, 'Mouse installation lacks a bound native shell click')
+    verify_input(click, facts['platform'], facts['pid'])
+    point_value = click.get('point', {})
+    need(all(P.finite(point_value.get(k)) for k in ('x', 'y')), 'Mouse install native point missing')
+    local = {k: point_value[k] - content[k] for k in ('x', 'y')}
+    need(all(bounds[k] <= local[k] < bounds[k] + bounds['width' if k == 'x' else 'height'] for k in ('x', 'y')),
+         'native install point misses the observed Mouse control')
+    need(any(event.get('type') == 'click' and event.get('trusted') is True and event.get('matches') is True
+             and event.get('selector') == selector
+             and all(P.finite(event.get(k)) and abs(event[k] - local[k]) <= 1 for k in ('x', 'y'))
+             for event in click.get('events', [])), 'trusted Mouse install event differs from the actual native point')
+    bridge = installed.get('bridge', {})
+    need(bridge.get('requestSource') == bridge.get('completionSource') == 'browser-control'
+         and bridge.get('tabId') == owner['tabId'] and bridge.get('webContentsId') == owner['webContentsId']
+         and bridge.get('nativeGestureWebContentsId') == shell_id, 'production installation did not bind the Mouse shell gesture to its Store guest')
+    need(bridge.get('extensionId') == ident and bridge.get('url') == url and bridge.get('result') == 'success'
+         and bridge.get('nativeGestureType') == 'mouseDown', 'production Store bridge did not complete the actual install request')
+    for key in ('nativeGestureAt', 'beginAt', 'installedAt', 'completeAt'):
+        need(P.integer(bridge.get(key), 1), 'Store bridge timestamp missing')
+    need(P.integer(click.get('at'), 1) and bridge['nativeGestureAt'] <= bridge['beginAt'] <= bridge['installedAt'] <= bridge['completeAt']
+         and abs(bridge['nativeGestureAt'] - click['at']) <= 2000, 'Store bridge was not initiated by the observed native user input')
+    return bridge
+
+
 def verify_webstore(read, facts):
     # Kept separate from owned unpacked-extension fixtures. The live helper's
     # receipt must identify Google's signed bytes and the real install UI.
@@ -373,8 +432,6 @@ def verify_webstore(read, facts):
          and download.scheme == 'https' and download.netloc in ('clients2.google.com', 'clients2.googleusercontent.com', 'clients.google.com', 'clients.googleusercontent.com'), 'live Store download origin missing')
     query = urllib.parse.parse_qs(request.query)
     need(query.get('acceptformat') == ['crx3'] and urllib.parse.parse_qs(query.get('x', [''])[0]).get('id') == [ident], 'Store request identifies another extension or unsigned format')
-    need(installed.get('storeURL', '').startswith('https://chromewebstore.google.com/detail/')
-         and ident in installed['storeURL'], 'installation did not originate in the real Store detail page')
     need(installed.get('nativeInstallClick') is True and installed.get('nativeConsent') is True, 'live Store install and permission confirmation were not native input')
     need(installed.get('runtimeVerified') is True and restored.get('runtimeVerified') is True, 'extension did not execute in a real renderer before and after restart')
     need(restored.get('id') == ident and restored.get('sha256') == signed['sha256'], 'restored Store extension is not the verified installed package')
@@ -393,16 +450,8 @@ def verify_webstore(read, facts):
         need(manifest_info.file_size <= 256 * 1024, 'unbounded archived Store manifest')
         manifest = json.loads(archive.read(manifest_info))
         need(manifest.get('version') == signed['version'], 'installed Store version differs from the signed manifest')
-    click = installed.get('installInput', {})
-    need(click in facts.get('nativeInputs', []) and click.get('action') == 'click', 'Store installation button has no bound native receipt')
-    verify_input(click, facts['platform'], facts['pid'])
-    bridge = installed.get('bridge', {})
-    need(bridge.get('extensionId') == ident and bridge.get('url') == installed['storeURL'] and bridge.get('result') == 'success'
-         and bridge.get('nativeGestureType') == 'mouseDown', 'production Store bridge did not complete the actual install request')
-    for key in ('nativeGestureAt', 'beginAt', 'installedAt', 'completeAt'):
-        need(P.integer(bridge.get(key), 1), 'Store bridge timestamp missing')
-    need(bridge['nativeGestureAt'] <= bridge['beginAt'] <= bridge['installedAt'] <= bridge['completeAt']
-         and abs(bridge['nativeGestureAt'] - click.get('at', 0)) <= 2000, 'Store bridge was not initiated by the observed native user input')
+    captures = {value['filename']: value for value in facts.get('captures', [])}
+    bridge = verify_webstore_install_control(read, installed, facts, captures, ident)
     consent = installed.get('consent', {})
     need(consent.get('originalNativeDialog') is True and consent.get('response') == 1 and consent.get('buttons') == ['Отмена', 'Установить расширение']
          and consent.get('defaultId') == consent.get('cancelId') == 0 and consent.get('title') == 'Установить расширение из Chrome Web Store?'
@@ -410,14 +459,11 @@ def verify_webstore(read, facts):
     need(consent.get('input') in facts['nativeInputs'] and consent['input'].get('native') == consent.get('native'), 'native permission input is not bound to observed OS dialog')
     verify_input(consent['input'], facts['platform'], facts['pid'])
     need(consent.get('at', 0) <= consent['input'].get('at', 0) <= consent.get('resolvedAt', 0) <= bridge['installedAt'], 'permission confirmation order differs')
-    captures = {value['filename']: value for value in facts.get('captures', [])}
     capture(read, captures[consent['capture']])
-    need(installed.get('storePage', {}).get('url') == installed['storeURL'] and installed['storePage'].get('api') == 'function', 'real Chrome Web Store page API missing')
-    capture(read, captures[installed['storeCapture']])
     runtime = {'write': verify_webstore_runtime(read, installed.get('runtime', {}), captures, ident, signed['version']),
                'restart': verify_webstore_runtime(read, restored.get('runtime', {}), captures, ident, signed['version'])}
     need(restored.get('removeInput') in facts['nativeInputs'], 'restored live extension was not removed through its actual manager control')
-    return {'id': ident, 'version': signed['version'], 'sha256': signed['sha256'], 'bytes': signed['bytes'], 'liveStore': True, 'restored': True, 'independentCRX3': proof, 'runtime': runtime}
+    return {'id': ident, 'version': signed['version'], 'sha256': signed['sha256'], 'bytes': signed['bytes'], 'liveStore': True, 'restored': True, 'installPath': 'browser-control', 'independentCRX3': proof, 'runtime': runtime}
 
 
 def verify(read, *, expected_platform=None, expected_arch=None):
