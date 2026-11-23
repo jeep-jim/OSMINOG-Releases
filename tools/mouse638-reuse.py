@@ -72,6 +72,41 @@ def adapted_tree(name, *, current_native=False):
     tree = ast.parse(checked(name), filename=str(TOOLS / name)) if name in FROZEN else legacy()['adapted_tree'](name, current_native=current_native)
 
     class Identity(ast.NodeTransformer):
+        def visit_FunctionDef(self, node):
+            node = self.generic_visit(node)
+            if name != 'mouse632-evidence.py' or node.name != 'verify_fractional_layouts':
+                return node
+            #638 deliberately partitions DOM panes on the native integer-DIP
+            #grid. Keep the complete seven-page Nora proof, but require this
+            #new source contract instead of the superseded fractional defect.
+            row = next(n for n in node.body if isinstance(n, ast.Assign)
+                       and ast.unparse(n.targets[0]) == 'row')
+            node.body[node.body.index(row) + 1:node.body.index(row) + 1] = ast.parse(
+                "require(row.get('layoutContract') == 'integer-dom-native-endpoints-638', "
+                "'seven-pane638 integer layout contract is missing')").body
+            loop = next(n for n in node.body if isinstance(n, ast.For)
+                        and ast.unparse(n.target) == '(identity, page)')
+            slot = next(n for n in loop.body if isinstance(n, ast.Assign)
+                        and ast.unparse(n.targets[0]) == 'slot')
+            loop.body[loop.body.index(slot) + 1:loop.body.index(slot) + 1] = ast.parse(
+                "require(all(nonnegative_integer(slot[key]) for key in ('x', 'y', 'width', 'height')), "
+                "'seven-pane638 DOM bounds are not integers')").body
+            comparisons = [n for n in ast.walk(node) if isinstance(n, ast.Compare)
+                           and ast.unparse(n) == 'differences >= 1']
+            assert len(comparisons) == 1, 'Reviewed Nora endpoint predicate changed'
+            comparisons[0].ops = [ast.Eq()]
+            comparisons[0].comparators = [ast.Constant(0)]
+            messages = [n for n in ast.walk(node) if isinstance(n, ast.Constant)
+                        and n.value == 'seven-pane fixture did not reproduce independent-span versus endpoint rounding']
+            assert len(messages) == 1, 'Reviewed Nora endpoint diagnostic changed'
+            messages[0].value = 'seven-pane638 integer DOM differs from rounded native endpoints'
+            result = next(n for n in node.body if isinstance(n, ast.Return))
+            assert isinstance(result.value, ast.Dict) and 'integerDOMPanes' not in [
+                key.value for key in result.value.keys], 'Reviewed Nora result changed'
+            result.value.keys.append(ast.Constant('integerDOMPanes'))
+            result.value.values.append(ast.parse('len(slots)', mode='eval').body)
+            return node
+
         def visit_IfExp(self, node):
             node = self.generic_visit(node)
             # Explicit owner638 change: rectangular grid and AI preview now
