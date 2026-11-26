@@ -51,7 +51,7 @@ def corners_fixture(theme='light'):
         for index, x in enumerate((8, width / 2 + 4)):
             bounds = {'x': x, 'y': 20, 'width': width / 2 - 16, 'height': 150}
             tab = 'page-' + str(index)
-            native.append({'id': tab, 'webContentsId': index + 31, 'visible': True, 'attached': True, 'bounds': bounds, 'viewBounds': bounds, 'panel': {'roundBottom': 12, 'roundGradient': copy.deepcopy(grad)}})
+            native.append({'id': tab, 'webContentsId': index + 31, 'visible': True, 'attached': True, 'bounds': bounds, 'viewBounds': bounds, 'parentBounds': None, 'actualBounds': bounds, 'parentVisible': True, 'panel': {'roundBottom': 12, 'roundGradient': copy.deepcopy(grad)}})
             masks.append({**bounds, 'gradient': copy.deepcopy(grad)})
             for side in ('left', 'right'):
                 probes.append({'tabId': tab, 'webContentsId': index + 31, 'side': side, 'point': {'x': x + (1 if side == 'left' else bounds['width'] - 1), 'y': 169}})
@@ -149,5 +149,20 @@ class Workspace641ReaderTests(unittest.TestCase):
             change(wrong)
             with self.assertRaises(ValueError):
                 W.verify_stationary_removal(wrong)
+    def test_corners_bind_parent_and_child_coordinates_to_the_actual_window_bounds(self):
+        rows, appearance, captures = corners_fixture()
+        for row in rows:
+            for page in row['native']:
+                page['parentBounds'] = copy.deepcopy(page['bounds'])
+                page['viewBounds'] = {**page['bounds'], 'x': 0, 'y': 0}
+        W.verify_corners(rows, 'light', appearance, captures)
+        for change in (lambda p: p['viewBounds'].update(x=1), lambda p: p['parentBounds'].update(y=0),
+                       lambda p: p.update(parentVisible=False), lambda p: p.update(actualBounds=p['viewBounds']),
+                       lambda p: p['parentBounds'].update(width=5)):
+            wrong = copy.deepcopy(rows); change(wrong[0]['native'][0])
+            with self.assertRaisesRegex(ValueError, 'actual visible page bounds'):
+                W.verify_corners(wrong, 'light', appearance, captures)
+
+
 if __name__ == '__main__':
     unittest.main()

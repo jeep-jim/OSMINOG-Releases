@@ -230,7 +230,12 @@ def verify_corners(rows, theme, appearance, captures):
         need(len(native) >= 2 and len(masks) == len(native) and len(probes) == len(native) * 2, 'both native bottom corners of every visible pane are required')
         for page, mask in zip(native, masks):
             bounds = P.rectangle(page.get('bounds'), 'native gradient pane')
-            need(page.get('visible') is page.get('attached') is True and page.get('viewBounds') == bounds and page.get('panel', {}).get('roundBottom') == 12
+            view = P.rectangle(page.get('viewBounds'), 'actual native child view')
+            parent = None if page.get('parentBounds') is None else P.rectangle(page['parentBounds'], 'actual native clip parent')
+            actual = {**view, 'x': view['x'] + (parent['x'] if parent else 0), 'y': view['y'] + (parent['y'] if parent else 0)}
+            need(page.get('visible') is page.get('attached') is page.get('parentVisible') is True
+                 and page.get('actualBounds') == actual == bounds and (parent is None or parent == bounds)
+                 and page.get('panel', {}).get('roundBottom') == 12
                  and all(mask.get(k) == bounds[k] for k in ('x', 'y', 'width', 'height')), 'native corner mask does not cover the actual visible page bounds')
             for submitted in (mask.get('gradient', {}), page['panel'].get('roundGradient', {})):
                 need(set(submitted) == set(expected) and all(P.finite(submitted.get(key)) and abs(submitted[key] - expected[key]) < 1e-6 for key in ('x0', 'y0', 'x1', 'y1'))
