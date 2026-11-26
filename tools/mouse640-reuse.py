@@ -89,7 +89,7 @@ SETTINGS_SECTIONS = ['privacy', 'overview-links', 'appearance', 'interface', 'sc
 def adapted_tree(name, *, current_native=False):
     tree = ast.parse(checked(name), filename=str(TOOLS / name)) if name in FROZEN else legacy()['adapted_tree'](name, current_native=current_native)
 
-    changed = {'input_budget': 0, 'settings_overview': 0}
+    changed = {'input_budget': 0, 'settings_overview': 0, 'update_receipt': 0}
 
     class Identity(ast.NodeTransformer):
         def visit_FunctionDef(self, node):
@@ -138,6 +138,13 @@ for row in categories:
 
         def visit_Call(self, node):
             node = self.generic_visit(node)
+            if (name == 'mouse637-current.py' and ast.dump(node) == ast.dump(ast.parse(
+                    "report.get('checks', {}).get('updateFrom639', {})", mode='eval').body)):
+                # The installed source wrapper retains its protocol field name.
+                # Its bound report, marker, packages and real predecessor remain
+                # strictly 639 -> 640; this changes only the enclosing lookup key.
+                changed['update_receipt'] += 1
+                return ast.parse("report.get('checks', {}).get('updateFrom638', {})", mode='eval').body
             if (name == 'mouse633-owner-feedback-evidence.py'
                     and ast.dump(node) == ast.dump(ast.parse("all(row.get('hidden') is False for row in initial['sections'])", mode='eval').body)):
                 changed['settings_overview'] += 1
@@ -195,7 +202,8 @@ for row in categories:
 
     tree = Identity().visit(tree)
     required = {'mouse637-features-evidence.py': 'input_budget',
-                'mouse633-owner-feedback-evidence.py': 'settings_overview'}.get(name)
+                'mouse633-owner-feedback-evidence.py': 'settings_overview',
+                'mouse637-current.py': 'update_receipt'}.get(name)
     if required is not None and changed[required] != 1:
         raise ValueError('Current640 Settings adaptation did not bind its frozen predicate: ' + required)
     return ast.fix_missing_locations(tree)
