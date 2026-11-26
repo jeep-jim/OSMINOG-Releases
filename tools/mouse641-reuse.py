@@ -101,6 +101,29 @@ def adapted_tree(name, *, current_native=False):
     class Identity(ast.NodeTransformer):
         def visit_FunctionDef(self, node):
             node = self.generic_visit(node)
+            if name == 'mouse637-library-evidence.py' and node.name == '_placeholder_size':
+                expected = ast.parse("""
+def _placeholder_size(row, view):
+    image, box = row['image'], row['row']
+    if view == 'grid': return abs(image['height'] - 112) <= 1
+    if view != 'list': return False
+    return all(abs(actual - expected) <= 1 for actual, expected in (
+        (image['x'], box['x'] + 6), (image['y'], box['y'] + 9),
+        (image['width'], box['width'] - 37), (image['height'], 108), (box['height'], 126)))
+""").body[0]
+                if ast.dump(node, include_attributes=False) != ast.dump(expected, include_attributes=False):
+                    raise ValueError('Frozen library placeholder size predicate changed')
+                mark('library_placeholder_geometry')
+                #641 glass rows use 10px horizontal/11px vertical padding,
+                #an 18px selection column and an 8px gap. The content image
+                #stays 108px high; grid sizing and the one-pixel tolerance stay.
+                #All identity, delay, decode and before/after stability checks
+                #remain in the unchanged retained placeholder_geometry caller.
+                node.body[-1] = ast.parse("""
+return all(abs(actual - expected) <= 1 for actual, expected in (
+    (image['x'], box['x'] + 10), (image['y'], box['y'] + 11),
+    (image['width'], box['width'] - 46), (image['height'], 108), (box['height'], 130)))
+""").body[0]
             if name == 'mouse633-owner-feedback-evidence.py' and node.name == 'settings_contract':
                 if ast.unparse(node.body[0]) != "value = facts.get('settings', {})":
                     raise ValueError('Frozen Settings readback binding changed')
@@ -260,6 +283,7 @@ if kind in ('settings', 'library'):
     required = {'mouse637-features-evidence.py': ('link_input', 'media_removed', 'always_header', 'ai_routes', 'explicit_preview', 'removed_controls'),
                 'mouse636-retained-owner-evidence.py': ('chat_interception', 'retained_ai', 'request_count', 'owned_count'),
                 'mouse637-sidebar-focus-evidence.py': ('library_glass',),
+                'mouse637-library-evidence.py': ('library_placeholder_geometry',),
                 'mouse632-feedback-evidence.py': ('stationary_removed',),
                 'mouse633-owner-feedback-evidence.py': ('settings_branding', 'settings_toggles')}.get(name, ())
     if any(changed.get(key) != 1 for key in required):
