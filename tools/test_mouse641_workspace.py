@@ -36,6 +36,55 @@ def layout_fixture():
     ledger = [value[name]['input'] for name in ('empty', 'chooser', 'insertion', 'blankDrag', 'edgeCarry')] + [event for row in headers for event in row['inputs']]
     return (value, ledger)
 
+def windows_layout_fixture():
+    """Synthetic child receipts, with the real 641 plan and clock semantics."""
+    value, ledger = layout_fixture()
+    for row in ledger: row['source'] = 'User32'
+    for action, kind in (('blankDrag', 'blank'), ('edgeCarry', 'edge')):
+        row = value[action]['input']; row['tabId'] = value[action]['before']['id']
+        start, finish = row['from'], row['to']; threshold = {'x': start['x'] + 12, 'y': start['y'] + 7}
+        target = {'x': 900, 'y': 80} if kind == 'edge' else finish
+        logical = [start.copy(), threshold]
+        for a, b, count in [(threshold, target, 12)] + ([(target, finish, 8)] if kind == 'edge' else []):
+            logical += [{axis: math.floor(a[axis] + (b[axis] - a[axis]) * step / count + .5)
+                         for axis in ('x', 'y')} for step in range(1, count + 1)]
+        logical.append(finish.copy())
+        samples = [{'logical': point, 'physical': {axis: point[axis] * 2 for axis in ('x', 'y')}} for point in logical]
+        start_at = 200000 if kind == 'edge' else 100000; hold, settle = (1000, 5000) if kind == 'edge' else (400, 200)
+        elapsed = 0; events, event_ns = [], []
+        for index, sample in enumerate(samples):
+            phase = 0 if index == 0 else 2 if index == len(samples) - 1 else 1
+            if phase == 2: elapsed += settle
+            events.append({**sample['physical'], 'phase': phase, 'at': start_at + elapsed, 'accepted': True})
+            event_ns.append(str(elapsed * 1000000))
+            if index == 13:
+                hold_start = elapsed; elapsed += hold; hold_end = elapsed
+            elif phase != 2: elapsed += 60 if index == 0 else 100 if index == 1 else 22
+        row['nativeDrag'] = {'schema': 1, 'method': 'independent-native-html-input-process', 'platform': 'win32', 'source': 'User32',
+            'parentPid': 101, 'childPid': 203 if kind == 'edge' else 202,
+            'nonce': '12345678-1234-1234-1234-12345678900' + ('2' if kind == 'edge' else '1'), 'kind': kind,
+            'budgetMs': 15000, 'driverCallLimitMs': 7000, 'holdMs': hold, 'settleMs': settle,
+            'deadlineAt': start_at - 3 + 15000, 'startedAt': start_at, 'completedAt': start_at + elapsed,
+            'elapsedMs': elapsed, 'forkedAt': start_at - 2, 'exitAt': start_at + elapsed + 2,
+            'exitCode': 0, 'exitSignal': None, 'lifecycleLimitMs': 30000, 'terminationRequested': False,
+            'coordinates': {'source': 'Electron screen.dipToScreenPoint', 'samples': samples},
+            'events': events, 'released': True, 'ok': True,
+            'timing': {'source': 'process.hrtime.bigint', 'scope': 'per-process elapsed',
+                'child': {'eventNs': event_ns, 'holdStartNs': str(hold_start * 1000000),
+                          'holdEndNs': str(hold_end * 1000000), 'elapsedNs': str(elapsed * 1000000)},
+                'parent': {'preparationNs': '1000000', 'elapsedNs': str((elapsed + 4) * 1000000)}}}
+        if kind == 'edge':
+            value[action]['direction'] = 1
+            value[action]['whileHeld'].update(active=True, sourceMembership='desk-1', sourceMembershipAfterCapture='desk-1',
+                originDesk='desk-1', sourceTabId='a', observerPid=101, observedAt=start_at + 1300,
+                captureFinishedAt=start_at + 1800, mouseDownAfterCapture=True,
+                observedElapsedNs='1303000000', captureElapsedNs='1803000000',
+                edgeObservation={'schema': 1, 'clock': 'renderer performance.now', 'edgeId': 'mouse-drag-edge-right',
+                    'destination': 'desk-2', 'originDesktop': 'desk-1', 'armedAtMs': 100, 'hoverAtMs': 500,
+                    'switchedAtMs': 1150, 'elapsedMs': 650, 'ok': True})
+    return value, ledger
+
+
 def corners_fixture(theme='light'):
     surface = {'mode': 'gradient', 'color': '#F3E6CA' if theme == 'light' else '#594B30', 'endColor': '#F2DCC8' if theme == 'light' else '#403C3D', 'angle': 135, 'opacity': 100}
     appearance = {'surfaces': {theme: {'workspace': surface}}}
@@ -64,6 +113,86 @@ def absent():
     return {'widgetCount': 0, 'scripts': [], 'styles': [], 'mediaPlayerAPI': 'undefined', 'onMediaPlayerAPI': 'undefined'}
 
 class Workspace641ReaderTests(unittest.TestCase):
+    def test_windows_html_drags_bind_separate_child_input_path_clocks_and_held_ownership(self):
+        value, ledger = windows_layout_fixture()
+        W.verify_layout(value, 'win32', 101, ledger)
+        self.assertEqual([len(value[kind]['input']['nativeDrag']['events']) for kind in ('blankDrag', 'edgeCarry')], [15, 23])
+        for kind in ('blankDrag', 'edgeCarry'):
+            row = value[kind]['input']; child = row['nativeDrag']
+            self.assertEqual(child['coordinates']['samples'][0]['logical'], row['from'])
+            self.assertEqual(child['coordinates']['samples'][-1]['logical'], row['to'])
+            self.assertEqual(child['events'][-1]['phase'], 2)
+
+    def test_windows_html_drag_rejects_changed_child_receipts_even_in_the_same_ledger(self):
+        value, ledger = windows_layout_fixture()
+        mutations = [(['nativeDrag'], None), (['nativeDrag', 'schema'], 2), (['nativeDrag', 'method'], 'parent-script'),
+            (['nativeDrag', 'platform'], 'linux'), (['nativeDrag', 'source'], 'XTest'), (['nativeDrag', 'parentPid'], 999),
+            (['nativeDrag', 'childPid'], 101), (['nativeDrag', 'childPid'], 0), (['nativeDrag', 'nonce'], 'missing'),
+            (['nativeDrag', 'kind'], 'other'), (['nativeDrag', 'ok'], False), (['nativeDrag', 'released'], False),
+            (['nativeDrag', 'exitCode'], 1), (['nativeDrag', 'exitSignal'], 'SIGTERM'),
+            (['nativeDrag', 'terminationRequested'], True), (['nativeDrag', 'failureCleanup'], {'accepted': True}),
+            (['nativeDrag', 'error'], 'deadline'), (['nativeDrag', 'releaseError'], 'UP failed'),
+            (['nativeDrag', 'budgetMs'], 15001), (['nativeDrag', 'budgetMs'], 0),
+            (['nativeDrag', 'driverCallLimitMs'], 14000), (['nativeDrag', 'lifecycleLimitMs'], 60000),
+            (['nativeDrag', 'holdMs'], 1), (['nativeDrag', 'settleMs'], 0), (['nativeDrag', 'elapsedMs'], -1),
+            (['nativeDrag', 'coordinates', 'source'], 'script coordinates'), (['nativeDrag', 'coordinates', 'samples'], []),
+            (['nativeDrag', 'events'], []), (['nativeDrag', 'events', 0, 'phase'], 1),
+            (['nativeDrag', 'events', 3, 'phase'], 2), (['nativeDrag', 'events', -1, 'phase'], 1),
+            (['nativeDrag', 'events', 1, 'accepted'], False), (['nativeDrag', 'events', 2, 'x'], 999),
+            (['nativeDrag', 'coordinates', 'samples', 1, 'logical', 'x'], 999),
+            (['nativeDrag', 'coordinates', 'samples', 2, 'logical', 'y'], 999), (['from', 'x'], 999), (['to', 'x'], 999),
+            (['nativeDrag', 'timing', 'source'], 'Date.now'), (['nativeDrag', 'timing', 'scope'], 'shared wall clock'),
+            (['nativeDrag', 'timing', 'child', 'eventNs'], []), (['nativeDrag', 'timing', 'child', 'eventNs', 0], '15000000001'),
+            (['nativeDrag', 'timing', 'child', 'eventNs', 2], '0'),
+            (['nativeDrag', 'timing', 'child', 'elapsedNs'], '15000000001'),
+            (['nativeDrag', 'timing', 'child', 'holdStartNs'], '0'),
+            (['nativeDrag', 'timing', 'child', 'holdEndNs'], '402000000'),
+            (['nativeDrag', 'timing', 'parent', 'preparationNs'], '15000000000'),
+            (['nativeDrag', 'timing', 'parent', 'elapsedNs'], '15000000001'),
+            (['nativeDrag', 'timing', 'parent', 'elapsedNs'], '-1'), (['observationError'], 'late callback'), (['tabId'], 'other')]
+        for kind in ('blankDrag', 'edgeCarry'):
+            for path, replacement in mutations:
+                with self.subTest(kind=kind, path=path, replacement=replacement):
+                    wrong, same_ledger = copy.deepcopy((value, ledger)); target = wrong[kind]['input']
+                    for key in path[:-1]: target = target[key]
+                    target[path[-1]] = replacement
+                    self.assertIn(wrong[kind]['input'], same_ledger)
+                    with self.assertRaisesRegex(ValueError, 'Windows'):
+                        W.verify_layout(wrong, 'win32', 101, same_ledger)
+            wrong, same_ledger = copy.deepcopy((value, ledger)); timing = wrong[kind]['input']['nativeDrag']['timing']['child']
+            settle = wrong[kind]['input']['nativeDrag']['settleMs']
+            timing['eventNs'][-1] = str(max(int(timing['eventNs'][-2]), int(timing['holdEndNs'])) + settle * 1000000 - 1)
+            with self.assertRaisesRegex(ValueError, 'Windows'):
+                W.verify_layout(wrong, 'win32', 101, same_ledger)
+
+    def test_windows_held_proof_rejects_late_native_samples_or_changed_source_ownership(self):
+        value, ledger = windows_layout_fixture(); child = value['edgeCarry']['input']['nativeDrag']
+        mutations = [('observerPid', 202), ('active', False), ('sourceTabId', 'other'), ('originDesk', 'desk-2'),
+            ('sourceMembership', 'desk-2'), ('sourceMembershipAfterCapture', 'desk-2'),
+            ('mouseDownAfterCapture', False), ('observedAt', child['events'][0]['at'] - 1),
+            ('observedAt', child['events'][-1]['at'] + 1), ('captureFinishedAt', child['events'][-1]['at'] + 1),
+            ('captureFinishedAt', child['events'][0]['at']), ('observedElapsedNs', '15000000001'),
+            ('captureElapsedNs', '0'), ('captureElapsedNs', '15000000001'), ('observedElapsedNs', 'invalid')]
+        for key, replacement in mutations:
+            with self.subTest(key=key, replacement=replacement):
+                wrong, same_ledger = copy.deepcopy((value, ledger)); wrong['edgeCarry']['whileHeld'][key] = replacement
+                with self.assertRaisesRegex(ValueError, 'Windows'):
+                    W.verify_layout(wrong, 'win32', 101, same_ledger)
+
+    def test_windows_edge_dwell_requires_its_own_renderer_observation(self):
+        value, ledger = windows_layout_fixture()
+        mutations = [('schema', 2), ('clock', 'child wait'), ('ok', False), ('error', 'timed out'),
+            ('edgeId', 'mouse-drag-edge-left'), ('originDesktop', 'desk-2'), ('destination', 'desk-1'),
+            ('armedAtMs', 600), ('hoverAtMs', None), ('switchedAtMs', 499), ('elapsedMs', 649)]
+        for key, replacement in mutations:
+            with self.subTest(key=key, replacement=replacement):
+                wrong, same_ledger = copy.deepcopy((value, ledger)); wrong['edgeCarry']['whileHeld']['edgeObservation'][key] = replacement
+                with self.assertRaisesRegex(ValueError, 'Windows'):
+                    W.verify_layout(wrong, 'win32', 101, same_ledger)
+        wrong, same_ledger = copy.deepcopy((value, ledger)); wrong['edgeCarry']['whileHeld']['edgeObservation'] = None
+        with self.assertRaisesRegex(ValueError, 'Windows'):
+            W.verify_layout(wrong, 'win32', 101, same_ledger)
+
 
     def test_split_choice_gap_drag_carry_and_both_tiny_headers_form_one_required_flow(self):
         value, ledger = layout_fixture()
