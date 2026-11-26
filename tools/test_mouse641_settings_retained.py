@@ -20,6 +20,10 @@ def settings_fixture():
     value['sections'] = list(OWNER['SECTIONS'])
     value['initial'].update(sections=sections, selectedPage='overview', navigation=PAGES[:])
     keys = OWNER['SETTINGS']
+    value['initial']['toggles'] = [{'key': key, 'checked': False, 'disabled': False} for key in keys]
+    for phase in ('initial', 'afterReload'):
+        value[phase]['branding'] = {'controlCount': 0, 'footerText': '', 'footerIcon': True,
+                                    'settingsHeading': 'Настройки', 'versionLabel': 'v6.0.41'}
     value['toggles'] = [{'key': key, 'before': False, 'changed': True, 'afterReload': True, 'restored': False}
                         for key in keys]
     value['persisted'] = dict.fromkeys(keys, True)
@@ -41,7 +45,59 @@ class RetainedSettings(unittest.TestCase):
     def test_categorized_overview_preserves_actual_native_pages_and_persisted_controls(self):
         result = self.verify(settings_fixture())
         self.assertEqual(result['sections'], OWNER['SECTIONS'])
+        self.assertEqual(result['toggles'], ['showFavicons', 'desktopGestures', 'downloadBounce', 'downloadBadge'])
         self.assertTrue(result['nonmodal'])
+
+    def test_removed_brand_controls_captions_and_missing_icon_or_version_are_rejected(self):
+        for phase in ('initial', 'afterReload'):
+            for defect in ('missing-proof', 'control', 'false-count', 'footer-text', 'footer-icon',
+                           'heading', 'missing-heading', 'empty-heading', 'blank-heading',
+                           'version', 'brand-version', 'toggle'):
+                facts = settings_fixture()
+                state = facts['settings'][phase]
+                branding = state['branding']
+                if defect == 'missing-proof': del state['branding']
+                elif defect == 'control': branding['controlCount'] = 1
+                elif defect == 'false-count': branding['controlCount'] = False
+                elif defect == 'footer-text': branding['footerText'] = 'Mouse Browser'
+                elif defect == 'footer-icon': branding['footerIcon'] = False
+                elif defect == 'heading': branding['settingsHeading'] = 'Настройки Mouse Browser'
+                elif defect == 'missing-heading': del branding['settingsHeading']
+                elif defect == 'empty-heading': branding['settingsHeading'] = ''
+                elif defect == 'blank-heading': branding['settingsHeading'] = ' \t '
+                elif defect == 'version': branding['versionLabel'] = 'v6.0.40'
+                elif defect == 'brand-version': branding['versionLabel'] = 'v6.0.41 Mouse Browser'
+                else: state['toggles'].append({'key': 'showBrandName', 'checked': True})
+                with self.subTest(phase=phase, defect=defect), self.assertRaisesRegex(ValueError, 'brand'):
+                    self.verify(facts)
+
+    def test_version_is_an_exact_token_and_preserves_current_action_suffixes(self):
+        for phase in ('initial', 'afterReload'):
+            for label in ('', ' \t ', 'v6.0.410', 'v6.0.41beta', 'v6.0.41.1', 'v6.0.41·Обновить'):
+                facts = settings_fixture()
+                facts['settings'][phase]['branding']['versionLabel'] = label
+                with self.subTest(phase=phase, label=label), self.assertRaisesRegex(ValueError, 'brand'):
+                    self.verify(facts)
+            for label in ('v6.0.41', 'v6.0.41 · Обновить', 'v6.0.41 · Проверить обновления'):
+                facts = settings_fixture()
+                facts['settings'][phase]['branding']['versionLabel'] = label
+                with self.subTest(phase=phase, label=label):
+                    self.assertTrue(self.verify(facts)['nonmodal'])
+
+    def test_each_remaining_setting_must_toggle_persist_reload_and_restore(self):
+        for key in OWNER['SETTINGS']:
+            for defect in ('missing', 'unchanged', 'not-persisted', 'not-reloaded', 'not-restored'):
+                facts = settings_fixture()
+                value = facts['settings']
+                row = next(item for item in value['toggles'] if item['key'] == key)
+                if defect == 'missing': value['toggles'].remove(row)
+                elif defect == 'unchanged': row['changed'] = row['before']
+                elif defect == 'not-persisted': value['persisted'][key] = False
+                elif defect == 'not-reloaded':
+                    next(item for item in value['afterReload']['toggles'] if item['key'] == key)['checked'] = False
+                else: row['restored'] = row['changed']
+                with self.subTest(key=key, defect=defect), self.assertRaises(ValueError):
+                    self.verify(facts)
 
     def test_flat_hidden_or_wrong_category_overview_fails(self):
         for defect in ('flat', 'hidden-adblock', 'wrong-page', 'missing-navigation'):

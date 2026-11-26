@@ -19,6 +19,23 @@ def need(value, message):
         raise ValueError('Mouse641 retained owner contract: ' + message)
 
 
+def settings_branding(value):
+    for phase in ('initial', 'afterReload'):
+        state = value.get(phase, {})
+        branding = state.get('branding', {})
+        heading, version = branding.get('settingsHeading'), branding.get('versionLabel')
+        need(type(branding.get('controlCount')) is int and branding['controlCount'] == 0
+             and branding.get('footerText') == '' and branding.get('footerIcon') is True
+             and isinstance(heading, str) and heading.strip() and 'mouse browser' not in heading.lower()
+             and isinstance(version, str) and version.split()[:1] == ['v6.0.41']
+             and 'mouse browser' not in version.lower(),
+             'removed brand caption or control returned, or icon/version disappeared: ' + phase)
+        toggles = state.get('toggles')
+        need(isinstance(toggles, list) and all(isinstance(row, dict)
+             and row.get('key') != 'showBrandName' for row in toggles),
+             'removed brand control remains in the actual Settings readback: ' + phase)
+
+
 def link_input(value, platform, pids):
     W = reader()
     need(value.get('action') == 'intercepted-link' and value.get('pid') in pids
