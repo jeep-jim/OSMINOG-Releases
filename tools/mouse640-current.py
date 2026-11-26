@@ -1,0 +1,14 @@
+#!/usr/bin/env python3
+"""Reuse the immutable predecessor checker for the reviewed638 identity."""
+import runpy
+from pathlib import Path
+runpy.run_path(str(Path(__file__).with_name("mouse640-reuse.py")))["execute"]('mouse637-current.py', globals())
+
+# All helper bytes are fetched from the accepted source commit and Git-blob checked.
+HELPERS += ('mouse-638-feedback-run.py', 'mouse-638-acceptance.py', 'mouse-638-crx-proof.cjs')
+
+# New639 runner and reader are fetched only from the accepted source Git tree.
+HELPERS += ('mouse-639-adblock-run.py', 'mouse-639-acceptance.py')
+
+#640 Settings is independently read from the combined native feature captures.
+HELPERS += ('mouse-640-settings-acceptance.py',)
