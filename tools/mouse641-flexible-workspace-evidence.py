@@ -69,6 +69,117 @@ def key_receipt(row, platform, pid):
          and P.finite(row.get('at')), 'key did not use the actual OS driver')
 
 
+def windows_html_drag(row, kind, pid):
+    """Read the independent child receipt; ordinary shell drags keep their gate."""
+    value = row.get('nativeDrag', {})
+    need(isinstance(value, dict) and value.get('schema') == 1
+         and value.get('method') == 'independent-native-html-input-process'
+         and value.get('platform') == 'win32' and value.get('source') == 'User32'
+         and value.get('parentPid') == pid and type(value.get('childPid')) is int
+         and value['childPid'] > 0 and value['childPid'] != pid and value.get('kind') == kind,
+         'Windows HTML drag lacks its separate native input process')
+    need(isinstance(value.get('nonce'), str) and re.fullmatch(r'[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}', value['nonce']),
+         'Windows HTML drag child identity is absent')
+    need(value.get('ok') is True and value.get('released') is True
+         and type(value.get('exitCode')) is int and value['exitCode'] == 0 and 'exitSignal' in value and value['exitSignal'] is None
+         and value.get('terminationRequested') is False and not value.get('error') and not value.get('releaseError')
+         and 'failureCleanup' not in value and not row.get('observationError'),
+         'Windows HTML drag child failed, was killed, or did not release')
+    budget = value.get('budgetMs'); hold, settle = (1000, 5000) if kind == 'edge' else (400, 200)
+    need(type(budget) is int and 0 < budget <= 15000 and value.get('driverCallLimitMs') == 7000
+         and value.get('lifecycleLimitMs') == 30000 and value.get('holdMs') == hold and value.get('settleMs') == settle,
+         'Windows HTML drag deadline/hold/lifecycle differs')
+    need(all(type(value.get(key)) is int for key in ('startedAt', 'completedAt', 'forkedAt', 'exitAt', 'deadlineAt'))
+         and P.finite(value.get('elapsedMs')) and value['elapsedMs'] == value['completedAt'] - value['startedAt'],
+         'Windows HTML drag raw process timestamps are missing')
+
+    def point(value):
+        need(isinstance(value, dict) and set(value) == {'x', 'y'}
+             and all(type(value[axis]) is int and abs(value[axis]) <= 2 ** 53 - 1 for axis in ('x', 'y')),
+             'Windows HTML drag coordinates are not finite native points')
+        return value
+
+    events = value.get('events', []); coordinates = value.get('coordinates', {}); count = 23 if kind == 'edge' else 15
+    need(isinstance(events, list) and len(events) == count and isinstance(coordinates, dict)
+         and coordinates.get('source') == 'Electron screen.dipToScreenPoint'
+         and isinstance(coordinates.get('samples'), list) and len(coordinates['samples']) == count,
+         'Windows HTML drag lacks its complete mapped native sequence')
+    samples = coordinates['samples']; logical = []
+    for index, (event, sample) in enumerate(zip(events, samples)):
+        need(isinstance(event, dict) and isinstance(sample, dict), 'Windows HTML drag point receipt is invalid')
+        logical.append(point(sample.get('logical'))); physical = point(sample.get('physical'))
+        phase = 0 if index == 0 else 2 if index == count - 1 else 1
+        need(type(event.get('phase')) is int and event['phase'] == phase and event.get('accepted') is True
+             and point({axis: event.get(axis) for axis in ('x', 'y')}) == physical and type(event.get('at')) is int,
+             'Windows HTML drag phases/physical coordinates do not match its actual input')
+    start, finish = point(row.get('from')), point(row.get('to'))
+    need(logical[0] == start and logical[-1] == logical[-2] == finish,
+         'Windows HTML drag endpoints differ from the parent input ledger')
+    threshold = {'x': start['x'] + 12, 'y': start['y'] + 7}; target = logical[13]
+    expected = [start, threshold]
+    def segment(a, b, steps):
+        # JavaScript Math.round resolves halves towards positive infinity.
+        return [{axis: math.floor(a[axis] + (b[axis] - a[axis]) * step / steps + .5)
+                 for axis in ('x', 'y')} for step in range(1, steps + 1)]
+    expected += segment(threshold, target, 12)
+    if kind == 'edge': expected += segment(target, finish, 8)
+    expected.append(finish)
+    need(logical == expected, 'Windows HTML drag did not execute the planned native path')
+
+    timing = value.get('timing', {})
+    need(isinstance(timing, dict) and timing.get('source') == 'process.hrtime.bigint'
+         and timing.get('scope') == 'per-process elapsed', 'Windows HTML drag lacks process-local timing')
+    child, parent = timing.get('child', {}), timing.get('parent', {})
+    need(isinstance(child, dict) and isinstance(parent, dict) and isinstance(child.get('eventNs'), list)
+         and len(child['eventNs']) == count, 'Windows HTML drag timing samples are incomplete')
+    def ns(value):
+        need(isinstance(value, str) and re.fullmatch(r'0|[1-9]\d{0,19}', value), 'Windows HTML drag monotonic offset is invalid')
+        return int(value)
+    event_ns = [ns(stamp) for stamp in child['eventNs']]; total = ns(child.get('elapsedNs'))
+    hold_start, hold_end = ns(child.get('holdStartNs')), ns(child.get('holdEndNs'))
+    need(event_ns == sorted(event_ns) and event_ns[-1] <= total <= budget * 1000000
+         and event_ns[13] <= hold_start <= hold_end <= event_ns[14]
+         and hold_end - hold_start >= hold * 1000000
+         and event_ns[-1] - max(event_ns[-2], hold_end) >= settle * 1000000,
+         'Windows HTML drag timing does not prove bounded hold, settling and final UP')
+    need(ns(parent.get('preparationNs')) + ns(parent.get('elapsedNs')) <= budget * 1000000,
+         'Windows HTML drag parent deadline was exceeded including startup and exit')
+    return value
+
+
+def windows_held_drag(row, pid):
+    held, receipt = row.get('whileHeld', {}), row['input']['nativeDrag']
+    before = row.get('before', {}); origin = before.get('desk'); tab_id = before.get('id')
+    need(isinstance(origin, str) and origin and isinstance(tab_id, str) and tab_id
+         and isinstance(held, dict) and held.get('observerPid') == pid and held.get('active') is True
+         and held.get('sourceTabId') == tab_id and row['input'].get('tabId') == tab_id
+         and held.get('originDesk') == origin and held.get('sourceMembership') == origin
+         and held.get('sourceMembershipAfterCapture') == origin
+         and held.get('mouseDown') is True and held.get('mouseDownAfterCapture') is True,
+         'Windows held drag lacks actual original ownership and OS button samples around capture')
+    observed, captured = held.get('observedAt'), held.get('captureFinishedAt')
+    need(type(observed) is int and type(captured) is int
+         and receipt['events'][0]['at'] <= observed <= captured <= receipt['events'][-1]['at'],
+         'Windows held capture was observed outside the actual native DOWN/UP interval')
+    def ns(value):
+        need(isinstance(value, str) and re.fullmatch(r'0|[1-9]\d{0,19}', value), 'Windows held parent timing is invalid')
+        return int(value)
+    parent = receipt['timing']['parent']
+    need(ns(held.get('observedElapsedNs')) <= ns(held.get('captureElapsedNs'))
+         <= int(parent['preparationNs']) + int(parent['elapsedNs']),
+         'Windows held observations are outside their actual parent process lifetime')
+    edge = held.get('edgeObservation', {}); direction = row.get('direction')
+    need(isinstance(edge, dict) and edge.get('schema') == 1 and edge.get('clock') == 'renderer performance.now'
+         and edge.get('ok') is True and not edge.get('error') and direction in (-1, 1)
+         and edge.get('edgeId') == 'mouse-drag-edge-' + ('right' if direction == 1 else 'left')
+         and edge.get('originDesktop') == origin and edge.get('destination') == row['after']['desk']
+         and all(P.finite(edge.get(key)) for key in ('armedAtMs', 'hoverAtMs', 'switchedAtMs', 'elapsedMs'))
+         and 0 <= edge['armedAtMs'] <= edge['hoverAtMs'] <= edge['switchedAtMs']
+         and edge['elapsedMs'] == row.get('hoverMs') == edge['switchedAtMs'] - edge['hoverAtMs']
+         and edge['elapsedMs'] >= 600,
+         'Windows desktop dwell was not observed from the actual renderer edge hover')
+
+
 def absent_player(value):
     need(value == {'widgetCount': 0, 'scripts': [], 'styles': [], 'mediaPlayerAPI': 'undefined', 'onMediaPlayerAPI': 'undefined'},
          'removed media player DOM/resources/IPC are still present')
@@ -282,11 +393,15 @@ def verify_layout(value, platform, pid, inputs):
     for kind in ('blankDrag', 'edgeCarry'):
         row = value.get(kind, {})
         input_receipt(row.get('input', {}), platform, pid, inputs, action='drag')
+        if platform == 'win32':
+            windows_html_drag(row['input'], 'edge' if kind == 'edgeCarry' else 'blank', pid)
+            need(row['input'].get('tabId') == row.get('before', {}).get('id'), 'Windows native HTML drag source differs from its owned live page')
         need(row['input'].get('selector') == '#blank-drag' and row.get('before', {}).get('id') == row.get('after', {}).get('id'), 'blank website drag changed its page identity')
         same_page(row['before'], row['after'], desktop=kind != 'edgeCarry')
         if kind == 'edgeCarry':
             need(row['before'].get('desk') != row['after'].get('desk') and row.get('whileHeld', {}).get('mouseDown') is True
                  and row['whileHeld'].get('desktopId') == row['after']['desk'] and row.get('hoverMs', 0) >= 600, 'desktop did not switch while the same native drag stayed held')
+            if platform == 'win32': windows_held_drag(row, pid)
         else:
             need(row.get('beforePane') != row.get('afterPane'), 'blank drag did not move a pane')
     headers = value.get('headers', [])
