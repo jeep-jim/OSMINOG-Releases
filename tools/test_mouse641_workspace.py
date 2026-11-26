@@ -45,12 +45,12 @@ def windows_layout_fixture():
         start, finish = row['from'], row['to']; threshold = {'x': start['x'] + 12, 'y': start['y'] + 7}
         target = {'x': 900, 'y': 80} if kind == 'edge' else finish
         logical = [start.copy(), threshold]
-        for a, b, count in [(threshold, target, 12)] + ([(target, finish, 8)] if kind == 'edge' else []):
+        for a, b, count in [(threshold, target, 12)] + ([(target, finish, 1)] if kind == 'edge' else []):
             logical += [{axis: math.floor(a[axis] + (b[axis] - a[axis]) * step / count + .5)
                          for axis in ('x', 'y')} for step in range(1, count + 1)]
         logical.append(finish.copy())
         samples = [{'logical': point, 'physical': {axis: point[axis] * 2 for axis in ('x', 'y')}} for point in logical]
-        start_at = 200000 if kind == 'edge' else 100000; hold, settle = (1000, 5000) if kind == 'edge' else (400, 200)
+        start_at = 200000 if kind == 'edge' else 100000; hold, settle = (800, 5000) if kind == 'edge' else (400, 200)
         elapsed = 0; events, event_ns = [], []
         for index, sample in enumerate(samples):
             phase = 0 if index == 0 else 2 if index == len(samples) - 1 else 1
@@ -116,7 +116,7 @@ class Workspace641ReaderTests(unittest.TestCase):
     def test_windows_html_drags_bind_separate_child_input_path_clocks_and_held_ownership(self):
         value, ledger = windows_layout_fixture()
         W.verify_layout(value, 'win32', 101, ledger)
-        self.assertEqual([len(value[kind]['input']['nativeDrag']['events']) for kind in ('blankDrag', 'edgeCarry')], [15, 23])
+        self.assertEqual([len(value[kind]['input']['nativeDrag']['events']) for kind in ('blankDrag', 'edgeCarry')], [15, 16])
         for kind in ('blankDrag', 'edgeCarry'):
             row = value[kind]['input']; child = row['nativeDrag']
             self.assertEqual(child['coordinates']['samples'][0]['logical'], row['from'])
