@@ -519,8 +519,18 @@
     "nativeShellCaptures": 8,
     "guestZoomCaptures": 8,
     "fullDisplayCropPixelsRecomputed": true,
-    "settingsSections": 14,
-    "settingsToggles": 5,
+    "settingsSections": 19,
+    "settingsToggles": 4,
+    "brandCaptionRemoval": {
+      "readbacks": ["initial", "afterReload"],
+      "controlCount": 0,
+      "footerText": "",
+      "footerIcon": true,
+      "settingsHeadingNonempty": true,
+      "settingsHeadingOmitsBrand": true,
+      "versionLabelToken": "v6.0.41",
+      "versionLabelOmitsBrand": true
+    },
     "currentTargets": [
       "darwin-arm64",
       "win32-x64",
@@ -720,7 +730,7 @@
       "mouse641-download-evidence.py": "a95424fdce2d87eb916504680e3639d46af7744ab1222887b12274a2d160c2fa",
       "mouse641-capture-evidence.py": "f9ec79bb75ee43fafb3f82f9948f7003ad69fcba7110fba9dacf960758b068c2",
       "mouse641-focused-evidence.py": "256c7b1325f488b1f14c68f435863e2f1fa9c29912b5dc2e562cfdde45517fa2",
-      "mouse641-reuse.py": "94b9a5edf4f87495a662b2eb0f276218c2f08311de4100364bfed9e0527fd232",
+      "mouse641-reuse.py": "596264a8a3beaff05137f65a6dbebb19b6ebab335f16d11c2c3f2a954b5044a1",
       "mouse641-zoom-evidence.py": "d6373a7fa1304cf8eea9f7488e41740d395f18b2abe6aecaad959592a2537509",
       "mouse641-agent-removal-adapter.py": "ec53c59338258bfb1fcfcaebc73f92f35601396f788ca6f1cd6b58d4a55b9a1d"
     }
@@ -753,7 +763,7 @@
       "mouse641-agent-removal-evidence.py": "04791a0b436b42cff6a6fb709855833009c8e1de211973a1590f5da45d9dd159",
       "mouse641-pane-layout-evidence.py": "bc02a6895982113ff1d1700e03b7de9d36dbf5ad6250ddbad9968187f050d892",
       "mouse641-context-evidence.py": "ea2edde025122a94356884a5a6bba154d6f34cb527878438b14ac34e629f6909",
-      "mouse641-reuse.py": "94b9a5edf4f87495a662b2eb0f276218c2f08311de4100364bfed9e0527fd232",
+      "mouse641-reuse.py": "596264a8a3beaff05137f65a6dbebb19b6ebab335f16d11c2c3f2a954b5044a1",
       "mouse641-zoom-evidence.py": "d6373a7fa1304cf8eea9f7488e41740d395f18b2abe6aecaad959592a2537509",
       "mouse641-agent-removal-adapter.py": "ec53c59338258bfb1fcfcaebc73f92f35601396f788ca6f1cd6b58d4a55b9a1d"
     },
@@ -1224,7 +1234,7 @@
       "mouse641-task-evidence.py": "7379c6b6ddbcc7f7a89b62f95efe1d386751821ddb99dcda439531aeb84e732d",
       "mouse-638-crx-proof.cjs": "5b0ac13325b55faa647f9d02c5c862db5e6e6e276fdef00b3c6788fff54dd829",
       "mouse641-extra-evidence.py": "e7102403d465b0b6f69cc9f5a88b834cb427b2b84ba70622113c53ae098f0f4d",
-      "mouse641-reuse.py": "94b9a5edf4f87495a662b2eb0f276218c2f08311de4100364bfed9e0527fd232",
+      "mouse641-reuse.py": "596264a8a3beaff05137f65a6dbebb19b6ebab335f16d11c2c3f2a954b5044a1",
       "mouse641-frozen.json": "239f287bb2a3d0ca1d70591f6d38db0069f91f4158623e469cabd9f85a472d68"
     }
   },
@@ -1259,7 +1269,7 @@
     "dependencies": {
       "mouse641-task-evidence.py": "7379c6b6ddbcc7f7a89b62f95efe1d386751821ddb99dcda439531aeb84e732d",
       "mouse641-extra-evidence.py": "e7102403d465b0b6f69cc9f5a88b834cb427b2b84ba70622113c53ae098f0f4d",
-      "mouse641-reuse.py": "94b9a5edf4f87495a662b2eb0f276218c2f08311de4100364bfed9e0527fd232",
+      "mouse641-reuse.py": "596264a8a3beaff05137f65a6dbebb19b6ebab335f16d11c2c3f2a954b5044a1",
       "mouse641-frozen.json": "239f287bb2a3d0ca1d70591f6d38db0069f91f4158623e469cabd9f85a472d68",
       "mouse641-current.py": "4db623ddf7d0b3b44b28661f5669e187e4e63e630e88551247e5f331afbe468a"
     }
@@ -1279,7 +1289,7 @@
     "dependencies": {
       "mouse641-task-evidence.py": "7379c6b6ddbcc7f7a89b62f95efe1d386751821ddb99dcda439531aeb84e732d",
       "mouse641-extra-evidence.py": "e7102403d465b0b6f69cc9f5a88b834cb427b2b84ba70622113c53ae098f0f4d",
-      "mouse641-reuse.py": "94b9a5edf4f87495a662b2eb0f276218c2f08311de4100364bfed9e0527fd232",
+      "mouse641-reuse.py": "596264a8a3beaff05137f65a6dbebb19b6ebab335f16d11c2c3f2a954b5044a1",
       "mouse641-frozen.json": "239f287bb2a3d0ca1d70591f6d38db0069f91f4158623e469cabd9f85a472d68",
       "mouse641-current.py": "4db623ddf7d0b3b44b28661f5669e187e4e63e630e88551247e5f331afbe468a",
       "mouse641-features-evidence.py": "836dbc60eb62d41e75be53a81bf3afc1a7feb42d2deea89d8f94104394cb6bb0",
@@ -1330,10 +1340,10 @@
     "dependencies": {
       "mouse641-task-evidence.py": "7379c6b6ddbcc7f7a89b62f95efe1d386751821ddb99dcda439531aeb84e732d",
       "mouse641-extra-evidence.py": "e7102403d465b0b6f69cc9f5a88b834cb427b2b84ba70622113c53ae098f0f4d",
-      "mouse641-reuse.py": "94b9a5edf4f87495a662b2eb0f276218c2f08311de4100364bfed9e0527fd232",
+      "mouse641-reuse.py": "596264a8a3beaff05137f65a6dbebb19b6ebab335f16d11c2c3f2a954b5044a1",
       "mouse641-frozen.json": "239f287bb2a3d0ca1d70591f6d38db0069f91f4158623e469cabd9f85a472d68",
       "mouse641-current.py": "4db623ddf7d0b3b44b28661f5669e187e4e63e630e88551247e5f331afbe468a",
-      "mouse641-owner-contracts.py": "9dcd5c7bbfb04e2067b476739c0562aec81767dada30d09851892c2aeed35f92",
+      "mouse641-owner-contracts.py": "187240bd2351390f10ea8697197c303fd450b8f7e17a5ab8c78d2be871b71bdc",
       "mouse641-features-evidence.py": "836dbc60eb62d41e75be53a81bf3afc1a7feb42d2deea89d8f94104394cb6bb0"
     },
     "featureTokens": [

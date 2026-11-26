@@ -101,6 +101,11 @@ def adapted_tree(name, *, current_native=False):
     class Identity(ast.NodeTransformer):
         def visit_FunctionDef(self, node):
             node = self.generic_visit(node)
+            if name == 'mouse633-owner-feedback-evidence.py' and node.name == 'settings_contract':
+                if ast.unparse(node.body[0]) != "value = facts.get('settings', {})":
+                    raise ValueError('Frozen Settings readback binding changed')
+                mark('settings_branding')
+                node.body[1:1] = ast.parse("_mouse641_contracts()['settings_branding'](value)").body
             if name == 'mouse637-features-evidence.py':
                 if node.name == 'input_event':
                     mark('link_input')
@@ -234,6 +239,12 @@ if kind in ('settings', 'library'):
                 replacement = previous('linux')
             if name in ('mouse633-owner-feedback-evidence.py', 'mouse637-agent-removal-evidence.py') and 'SECTIONS' in names:
                 replacement = SETTINGS_SECTIONS
+            if name == 'mouse633-owner-feedback-evidence.py' and 'SETTINGS' in names:
+                original = ('showBrandName', 'showFavicons', 'desktopGestures', 'downloadBounce', 'downloadBadge')
+                if ast.literal_eval(node.value) != original:
+                    raise ValueError('Frozen Settings toggle contract changed')
+                mark('settings_toggles')
+                replacement = original[1:]
             if name == 'mouse637-features-evidence.py' and 'expected_selectors' in names:
                 mark('removed_controls')
                 need_removed = {'#mouse-media-widget [data-media=return]', '#mouse-media-widget [data-media=toggle]'}
@@ -249,7 +260,8 @@ if kind in ('settings', 'library'):
     required = {'mouse637-features-evidence.py': ('link_input', 'media_removed', 'always_header', 'ai_routes', 'explicit_preview', 'removed_controls'),
                 'mouse636-retained-owner-evidence.py': ('chat_interception', 'retained_ai', 'request_count', 'owned_count'),
                 'mouse637-sidebar-focus-evidence.py': ('library_glass',),
-                'mouse632-feedback-evidence.py': ('stationary_removed',)}.get(name, ())
+                'mouse632-feedback-evidence.py': ('stationary_removed',),
+                'mouse633-owner-feedback-evidence.py': ('settings_branding', 'settings_toggles')}.get(name, ())
     if any(changed.get(key) != 1 for key in required):
         raise ValueError('Current641 adaptation did not bind its frozen predicate: ' + repr(changed))
     return ast.fix_missing_locations(tree)
