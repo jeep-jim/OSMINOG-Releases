@@ -1,0 +1,80 @@
+name: Publish verified Mouse Browser 6.0.41 Windows x64
+on:
+  pull_request:
+    paths: ['tools/mouse641-*', 'tools/mouse-638-crx-proof.cjs', 'tools/test_mouse641_*', 'tools/fixtures/mouse641-*', '.github/workflows/publish-mouse641*.yml', 'staging/mouse/6.0.41-*/**']
+  push:
+    branches: [main]
+    paths: ['staging/mouse/6.0.41-windows-x64/PUBLISH_OWNER', 'staging/mouse/6.0.41-windows-x64/pin.json', '.github/workflows/publish-mouse641-windows.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  contract:
+    outputs:
+      publish: ${{ steps.publish_plan.outputs.publish }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - name: Verify retained acceptance and ordered publication contracts
+        run: python3 -m unittest discover -s tools -p "test_mouse641_*.py" -v
+      - name: Compile current publisher and independent validators
+        run: python3 -m py_compile tools/mouse641-*.py
+      - name: Validate the unready or exact pinned candidate contract
+        run: |
+          python3 tools/mouse641-release.py validate-template
+          python3 tools/mouse641-windows-release.py validate-template
+      - name: Require this exact candidate and verified preceding public platforms
+        id: publish_plan
+        run: python3 tools/mouse641-publish-plan.py windows-x64 >> "$GITHUB_OUTPUT"
+  publish-windows:
+    if: github.event_name != 'pull_request' && needs.contract.outputs.publish == 'true'
+    needs: contract
+    runs-on: windows-latest
+    timeout-minutes: 68
+    permissions:
+      contents: write
+    concurrency:
+      group: mouse-windows-x64-release
+      cancel-in-progress: false
+    env:
+      GH_TOKEN: ${{ github.token }}
+      PYTHONUTF8: '1'
+    steps:
+      - name: Preserve exact publisher source bytes on Windows
+        shell: pwsh
+        run: git config --global core.autocrlf false
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Import immutable successful Windows CI installer
+        run: python tools/mouse641-windows-release.py import
+      - name: Verify exact installer on a fresh Windows machine
+        run: python tools/mouse641-windows-release.py verify
+      - name: Publish and verify immutable public asset
+        run: python tools/mouse641-windows-release.py publish
+      - name: Advance Windows feed and verify anonymous discovery and download
+        run: python tools/mouse641-windows-release.py channel
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: mouse641-windows-release-verification-${{ github.run_attempt }}
+          path: |
+            mouse641-windows-release/*.json
+            mouse641-windows-release/*.log
+            mouse641-windows-release/*.png
+            mouse641-windows-release/mouse-639-*.html
+            mouse641-windows-release/mouse-638-*.crx
+            mouse641-windows-release/mouse-637-agent-code-*.cjs
+            mouse641-windows-release/mouse-637-library-source.txt
+            mouse641-windows-release/mouse-631-upgrade/**
+            mouse641-windows-release/mouse-637-baseline-performance/**
+            mouse641-windows-release/SHA256SUMS.txt
+            mouse641-windows-release/RELEASE_NOTES.md
+          retention-days: 14

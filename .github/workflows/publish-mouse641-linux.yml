@@ -1,0 +1,85 @@
+name: Publish verified Mouse Browser 6.0.41 Linux x64
+on:
+  pull_request:
+    paths: ['tools/mouse641-*', 'tools/mouse-638-crx-proof.cjs', 'tools/test_mouse641_*', 'tools/fixtures/mouse641-*', '.github/workflows/publish-mouse641*.yml', 'staging/mouse/6.0.41-*/**']
+  push:
+    branches: [main]
+    paths: ['staging/mouse/6.0.41-linux-x64/PUBLISH_OWNER', 'staging/mouse/6.0.41-linux-x64/pin.json', '.github/workflows/publish-mouse641-linux.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  contract:
+    outputs:
+      publish: ${{ steps.publish_plan.outputs.publish }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - name: Verify retained acceptance and ordered publication contracts
+        run: python3 -m unittest discover -s tools -p "test_mouse641_*.py" -v
+      - name: Compile current publisher and independent validators
+        run: python3 -m py_compile tools/mouse641-*.py
+      - name: Validate the unready or exact pinned candidate contract
+        run: |
+          python3 tools/mouse641-release.py validate-template
+          python3 tools/mouse641-linux-release.py validate-template
+      - name: Require this exact candidate and verified preceding public platforms
+        id: publish_plan
+        run: python3 tools/mouse641-publish-plan.py linux-x64 >> "$GITHUB_OUTPUT"
+  publish-linux:
+    if: github.event_name != 'pull_request' && needs.contract.outputs.publish == 'true'
+    needs: contract
+    runs-on: ubuntu-22.04
+    timeout-minutes: 73
+    permissions:
+      contents: write
+    concurrency:
+      group: mouse-linux-x64-release
+      cancel-in-progress: false
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Prepare native Linux desktop dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y xvfb openbox xdotool x11-utils dbus-x11 pulseaudio libfuse2 libgtk-3-0 libnss3 libxss1 libasound2 libgbm1 libsecret-1-0 libnotify4 libatspi2.0-0 libxtst6 libxext6
+      - name: Import immutable successful Linux CI packages
+        run: python3 tools/mouse641-linux-release.py import
+      - name: Verify exact packages on a fresh Linux desktop
+        run: |
+          # Match the pinned source job's X11 desktop. Dense native capture sizes
+          # and every pixel/input acceptance criterion remain unchanged.
+          dbus-run-session -- xvfb-run -a -s '-screen 0 1600x1100x24' bash -euo pipefail -c '
+            openbox > "$RUNNER_TEMP/mouse641-openbox.log" 2>&1 &
+            pulseaudio --start --exit-idle-time=-1
+            python3 tools/mouse641-linux-release.py verify
+          '
+      - name: Publish and verify both immutable public packages
+        run: python3 tools/mouse641-linux-release.py publish
+      - name: Advance Linux feed and verify anonymous updater downloads
+        run: python3 tools/mouse641-linux-release.py channel
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: mouse641-linux-release-verification-${{ github.run_attempt }}
+          path: |
+            mouse641-linux-release/*.json
+            mouse641-linux-release/*.log
+            mouse641-linux-release/*.png
+            mouse641-linux-release/mouse-639-*.html
+            mouse641-linux-release/mouse-638-*.crx
+            mouse641-linux-release/mouse-637-agent-code-*.cjs
+            mouse641-linux-release/mouse-637-library-source.txt
+            mouse641-linux-release/mouse-linux-appimage/**
+            mouse641-linux-release/mouse-637-baseline-performance/**
+            mouse641-linux-release/SHA256SUMS.txt
+            mouse641-linux-release/RELEASE_NOTES.md
+          retention-days: 14
