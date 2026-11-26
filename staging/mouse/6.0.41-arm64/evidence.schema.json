@@ -603,7 +603,7 @@
     "privateBookmarksEphemeral": true,
     "normalPagesPreserved": true,
     "physicalUserDeviceVerified": false,
-    "sha256": "1d7b731a9345c4fe65434e84e20edd1ad6fe52c07d336d74e9a7ce0be4dca157"
+    "sha256": "ea2edde025122a94356884a5a6bba154d6f34cb527878438b14ac34e629f6909"
   },
   "x-workspaceGeometryGate": {
     "validator": "tools/mouse641-workspace-evidence.py",
@@ -752,7 +752,7 @@
       "mouse641-performance-evidence.py": "ffcfe19124f223895659b96a508c928aa86f90453e8b46d2ca6a530d3e0076ed",
       "mouse641-agent-removal-evidence.py": "04791a0b436b42cff6a6fb709855833009c8e1de211973a1590f5da45d9dd159",
       "mouse641-pane-layout-evidence.py": "bc02a6895982113ff1d1700e03b7de9d36dbf5ad6250ddbad9968187f050d892",
-      "mouse641-context-evidence.py": "1d7b731a9345c4fe65434e84e20edd1ad6fe52c07d336d74e9a7ce0be4dca157",
+      "mouse641-context-evidence.py": "ea2edde025122a94356884a5a6bba154d6f34cb527878438b14ac34e629f6909",
       "mouse641-reuse.py": "94b9a5edf4f87495a662b2eb0f276218c2f08311de4100364bfed9e0527fd232",
       "mouse641-zoom-evidence.py": "d6373a7fa1304cf8eea9f7488e41740d395f18b2abe6aecaad959592a2537509",
       "mouse641-agent-removal-adapter.py": "ec53c59338258bfb1fcfcaebc73f92f35601396f788ca6f1cd6b58d4a55b9a1d"
@@ -1308,7 +1308,7 @@
   },
   "x-current641WorkspaceGate": {
     "validator": "tools/mouse641-flexible-workspace-evidence.py",
-    "sha256": "ee6fc1ba6db0527c9dde33fb3367c758a16a8ee2a356abaaab21515d261ea667",
+    "sha256": "7f556cc661e3b3bf7b48f2b34fececd8b0d0b1b4c08e4ff60c0e11fbb7001d20",
     "runtimeVersion": "6.0.41",
     "sourceAndFreshInstalled": true,
     "savedReportAcceptedAsInput": false,
