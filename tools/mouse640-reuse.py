@@ -169,7 +169,11 @@ for row in categories:
             ):
                 value = value.replace(old, new)
             if name in PREDECESSOR_MODULES:
-                value = value.replace('6.0.38', '6.0.39').replace('legacy638-update', 'legacy639-update').replace('updateFrom638', 'updateFrom639')
+                value = value.replace('6.0.38', '6.0.39').replace('legacy638-update', 'legacy639-update')
+                # Windows display ordering binds the same preserved source
+                # wrapper field as the current upgrade verifier above.
+                if name != 'mouse637-windows-display-evidence.py':
+                    value = value.replace('updateFrom638', 'updateFrom639')
                 value = value.replace('b9d243dd7507da3c5b5397c62391315c09794db8', PUBLISHED_SOURCE)
                 value = value.replace('MOUSE_639_ACTUAL_638_UPDATER_', 'MOUSE_640_ACTUAL_639_UPDATER_')
                 if value == '638':
