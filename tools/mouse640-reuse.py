@@ -89,6 +89,8 @@ SETTINGS_SECTIONS = ['privacy', 'overview-links', 'appearance', 'interface', 'sc
 def adapted_tree(name, *, current_native=False):
     tree = ast.parse(checked(name), filename=str(TOOLS / name)) if name in FROZEN else legacy()['adapted_tree'](name, current_native=current_native)
 
+    changed = {'input_budget': 0, 'settings_overview': 0}
+
     class Identity(ast.NodeTransformer):
         def visit_FunctionDef(self, node):
             node = self.generic_visit(node)
@@ -121,6 +123,14 @@ for row in categories:
 
         def visit_Compare(self, node):
             node = self.generic_visit(node)
+            if (name == 'mouse637-features-evidence.py'
+                    and ast.unparse(node) == '50 <= len(native) <= 200'):
+                # The independently validated Settings640 route adds exactly 15
+                # native clicks per theme: open, 8 categories, appearance, 2 search
+                # focuses, clear, narrow overview, close. Keep the old 200 budget
+                # plus those 30 real controls; every ledger row still validates.
+                changed['input_budget'] += 1
+                return ast.parse('50 <= len(native) <= 230', mode='eval').body
             if (name == 'mouse637-sidebar-focus-evidence.py'
                     and ast.unparse(node) == 'shell.get(kind) == toolbar'):
                 return ast.parse("all(shell.get(kind, {}).get(key) == toolbar.get(key) for key in ('backgroundColor', 'backgroundImage'))", mode='eval').body
@@ -129,7 +139,8 @@ for row in categories:
         def visit_Call(self, node):
             node = self.generic_visit(node)
             if (name == 'mouse633-owner-feedback-evidence.py'
-                    and ast.unparse(node) == "all(row.get('hidden') is False for row in initial['sections'])"):
+                    and ast.dump(node) == ast.dump(ast.parse("all(row.get('hidden') is False for row in initial['sections'])", mode='eval').body)):
+                changed['settings_overview'] += 1
                 return ast.parse("initial.get('selectedPage') == 'overview' and [row.get('name') for row in initial['sections'] if row.get('hidden') is False] == ['privacy', 'overview-links'] and initial.get('navigation') == ['overview', 'appearance', 'workspace', 'privacy', 'imports', 'capture', 'downloads', 'documents', 'about']", mode='eval').body
             return node
 
@@ -182,7 +193,12 @@ for row in categories:
                 node.value = ast.parse(repr(replacement), mode='eval').body
             return node
 
-    return ast.fix_missing_locations(Identity().visit(tree))
+    tree = Identity().visit(tree)
+    required = {'mouse637-features-evidence.py': 'input_budget',
+                'mouse633-owner-feedback-evidence.py': 'settings_overview'}.get(name)
+    if required is not None and changed[required] != 1:
+        raise ValueError('Current640 Settings adaptation did not bind its frozen predicate: ' + required)
+    return ast.fix_missing_locations(tree)
 
 
 def load(name, *, namespace=None, current_native=False):
