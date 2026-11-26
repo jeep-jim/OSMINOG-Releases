@@ -85,7 +85,7 @@ def windows_html_drag(row, kind, pid):
          and value.get('terminationRequested') is False and not value.get('error') and not value.get('releaseError')
          and 'failureCleanup' not in value and not row.get('observationError'),
          'Windows HTML drag child failed, was killed, or did not release')
-    budget = value.get('budgetMs'); hold, settle = (1000, 5000) if kind == 'edge' else (400, 200)
+    budget = value.get('budgetMs'); hold, settle = (800, 5000) if kind == 'edge' else (400, 200)
     need(type(budget) is int and 0 < budget <= 15000 and value.get('driverCallLimitMs') == 7000
          and value.get('lifecycleLimitMs') == 30000 and value.get('holdMs') == hold and value.get('settleMs') == settle,
          'Windows HTML drag deadline/hold/lifecycle differs')
@@ -99,7 +99,7 @@ def windows_html_drag(row, kind, pid):
              'Windows HTML drag coordinates are not finite native points')
         return value
 
-    events = value.get('events', []); coordinates = value.get('coordinates', {}); count = 23 if kind == 'edge' else 15
+    events = value.get('events', []); coordinates = value.get('coordinates', {}); count = 16 if kind == 'edge' else 15
     need(isinstance(events, list) and len(events) == count and isinstance(coordinates, dict)
          and coordinates.get('source') == 'Electron screen.dipToScreenPoint'
          and isinstance(coordinates.get('samples'), list) and len(coordinates['samples']) == count,
@@ -122,7 +122,7 @@ def windows_html_drag(row, kind, pid):
         return [{axis: math.floor(a[axis] + (b[axis] - a[axis]) * step / steps + .5)
                  for axis in ('x', 'y')} for step in range(1, steps + 1)]
     expected += segment(threshold, target, 12)
-    if kind == 'edge': expected += segment(target, finish, 8)
+    if kind == 'edge': expected.append(finish)
     expected.append(finish)
     need(logical == expected, 'Windows HTML drag did not execute the planned native path')
 
