@@ -40,6 +40,12 @@ shell['settings'].update(backgroundColor='rgba(21, 29, 42, 0.95)' if theme == 'd
 
             def visit_Assign(self, node):
                 node = self.generic_visit(node)
+                if (name == 'test_mouse637_current_acceptance.py' and any(
+                        ast.dump(target) == ast.dump(ast.parse("wrapper['checks']['updateFrom639'] = None").body[0].targets[0])
+                        for target in node.targets)):
+                    # Current source retains this protocol key; actual version,
+                    # native markers, profile and package proofs remain 639 -> 640.
+                    node.targets[0] = ast.parse("wrapper['checks']['updateFrom638'] = None").body[0].targets[0]
                 if (name == 'test_mouse637_agent_removal_evidence.py'
                         and any(isinstance(target, ast.Name) and target.id == 'SETTINGS' for target in node.targets)):
                     node.value = ast.parse("['privacy', 'overview-links', 'appearance', 'interface', 'scale', 'workspace', 'imports', 'passwords', 'private-browsing', 'capture', 'downloads', 'documents', 'updates', 'about']", mode='eval').body
