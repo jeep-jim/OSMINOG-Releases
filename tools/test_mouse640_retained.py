@@ -62,7 +62,8 @@ shell['settings'].update(backgroundColor='rgba(21, 29, 42, 0.95)' if theme == 'd
                     if filename.startswith('mouse637-'):
                         value = value.replace(filename, filename.replace('mouse637-', 'mouse640-'))
                 value = value.replace('7c09b6cb9885ce72be41e8f16a35d4c55c9ecde3', 'eccadb3a37abd00d039616b321292cba57a49941')
-                value = value.replace('MOUSE_637_REAL_636_TO_637_', 'MOUSE_640_REAL_639_TO_640_').replace('updateFrom636', 'updateFrom639')
+                value = value.replace('MOUSE_637_REAL_636_TO_637_', 'MOUSE_640_REAL_639_TO_640_')
+                value = value.replace('updateFrom636', 'updateFrom638' if name == 'test_mouse637_windows_display_evidence.py' else 'updateFrom639')
                 value = value.replace('legacy636-update', 'legacy639-update')
                 return ast.copy_location(ast.Constant(value), node)
 
