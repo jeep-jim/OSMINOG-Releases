@@ -1,21 +1,21 @@
 {
   "version": "6.0.42",
-  "ready": false,
+  "ready": true,
   "sourceBranch": "main",
-  "source": null,
-  "sourcePR": null,
-  "sourceMerge": null,
-  "run": null,
-  "attempt": null,
-  "job": null,
-  "artifact": null,
-  "artifactSHA256": null,
-  "verificationArtifact": null,
-  "verificationSHA256": null,
+  "source": "ac51d80d4190bce54d8cc5f7017359dcb8fa838c",
+  "sourcePR": 222,
+  "sourceMerge": "fb8b3d61c53b5f15c450b418cadb0db1cb675cdf",
+  "run": 45958952361,
+  "attempt": 2,
+  "job": 140386212563,
+  "artifact": 15182679015,
+  "artifactSHA256": "5316c5e83426baab5b8125019112819bb19bcd377cb21681184ace102e7fa6b3",
+  "verificationArtifact": 15182683720,
+  "verificationSHA256": "d7ed2e4e62f56aec79e5ba017061c90a90d0e3f58ef9749892a7873f0c6af670",
   "package": {
     "name": "Mouse-Browser-6.0.42-Windows-x64.exe",
-    "size": null,
-    "sha256": null
+    "size": 113796046,
+    "sha256": "405309cf649fc46ed690726afc857ed391288408192923e555c70f8994e93b57"
   },
   "previous": {
     "version": "6.0.29",
@@ -37,7 +37,7 @@
       "sha256": "1e6f4860869fe1060dde1f009fad4fd74b4f4f3adb2cf0f28122047d66e0c341"
     }
   },
-  "modernJob": null,
-  "modernArtifact": null,
-  "modernSHA256": null
+  "modernJob": 140396038742,
+  "modernArtifact": 15183104809,
+  "modernSHA256": "dfcaea9dd215da546e384ccf211edfecce0ff3be54947e7ccfe1efe5f46c641b"
 }
