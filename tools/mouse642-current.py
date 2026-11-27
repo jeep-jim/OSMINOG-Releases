@@ -15,3 +15,6 @@ HELPERS += ('mouse-640-settings-acceptance.py',)
 
 #641 separately binds actual user flows, two installed processes and raw pixels.
 HELPERS += ('mouse-641-workspace-run.py', 'mouse-641-workspace-acceptance.py')
+
+#642 binds real keyboard layouts, consent-based correction and saved tones.
+HELPERS += ('mouse-642-controls-run.py', 'mouse-642-controls-acceptance.py')

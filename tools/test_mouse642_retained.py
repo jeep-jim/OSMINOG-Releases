@@ -85,8 +85,8 @@ shell['library'] = dict(shell['settings'])
                         and isinstance(node.func, ast.Attribute) and node.func.attr == 'assertEqual'
                         and len(node.args) == 2 and ast.unparse(node.args[0]) == 'len(seen)'
                         and isinstance(node.args[1], ast.Constant) and node.args[1].value == 10):
-                    #638 added three helpers;639 two;640 the Settings reader.
-                    node.args[1] = ast.copy_location(ast.Constant(18), node.args[1])
+                    #638 added three helpers;639 two;640 one;641 two;642 two.
+                    node.args[1] = ast.copy_location(ast.Constant(20), node.args[1])
                 return node
 
             def visit_IfExp(self, node):

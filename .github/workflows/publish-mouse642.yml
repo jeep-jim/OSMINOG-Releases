@@ -95,6 +95,8 @@ jobs:
           grep -x MOUSE_639_ADBLOCK_NATIVE_PASS mouse-639-adblock-read.log
           grep -x MOUSE_641_WORKSPACE_WRITE_PASS mouse-641-workspace-write.log
           grep -x MOUSE_641_WORKSPACE_NATIVE_PASS mouse-641-workspace-read.log
+          grep -x MOUSE_642_CONTROLS_WRITE_PASS mouse-642-controls-write.log
+          grep -x MOUSE_642_CONTROLS_NATIVE_PASS mouse-642-controls-read.log
           grep -q MOUSE_641_MEDIA_PLAYER_REMOVED_PASS mouse-631-native.log
           grep -q MOUSE_642_REAL_641_TO_642_PROFILE_PASS mouse-637-upgrade.log
           grep -q MOUSE_632_DOCUMENTS_VIEW_ONLY_PASS mouse-smoke-write.log
