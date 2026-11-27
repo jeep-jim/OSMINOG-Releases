@@ -66,6 +66,44 @@ def input_receipt(row, platform, pid, ledger=None, *, selector=None, action='cli
 
 
 
+def verify_settings_url_input(typed, platform, pid, inputs, text_inputs=None):
+    selector, expected = '#settings-adblock-exception-url', 'https://LOCALHOST:443/owned?path=one'
+    legacy = 'native focus, webContents.sendInputEvent and insertText'
+    empty = 'native focus and webContents.insertText'
+    need(isinstance(typed, dict) and typed.get('value') == expected and typed.get('source') in (legacy, empty)
+         and any(event.get('type') == 'input' and event.get('trusted') is True for event in typed.get('events', [])),
+         'settings URL was not entered through its actual control')
+    input_receipt(typed.get('input', {}), platform, pid, inputs, selector=selector)
+    if typed['source'] == legacy:
+        need(typed.get('preparation') != 'already-empty', 'empty-field insertion cannot claim the legacy key route')
+        return
+    need(typed.get('selector') == selector and typed.get('preparation') == 'already-empty' and typed.get('stage') == 'complete'
+         and not any(typed.get(key) for key in ('error', 'failure', 'diagnosticError'))
+         and isinstance(text_inputs, list) and typed in text_inputs, 'empty-field insertion is incomplete or absent from its stored text ledger')
+    snapshots = []
+    for key in ('before', 'prepared', 'after'):
+        state = typed.get(key, {})
+        need(isinstance(state, dict) and all(state.get(flag) is True for flag in ('exists', 'focused', 'sameTarget'))
+             and state.get('activeElement') == {'id': selector[1:], 'tagName': 'INPUT', 'type': 'text'}
+             and isinstance(state.get('events'), list) and 0 < len(state['events']) <= 300,
+             'empty-field insertion lacks its original focused target snapshot: ' + key)
+        need(state.get('value') == (expected if key == 'after' else ''), 'empty-field insertion snapshot has different text: ' + key)
+        if key != 'after':
+            need(type(state.get('selectionStart')) is int and type(state.get('selectionEnd')) is int
+                 and state['selectionStart'] == state['selectionEnd'] == 0,
+                 'empty-field insertion began with a nonempty or unknown selection')
+        snapshots.append(state)
+    before, prepared, after = snapshots
+    click_events = typed['input']['events']
+    need(before['events'][:len(click_events)] == click_events
+         and prepared['events'][:len(before['events'])] == before['events']
+         and after['events'][:len(prepared['events'])] == prepared['events'] and typed['events'] == after['events'],
+         'empty-field insertion replaced its native click or preparation event history')
+    need(any(event.get('type') == 'input' and event.get('trusted') is True and event.get('matches') is True
+             for event in after['events'][len(prepared['events']):]),
+         'empty-field insertion lacks a new trusted input on the prepared target')
+
+
 def verify_classic_return(row, initial, platform, pid, inputs):
     same_grid(row['before'], row['state']); same_grid(row['before'], row['returned']); classic(row['state'], row.get('active'))
     selector = '[data-window="minimize"]' if row.get('kind') == 'link' else '#return-to-grid'
@@ -540,10 +578,7 @@ def verify(read, expected_platform=None, expected_arch=None):
             key_receipt(event, platform, pid)
     for key, selector in [('addURL', '#settings-adblock-exception-add'), ('openChooser', '#settings-adblock-exception-tab'), ('addTab', '#settings-adblock-exception-add-tab')]:
         input_receipt(exclusions.get(key, {}), platform, pid, inputs, selector=selector)
-    typed = exclusions.get('url', {}); need(typed.get('value') == 'https://LOCALHOST:443/owned?path=one'
-         and typed.get('source') == 'native focus, webContents.sendInputEvent and insertText'
-         and any(event.get('type') == 'input' and event.get('trusted') is True for event in typed.get('events', [])), 'settings URL was not entered through its actual control')
-    input_receipt(typed.get('input', {}), platform, pid, inputs, selector='#settings-adblock-exception-url')
+    verify_settings_url_input(exclusions.get('url', {}), platform, pid, inputs, write.get('textInputs'))
     input_receipt(exclusions.get('chooseTab', {}), platform, pid, inputs)
     need(exclusions['chooseTab']['selector'] == '#choice-dialog [data-value="' + cases[-1]['native']['tabId'] + '"]'
          and exclusions.get('saved', {}).get('hosts') == ['127.0.0.1', 'localhost'], 'settings open-tab chooser or host normalization differs')
