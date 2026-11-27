@@ -115,6 +115,9 @@ def correction_fixture():
             'paragraph': {'value': C.EXPECTED, 'prefix': 'Earlier paragraph stays.',
                           'beforeText': 'Earlier paragraph stays.' + C.SAMPLE, 'afterText': 'Earlier paragraph stays.' + C.EXPECTED,
                           'hostPreserved': True, 'wrappersPreserved': True, 'textNodesPreserved': True,
+                          'unmodifiedTextNodesPreserved': True, 'editedTextNodeReplaced': False,
+                          'undo': {'value': C.SAMPLE, 'prefix': 'Earlier paragraph stays.', 'hostPreserved': True,
+                                   'wrappersPreserved': True, 'source': 'WebContents.undo'},
                           'events': [{'trusted': True, 'value': 'Earlier paragraph stays.' + C.EXPECTED, 'inputType': 'insertText'}]},
             'undo': {'value': C.SAMPLE, 'source': 'WebContents.undo'}, 'rejected': {'value': C.SAMPLE, 'visible': False},
             'stale': {'result': {'ok': False, 'reason': 'stale-target'}, 'value': C.SAMPLE + 'x'},
@@ -210,6 +213,34 @@ class Controls642Reader(unittest.TestCase):
         for mutation in [{'source': 'script'}, {'pid': 102}, {'events': [{'type': 'click', 'trusted': False, 'matches': True}]}, {'point': {}}]:
             value = input_receipt('#button'); value.update(mutation)
             with self.assertRaises(ValueError): C.native_input(value, 'linux', 101)
+
+    def test_plain_paragraph_accepts_native_edited_node_replacement_with_unchanged_other_nodes_and_undo(self):
+        for replaced in (False, True):
+            value = correction_fixture()
+            value['paragraph'].update(textNodesPreserved=not replaced, editedTextNodeReplaced=replaced)
+            with self.subTest(editedTextNodeReplaced=replaced):
+                C.correction(value)
+
+    def test_plain_paragraph_rejects_changes_to_untouched_nodes_or_untruthful_edited_node_receipts(self):
+        changes = [lambda p: p.update(unmodifiedTextNodesPreserved=False), lambda p: p.pop('unmodifiedTextNodesPreserved'),
+                   lambda p: p.update(hostPreserved=False), lambda p: p.update(wrappersPreserved=False),
+                   lambda p: p.update(textNodesPreserved=False, editedTextNodeReplaced=False),
+                   lambda p: p.update(textNodesPreserved=True, editedTextNodeReplaced=True),
+                   lambda p: p.update(textNodesPreserved=1), lambda p: p.update(editedTextNodeReplaced=0),
+                   lambda p: p.pop('editedTextNodeReplaced'), lambda p: p.pop('textNodesPreserved')]
+        for change in changes:
+            value = correction_fixture(); change(value['paragraph'])
+            with self.assertRaises(ValueError): C.correction(value)
+
+    def test_plain_paragraph_requires_actual_undo_preserving_original_prefix_host_and_wrappers(self):
+        changes = [lambda p: p.pop('undo'), lambda p: p['undo'].update(value=C.EXPECTED),
+                   lambda p: p['undo'].update(prefix='changed earlier text'),
+                   lambda p: p['undo'].update(hostPreserved=False), lambda p: p['undo'].update(wrappersPreserved=False),
+                   lambda p: p['undo'].update(hostPreserved=1), lambda p: p['undo'].update(wrappersPreserved=1),
+                   lambda p: p['undo'].update(source='synthetic DOM replacement')]
+        for change in changes:
+            value = correction_fixture(); change(value['paragraph'])
+            with self.assertRaisesRegex(ValueError, 'paragraph native undo'): C.correction(value)
 
     def test_full_reader_binds_two_processes_and_every_actual_png(self):
         files = sealed(*fixture()); result = C.verify(files.__getitem__, expected_platform='linux', expected_arch='x64')

@@ -101,7 +101,9 @@ class Controls642PublicationBinding(unittest.TestCase):
                    lambda v: v['required'].remove('mouse-642-controls-read.log'), lambda v: v['featureTokens'].pop(),
                    lambda v: v.update(sourceAndFreshInstalled=False), lambda v: v.update(savedReportAcceptedAsInput=True),
                    lambda v: v.update(runtimeVersion='6.0.41'), lambda v: v.update(realOSInputLanguage=False),
-                   lambda v: v.update(explicitConsentBeforeReplacement=False), lambda v: v.update(nativeUndo=False)]
+                   lambda v: v.update(explicitConsentBeforeReplacement=False), lambda v: v.update(nativeUndo=False),
+                   lambda v: v.update(plainParagraphCorrection=False), lambda v: v.update(unmodifiedEditorNodesPreserved=False),
+                   lambda v: v.update(plainParagraphNativeUndo=False), lambda v: v.pop('plainParagraphNativeUndo')]
         with tempfile.TemporaryDirectory() as directory:
             target = Path(directory)
             for change in changes:
