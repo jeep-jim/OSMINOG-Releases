@@ -1,0 +1,49 @@
+{
+  "version": "6.0.42",
+  "ready": false,
+  "source": null,
+  "run": null,
+  "artifact": null,
+  "archiveSHA256": null,
+  "verificationArtifact": null,
+  "verificationSHA256": null,
+  "sourcePR": null,
+  "sourceMerge": null,
+  "sourceAttempt": null,
+  "sourceJob": null,
+  "packages": {
+    "Mouse-Browser-6.0.42-mac-arm64.dmg": {
+      "size": null,
+      "sha256": null
+    },
+    "Mouse-Browser-6.0.42-mac-arm64.zip": {
+      "size": null,
+      "sha256": null
+    }
+  },
+  "previous": {
+    "version": "6.0.29",
+    "source": "72679ee907dda6e7ac134b1f01addee858c4e59a",
+    "updaterBlobSHA": "c4a9564bc5a7c3cf2c6798b5eade9680ee0e57cf",
+    "package": {
+      "name": "Mouse-Browser-6.0.29-mac-arm64.dmg",
+      "size": 137744712,
+      "sha256": "665fca86eb86f1bd98bca4c72652fb5b0a981fc4f4c6467a66d0683874c6d57c"
+    }
+  },
+  "currentPrevious": {
+    "version": "6.0.41",
+    "source": "3a32e02a8893b4c2f1397cd0a08e94af737f42fc",
+    "updaterBlobSHA": "91ab363f926774825caf8055b2d3d81bf0d51264",
+    "packages": {
+      "Mouse-Browser-6.0.41-mac-arm64.dmg": {
+        "size": 131533136,
+        "sha256": "ee9c8c4af98667556d9ce93917e683343237d88b55ede060eb0b5b015758a727"
+      },
+      "Mouse-Browser-6.0.41-mac-arm64.zip": {
+        "size": 131555539,
+        "sha256": "a8886a415b67bb5865258fa98d66eadcd78ce36cd175aef1b006c3c79044b1df"
+      }
+    }
+  }
+}
