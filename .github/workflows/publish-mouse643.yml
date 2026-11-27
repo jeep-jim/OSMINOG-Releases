@@ -1,0 +1,175 @@
+name: Publish verified Mouse Browser 6.0.43 Mac only
+on:
+  pull_request:
+    paths: ['tools/mouse643-*', 'tools/mouse-638-crx-proof.cjs', 'tools/test_mouse643_*', 'tools/fixtures/mouse643-*', '.github/workflows/publish-mouse643.yml', 'staging/mouse/6.0.43-arm64/**']
+  push:
+    branches: [main]
+    paths: ['staging/mouse/6.0.43-arm64/PUBLISH_OWNER', 'staging/mouse/6.0.43-arm64/pin.json', '.github/workflows/publish-mouse643.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  contract:
+    outputs:
+      publish: ${{ steps.publish_plan.outputs.publish }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Verify frozen acceptance and Mac-only publication contracts
+        run: |
+          python3 -m unittest discover -s tools -p "test_mouse642_*.py" -v
+          python3 -m unittest discover -s tools -p "test_mouse643_*.py" -v
+      - name: Compile current publisher and independent validators
+        run: python3 -m py_compile tools/mouse643-*.py
+      - name: Validate the unready or exact pinned candidate contract
+        run: python3 tools/mouse643-release.py validate-template
+      - name: Require this exact authorized Mac candidate
+        id: publish_plan
+        run: python3 tools/mouse643-publish-plan.py macos-arm64 >> "$GITHUB_OUTPUT"
+  mouse-release:
+    if: github.event_name != 'pull_request' && needs.contract.outputs.publish == 'true'
+    needs: contract
+    runs-on: macos-15
+    timeout-minutes: 73
+    permissions:
+      contents: write
+    concurrency:
+      group: quadro-macos-release
+      cancel-in-progress: false
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Import exact merged native-tested packages
+        run: python3 tools/mouse643-release.py import
+      - name: Verify installed DMG and actual previous-version replacement
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(uname -m)" = arm64
+          xcrun swift mouse643-release/mouse-637-macos-display.swift --output mouse643-release/mouse-637-display.json
+          xcrun swift mouse643-release/mouse-637-macos-display.swift --verify mouse643-release/mouse-637-display.json
+          cmp mouse643-release/Mouse-Browser-6.0.43-mac-arm64.dmg mouse643-release/Quadro-Browser-6.0.43-mac-arm64.dmg
+          MOUNT="$RUNNER_TEMP/mouse628-dmg"
+          mkdir -p "$MOUNT"
+          hdiutil attach mouse643-release/Mouse-Browser-6.0.43-mac-arm64.dmg -nobrowse -readonly -mountpoint "$MOUNT"
+          trap 'hdiutil detach "$MOUNT" || true' EXIT
+          APP="$RUNNER_TEMP/Установка Mouse/Mouse Browser.app"
+          mkdir -p "$(dirname "$APP")"
+          ditto "$MOUNT/Mouse Browser.app" "$APP"
+          test "$(lipo -archs "$APP/Contents/MacOS/Mouse Browser")" = arm64
+          codesign --verify --deep --strict "$APP"
+          ditto -x -k mouse643-release/Mouse-Browser-6.0.43-mac-arm64.zip "$RUNNER_TEMP/mouse628-zip"
+          codesign --verify --deep --strict "$RUNNER_TEMP/mouse628-zip/Mouse Browser.app"
+          cmp "$APP/Contents/Resources/app.asar" "$RUNNER_TEMP/mouse628-zip/Mouse Browser.app/Contents/Resources/app.asar"
+          test ! -e "$APP/Contents/Resources/mouse-agent-node_modules"
+          test ! -e "$RUNNER_TEMP/mouse628-zip/Mouse Browser.app/Contents/Resources/mouse-agent-node_modules"
+          hdiutil detach "$MOUNT"
+          trap - EXIT
+          cd mouse643-release
+          rm -f mouse-628-motion-trace.json mouse-628-motion.json mouse-628-motion-trace-report.json
+          env -u GH_TOKEN python3 mouse-verify.py "$APP/Contents/MacOS/Mouse Browser"
+          grep -q MOUSE_643_REAL_629_TO_643_REPLACE_RELAUNCH_PROFILE_PASS mouse-update-roundtrip.log
+          grep -q MOUSE_632_FOOTER_LAYOUT_BOTH_THEMES_PASS mouse-smoke-write.log
+          grep -q MOUSE_632_WEBSITE_OFFER_NEW_TAB_PASS mouse-smoke-write.log
+          grep -q MOUSE_633_OWNER_FEEDBACK_PASS mouse-633-owner-feedback.log
+          grep -q MOUSE_636_RETAINED_OWNER_FEEDBACK_PASS mouse-636-retained-owner-feedback.log
+          grep -q MOUSE_635_LIBRARY_STABLE_PASS mouse-636-owner-feedback.log
+          grep -q MOUSE_637_AGENT_REMOVAL_PASS mouse-636-owner-feedback.log
+          grep -q MOUSE_636_PINNED_PANES_PASS mouse-636-owner-feedback.log
+          grep -q MOUSE_636_OWNER_FEEDBACK_PASS mouse-636-owner-feedback.log
+          grep -q MOUSE_636_SEARCH_REMOVAL_PASS mouse-636-owner-feedback.log
+          grep -q MOUSE_637_PERFORMANCE_PASS mouse-636-owner-feedback.log
+          grep -x MOUSE_637_FEATURES_WRITE_PASS mouse-637-features-write.log
+          grep -x MOUSE_637_FEATURES_NATIVE_PASS mouse-637-features-read.log
+          grep -x MOUSE_643_REAL_642_TO_643_UPDATE_BUTTON_PASS mouse-637-update-button.log
+          grep -q MOUSE_637_BASELINE_PERFORMANCE_PASS mouse-637-baseline-performance.log
+          grep -x MOUSE_639_ADBLOCK_WRITE_PASS mouse-639-adblock-write.log
+          grep -x MOUSE_639_ADBLOCK_NATIVE_PASS mouse-639-adblock-read.log
+          grep -x MOUSE_641_WORKSPACE_WRITE_PASS mouse-641-workspace-write.log
+          grep -x MOUSE_641_WORKSPACE_NATIVE_PASS mouse-641-workspace-read.log
+          grep -x MOUSE_642_CONTROLS_WRITE_PASS mouse-642-controls-write.log
+          grep -x MOUSE_642_CONTROLS_NATIVE_PASS mouse-642-controls-read.log
+          grep -x MOUSE_643_POLISH_WRITE_PASS mouse-643-polish-write.log
+          grep -x MOUSE_643_POLISH_NATIVE_PASS mouse-643-polish-read.log
+          grep -q MOUSE_643_ACTIVE_TAB_BOX_BOTH_THEMES_PASS mouse-smoke-write.log
+          grep -q MOUSE_641_MEDIA_PLAYER_REMOVED_PASS mouse-631-native.log
+          grep -q MOUSE_643_REAL_642_TO_643_PROFILE_PASS mouse-637-upgrade.log
+          grep -q MOUSE_632_DOCUMENTS_VIEW_ONLY_PASS mouse-smoke-write.log
+          grep -q MOUSE_632_STATIONARY_MEDIA_PASS mouse-631-native.log
+          grep -q MOUSE_628_PER_PANE_PROGRESS_NATIVE_PASS mouse-smoke-write.log
+          grep -q MOUSE_630_DOWNLOAD_ACTIVITY_PASS mouse-smoke-write.log
+          grep -q MOUSE_630_CAPTURE_FEEDBACK_PASS mouse-smoke-write.log
+          grep -q MOUSE_630_NORA_NATIVE_FOREGROUND_PASS mouse-smoke-write.log
+          grep -q MOUSE_629_TWO_FINGER_WHEEL_TUTORIAL_WRITE_PASS mouse-smoke-write.log
+          grep -q MOUSE_629_TWO_FINGER_WHEEL_TUTORIAL_NATIVE_PASS mouse-smoke-read.log
+          grep -q MOUSE_629_UI_REGRESSIONS_NATIVE_PASS mouse-smoke-write.log
+          grep -q MOUSE_630_NATIVE_WHEEL_DESKTOPS_PASS mouse-smoke-write.log
+          grep -q MOUSE_630_PAGE_SCROLL_PRESERVED_PASS mouse-smoke-write.log
+          grep -q MOUSE_630_PRIVATE_DOWNLOAD_SCOPE_PASS mouse-smoke-write.log
+          grep -q MOUSE_628_OPEN_NORA_DESKTOP_SLIDE_NATIVE_PASS mouse-smoke-write.log
+          grep -q MOUSE_628_BORDERLESS_NATIVE_PASS mouse-smoke-write.log
+          grep -q MOUSE_628_NORA_CONTENT_FIT_NATIVE_PASS mouse-smoke-write.log
+          grep -q MOUSE_PROFILE_COOKIE_RESTART_PASS mouse-smoke-read.log
+      - name: Recompute fresh installed evidence and publish exact packages
+        run: |
+          python3 tools/mouse643-release.py publish
+      - name: Advance static update channel after public package verification
+        run: python3 tools/mouse643-release.py channel
+      - name: Verify shipped 6.0.29 updater discovers and downloads 6.0.43 anonymously
+        shell: bash
+        run: |
+          env -u GH_TOKEN node - <<'NODE'
+          const assert=require('node:assert/strict'),fs=require('node:fs/promises'),os=require('node:os');
+          const {MouseUpdates:Old}=require('./mouse643-release/legacy629-update.cjs');
+          const {MouseUpdates,CHANNEL}=require('./mouse643-release/mouse-update.cjs');
+          const pin=require('./staging/mouse/6.0.43-arm64/pin.json');
+          const sleep=ms=>new Promise(resolve=>setTimeout(resolve,ms));
+          (async()=>{
+            let old,error,observations=[];
+            for(let i=0;i<48;i++){
+              try{
+                old=new Old({app:{getVersion:()=> '6.0.29',getPath:()=>os.tmpdir()},shell:{}});
+                const state=await old.run('check');
+                observations.push({attempt:i+1,phase:state.phase,channel:state.channel,availableVersion:state.availableVersion});
+                assert.equal(state.phase,'available');assert.equal(state.channel,'static');assert.equal(state.availableVersion,'6.0.43');error=null;break;
+              }catch(e){error=e;observations.push({attempt:i+1,error:String(e.message)});await sleep(5000)}
+            }
+            await fs.writeFile('mouse643-release/channel-discovery-diagnostics.json',JSON.stringify({channel:CHANNEL,observations},null,2));
+            if(error)throw error;
+            const candidate=pin.packages['Mouse-Browser-6.0.43-mac-arm64.dmg'];
+            assert.equal(old.candidate.hash,candidate.sha256);assert.equal(old.candidate.size,candidate.size);
+            assert.equal((await old.run('download')).phase,'ready');await old.verified();
+            const current=new MouseUpdates({app:{getVersion:()=> '6.0.43'},shell:{}});
+            assert.equal((await current.run('check')).phase,'current');assert.equal(current.state.channel,'static');
+            await fs.writeFile('mouse643-release/channel-verification.json',JSON.stringify({channel:CHANNEL,actualOldModuleVersion:'6.0.29',version:'6.0.43',hash:old.candidate.hash,size:old.candidate.size,anonymousDiscovery:true,verifiedDownload:true,currentVersionCheck:true},null,2));
+            console.log('MOUSE630_ACTUAL_629_UPDATER_STATIC_DISCOVERY_DOWNLOAD_PASS');
+          })().catch(error=>{console.error(error);process.exit(1)});
+          NODE
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: mouse643-release-verification-attempt-${{ github.run_attempt }}
+          path: |
+            mouse643-release/*.log
+            mouse643-release/*.png
+            mouse643-release/mouse-639-*.html
+            mouse643-release/mouse-638-*.crx
+            mouse643-release/mouse-637-agent-code-*.cjs
+            mouse643-release/mouse-verify.py
+            mouse643-release/mouse-637-baseline-performance.py
+            mouse643-release/*.json
+            mouse643-release/*.md
+            mouse643-release/mouse-637-library-source.txt
+            mouse643-release/mouse-637-baseline-performance/**
+            mouse643-release/SHA256SUMS.txt
+          retention-days: 14
