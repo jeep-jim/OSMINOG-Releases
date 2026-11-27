@@ -733,7 +733,7 @@
       "mouse642-download-evidence.py": "4e22b606556649c6d79173f6e7598d96c6ee30f76cf876e57c86ea2d15102464",
       "mouse642-capture-evidence.py": "318f21208d04f421076335c8203b4ecc2bf66247c55b21159a8bd4947e91856d",
       "mouse642-focused-evidence.py": "0d9844584fb94dd557a0455b55a36e84816849b15e41d034e10afb7d5e875020",
-      "mouse642-reuse.py": "caf7763b2b2f606b24c5f38aa27b0962fe8ae0ac3b59343cf369c3b15f606293",
+      "mouse642-reuse.py": "5310a2764e4f0d30fb3247d54d7412d45f0b45e4edc84f33944dfd4928f830e5",
       "mouse642-zoom-evidence.py": "140a17027d1f6938c595c7c30c6f250fc4d6728fa22e92949d657bdfc110b87e",
       "mouse642-agent-removal-adapter.py": "70f54e2017e8fb17eeb3075fb268e867b25623a48b2cb5431723bf54d071fa86"
     }
@@ -766,7 +766,7 @@
       "mouse642-agent-removal-evidence.py": "e20fb7cf622bf2207e3235a1628789f76705ca9990745a1d0d8612415a3e112e",
       "mouse642-pane-layout-evidence.py": "84586dbb8e29c594e42a06d673a9bdc72481be88a3e5ef89f161b6a5e92c01ca",
       "mouse642-context-evidence.py": "2bd9dfaea271fd4405b3269901b139ab47dc74f3f3f1ff76b4eaf7a6e7c4e2b5",
-      "mouse642-reuse.py": "caf7763b2b2f606b24c5f38aa27b0962fe8ae0ac3b59343cf369c3b15f606293",
+      "mouse642-reuse.py": "5310a2764e4f0d30fb3247d54d7412d45f0b45e4edc84f33944dfd4928f830e5",
       "mouse642-zoom-evidence.py": "140a17027d1f6938c595c7c30c6f250fc4d6728fa22e92949d657bdfc110b87e",
       "mouse642-agent-removal-adapter.py": "70f54e2017e8fb17eeb3075fb268e867b25623a48b2cb5431723bf54d071fa86"
     },
@@ -1182,7 +1182,7 @@
   },
   "x-currentHelpersGate": {
     "validator": "tools/mouse642-current.py",
-    "sha256": "216ab95ef34fe92329192b6cc0537dc69e4453a66576de8472fb418fd76b6c76",
+    "sha256": "0ce16349211a0c46354395bffe5563ec7ad0a637b5bedbde5bc9a4a0de026a7f",
     "sourceAndFreshInstalled": true,
     "savedReportAcceptedAsInput": false,
     "sourceHelpers": "exact tested source Git blob bytes",
@@ -1240,8 +1240,8 @@
     "dependencies": {
       "mouse642-task-evidence.py": "941ad3509e99e468d17fbf6bd0f62ff00ac112dd3c2feb37aa2b46d173c2cc52",
       "mouse-638-crx-proof.cjs": "5b0ac13325b55faa647f9d02c5c862db5e6e6e276fdef00b3c6788fff54dd829",
-      "mouse642-extra-evidence.py": "1e48354f67da860fa7ded1a6a756e9c55c7e323ef4436f7592250cc6f1d86d44",
-      "mouse642-reuse.py": "caf7763b2b2f606b24c5f38aa27b0962fe8ae0ac3b59343cf369c3b15f606293",
+      "mouse642-extra-evidence.py": "83cf86ecf6b0700bb66382b428b1438604ff88e93959548a2b5aa011210673bb",
+      "mouse642-reuse.py": "5310a2764e4f0d30fb3247d54d7412d45f0b45e4edc84f33944dfd4928f830e5",
       "mouse642-frozen.json": "e057bd5b24ce5017e9f0adb5f42c6800e98e076e1c1869b40afbc719a4f9a375"
     }
   },
@@ -1275,10 +1275,10 @@
     ],
     "dependencies": {
       "mouse642-task-evidence.py": "941ad3509e99e468d17fbf6bd0f62ff00ac112dd3c2feb37aa2b46d173c2cc52",
-      "mouse642-extra-evidence.py": "1e48354f67da860fa7ded1a6a756e9c55c7e323ef4436f7592250cc6f1d86d44",
-      "mouse642-reuse.py": "caf7763b2b2f606b24c5f38aa27b0962fe8ae0ac3b59343cf369c3b15f606293",
+      "mouse642-extra-evidence.py": "83cf86ecf6b0700bb66382b428b1438604ff88e93959548a2b5aa011210673bb",
+      "mouse642-reuse.py": "5310a2764e4f0d30fb3247d54d7412d45f0b45e4edc84f33944dfd4928f830e5",
       "mouse642-frozen.json": "e057bd5b24ce5017e9f0adb5f42c6800e98e076e1c1869b40afbc719a4f9a375",
-      "mouse642-current.py": "216ab95ef34fe92329192b6cc0537dc69e4453a66576de8472fb418fd76b6c76"
+      "mouse642-current.py": "0ce16349211a0c46354395bffe5563ec7ad0a637b5bedbde5bc9a4a0de026a7f"
     }
   },
   "x-current640SettingsGate": {
@@ -1295,10 +1295,10 @@
     ],
     "dependencies": {
       "mouse642-task-evidence.py": "941ad3509e99e468d17fbf6bd0f62ff00ac112dd3c2feb37aa2b46d173c2cc52",
-      "mouse642-extra-evidence.py": "1e48354f67da860fa7ded1a6a756e9c55c7e323ef4436f7592250cc6f1d86d44",
-      "mouse642-reuse.py": "caf7763b2b2f606b24c5f38aa27b0962fe8ae0ac3b59343cf369c3b15f606293",
+      "mouse642-extra-evidence.py": "83cf86ecf6b0700bb66382b428b1438604ff88e93959548a2b5aa011210673bb",
+      "mouse642-reuse.py": "5310a2764e4f0d30fb3247d54d7412d45f0b45e4edc84f33944dfd4928f830e5",
       "mouse642-frozen.json": "e057bd5b24ce5017e9f0adb5f42c6800e98e076e1c1869b40afbc719a4f9a375",
-      "mouse642-current.py": "216ab95ef34fe92329192b6cc0537dc69e4453a66576de8472fb418fd76b6c76",
+      "mouse642-current.py": "0ce16349211a0c46354395bffe5563ec7ad0a637b5bedbde5bc9a4a0de026a7f",
       "mouse642-features-evidence.py": "7a6df8b971974704085b21d66b414b393a4abcfb9851f192b10b071237230727",
       "mouse642-sidebar-focus-evidence.py": "ff09c6e2b4188b9426c3028129a185d985ec3b221f0f74dd1dc61410685c05fd"
     },
@@ -1346,10 +1346,10 @@
     ],
     "dependencies": {
       "mouse642-task-evidence.py": "941ad3509e99e468d17fbf6bd0f62ff00ac112dd3c2feb37aa2b46d173c2cc52",
-      "mouse642-extra-evidence.py": "1e48354f67da860fa7ded1a6a756e9c55c7e323ef4436f7592250cc6f1d86d44",
-      "mouse642-reuse.py": "caf7763b2b2f606b24c5f38aa27b0962fe8ae0ac3b59343cf369c3b15f606293",
+      "mouse642-extra-evidence.py": "83cf86ecf6b0700bb66382b428b1438604ff88e93959548a2b5aa011210673bb",
+      "mouse642-reuse.py": "5310a2764e4f0d30fb3247d54d7412d45f0b45e4edc84f33944dfd4928f830e5",
       "mouse642-frozen.json": "e057bd5b24ce5017e9f0adb5f42c6800e98e076e1c1869b40afbc719a4f9a375",
-      "mouse642-current.py": "216ab95ef34fe92329192b6cc0537dc69e4453a66576de8472fb418fd76b6c76",
+      "mouse642-current.py": "0ce16349211a0c46354395bffe5563ec7ad0a637b5bedbde5bc9a4a0de026a7f",
       "mouse642-owner-contracts.py": "3fa6b713643e6c02a4557d50e79ee596bc2ec160bcfd04607aea6a7996b44dba",
       "mouse642-features-evidence.py": "7a6df8b971974704085b21d66b414b393a4abcfb9851f192b10b071237230727"
     },
@@ -1378,5 +1378,40 @@
     "sameSiteNavigationKeepsTabAndWebContents": true,
     "classicCornerMinimizeReturnsSavedGrid": true,
     "classicCornerReturnKeepsWindowVisible": true
+  },
+  "x-current642ControlsGate": {
+    "validator": "tools/mouse642-controls-evidence.py",
+    "runtimeVersion": "6.0.42",
+    "sourceAndFreshInstalled": true,
+    "savedReportAcceptedAsInput": false,
+    "realOSInputLanguage": true,
+    "samePhysicalKeyBothLayouts": true,
+    "explicitConsentBeforeReplacement": true,
+    "originalTargetAndRangeBound": true,
+    "nativeUndo": true,
+    "settingsOnlyInterfaceLanguage": true,
+    "independentToneControls": true,
+    "twoProcessTonePersistence": true,
+    "required": [
+      "mouse-642-controls-acceptance.json",
+      "mouse-642-controls.json",
+      "mouse-642-controls-write.json",
+      "mouse-642-controls-processes.json",
+      "mouse-642-controls-write.log",
+      "mouse-642-controls-read.log"
+    ],
+    "featureTokens": [
+      "native642-theme-temperature-and-restart",
+      "native642-real-os-input-language",
+      "native642-consent-layout-correction"
+    ],
+    "dependencies": {
+      "mouse642-task-evidence.py": "941ad3509e99e468d17fbf6bd0f62ff00ac112dd3c2feb37aa2b46d173c2cc52",
+      "mouse642-extra-evidence.py": "83cf86ecf6b0700bb66382b428b1438604ff88e93959548a2b5aa011210673bb",
+      "mouse642-reuse.py": "5310a2764e4f0d30fb3247d54d7412d45f0b45e4edc84f33944dfd4928f830e5",
+      "mouse642-frozen.json": "e057bd5b24ce5017e9f0adb5f42c6800e98e076e1c1869b40afbc719a4f9a375",
+      "mouse642-current.py": "0ce16349211a0c46354395bffe5563ec7ad0a637b5bedbde5bc9a4a0de026a7f"
+    },
+    "sha256": "890d4250754ddc4a959fd4275e09a811a6d0ed3cbd72e86ff873205931374ff9"
   }
 }

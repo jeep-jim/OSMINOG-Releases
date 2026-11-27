@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Bind current glass Settings, retained AdBlock and native installation jobs."""
+"""Bind current controls, glass Settings, AdBlock and native installation jobs."""
 from contextlib import contextmanager
 import datetime
 import hashlib
@@ -37,6 +37,13 @@ WORKSPACE_DEPENDENCIES = ('mouse642-task-evidence.py', 'mouse642-extra-evidence.
     'mouse642-features-evidence.py')
 WORKSPACE_TOKENS = ('native641-classic-grid-and-workspace-flows', 'native641-site-exclusions-restart',
     'native641-theme-surfaces-and-library', 'native641-headers-always-visible', 'native641-media-player-removed-site-audio-retained')
+CONTROLS_REQUIRED = ('mouse-642-controls-acceptance.json', 'mouse-642-controls.json',
+    'mouse-642-controls-write.json', 'mouse-642-controls-processes.json',
+    'mouse-642-controls-write.log', 'mouse-642-controls-read.log')
+CONTROLS_DEPENDENCIES = ('mouse642-task-evidence.py', 'mouse642-extra-evidence.py',
+    'mouse642-reuse.py', 'mouse642-frozen.json', 'mouse642-current.py')
+CONTROLS_TOKENS = ('native642-theme-temperature-and-restart', 'native642-real-os-input-language',
+    'native642-consent-layout-correction')
 
 
 def need(value, message):
@@ -53,6 +60,7 @@ def validate_pin(pin, platform):
     validate_adblock_contract(TOOLS.parent / 'staging/mouse/6.0.42-arm64')
     validate_settings_contract(TOOLS.parent / 'staging/mouse/6.0.42-arm64')
     validate_workspace_contract(TOOLS.parent / 'staging/mouse/6.0.42-arm64')
+    validate_controls_contract(TOOLS.parent / 'staging/mouse/6.0.42-arm64')
     previous = runpy.run_path(str(TOOLS / 'mouse642-reuse.py'))['previous'](platform)
     need(pin.get('currentPrevious') == previous, 'actual published638 predecessor pin differs')
     prefix = {'linux': 'noble', 'win32': 'modern'}.get(platform)
@@ -79,6 +87,7 @@ def validate_contract(stage):
     validate_adblock_contract(stage)
     validate_settings_contract(stage)
     validate_workspace_contract(stage)
+    validate_controls_contract(stage)
 
 
 def validate_adblock_contract(stage):
@@ -119,6 +128,21 @@ def validate_workspace_contract(stage):
          and contract.get('featureTokens') == list(WORKSPACE_TOKENS), 'independent641 workspace dependency/receipt contract changed')
 
 
+def validate_controls_contract(stage):
+    contract = json.loads((stage / 'evidence.schema.json').read_text())['x-current642ControlsGate']
+    need(contract.get('validator') == 'tools/mouse642-controls-evidence.py'
+         and contract.get('sha256') == sha((TOOLS / 'mouse642-controls-evidence.py').read_bytes())
+         and contract.get('runtimeVersion') == VERSION and contract.get('sourceAndFreshInstalled') is True
+         and contract.get('savedReportAcceptedAsInput') is False
+         and all(contract.get(key) is True for key in ('realOSInputLanguage', 'samePhysicalKeyBothLayouts',
+             'explicitConsentBeforeReplacement', 'originalTargetAndRangeBound', 'nativeUndo',
+             'settingsOnlyInterfaceLanguage', 'independentToneControls', 'twoProcessTonePersistence')),
+         'independent642 controls validator identity or required behavior changed')
+    need(contract.get('dependencies') == {name: sha((TOOLS / name).read_bytes()) for name in CONTROLS_DEPENDENCIES}
+         and contract.get('required') == list(CONTROLS_REQUIRED)
+         and contract.get('featureTokens') == list(CONTROLS_TOKENS), 'independent642 controls dependency/receipt contract changed')
+
+
 def verify_helper_bytes(output):
     """The fetched source checker/proof must match independent publisher code."""
     source = (output / 'mouse-638-acceptance.py').read_bytes()
@@ -138,6 +162,41 @@ def verify_helper_bytes(output):
     need(source641.replace(b'mouse-631-acceptance.py', b'mouse642-task-evidence.py') ==
          (TOOLS / 'mouse642-flexible-workspace-evidence.py').read_bytes(),
          'source641 workspace checker differs from independent publisher reader')
+    source642 = (output / 'mouse-642-controls-acceptance.py').read_bytes()
+    need(source642.replace(b'mouse-631-acceptance.py', b'mouse642-task-evidence.py') ==
+         (TOOLS / 'mouse642-controls-evidence.py').read_bytes(),
+         'source642 controls checker differs from independent publisher reader')
+
+
+def controls(read, *, platform, arch, build=None, verification=None):
+    accepted = runpy.run_path(str(TOOLS / 'mouse642-controls-evidence.py'))['verify'](
+        read, expected_platform=platform, expected_arch=arch)
+    original = read('mouse-642-controls-acceptance.json')
+    need(json.loads(original) == accepted, 'native642 acceptance differs from independently read controls, native input and display bytes')
+    process_raw = read('mouse-642-controls-processes.json'); processes = json.loads(process_raw)
+    expected = {'file': 'mouse-642-controls-acceptance.json', 'sha256': sha(original),
+        'report': {'file': 'mouse-642-controls.json', 'sha256': sha(read('mouse-642-controls.json'))},
+        'processes': {'file': 'mouse-642-controls-processes.json', 'sha256': sha(process_raw)}}
+    if build is not None:
+        need(set(CONTROLS_TOKENS) <= set(build.get('tests', [])), 'candidate manifest omits mandatory642 native feature gates')
+        need(build.get('controls642') == expected, 'candidate manifest does not bind the actual642 process/report/acceptance bytes')
+        if platform != 'darwin':
+            verification = build.get('verification', {}).get('result')
+    if platform != 'darwin':
+        need(isinstance(verification, dict), 'installed642 controls lack their actual executable verification')
+        checks = verification.get('checks', {})
+        need(checks.get('controls642') == {**processes, 'acceptanceSha256': expected['sha256']},
+             'installed642 controls wrapper differs from its actual process and independent acceptance bytes')
+        key, repeated = {'linux': ('debInstallation', 'debReinstallation'), 'win32': ('installation', 'reinstallation')}[platform]
+        installation = checks.get(key, {})
+        need(isinstance(installation.get('executable'), str) and installation['executable']
+             and re.fullmatch('[0-9a-f]{64}', installation.get('executableSha256', ''))
+             and all(processes.get(field) == installation.get(field) for field in ('executable', 'executableSha256')),
+             'native642 controls ran another executable than the verified installation')
+        if repeated in checks:
+            need(all(checks[repeated].get(field) == installation[field] for field in ('executable', 'executableSha256')),
+                 'native642 installation and reinstallation differ')
+    return accepted
 
 
 def workspace(read, *, platform, arch, build=None, verification=None):
@@ -398,10 +457,12 @@ def import_extra(module, platform):
         accepted_adblock = adblock(archive.read, platform=platform, arch=arch, build=build)
         accepted_settings = settings(archive.read, platform=platform, arch=arch, build=build)
         accepted_workspace = workspace(archive.read, platform=platform, arch=arch, build=build)
+        accepted_controls = controls(archive.read, platform=platform, arch=arch, build=build)
     (output / 'source638-feedback-independent.json').write_text(json.dumps(accepted, indent=2) + '\n')
     (output / 'source639-adblock-independent.json').write_text(json.dumps(accepted_adblock, indent=2) + '\n')
     (output / 'source640-settings-independent.json').write_text(json.dumps(accepted_settings, indent=2) + '\n')
     (output / 'source641-workspace-independent.json').write_text(json.dumps(accepted_workspace, indent=2) + '\n')
+    (output / 'source642-controls-independent.json').write_text(json.dumps(accepted_controls, indent=2) + '\n')
     if platform == 'linux':
         source_job = job(api, pin, 'nobleJob', 'mouse-linux-install-noble', ['Check clean package dependencies and native Ubuntu 24.04 launch'])
         with artifact(api, pin, id_key='nobleArtifact', hash_key='nobleSHA256', name='mouse-linux-install-noble-verification', output=output, source_job=source_job) as archive:
@@ -423,10 +484,12 @@ def import_extra(module, platform):
             accepted_adblock = adblock(archive.read, platform='win32', arch='x64', verification=verification)
             accepted_settings = settings(archive.read, platform='win32', arch='x64')
             accepted_workspace = workspace(archive.read, platform='win32', arch='x64', verification=verification)
+            accepted_controls = controls(archive.read, platform='win32', arch='x64', verification=verification)
         (output / 'source638-modern-independent.json').write_text(json.dumps(accepted, indent=2) + '\n')
         (output / 'source639-modern-adblock-independent.json').write_text(json.dumps(accepted_adblock, indent=2) + '\n')
         (output / 'source640-modern-settings-independent.json').write_text(json.dumps(accepted_settings, indent=2) + '\n')
         (output / 'source641-modern-workspace-independent.json').write_text(json.dumps(accepted_workspace, indent=2) + '\n')
+        (output / 'source642-modern-controls-independent.json').write_text(json.dumps(accepted_controls, indent=2) + '\n')
     print('MOUSE_639_SOURCE_SUPPLEMENTAL_ACCEPTANCE_PASS', flush=True)
 
 
@@ -446,4 +509,6 @@ def fresh(module, platform):
     (output / 'installed640-settings-independent.json').write_text(json.dumps(accepted_settings, indent=2) + '\n')
     accepted_workspace = workspace(read, platform=platform, arch=arch, verification=verification)
     (output / 'installed641-workspace-independent.json').write_text(json.dumps(accepted_workspace, indent=2) + '\n')
+    accepted_controls = controls(read, platform=platform, arch=arch, verification=verification)
+    (output / 'installed642-controls-independent.json').write_text(json.dumps(accepted_controls, indent=2) + '\n')
     return accepted

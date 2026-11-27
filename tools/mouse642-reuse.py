@@ -94,6 +94,8 @@ def contracts():
 def adapted_tree(name, *, current_native=False):
     tree = ast.parse(checked(name), filename=str(TOOLS / name)) if name in FROZEN else legacy()['adapted_tree'](name, current_native=current_native)
     origin_changes = 0
+    language_changes = 0
+    footer_changes = 0
     if name == 'mouse637-library-evidence.py':
         # 642 preserves the accepted641 geometry exactly, including its 1px
         # tolerance in the unchanged caller. Bind the inherited AST as well as
@@ -113,8 +115,15 @@ def _placeholder_size(row, view):
 
     class Identity(ast.NodeTransformer):
         def visit_Call(self, node):
-            nonlocal origin_changes
+            nonlocal origin_changes, footer_changes
             node = self.generic_visit(node)
+            if (name == 'mouse636-feedback-evidence.py' and len(node.args) == 2
+                    and isinstance(node.args[1], ast.Constant) and node.args[1].value == 'requested footer order differs'):
+                original = ast.parse("c.get('left') == ['website'] and c.get('right', [])[-2:] == ['theme-button', 'settings-button'] and c.get('themeBeforeSettings') is True and 'language-select' in c['right'] and 'version-button' in c['right'] and c['right'].index('language-select') > c['right'].index('version-button')", mode='eval').body
+                if ast.dump(node.args[0], include_attributes=False) != ast.dump(original, include_attributes=False):
+                    raise ValueError('Frozen current footer predicate changed')
+                node.args[0] = ast.parse("c.get('left') == ['website'] and c.get('right', [])[-2:] == ['theme-button', 'settings-button'] and c.get('themeBeforeSettings') is True and isinstance(c.get('right'), list) and all(c['right'].count(key) == 1 for key in ('version-button', 'temperature-button', 'input-language-button', 'input-language-more')) and 'language-select' not in c['right'] and c['right'].index('version-button') < c['right'].index('temperature-button') < c['right'].index('input-language-button') < c['right'].index('input-language-more') < c['right'].index('theme-button')", mode='eval').body
+                footer_changes += 1
             replacements = {
                 ('mouse637-features-evidence.py', 'AI preview needs two distinct owned origins'):
                     "isinstance(chat_origin, str) and isinstance(preview_origin, str) and re.fullmatch(r'http://127\\.0\\.0\\.1:\\d+', chat_origin) and re.fullmatch(r'http://localhost:\\d+', preview_origin)",
@@ -133,9 +142,15 @@ def _placeholder_size(row, view):
             return node
 
         def visit_Constant(self, node):
+            nonlocal language_changes
             if not isinstance(node.value, str):
                 return node
             value = node.value.replace('6.0.41', '6.0.42')
+            # The interface language chooser moved into Settings. Preserve the
+            # frozen catalog, native input, translation and screen-pixel gates.
+            if name == 'mouse637-features-evidence.py' and node.value == '#language-select':
+                value = '#settings-language'
+                language_changes += 1
             for old, new in MODULES.items():
                 value = value.replace(old, new)
             value = value.replace('mouse641-release', 'mouse642-release').replace('mouse641-linux-release', 'mouse642-linux-release').replace('mouse641-windows-release', 'mouse642-windows-release')
@@ -177,6 +192,10 @@ def _placeholder_size(row, view):
     expected = int(name in {'mouse637-features-evidence.py', 'mouse636-retained-owner-evidence.py', 'mouse634-download-evidence.py'})
     if origin_changes != expected:
         raise ValueError('642 owned fixture adaptation did not bind its exact frozen predicate: ' + name)
+    if language_changes != int(name == 'mouse637-features-evidence.py'):
+        raise ValueError('642 interface language adapter did not bind its exact frozen selector: ' + name)
+    if footer_changes != int(name == 'mouse636-feedback-evidence.py'):
+        raise ValueError('642 footer adapter did not bind its exact frozen predicate: ' + name)
     return ast.fix_missing_locations(tree)
 
 

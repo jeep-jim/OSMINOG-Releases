@@ -289,6 +289,8 @@ class ExtraProvenance(unittest.TestCase):
                          'mouse-640-settings-acceptance.py': (TOOLS / 'mouse642-settings-evidence.py').read_bytes().replace(
                              b'mouse642-task-evidence.py', b'mouse-631-acceptance.py'),
                          'mouse-641-workspace-acceptance.py': (TOOLS / 'mouse642-flexible-workspace-evidence.py').read_bytes().replace(
+                             b'mouse642-task-evidence.py', b'mouse-631-acceptance.py'),
+                         'mouse-642-controls-acceptance.py': (TOOLS / 'mouse642-controls-evidence.py').read_bytes().replace(
                              b'mouse642-task-evidence.py', b'mouse-631-acceptance.py')}
             for name, raw in originals.items(): (output / name).write_bytes(raw)
             EXTRA['verify_helper_bytes'](output)

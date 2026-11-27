@@ -207,7 +207,7 @@ class CurrentLibraryGeometry(unittest.TestCase):
         digest = hashlib.sha256((TOOLS / 'mouse642-reuse.py').read_bytes()).hexdigest()
         references = [value['dependencies']['mouse642-reuse.py'] for value in schema.values()
                       if isinstance(value, dict) and 'mouse642-reuse.py' in value.get('dependencies', {})]
-        self.assertEqual(references, [digest] * 6)
+        self.assertEqual(references, [digest] * 7)
 
 
 if __name__ == '__main__':
