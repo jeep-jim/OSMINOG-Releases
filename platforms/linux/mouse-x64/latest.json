@@ -1,22 +1,22 @@
 {
   "schema": 1,
-  "version": "6.0.41",
+  "version": "6.0.42",
   "platform": "linux",
   "arch": "x64",
-  "url": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/mouse-linux-v6.0.41-x64/Mouse-Browser-6.0.41-Linux-x64.AppImage",
-  "size": 128822176,
-  "digest": "sha256:d68443f65a82d108162a2f528c4898abc8406150f270a19e09b3a257f84238f0",
+  "url": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/mouse-linux-v6.0.42-x64/Mouse-Browser-6.0.42-Linux-x64.AppImage",
+  "size": 128892006,
+  "digest": "sha256:47663773e021d28b0d0ac97cc3689f6c5f3ce0d20975d88dbcef91480de38fde",
   "packages": {
     "appimage": {
-      "url": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/mouse-linux-v6.0.41-x64/Mouse-Browser-6.0.41-Linux-x64.AppImage",
-      "size": 128822176,
-      "digest": "sha256:d68443f65a82d108162a2f528c4898abc8406150f270a19e09b3a257f84238f0"
+      "url": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/mouse-linux-v6.0.42-x64/Mouse-Browser-6.0.42-Linux-x64.AppImage",
+      "size": 128892006,
+      "digest": "sha256:47663773e021d28b0d0ac97cc3689f6c5f3ce0d20975d88dbcef91480de38fde"
     },
     "deb": {
-      "url": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/mouse-linux-v6.0.41-x64/Mouse-Browser-6.0.41-Linux-x64.deb",
-      "size": 101395748,
-      "digest": "sha256:42b1f88a013fffe8b786b1d2db910f3662b9f1f85f334a7042525e2a19571532"
+      "url": "https://github.com/jeep-jim/OSMINOG-Releases/releases/download/mouse-linux-v6.0.42-x64/Mouse-Browser-6.0.42-Linux-x64.deb",
+      "size": 101442060,
+      "digest": "sha256:053c32bfc70d61256cd70f5d2988b2ac0d0c88fa0f25cf44389801264770e2ad"
     }
   },
-  "publishedAt": "2026-11-26T16:10:07Z"
+  "publishedAt": "2026-11-27T10:10:16Z"
 }
