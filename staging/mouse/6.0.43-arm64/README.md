@@ -1,9 +1,11 @@
 # Mouse Browser 6.0.43 — Mac arm64 only
 
-This stage is unready. No source, merged-source, run, job, artifact or package-byte
-claim is populated, and `PUBLISH_OWNER` is absent. Activating it requires the exact
-successful Mac source candidate, its ordinary source merge with the same tree,
-actual run/attempt/job provenance, archive digests and full DMG/ZIP byte hashes.
+This stage pins source `926ad99ffa36e15068b713d110c127e1fa22565e`, ordinary merge `ee037d9da18968b91f55ec21ace701ab7a127f22`
+from PR224, accepted Mac run46008709674 attempt1, job140538363015.
+The source candidate and verification archives, exact DMG/ZIP bytes, complete
+independent publisher replay and native frame review were accepted before activation.
+The publisher must still perform its fresh installed checks and verify public
+package/feed availability before this version is reported as released.
 
 The owner has authorized **Mac only**. There is no Linux or Windows 6.0.43 stage,
 workflow or publication entry point. Their published 6.0.42 packages and feeds remain

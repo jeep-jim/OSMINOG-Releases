@@ -76,6 +76,14 @@ class FrozenPredecessor(unittest.TestCase):
         baseline_constants = [n.value for n in ast.walk(REUSE['adapted_tree']('mouse637-performance-evidence.py')) if isinstance(n, ast.Constant)]
         self.assertIn('mouse642-task-evidence.py', baseline_constants)
 
+    def test_schema_upgrade_markers_equal_the_executed_current_readers(self):
+        schema = json.loads((STAGE / 'evidence.schema.json').read_text())
+        expected = [runpy.run_path(str(TOOLS / name))['MARKER'] for name in
+                    ('mouse643-upgrade-evidence.py', 'mouse643-update-button-evidence.py')]
+        self.assertEqual(expected, ['MOUSE_643_REAL_642_TO_643_PROFILE_PASS',
+                                    'MOUSE_643_REAL_642_TO_643_UPDATE_BUTTON_PASS'])
+        self.assertEqual([marker for marker in schema['x-nativeMarkers'] if '_REAL_' in marker], expected)
+
     def test_actual_import_guard_requires_box_token_and_all_current_features(self):
         declared = json.loads((TOOLS / 'fixtures/mouse643-macos-build-feature-tokens.json').read_text())['tests']
         tree = REUSE['adapted_tree']('mouse632-release.py')
