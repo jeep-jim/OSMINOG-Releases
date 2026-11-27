@@ -136,6 +136,7 @@ def validate_controls_contract(stage):
          and contract.get('savedReportAcceptedAsInput') is False
          and all(contract.get(key) is True for key in ('realOSInputLanguage', 'samePhysicalKeyBothLayouts',
              'explicitConsentBeforeReplacement', 'originalTargetAndRangeBound', 'nativeUndo',
+             'plainParagraphCorrection', 'unmodifiedEditorNodesPreserved', 'plainParagraphNativeUndo',
              'settingsOnlyInterfaceLanguage', 'independentToneControls', 'twoProcessTonePersistence')),
          'independent642 controls validator identity or required behavior changed')
     need(contract.get('dependencies') == {name: sha((TOOLS / name).read_bytes()) for name in CONTROLS_DEPENDENCIES}

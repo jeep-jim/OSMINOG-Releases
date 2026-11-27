@@ -211,10 +211,20 @@ def correction(value):
     prefix = 'Earlier paragraph stays.'
     need(paragraph.get('value') == EXPECTED and paragraph.get('prefix') == prefix
          and paragraph.get('beforeText') == prefix + SAMPLE and paragraph.get('afterText') == prefix + EXPECTED
-         and all(paragraph.get(key) is True for key in ('hostPreserved', 'wrappersPreserved', 'textNodesPreserved'))
+         and all(paragraph.get(key) is True for key in ('hostPreserved', 'wrappersPreserved', 'unmodifiedTextNodesPreserved'))
          and any(event.get('trusted') is True and event.get('value') == prefix + EXPECTED
                  and event.get('inputType') in ('insertText', 'insertReplacementText') for event in paragraph.get('events', [])),
          'plain paragraph correction changed earlier text, editor identity or its actual host input')
+    # Blink may replace the one edited Text node during its native undoable edit.
+    # The receipt must distinguish that from changes to any untouched node.
+    need(type(paragraph.get('textNodesPreserved')) is bool and type(paragraph.get('editedTextNodeReplaced')) is bool
+         and paragraph['textNodesPreserved'] is (not paragraph['editedTextNodeReplaced']),
+         'plain paragraph edited-node receipt is missing or inconsistent')
+    undo = paragraph.get('undo', {})
+    need(undo == {'value': SAMPLE, 'prefix': prefix, 'hostPreserved': True,
+         'wrappersPreserved': True, 'source': 'WebContents.undo'}
+         and all(undo.get(key) is True for key in ('hostPreserved', 'wrappersPreserved')),
+         'plain paragraph native undo did not restore its original text and editor structure')
     need(re.fullmatch(r'[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}', value['accepted'].get('token', '')),
          'consent lacks its original one-use target token')
     need(value.get('undo') == {'value': SAMPLE, 'source': 'WebContents.undo'}, 'native undo did not restore the exact original text')
@@ -386,7 +396,8 @@ def verify(read, expected_platform=None, expected_arch=None):
     return {'schema': 1, 'version': VERSION, 'ok': True, 'platform': platform, 'arch': arch,
             'processes': {'writePid': pid, 'readPid': restart['pid']}, 'nativeCaptures': list(CAPTURES),
             'realOSInputLanguage': True, 'physicalKeyBothLayouts': True, 'consentOnlyCorrection': True,
-            'nativeUndo': True, 'settingsOnlyInterfaceLanguage': True, 'independentToneControls': True,
+            'nativeUndo': True, 'plainParagraphCorrection': True, 'unmodifiedEditorNodesPreserved': True,
+            'plainParagraphNativeUndo': True, 'settingsOnlyInterfaceLanguage': True, 'independentToneControls': True,
             'twoProcessTonePersistence': True, 'artifacts': list(artifacts.values())}
 
 
