@@ -20,6 +20,20 @@ def identity(name='a', desk='desk-1'):
 def receipt(selector='#button', action='click'):
     return {'selector': selector, 'source': 'XTest', 'pid': 101, 'action': action, 'at': 1000, 'point': {'x': 40, 'y': 50}, 'from': {'x': 40, 'y': 50}, 'to': {'x': 120, 'y': 80}, 'released': True, 'events': [{'type': 'pointerdown' if action == 'drag' else 'click', 'trusted': True, 'matches': True}]}
 
+def url_input_fixture():
+    selector, value = '#settings-adblock-exception-url', 'https://LOCALHOST:443/owned?path=one'
+    click = receipt(selector)
+    before = {'exists': True, 'focused': True, 'sameTarget': True,
+              'activeElement': {'id': selector[1:], 'tagName': 'INPUT', 'type': 'text'},
+              'value': '', 'selectionStart': 0, 'selectionEnd': 0, 'events': copy.deepcopy(click['events'])}
+    after = {**copy.deepcopy(before), 'value': value, 'selectionStart': len(value), 'selectionEnd': len(value)}
+    after['events'].append({'type': 'input', 'trusted': True, 'matches': True})
+    row = {'selector': selector, 'value': value, 'source': 'native focus and webContents.insertText',
+           'preparation': 'already-empty', 'stage': 'complete', 'input': click, 'before': before,
+           'prepared': copy.deepcopy(before), 'after': after, 'events': copy.deepcopy(after['events'])}
+    return row, [click], [row]
+
+
 def layout_fixture():
     home = {'visible': True, 'search': True, 'favorites': True, 'tabs': [{'id': 'c', 'visible': True}]}
     empty = {'input': receipt('#footer-left [data-action="split-x"]'), 'paneId': 'p3', 'after': {'slots': {'p3': ''}}, 'home': home}
@@ -113,6 +127,62 @@ def absent():
     return {'widgetCount': 0, 'scripts': [], 'styles': [], 'mediaPlayerAPI': 'undefined', 'onMediaPlayerAPI': 'undefined'}
 
 class Workspace641ReaderTests(unittest.TestCase):
+    def test_empty_url_insertion_and_legacy_input_receipts_remain_distinct_valid_routes(self):
+        row, inputs, texts = url_input_fixture()
+        W.verify_settings_url_input(row, 'linux', 101, inputs, texts)
+        legacy = {'value': row['value'], 'source': 'native focus, webContents.sendInputEvent and insertText',
+                  'input': row['input'], 'events': [{'type': 'input', 'trusted': True}]}
+        W.verify_settings_url_input(legacy, 'linux', 101, inputs)
+        row['source'] = legacy['source']
+        with self.assertRaisesRegex(ValueError, 'legacy key route'):
+            W.verify_settings_url_input(row, 'linux', 101, inputs, texts)
+
+    def test_empty_url_insertion_requires_stored_before_prepared_and_after_snapshots(self):
+        for key in ('before', 'prepared', 'after'):
+            row, inputs, texts = url_input_fixture(); row.pop(key)
+            with self.assertRaisesRegex(ValueError, 'snapshot'):
+                W.verify_settings_url_input(row, 'linux', 101, inputs, texts)
+        for field, replacement in [('stage', 'select-all'), ('preparation', 'assumed-empty'),
+                                   ('selector', '#another-field'), ('value', 'https://other.example/'), ('error', {'message': 'failed'})]:
+            row, inputs, texts = url_input_fixture(); row[field] = replacement
+            with self.assertRaises(ValueError): W.verify_settings_url_input(row, 'linux', 101, inputs, texts)
+        row, inputs, texts = url_input_fixture()
+        with self.assertRaisesRegex(ValueError, 'stored text ledger'):
+            W.verify_settings_url_input(row, 'linux', 101, inputs, [])
+        changed = copy.deepcopy(texts); changed[0]['prepared']['focused'] = False
+        with self.assertRaisesRegex(ValueError, 'stored text ledger'):
+            W.verify_settings_url_input(row, 'linux', 101, inputs, changed)
+
+    def test_empty_url_insertion_cannot_clear_a_nonempty_field_or_switch_its_target(self):
+        for key in ('before', 'prepared', 'after'):
+            changes = [('exists', False), ('focused', False), ('sameTarget', False),
+                       ('activeElement', {'id': 'another', 'tagName': 'INPUT', 'type': 'text'}),
+                       ('activeElement', {'id': 'settings-adblock-exception-url', 'tagName': 'INPUT', 'type': 'password'}),
+                       ('value', 'unexpected value')]
+            if key != 'after': changes += [('selectionStart', 1), ('selectionEnd', None), ('selectionStart', False)]
+            for field, replacement in changes:
+                row, inputs, texts = url_input_fixture(); row[key][field] = replacement
+                with self.subTest(snapshot=key, field=field, replacement=replacement):
+                    with self.assertRaises(ValueError): W.verify_settings_url_input(row, 'linux', 101, inputs, texts)
+
+    def test_empty_url_insertion_requires_native_click_and_new_trusted_input_on_the_same_target(self):
+        row, inputs, texts = url_input_fixture()
+        with self.assertRaisesRegex(ValueError, 'native process ledger'):
+            W.verify_settings_url_input(row, 'linux', 101, [], texts)
+        for field, replacement in [('source', 'script'), ('pid', 999), ('selector', '#another-field')]:
+            row, inputs, texts = url_input_fixture(); row['input'][field] = replacement
+            with self.assertRaises(ValueError): W.verify_settings_url_input(row, 'linux', 101, inputs, texts)
+        for field in ('trusted', 'matches'):
+            row, inputs, texts = url_input_fixture(); row['after']['events'][-1][field] = False
+            row['events'] = copy.deepcopy(row['after']['events'])
+            with self.assertRaises(ValueError): W.verify_settings_url_input(row, 'linux', 101, inputs, texts)
+        row, inputs, texts = url_input_fixture(); row['prepared']['events'] = copy.deepcopy(row['after']['events'])
+        with self.assertRaisesRegex(ValueError, 'new trusted input'):
+            W.verify_settings_url_input(row, 'linux', 101, inputs, texts)
+        row, inputs, texts = url_input_fixture(); row['before']['events'][0]['trusted'] = False
+        with self.assertRaisesRegex(ValueError, 'event history'):
+            W.verify_settings_url_input(row, 'linux', 101, inputs, texts)
+
     def test_windows_html_drags_bind_separate_child_input_path_clocks_and_held_ownership(self):
         value, ledger = windows_layout_fixture()
         W.verify_layout(value, 'win32', 101, ledger)
