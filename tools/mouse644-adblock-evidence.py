@@ -23,7 +23,12 @@ SCRIPT = {'allowed': '/* Mouse639 owned allowed script */ globalThis.mouse639.ex
           'advertising': '/* Mouse639 owned advertising script */ globalThis.mouse639.executed.advertising++;'}
 COLORS = {'allowed': [42, 178, 93], 'advertising': [235, 158, 43], 'blocked': [200, 65, 85]}
 WRITE_CASES = ('default-off', 'enabled-first', 'enabled-second-tab', 'enabled-other-desktop', 'enabled-private', 'disabled-again')
-BASE_SETTINGS = {key: True for key in ('showBrandName', 'showFavicons', 'desktopGestures', 'downloadBounce', 'downloadBadge')}
+BASE_SETTINGS = {key: True for key in ('showBrandName', 'showFavicons', 'desktopGestures', 'downloadBounce', 'downloadBadge', 'syncWebsiteTheme')}
+SUBSCRIPTION_METADATA = {
+    'easylist': {'name': 'EasyList', 'authors': 'The EasyList authors', 'homepage': 'https://easylist.to/',
+                 'license': 'https://creativecommons.org/licenses/by-sa/3.0/'},
+    'ruadlist': {'name': 'RU AdList', 'authors': 'RU AdList authors (see the preserved list header)',
+                'homepage': 'https://forums.lanik.us/viewforum.php?f=102', 'license': 'https://creativecommons.org/licenses/by/3.0/'}}
 
 
 def need(condition, message):
@@ -52,14 +57,36 @@ def settings(value, enabled, *, private=False, state=False):
     need(value == expected, 'settings defaults, opt-in value or private state differ')
 
 
-def state(value, enabled, *, prepared=True):
-    need(isinstance(value, dict) and set(value) == {'enabled', 'phase', 'lists', 'rules', 'updatedAt'}, 'unexpected public blocker state')
+def state(value, enabled, *, cache_records, prepared=True, private=False):
+    expected_keys = {'enabled', 'phase', 'lists', 'rules', 'updatedAt', 'subscriptions',
+                     'updateIntervalHours', 'maxSubscriptions', 'privateMode', 'revision'}
+    need(isinstance(value, dict) and set(value) == expected_keys, 'unexpected public blocker state')
     need(value['enabled'] is enabled and value['phase'] == ('ready' if enabled else 'off'), 'blocker is not in the required settled state')
-    need(value['lists'] == (2 if prepared else 0) and P.integer(value['rules'], 10 if prepared else 1), 'synthetic filter lists were not loaded')
+    # Both labelled fixture lists have sixty distinct domains and share one URL
+    # rule: 61 + 61 - 1 = 121. Before opt-in no list or seed rule is installed.
+    need(value['lists'] == (2 if prepared else 0) and type(value['rules']) is int
+         and value['rules'] == (121 if prepared else 0), 'synthetic filter rules were not loaded exactly')
+    need(value['updateIntervalHours'] == 12 and value['maxSubscriptions'] == 8 and value['privateMode'] is private
+         and P.integer(value['revision'], 1 if prepared else 0), 'subscription policy or private state differs')
+    by_id = {row['source']: row for row in cache_records}
+    need(set(by_id) == set(SUBSCRIPTION_METADATA), 'verified cache subscription identities differ')
+    updated = min(row['updatedAt'] for row in cache_records) if prepared else None
+    need(value['updatedAt'] == updated, 'public blocker cache timestamp differs')
     if prepared:
         stamp(value['updatedAt'])
-    else:
-        need(value['updatedAt'] is None, 'default-off profile parsed filter cache')
+    subscriptions = value['subscriptions']
+    need(isinstance(subscriptions, list) and [row.get('id') for row in subscriptions] == list(SUBSCRIPTION_METADATA),
+         'exact built-in subscription inventory differs')
+    for row in subscriptions:
+        ident = row['id']; cached = by_id[ident]
+        expected = {**SUBSCRIPTION_METADATA[ident], 'id': ident,
+                    'url': 'https://easylist-downloads.adblockplus.org/' + ident + '.txt',
+                    'builtin': True, 'enabled': True, 'phase': ('ready' if enabled else 'off'),
+                    'origin': 'cache' if prepared else 'none', 'ruleCount': 61 if prepared else 0,
+                    'updatedAt': cached['updatedAt'] if prepared else None,
+                    'checkedAt': cached['updatedAt'] if prepared else None,
+                    'sha256': cached['textSha256'] if prepared else None, 'lastError': None, 'nextRetryAt': None}
+        need(row == expected, 'subscription state or verified cached content differs')
 
 
 def image_capture(read, value):
@@ -117,7 +144,7 @@ def input_receipts(part, platform):
     return by_ticket
 
 
-def verify_case(value, part, hits, captures, decoded, blocked, private):
+def verify_case(value, part, hits, captures, decoded, blocked, private, cache_records):
     name, token = value.get('name'), value.get('token')
     need(isinstance(token, str) and re.fullmatch(r'[a-f0-9-]{36}', token), 'invalid HTTP request token')
     need(value.get('pid') == part['pid'] and value.get('blocked') is blocked and value.get('privateMode') is private
@@ -133,7 +160,7 @@ def verify_case(value, part, hits, captures, decoded, blocked, private):
     counts = {kind: sum(hit['kind'] == kind for hit in own_hits) for kind in ('page', 'allowed', 'advertising')}
     need(counts == value.get('counts') == {'page': 1, 'allowed': 1, 'advertising': 0 if blocked else 1}, 'server actually received an unexpected request')
     settings(value.get('settings'), blocked, private=private, state=True)
-    state(value.get('state'), blocked, prepared=name != 'default-off')
+    state(value.get('state'), blocked, prepared=name != 'default-off', private=private, cache_records=cache_records)
     native = value.get('native', {})
     need(all(native.get(key) is True for key in ('visible', 'parentVisible', 'cachedVisible', 'attached')) and native.get('zoom') == 1, 'fixture is not a visible native view at actual scale')
     need(isinstance(native.get('tabId'), str) and native['tabId'] and isinstance(native.get('desk'), str) and native['desk'] and P.integer(native.get('webContentsId'), 1), 'native page owner missing')
@@ -233,7 +260,7 @@ def verify(read, *, expected_platform=None, expected_arch=None):
             need(cache.get('seedSha256') == digest(raw('mouse-639-adblock-cache.json')) and cache.get('records') == cache_records, 'installed process did not read the exact seeded cache')
         enabled = phase == 'read'
         settings(part.get('initial', {}).get('settings'), enabled, state=True)
-        state(part.get('initial', {}).get('state'), enabled, prepared=enabled)
+        state(part.get('initial', {}).get('state'), enabled, prepared=enabled, cache_records=cache_records)
         settings(part.get('finalSettings'), not enabled)
         need(part.get('fixtureSha256') == digest(template), 'served fixture template differs')
         origin = urllib.parse.urlparse(part.get('origin', ''))
@@ -262,7 +289,7 @@ def verify(read, *, expected_platform=None, expected_arch=None):
         need(len({value.get('token') for value in cases}) == len(cases), 'HTTP request tokens were reused')
         for value in cases:
             blocked = value['name'] not in ('default-off', 'disabled-again')
-            accepted_cases.append(verify_case(value, part, hits, captures, decoded, blocked, value['name'] == 'enabled-private'))
+            accepted_cases.append(verify_case(value, part, hits, captures, decoded, blocked, value['name'] == 'enabled-private', cache_records))
         ui = {value['name']: value for value in part.get('ui', [])}
         for value in ui.values():
             shot = captures.get(value.get('capture'))
@@ -281,7 +308,7 @@ def verify(read, *, expected_platform=None, expected_arch=None):
                  and change['after'].get('stored') is on and change['after'].get('disabled') is False, 'checkbox does not reflect committed preference')
             need(change['name'] in ui and all(ui[change['name']].get(k) == v for k, v in change['after'].items()), 'transition has no bound UI capture')
             settings(change.get('saved'), on)
-            state(change.get('state'), on)
+            state(change.get('state'), on, cache_records=cache_records)
         if phase == 'write':
             need(ui.get('initial-off', {}).get('checked') is False and ui.get('enable-dark', {}).get('theme') == 'dark'
                  and ui.get('enabled-light', {}).get('theme') == 'light' and ui['enabled-light'].get('checked') is True, 'new toggle was not observed in both themes')

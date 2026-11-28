@@ -69,7 +69,11 @@ def target(name):
 
 PREDECESSOR_MODULES = {'mouse637-current.py', 'mouse637-upgrade-evidence.py',
     'mouse637-update-button-evidence.py', 'mouse637-performance-evidence.py', 'mouse637-public-channel.py'}
-SETTINGS_SECTIONS = legacy()['SETTINGS_SECTIONS']
+FROZEN_SETTINGS_SECTIONS = legacy()['SETTINGS_SECTIONS']
+SETTINGS_SECTIONS = list(FROZEN_SETTINGS_SECTIONS)
+SETTINGS_SECTIONS.insert(SETTINGS_SECTIONS.index('adblock-exclusions'), 'adblock-subscriptions')
+FROZEN_SETTINGS_TOGGLES = ('showFavicons', 'desktopGestures', 'downloadBounce', 'downloadBadge')
+SETTINGS_TOGGLES = ('showFavicons', 'syncWebsiteTheme', 'desktopGestures', 'downloadBounce', 'downloadBadge')
 SETTINGS_PAGES = legacy()['SETTINGS_PAGES']
 
 
@@ -79,6 +83,10 @@ def contracts():
 
 def adapted_tree(name, *, current_native=False):
     tree = ast.parse(checked(name), filename=str(TOOLS / name)) if name in FROZEN else legacy()['adapted_tree'](name, current_native=current_native)
+    changed = {}
+
+    def mark(key):
+        changed[key] = changed.get(key, 0) + 1
 
     class Identity(ast.NodeTransformer):
         def visit_Constant(self, node):
@@ -116,9 +124,24 @@ def adapted_tree(name, *, current_native=False):
             names = [item.id for item in node.targets if isinstance(item, ast.Name)]
             if name == 'mouse637-upgrade-evidence.py' and 'BASELINES' in names:
                 node.value = ast.parse(repr(baselines()), mode='eval').body
+            if name in ('mouse633-owner-feedback-evidence.py', 'mouse637-agent-removal-evidence.py') and 'SECTIONS' in names:
+                if ast.literal_eval(node.value) != FROZEN_SETTINGS_SECTIONS:
+                    raise ValueError('Frozen643 Settings section contract changed')
+                mark('settings_sections')
+                node.value = ast.parse(repr(SETTINGS_SECTIONS), mode='eval').body
+            if name == 'mouse633-owner-feedback-evidence.py' and 'SETTINGS' in names:
+                if ast.literal_eval(node.value) != FROZEN_SETTINGS_TOGGLES:
+                    raise ValueError('Frozen643 Settings toggle contract changed')
+                mark('settings_toggles')
+                node.value = ast.parse(repr(SETTINGS_TOGGLES), mode='eval').body
             return node
 
-    return ast.fix_missing_locations(Identity().visit(tree))
+    tree = Identity().visit(tree)
+    required = {'mouse633-owner-feedback-evidence.py': ('settings_sections', 'settings_toggles'),
+                'mouse637-agent-removal-evidence.py': ('settings_sections',)}.get(name, ())
+    if any(changed.get(key) != 1 for key in required):
+        raise ValueError('Current644 Settings adaptation did not bind its frozen inventory: ' + repr(changed))
+    return ast.fix_missing_locations(tree)
 
 
 def prepare_scope(scope):

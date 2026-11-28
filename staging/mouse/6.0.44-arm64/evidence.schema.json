@@ -519,8 +519,8 @@
     "nativeShellCaptures": 8,
     "guestZoomCaptures": 8,
     "fullDisplayCropPixelsRecomputed": true,
-    "settingsSections": 19,
-    "settingsToggles": 4,
+    "settingsSections": 20,
+    "settingsToggles": 5,
     "brandCaptionRemoval": {
       "readbacks": [
         "initial",
@@ -733,7 +733,7 @@
       "mouse644-download-evidence.py": "befa5c665a637c4ad1b1985f88fd4e8f58b1040cfebf2a3a2a7b9a80960c61cb",
       "mouse644-capture-evidence.py": "f2c4455f77310140e3c7ef1fc83aefe1416a1951f86cd4439d06669d8a15c7a9",
       "mouse644-focused-evidence.py": "75b732e0241f547cc2daf4fc92df5802dbe1fb9feee38a9b9b9a4fa7dbbca04d",
-      "mouse644-reuse.py": "c6ecdd50ac8f2881cde67dfdd27b8974e22cfd976dd565e39c2fdedee013a99f",
+      "mouse644-reuse.py": "013313941f69dd99c48feb11fbb39e64f1317c6d28779754a4fcfdbed7d3a1c8",
       "mouse644-zoom-evidence.py": "c0b0f8e9643931464dfbc1188fc6b30055d0ecade0afeedcd5fde2711c5ff188",
       "mouse644-agent-removal-adapter.py": "7a0a8df1615196d5687f97ac90410b0968a2a2658ede06b3b3af5d8c77a2ecde"
     }
@@ -766,7 +766,7 @@
       "mouse644-agent-removal-evidence.py": "4925d831e1b7935985db4ec147604229f197b64ebe7f3e804da17d0e7c9b3275",
       "mouse644-pane-layout-evidence.py": "fd4c012f718b32017656f427bef558759dd17d9beb05166414dd5ec749de605c",
       "mouse644-context-evidence.py": "fb0024bd4acd744b5ef3604cbad2484610c5a5836de195986c5baed5cf67175c",
-      "mouse644-reuse.py": "c6ecdd50ac8f2881cde67dfdd27b8974e22cfd976dd565e39c2fdedee013a99f",
+      "mouse644-reuse.py": "013313941f69dd99c48feb11fbb39e64f1317c6d28779754a4fcfdbed7d3a1c8",
       "mouse644-zoom-evidence.py": "c0b0f8e9643931464dfbc1188fc6b30055d0ecade0afeedcd5fde2711c5ff188",
       "mouse644-agent-removal-adapter.py": "7a0a8df1615196d5687f97ac90410b0968a2a2658ede06b3b3af5d8c77a2ecde"
     },
@@ -1239,7 +1239,7 @@
       "mouse644-task-evidence.py": "538e5d6d6da06c66bda9347fc407738808dcb0ad5678879036c763b2e294d511",
       "mouse-638-crx-proof.cjs": "5b0ac13325b55faa647f9d02c5c862db5e6e6e276fdef00b3c6788fff54dd829",
       "mouse644-extra-evidence.py": "077aac70240e2188f5672c4ac7dbc96201a5e63ddf0193db97bc42a83db1cf73",
-      "mouse644-reuse.py": "c6ecdd50ac8f2881cde67dfdd27b8974e22cfd976dd565e39c2fdedee013a99f",
+      "mouse644-reuse.py": "013313941f69dd99c48feb11fbb39e64f1317c6d28779754a4fcfdbed7d3a1c8",
       "mouse644-frozen.json": "42491953b444614705c5779cf39e3e152f22e11bea6b09910a1d354efb342525"
     }
   },
@@ -1257,7 +1257,7 @@
   },
   "x-current639AdblockGate": {
     "validator": "tools/mouse644-adblock-evidence.py",
-    "sha256": "fb7b08026bc36599e4637bca670ac7466fcf408791f17a0ba043715c3e4a7bd8",
+    "sha256": "c19ae6a083d8635ae6d07389cbe04f4d82afbaaf648bef059ae0d473dabbf43f",
     "sourceAndFreshInstalled": true,
     "required": [
       "mouse-639-acceptance.json",
@@ -1276,7 +1276,7 @@
     "dependencies": {
       "mouse644-task-evidence.py": "538e5d6d6da06c66bda9347fc407738808dcb0ad5678879036c763b2e294d511",
       "mouse644-extra-evidence.py": "077aac70240e2188f5672c4ac7dbc96201a5e63ddf0193db97bc42a83db1cf73",
-      "mouse644-reuse.py": "c6ecdd50ac8f2881cde67dfdd27b8974e22cfd976dd565e39c2fdedee013a99f",
+      "mouse644-reuse.py": "013313941f69dd99c48feb11fbb39e64f1317c6d28779754a4fcfdbed7d3a1c8",
       "mouse644-frozen.json": "42491953b444614705c5779cf39e3e152f22e11bea6b09910a1d354efb342525",
       "mouse644-current.py": "6eb1a9b25296a3855ccfa6f55f01cd167afd62ded9122c98358560fdad74f873"
     }
@@ -1296,7 +1296,7 @@
     "dependencies": {
       "mouse644-task-evidence.py": "538e5d6d6da06c66bda9347fc407738808dcb0ad5678879036c763b2e294d511",
       "mouse644-extra-evidence.py": "077aac70240e2188f5672c4ac7dbc96201a5e63ddf0193db97bc42a83db1cf73",
-      "mouse644-reuse.py": "c6ecdd50ac8f2881cde67dfdd27b8974e22cfd976dd565e39c2fdedee013a99f",
+      "mouse644-reuse.py": "013313941f69dd99c48feb11fbb39e64f1317c6d28779754a4fcfdbed7d3a1c8",
       "mouse644-frozen.json": "42491953b444614705c5779cf39e3e152f22e11bea6b09910a1d354efb342525",
       "mouse644-current.py": "6eb1a9b25296a3855ccfa6f55f01cd167afd62ded9122c98358560fdad74f873",
       "mouse644-features-evidence.py": "5cb64327f4fde4457e013f2a308e1397883c3d86e984bbfafe26cdb66d6486d7",
@@ -1347,7 +1347,7 @@
     "dependencies": {
       "mouse644-task-evidence.py": "538e5d6d6da06c66bda9347fc407738808dcb0ad5678879036c763b2e294d511",
       "mouse644-extra-evidence.py": "077aac70240e2188f5672c4ac7dbc96201a5e63ddf0193db97bc42a83db1cf73",
-      "mouse644-reuse.py": "c6ecdd50ac8f2881cde67dfdd27b8974e22cfd976dd565e39c2fdedee013a99f",
+      "mouse644-reuse.py": "013313941f69dd99c48feb11fbb39e64f1317c6d28779754a4fcfdbed7d3a1c8",
       "mouse644-frozen.json": "42491953b444614705c5779cf39e3e152f22e11bea6b09910a1d354efb342525",
       "mouse644-current.py": "6eb1a9b25296a3855ccfa6f55f01cd167afd62ded9122c98358560fdad74f873",
       "mouse644-owner-contracts.py": "be9b163c50a68881fde18d556985a036f23a11f92a7ac68fa7e06113fddb9659",
@@ -1408,7 +1408,7 @@
     "dependencies": {
       "mouse644-task-evidence.py": "538e5d6d6da06c66bda9347fc407738808dcb0ad5678879036c763b2e294d511",
       "mouse644-extra-evidence.py": "077aac70240e2188f5672c4ac7dbc96201a5e63ddf0193db97bc42a83db1cf73",
-      "mouse644-reuse.py": "c6ecdd50ac8f2881cde67dfdd27b8974e22cfd976dd565e39c2fdedee013a99f",
+      "mouse644-reuse.py": "013313941f69dd99c48feb11fbb39e64f1317c6d28779754a4fcfdbed7d3a1c8",
       "mouse644-frozen.json": "42491953b444614705c5779cf39e3e152f22e11bea6b09910a1d354efb342525",
       "mouse644-current.py": "6eb1a9b25296a3855ccfa6f55f01cd167afd62ded9122c98358560fdad74f873"
     },
@@ -1446,7 +1446,7 @@
     "dependencies": {
       "mouse644-task-evidence.py": "538e5d6d6da06c66bda9347fc407738808dcb0ad5678879036c763b2e294d511",
       "mouse644-extra-evidence.py": "077aac70240e2188f5672c4ac7dbc96201a5e63ddf0193db97bc42a83db1cf73",
-      "mouse644-reuse.py": "c6ecdd50ac8f2881cde67dfdd27b8974e22cfd976dd565e39c2fdedee013a99f",
+      "mouse644-reuse.py": "013313941f69dd99c48feb11fbb39e64f1317c6d28779754a4fcfdbed7d3a1c8",
       "mouse644-frozen.json": "42491953b444614705c5779cf39e3e152f22e11bea6b09910a1d354efb342525",
       "mouse644-current.py": "6eb1a9b25296a3855ccfa6f55f01cd167afd62ded9122c98358560fdad74f873"
     },
@@ -1479,7 +1479,7 @@
       "mouse644-polish-evidence.py": "7b364c3e524c2eeea2bb66c0356e9c559402d92dc5f716c85ac59bc78a85bb0a",
       "mouse644-task-evidence.py": "538e5d6d6da06c66bda9347fc407738808dcb0ad5678879036c763b2e294d511",
       "mouse644-extra-evidence.py": "077aac70240e2188f5672c4ac7dbc96201a5e63ddf0193db97bc42a83db1cf73",
-      "mouse644-reuse.py": "c6ecdd50ac8f2881cde67dfdd27b8974e22cfd976dd565e39c2fdedee013a99f",
+      "mouse644-reuse.py": "013313941f69dd99c48feb11fbb39e64f1317c6d28779754a4fcfdbed7d3a1c8",
       "mouse644-frozen.json": "42491953b444614705c5779cf39e3e152f22e11bea6b09910a1d354efb342525",
       "mouse644-current.py": "6eb1a9b25296a3855ccfa6f55f01cd167afd62ded9122c98358560fdad74f873"
     },
@@ -1511,7 +1511,7 @@
       "mouse644-branding-evidence.py": "f74f6f0db8505a7ce32e131dc345817f3e7dfe52c6767ddb078ff1e226867277",
       "mouse644-extra-evidence.py": "077aac70240e2188f5672c4ac7dbc96201a5e63ddf0193db97bc42a83db1cf73",
       "mouse644-current.py": "6eb1a9b25296a3855ccfa6f55f01cd167afd62ded9122c98358560fdad74f873",
-      "mouse644-reuse.py": "c6ecdd50ac8f2881cde67dfdd27b8974e22cfd976dd565e39c2fdedee013a99f",
+      "mouse644-reuse.py": "013313941f69dd99c48feb11fbb39e64f1317c6d28779754a4fcfdbed7d3a1c8",
       "mouse644-frozen.json": "42491953b444614705c5779cf39e3e152f22e11bea6b09910a1d354efb342525"
     },
     "nativeFinderAndBundleNames": true,
