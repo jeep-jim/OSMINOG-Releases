@@ -1,0 +1,134 @@
+name: Mouse Flash and identity for Mac 6.0.45
+on:
+  push:
+    branches: ['mouse/flash-direct-transfer', 'mouse/645-flash-identity']
+    paths: ['desktop/browser.cjs', 'desktop/mouse-*', 'desktop/mouse/**', 'desktop/mouse-native/**', 'tools/mouse-*', 'tools/test_mouse*', 'tools/test-mouse*', '.github/workflows/mouse-macos.yml', 'desktop/testfixtures/mouse-645-*', 'desktop/mouse-flash*', 'desktop/mouse/flash/**', 'desktop/mouse-profile*', 'desktop/mouse-account*', 'desktop/mouse-sync*', 'desktop/mouse-645*', 'desktop/mouse/account-ui.js', 'desktop/mouse/flash-sidebar.js', 'desktop/mouse/mouse-645.css', 'desktop/mouse/browser.js', 'desktop/mouse/mouse-613-ui.js', 'desktop/mouse/index.html', 'desktop/mouse/settings-panel.js', 'desktop/mouse/settings-glass.css', 'desktop/mouse-settings-ui.test.cjs', 'desktop/mouse-main.cjs', 'desktop/mouse-preload.cjs', 'desktop/mouse-build.cjs', 'desktop/mouse-native-build.cjs', 'tools/mouse-flash*', 'tools/test-mouse-flash*', 'tools/mouse-account*', 'tools/test-mouse-account*', 'tools/mouse-profile*', 'tools/mouse-645*', 'services/mouse-identity/**', '.github/workflows/mouse-flash.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  direct-transfer:
+    runs-on: macos-15
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Check Apple Silicon runner
+        run: test "$(uname -m)" = arm64
+      - name: Install existing pinned desktop dependencies
+        working-directory: desktop
+        run: npm ci
+      - name: Transfer, account, profile and retained settings contracts
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p mouse-flash-evidence
+          node --test desktop/mouse-flash*.test.cjs tools/test-mouse-flash*.cjs tools/test-mouse-account-registry.cjs desktop/mouse-profile.test.cjs desktop/mouse-settings-ui.test.cjs desktop/mouse-641-retained-settings.test.cjs desktop/mouse-private.test.cjs desktop/mouse-644-release.test.cjs | tee mouse-flash-evidence/unit.log
+      - name: Native account and sidebar behavior contracts
+        working-directory: desktop
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --test mouse-account-ui.test.cjs mouse-account-keychain.test.cjs mouse-flash-sidebar.test.cjs mouse-645-ui.test.cjs mouse-645-account-acceptance.test.cjs mouse-620.test.cjs mouse-appearance.test.cjs | tee ../mouse-flash-evidence/identity-ui.log
+      - name: Compile protected Keychain and retained native modules
+        working-directory: desktop
+        shell: bash
+        run: |
+          set -euo pipefail
+          node mouse-native-build.cjs | tee ../mouse-flash-evidence/native-build.log
+          node -e "const n=require('./mouse-account-keychain.node');for(const key of ['available','probe','put','get','remove'])require('node:assert/strict').equal(typeof n[key],'function');console.log('MOUSE_ACCOUNT_KEYCHAIN_BUILT')" | tee -a ../mouse-flash-evidence/native-build.log
+      - name: Real RTC transfer, consent, interruption and resume in two sandboxed Mouse windows
+        env:
+          MOUSE_FLASH_SMOKE_ROOT: ${{ runner.temp }}/mouse-flash-owned-fixtures
+          MOUSE_FLASH_EVIDENCE: ${{ github.workspace }}/mouse-flash-evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          node desktop/node_modules/electron/cli.js tools/mouse-flash-rtc-smoke.cjs 2>&1 | tee mouse-flash-evidence/rtc.log
+          grep -qx MOUSE_FLASH_REAL_RTC_PASS mouse-flash-evidence/rtc.log
+          node -e "const r=require('./mouse-flash-evidence/mouse-flash-rtc.json');require('node:assert/strict').ok(r.status==='PASS' && r.realRTCDataChannel===true && r.platform==='darwin' && r.payloadBytes>48*1048576 && r.payloadBytesAfterResume===r.payloadBytes-r.durableBeforeResume)"
+      - name: Profile placement, signed owner ID, photo, persistence and incognito in native settings
+        env:
+          MOUSE_PROFILE_SMOKE_ROOT: ${{ runner.temp }}/mouse-profile-owned-fixtures
+          MOUSE_PROFILE_EVIDENCE: ${{ github.workspace }}/mouse-flash-evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          node desktop/node_modules/electron/cli.js tools/mouse-profile-ui-smoke.cjs 2>&1 | tee mouse-flash-evidence/profile.log
+          grep -qx MOUSE_PROFILE_UI_PASS mouse-flash-evidence/profile.log
+          node -e "const r=require('./mouse-flash-evidence/mouse-profile-ui.json');require('node:assert/strict').ok(r.status==='PASS' && r.platform==='darwin' && r.sandbox===true && r.nodeIntegration===false && r.contextIsolation===true)"
+      - name: Preserve test receipts and screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mouse-flash-direct-transfer-evidence
+          path: mouse-flash-evidence/
+          if-no-files-found: warn
+  installed-ui:
+    runs-on: macos-15
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: desktop
+    env:
+      CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+      CSC_FOR_PULL_REQUEST: 'true'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Check Apple Silicon runner
+        run: test "$(uname -m)" = arm64
+      - name: Install existing pinned desktop dependencies
+        run: npm ci
+      - name: Prepare the production runtime, native modules and icons
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm run prepare:runtime
+          node mouse-native-build.cjs
+          node mouse-icon.cjs
+      - name: Restore Electron and builder download cache
+        uses: actions/cache/restore@v4
+        with:
+          path: |
+            ${{ runner.temp }}/mouse-electron-cache
+            ${{ runner.temp }}/mouse-builder-cache
+          key: mouse-macos-arm64-downloads-v1-${{ hashFiles('desktop/package-lock.json') }}
+      - name: Package the same production Mac app without disk-image compression
+        env:
+          ELECTRON_CACHE: ${{ runner.temp }}/mouse-electron-cache
+          ELECTRON_BUILDER_CACHE: ${{ runner.temp }}/mouse-builder-cache
+        run: npx electron-builder --config mouse-build.cjs --mac --arm64 --dir --publish never
+      - name: Verify the installed account UI, Flash sidebar, updates and appearance restart
+        shell: bash
+        run: |
+          set -euo pipefail
+          xcrun swift ../tools/mouse-637-macos-display.swift --output mouse-637-display.json
+          xcrun swift ../tools/mouse-637-macos-display.swift --verify mouse-637-display.json
+          APP="dist-mouse/mac-arm64/Mouse Browser.app"
+          test "$(lipo -archs "$APP/Contents/MacOS/Mouse Browser")" = arm64
+          codesign --verify --deep --strict "$APP"
+          INSTALL="$RUNNER_TEMP/Mouse 645 UI/Mouse Browser.app"
+          mkdir -p "$(dirname "$INSTALL")"
+          ditto "$APP" "$INSTALL"
+          python3 ../tools/mouse-645-verify.py --executable "$INSTALL/Contents/MacOS/Mouse Browser" --output "$PWD" --profile "$RUNNER_TEMP/mouse-645-ui-profile" 2>&1 | tee mouse-645-ui-gate.log
+          grep -x MOUSE_645_UI_ACCEPTANCE_PASS mouse-645-ui-gate.log
+          grep -x MOUSE_645_UI_WRITE_PASS mouse-645-write.log
+          grep -x MOUSE_645_UI_NATIVE_PASS mouse-645-read.log
+          test -s mouse-645-acceptance.json
+      - name: Preserve installed UI receipts and OS screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mouse-645-installed-ui-evidence
+          path: |
+            desktop/mouse-645-*.json
+            desktop/mouse-645-*.png
+            desktop/mouse-645-*.log
+            desktop/mouse-637-display.json
+          retention-days: 14
+          if-no-files-found: warn
