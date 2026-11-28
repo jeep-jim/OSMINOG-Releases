@@ -1,9 +1,27 @@
-# Mouse 6.0.44 — Mac arm64 publication template
+# Mouse 6.0.44 — pinned Mac arm64 publication
 
-This stage is **not ready**. The source SHA, merged PR, successful native run,
-attempt/job, verification and package artifact IDs/hashes and DMG/ZIP hashes must
-be filled from the actual accepted candidate. There is no PUBLISH_OWNER trigger.
-Synthetic rejection tests do not mean the application has passed native checks.
+**Source accepted and pinned; publication pending.** `pin.json` is ready for the
+authorized publisher and `PUBLISH_OWNER` is present. Fresh publisher native
+verification, package upload, Mac channel advancement and mouse.black
+verification remain pending.
+
+## Accepted source
+
+| Binding | Accepted value |
+| --- | --- |
+| Source HEAD | [`ad9b8c217da8917f95a2d672e62790f474daef4b`](https://github.com/jeep-jim/OSMINOG/commit/ad9b8c217da8917f95a2d672e62790f474daef4b) |
+| Merged source PR | [OSMINOG#226](https://github.com/jeep-jim/OSMINOG/pull/226) |
+| Source merge | [`161f2ebda378c48c1ae714c671c2d91830c4558f`](https://github.com/jeep-jim/OSMINOG/commit/161f2ebda378c48c1ae714c671c2d91830c4558f) |
+| Successful native run | [46106499427](https://github.com/jeep-jim/OSMINOG/actions/runs/46106499427), attempt 1 |
+| Successful native job | [140860337521](https://github.com/jeep-jim/OSMINOG/actions/runs/46106499427/job/140860337521) |
+| Candidate artifact | `mouse-arm64-candidate`, ID `15248501921` |
+| Verification artifact | `mouse-arm64-verification`, ID `15247979966` |
+
+Both artifact ZIP SHA-256 hashes and the exact DMG/ZIP byte lengths and SHA-256
+hashes are recorded in `pin.json`. The source run verified the installed and
+updated display name `Mouse`, all 56 bundle localizations, website themes,
+network filters, performance, actual 6.0.43 update/profile retention and the
+reduced-motion scenario with two recorded frames.
 
 Only macOS arm64 is authorized. Windows/Linux stay on 6.0.42. Earlier publishers,
 pins, release assets and feeds are immutable; 644 wraps the frozen 643 validators
@@ -18,36 +36,31 @@ fetched from the pinned Git tree; the independent readers and Swift must match.
 
 ## Authorized execution
 
-1. Accept a successful exact-source Mac CI run and merge its PR.
-2. Populate pin.json from those verified bytes and identifiers.
-3. Validate the complete source and independent evidence.
-4. Add PUBLISH_OWNER containing exactly
-   `Mouse Browser 6.0.44: publish pinned source and verified Mac packages`
-   and merge the activation PR into the release repository's main branch.
-5. The ordinary push trigger on main starts publish-mouse644.yml. No manual
-   dispatch, token extraction or alternate project credentials are needed.
-6. Only after fresh installed checks, immutable package upload and public hash
-   verification may the publisher advance the existing Mac channel.
-7. Verify the channel and mouse.black catalog/link/full DMG hash independently.
+`PUBLISH_OWNER` contains exactly:
+
+```text
+Mouse Browser 6.0.44: publish pinned source and verified Mac packages
+```
+
+1. Merge the activation PR after its contract checks pass. The ordinary push
+   trigger on the release repository's main branch starts `publish-mouse644.yml`.
+2. The publisher imports the pinned packages, checks their exact successful
+   source job/attempt, artifact origin/time and merged source HEAD, and repeats
+   the installed native checks on macOS arm64.
+3. After immutable package upload and public byte/hash verification, the
+   publisher advances only the existing Mac channel.
+4. Verify the channel and mouse.black catalog/link/full DMG hash independently.
 
 Local checks:
 
 ```sh
-python3 -m unittest discover -s tools -p 'test_mouse642_*.py' -v
-python3 -m unittest discover -s tools -p 'test_mouse643_*.py' -v
-python3 -m unittest discover -s tools -p 'test_mouse644_*.py' -v
-python3 -m py_compile tools/mouse644-*.py
 python3 tools/mouse644-release.py validate-template
 python3 tools/mouse644-publish-plan.py macos-arm64
 ```
 
-The final command must print publish=false until actual acceptance is complete.
-
-`pin.json` requires the accepted source HEAD, merged PR and merge commit, native
-run/attempt/job, both artifact IDs and whole-archive SHA-256 hashes, and each
-DMG/ZIP byte length and SHA-256. The inherited import validator checks the exact
-successful source job, artifact origin/time, merged source HEAD and package
-bytes. Never fill these fields from a failed attempt or an unrelated rerun.
+The final command must print `publish=true` for this exact authorized pin.
+The workflow retains all frozen and current contract suites. Pin validation
+does not replace the independent source/fresh-install or public-byte gates.
 
 After activation, `publish-mouse644.yml` imports (does not rebuild) those bytes,
 repeats installed native checks on macOS arm64, uploads immutable packages,
