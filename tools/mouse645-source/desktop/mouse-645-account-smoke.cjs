@@ -65,6 +65,172 @@ function pageReadback() {
   return {fixture: globalThis.mouse645AccountFixture === true, url: location.href,
     local: localStorage.getItem('mouse645_profile')};
 }
+function presentationReadback(scope = globalThis) {
+  const model = scope.MouseTest?.model, transition = scope.MouseDesktopSlide?.last;
+  const size = element => element ? Object.fromEntries(['clientWidth', 'clientHeight', 'scrollWidth', 'scrollHeight'].map(key => [key, element[key]])) : null;
+  const region = selector => {
+    const element = scope.document.querySelector(selector); if (!element) return null;
+    const rect = element.getBoundingClientRect(), css = scope.getComputedStyle(element);
+    return {bounds: Object.fromEntries(['x', 'y', 'width', 'height'].map(key => [key, rect[key]])),
+      display: css.display, visibility: css.visibility, opacity: css.opacity};
+  };
+  const visual = scope.visualViewport, newTab = scope.document.querySelector('#new-tab');
+  const before = newTab ? scope.getComputedStyle(newTab, '::before') : null;
+  return {visible: scope.document.visibilityState, focused: scope.document.hasFocus(),
+    rootTheme: scope.document.documentElement.dataset.theme || '',
+    viewport: {innerWidth: scope.innerWidth, innerHeight: scope.innerHeight,
+      visualViewport: visual ? Object.fromEntries(['width', 'height', 'offsetLeft', 'offsetTop', 'pageLeft', 'pageTop', 'scale'].map(key => [key, visual[key]])) : null},
+    documentSize: size(scope.document.documentElement), bodySize: size(scope.document.body),
+    regions: {toolbar: region('.toolbar'), workspace: region('#workspace'), statusbar: region('#statusbar')},
+    newTab: {region: region('#new-tab'), before: before ? Object.fromEntries(['display', 'position', 'width', 'height'].map(key => [key, before[key]])) : null},
+    ready: model?.ready === true, markerReady: scope.document.documentElement.dataset.mouseReady === 'true',
+    switching: !!model?.switching, desktopSliding: !!model?.desktopSliding,
+    desktopId: model?.desktopId || '', stateDesktopId: model?.state?.desktopId || '',
+    transition: transition ? Object.fromEntries(['phase', 'presented', 'startedAt', 'selectedAt', 'layoutAt', 'totalDurationMs', 'layoutCalls'].map(key => [key, transition[key]])) : null,
+    trace: scope.__mouse645PresentationTrace?.read() || [],
+    longTasks: scope.__mouse645PresentationTrace?.longTasks?.() || {supported: false, entries: []}};
+}
+function installPresentationTrace(scope = globalThis) {
+  const previous = scope.__mouse631Frames, events = [], longTasks = [];
+  let observer = null, supported = false;
+  function observeLongTasks(entries) {
+    for (const entry of entries) {
+      if (longTasks.length >= 64) break;
+      if (entry.entryType === 'longtask' && Number.isFinite(entry.startTime) && Number.isFinite(entry.duration)) {
+        longTasks.push({startTime: entry.startTime, duration: entry.duration});
+      }
+    }
+    if (longTasks.length >= 64) { try { observer?.disconnect(); } catch {} }
+  }
+  try {
+    if (typeof scope.PerformanceObserver === 'function' && scope.PerformanceObserver.supportedEntryTypes?.includes('longtask')) {
+      observer = new scope.PerformanceObserver(list => { try { observeLongTasks(list.getEntries()); } catch {} });
+      observer.observe({type: 'longtask', buffered: false}); supported = true;
+    }
+  } catch { try { observer?.disconnect(); } catch {} observer = null; }
+  const collector = {...previous, switchTrace: {record(phase, frameTime) {
+    if (typeof phase !== 'string' || phase.length > 80) return;
+    events.push({phase, at: scope.performance.now(), ...(Number.isFinite(frameTime) ? {frameTime} : {})});
+    if (events.length > 256) events.shift();
+  }}};
+  scope.__mouse631Frames = collector;
+  scope.__mouse645PresentationTrace = {read: () => events.slice(), longTasks() {
+    try { if (observer) observeLongTasks(observer.takeRecords()); } catch {}
+    return {supported, entries: longTasks.slice()};
+  }, dispose() {
+    try { observer?.disconnect(); } catch {}
+    if (scope.__mouse631Frames === collector) {
+      if (previous === undefined) delete scope.__mouse631Frames; else scope.__mouse631Frames = previous;
+    }
+    delete scope.__mouse645PresentationTrace;
+  }};
+  return true;
+}
+async function prepareAccountWindow({app, win, screen, readState, nativeDesktopId, until, frame, presentsWorkspace, report, persist}) {
+  const {fixtureWindowBounds, containsRect} = require('./mouse-631-smoke-helpers.cjs');
+  report.initial = {...await readState(), nativeDesktopId: nativeDesktopId()};
+  if (win.isFullScreen()) { win.setFullScreen(false); await until(() => !win.isFullScreen(), 'account fixture leaves fullscreen'); }
+  if (win.isMaximized()) win.unmaximize();
+  if (win.isMinimized()) win.restore();
+  const display = screen.getDisplayMatching(win.getBounds());
+  report.geometry = {display: {id: display.id, bounds: display.bounds, workArea: display.workArea, scaleFactor: display.scaleFactor},
+    minimumSize: win.getMinimumSize(), before: {window: win.getBounds(), content: win.getContentBounds()}};
+  await persist();
+  report.geometry.requestedBounds = fixtureWindowBounds(display.workArea, report.geometry.minimumSize);
+  win.setBounds(report.geometry.requestedBounds);
+  app.focus({steal: true}); win.show(); win.focus(); win.webContents.focus();
+  await until(() => win.isVisible() && win.isFocused() && win.webContents.isFocused(), 'visible native account window');
+  report.geometry.after = {window: win.getBounds(), content: win.getContentBounds()};
+  report.geometry.zoomFactor = win.webContents.getZoomFactor();
+  assert.ok(Number.isFinite(report.geometry.zoomFactor) && report.geometry.zoomFactor > 0, 'Actual shell zoom is finite and positive');
+  report.geometry.expectedViewport = {innerWidth: report.geometry.after.content.width / report.geometry.zoomFactor,
+    innerHeight: report.geometry.after.content.height / report.geometry.zoomFactor};
+  assert.ok(containsRect(display.workArea, report.geometry.after.window) && containsRect(display.workArea, report.geometry.after.content),
+    'Actual account fixture window and content fit the display work area');
+  await until(async () => { report.settled = {...await readState(), nativeDesktopId: nativeDesktopId()};
+    const value = report.settled;
+    // CSSOM viewport sizes are integers. At the default zoom of 1 this is exact;
+    // a fractional page zoom can round a native DIP size to either adjacent CSS pixel.
+    const matchingViewport = ['innerWidth', 'innerHeight'].every(key => Number.isInteger(value.viewport?.[key])
+      && value.viewport[key] >= Math.floor(report.geometry.expectedViewport[key])
+      && value.viewport[key] <= Math.ceil(report.geometry.expectedViewport[key]));
+    return value.ready && value.markerReady && !value.switching && !value.desktopSliding
+      && value.desktopId === value.nativeDesktopId && value.stateDesktopId === value.nativeDesktopId
+      && matchingViewport;
+  }, 'ready renderer, native desktop selection and matching viewport');
+  if (presentsWorkspace) await frame();
+  Object.assign(report, await readState(), {frameBoundary: presentsWorkspace});
+  assert.equal(report.visible, 'visible'); assert.equal(report.focused, true);
+  await persist();
+}
+async function observeNativePresentation({probe, operation, report, timers = {setInterval, clearInterval}, now = Date.now}) {
+  const maximum = 16, intervalMs = 125;
+  Object.assign(report, {diagnosticOnly: true, maximum, intervalMs, samples: []});
+  function sample(phase) {
+    if (report.samples.length >= maximum) return false;
+    const row = {phase, at: now()};
+    try { row.native = probe(); } catch (error) { row.error = String(error.message || error).slice(0, 300); }
+    report.samples.push(row); return true;
+  }
+  sample('before');
+  const timer = timers.setInterval(() => { if (!sample('during')) timers.clearInterval(timer); }, intervalMs);
+  try { return await operation(); }
+  finally { timers.clearInterval(timer); sample('after'); }
+}
+async function verifyFrameLeaseCleanup({before, read, until}) {
+  const initial = before.frameLease;
+  assert.equal(typeof before.backgroundThrottling, 'boolean');
+  assert.ok(initial, 'Native frame lease diagnostics are installed');
+  assert.equal(initial.active, false); assert.equal(initial.disposed, false); assert.equal(initial.restoreFailures, 0); assert.notEqual(initial.blocked, true);
+  let after;
+  // This observes cleanup only after the actual switch returned successfully.
+  // Waiting for counters as well as inactive state avoids accepting the old
+  // baseline before a late begin/end IPC pair has reached the main process.
+  await until(() => {
+    const value = read();
+    after = {backgroundThrottling: value.backgroundThrottling, frameLease: value.frameLease};
+    assert.ok(after.frameLease, 'Native frame lease diagnostics remain installed');
+    assert.equal(after.frameLease.restoreFailures, 0, 'Native frame scheduling restoration failed');
+    assert.notEqual(after.frameLease.blocked, true, 'Native frame scheduling remains blocked');
+    return after.frameLease.begins > initial.begins && after.frameLease.releases > initial.releases
+      && after.frameLease.restored > initial.restored && after.frameLease.active === false
+      && after.backgroundThrottling === before.backgroundThrottling;
+  }, 'foreground frame lease IPC cleanup after real presentation', 500);
+  assert.equal(after.frameLease.disposed, false);
+  assert.equal(after.frameLease.begins, initial.begins + 1);
+  assert.equal(after.frameLease.releases, initial.releases + 1);
+  assert.equal(after.frameLease.restored, initial.restored + 1);
+  assert.equal(after.frameLease.priorAllowed, before.backgroundThrottling);
+  return {before: {backgroundThrottling: before.backgroundThrottling, frameLease: initial}, after, settled: true};
+}
+async function captureWriterFailure({failed, index, globalCapture, win, screen, nativeImage, output}) {
+  if (!failed || ![0, 1, 3].includes(index)) return null;
+  // This function is called only after the isolated installed fixture failed.
+  // A display snapshot is diagnostic; it cannot satisfy presentation or retry
+  // the original switch. Keep both acquisition and private output bounded.
+  const {bounded} = require('./mouse-631-smoke-helpers.cjs');
+  const {screenCropGeometry} = require('./mouse-628-ui-smoke.cjs');
+  assert.ok(path.isAbsolute(output));
+  const display = screen.getDisplayMatching(win.getBounds()), contentBounds = win.getContentBounds();
+  const frame = await bounded(globalCapture.acquire(display), 4500, '645 account failure OS display');
+  assert.equal(frame.kind, 'screen'); assert.ok(frame.backend);
+  assert.ok(typeof frame.base === 'string' && frame.base.startsWith('data:image/png;base64,'));
+  const full = Buffer.from(frame.base.slice(frame.base.indexOf(',') + 1), 'base64');
+  const screenPixelSize = {width: full.readUInt32BE(16), height: full.readUInt32BE(20)};
+  assert.deepEqual(win.getContentBounds(), contentBounds, 'The failed fixture did not move during display capture');
+  const geometry = screenCropGeometry(display.bounds, contentBounds, screenPixelSize);
+  const png = nativeImage.createFromBuffer(full).crop(geometry.cropPixels).toPNG({scaleFactor: 1});
+  const pixelSize = {width: png.readUInt32BE(16), height: png.readUInt32BE(20)};
+  assert.deepEqual(pixelSize, {width: geometry.cropPixels.width, height: geometry.cropPixels.height});
+  const filename = 'mouse-645-account-' + String(index).padStart(2, '0') + '-failure.png';
+  const displayFilename = filename.replace(/\.png$/, '-display.png');
+  await bounded(Promise.all([fsp.writeFile(path.join(output, filename), png, {mode: 0o600, flag: 'wx'}),
+    fsp.writeFile(path.join(output, displayFilename), full, {mode: 0o600, flag: 'wx'})]), 2500, '645 account failure PNG output');
+  return {diagnosticOnly: true, afterFailure: true, source: 'globalCapture.acquire(display)', kind: frame.kind,
+    backend: frame.backend, filename, displayFilename, sha256: sha(png), displaySha256: sha(full),
+    screenPixelSize, pixelSize, contentBounds, capturedAt: Date.now(),
+    display: {id: display.id, bounds: display.bounds, workArea: display.workArea, scaleFactor: display.scaleFactor}, ...geometry};
+}
 
 async function recordStartupGuard({app, profileContext, accountState}) {
   if (process.env.CI !== 'true' || !path.isAbsolute(process.env.MOUSE_TEST_PROFILE || '')
@@ -109,8 +275,8 @@ async function recordStartupGuard({app, profileContext, accountState}) {
 }
 
 async function smoke(ctx) {
-  const {app, win, browser, store, libraryService, desktopService, profileService, accountService, accountSync, profileContext} = ctx;
-  const {safeStorage, nativeImage} = require('electron');
+  const {app, win, browser, store, libraryService, desktopService, profileService, accountService, accountSync, profileContext, globalCapture} = ctx;
+  const {safeStorage, nativeImage, screen} = require('electron');
   const {readPrivateJSON, writePrivateJSON} = require('./mouse-profile-context.cjs');
   const {exportWorkspace} = require('./mouse-config-sync.cjs');
   const {leaves} = require('./mouse/layout.js');
@@ -159,12 +325,21 @@ async function smoke(ctx) {
     try { fs.writeFileSync(path.join(output, reportName(spec.index, '-exit')), JSON.stringify(receipt) + '\n', {mode: 0o600}); } catch {}
   });
   let failing = false;
+  function nativePresentation() { return {...require('./mouse-native-menu.node').testWindowPresentation(), backgroundThrottling: win.webContents.getBackgroundThrottling(), frameLease: win.mouseFrameLeaseForTest?.() ?? null}; }
   async function fail(error) {
     if (failing) return; failing = true;
     // Native account errors are sanitized; assertions here never compare or
     // print a token, password, keychain secret or recovery code.
     facts.error = {phase: facts.phase, message: String(error.message || error).slice(0, 2000)};
-    try { facts.presentationFailure = await js('(()=>{const t=globalThis.MouseDesktopSlide?.last;return{visible:document.visibilityState,focused:document.hasFocus(),desktopId:globalThis.MouseTest?.model.desktopId,switching:globalThis.MouseTest?.model.switching,transition:t?{phase:t.phase,presented:t.presented,totalDurationMs:t.totalDurationMs,layoutCalls:t.layoutCalls}:null}})()'); } catch {}
+    try { facts.presentationFailure = await js('(' + presentationReadback.toString() + ')()');
+      facts.presentationFailure.native = {visible: win.isVisible(), focused: win.isFocused(), window: win.getBounds(), content: win.getContentBounds(), zoomFactor: win.webContents.getZoomFactor(), desktopId: desktopService.bank.active};
+      await js('globalThis.__mouse645PresentationTrace?.dispose();true');
+    } catch {}
+    try { facts.nativePresentationFailure = nativePresentation(); }
+    catch (cause) { facts.nativePresentationError = String(cause.message || cause).slice(0, 300); }
+    try { const capture = await captureWriterFailure({failed: true, index: spec.index, globalCapture, win, screen, nativeImage, output});
+      if (capture) facts.failureCapture = capture;
+    } catch (cause) { facts.failureCaptureError = String(cause.message || cause).slice(0, 300); }
     facts.completed = false;
     try { await save(); } finally { console.error('MOUSE_645_ACCOUNT_NATIVE_FAIL ' + spec.label); app.exit(1); }
   }
@@ -253,8 +428,15 @@ async function smoke(ctx) {
   async function writeWorkspace(label) {
     const choice = FIXTURES[label], bank = desktopService.bank;
     const target = bank.items[choice.index].id, url = staged.browserOrigin + '/page/' + label + '/';
-    await js('MouseTest.switchDesktop(' + JSON.stringify(target) + ',false)');
+    facts.desktopSelection = {target, before: {...await js('(' + presentationReadback.toString() + ')()'), nativeDesktopId: bank.active}};
+    await save();
+    facts.desktopSelection.nativePresentation = {};
+    await observeNativePresentation({probe: nativePresentation, report: facts.desktopSelection.nativePresentation,
+      operation: () => js('MouseTest.switchDesktop(' + JSON.stringify(target) + ',false)')});
+    facts.desktopSelection.frameLeaseCleanup = await verifyFrameLeaseCleanup({
+      before: facts.desktopSelection.nativePresentation.samples[0].native, read: nativePresentation, until});
     await until(() => js('!MouseTest.model.switching'), 'desktop selection');
+    facts.desktopSelection.after = {...await js('(' + presentationReadback.toString() + ')()'), nativeDesktopId: bank.active};
     await js('MouseNative.desktops("rename",{id:' + JSON.stringify(target) + ',name:' + JSON.stringify(choice.name + ' desktop') + '})');
     await js('MouseTest.openPage(' + JSON.stringify(url) + ',"p1")');
     const loaded = await page(url);
@@ -355,6 +537,8 @@ async function smoke(ctx) {
     return {phase: accountSync.state().phase, revision: remote.revision, state: remote.state};
   }
   async function transition(payload = {}) {
+    facts.presentationResult = await js('(' + presentationReadback.toString() + ')()');
+    await js('globalThis.__mouse645PresentationTrace?.dispose();true');
     facts.completed = true; facts.transitionRequested = true; facts.operation = spec.operation;
     facts.next = spec.next; facts.completedAt = Date.now();
     await save();
@@ -384,19 +568,16 @@ async function smoke(ctx) {
       const value = await readPrivateJSON(acknowledgement, 4096);
       return value?.runId === facts.runId && value.pid === process.pid && value.index === spec.index;
     }, 'external coordinator observed the installed process', 18000);
-    // Match the retained UI fixtures: a process launched by the coordinator
-    // must be foreground and presenting before asking it to switch desktops.
-    app.focus({steal: true}); if (win.isMinimized()) win.restore();
-    win.show(); win.focus(); win.webContents.focus();
-    await until(() => win.isVisible() && win.isFocused() && win.webContents.isFocused(), 'visible native account window');
+    // Use the same measured work-area fit as the retained installed UI tests.
+    // The default 960px app height can exceed the actual CI display work area.
+    facts.presentation = {};
     // Only the three workspace writers invoke the desktop presentation path.
     // Account/state-only stages require foreground visibility, not animation.
     const presentsWorkspace = [0, 1, 3].includes(spec.index);
-    facts.presentation = await js(presentsWorkspace
-      ? 'new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(()=>resolve({visible:document.visibilityState,focused:document.hasFocus()}))))'
-      : '({visible:document.visibilityState,focused:document.hasFocus()})');
-    facts.presentation.frameBoundary = presentsWorkspace;
-    assert.equal(facts.presentation.visible, 'visible'); assert.equal(facts.presentation.focused, true);
+    await prepareAccountWindow({app, win, screen, until, report: facts.presentation, persist: save, presentsWorkspace,
+      readState: () => js('(' + presentationReadback.toString() + ')()'), nativeDesktopId: () => desktopService.bank.active,
+      frame: () => js('new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)))')});
+    await js('(' + installPresentationTrace.toString() + ')()');
     await save();
     facts.phase = 'verify-profile';
     assert.equal(profileContext.active, spec.profile);
@@ -493,6 +674,8 @@ async function smoke(ctx) {
     }
     await flush();
     if (spec.operation !== 'finish') return await transition(spec.operation === 'login' ? {accountId: 2, password: PASSWORDS.A} : {});
+    facts.presentationResult = await js('(' + presentationReadback.toString() + ')()');
+    await js('globalThis.__mouse645PresentationTrace?.dispose();true');
     facts.completed = true; facts.operation = 'finish'; facts.completedAt = Date.now(); await save();
     clearTimeout(watchdog);
     console.log('MOUSE_645_ACCOUNT_DEVICE_PASS ' + spec.device);
@@ -507,3 +690,9 @@ module.exports.stateSummary = stateSummary;
 module.exports.pageReadback = pageReadback;
 module.exports.recordStartupGuard = recordStartupGuard;
 module.exports.slotOccupancy = slotOccupancy;
+module.exports.prepareAccountWindow = prepareAccountWindow;
+module.exports.presentationReadback = presentationReadback;
+module.exports.installPresentationTrace = installPresentationTrace;
+module.exports.observeNativePresentation = observeNativePresentation;
+module.exports.verifyFrameLeaseCleanup = verifyFrameLeaseCleanup;
+module.exports.captureWriterFailure = captureWriterFailure;

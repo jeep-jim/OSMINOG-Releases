@@ -82,6 +82,7 @@ def adapted_tree(name, *, current_native=False):
     tree = ast.parse(checked(name), filename=str(TOOLS / name)) if name in FROZEN else legacy()['adapted_tree'](name, current_native=current_native)
     footer_changes = set()
     search_footer_changes = {}
+    update_route_changes = 0
     class Identity(ast.NodeTransformer):
         def visit_Compare(self, node):
             node = self.generic_visit(node)
@@ -99,6 +100,32 @@ def adapted_tree(name, *, current_native=False):
                 if ast.dump(node) == ast.dump(old):
                     footer_changes.add('actions')
                     return ast.copy_location(ast.parse("['emoji', 'zoom', 'history', 'bookmarks', 'downloads', 'flash', 'screenshot']", mode='eval').body, node)
+            return node
+
+        def visit_For(self, node):
+            nonlocal update_route_changes
+            node = self.generic_visit(node)
+            if name == 'mouse637-update-ui-evidence.py':
+                target = ast.parse('for field, selector in (): pass').body[0].target
+                original = ast.parse("[('openInput', '#version-button'), ('dismissInput', CONTROLS[-1] if theme == 'light' else '#update-minimize')]", mode='eval').body
+                # Match the complete frozen route, not arbitrary selector text.
+                if ast.dump(node.target) == ast.dump(target) and ast.dump(node.iter) == ast.dump(original):
+                    update_route_changes += 1
+                    node.iter = ast.copy_location(ast.parse("[('settingsOpenInput', '#settings-button'), ('openInput', '#settings-sidebar-update'), ('dismissInput', CONTROLS[-1] if theme == 'light' else '#update-minimize'), ('settingsCloseInput', '#settings-dialog [data-close-dialog]')]", mode='eval').body, node.iter)
+                    checks = ast.parse("""
+settings_handoff = sample.get('settingsHandoff')
+need(isinstance(settings_handoff, dict)
+     and set(settings_handoff) == {'settingsOpen', 'updateOpen', 'updateModal'}
+     and all(settings_handoff[key] is True for key in ('settingsOpen', 'updateOpen', 'updateModal'))
+     and after.get('settingsOpen') is False,
+     '645 Settings update handoff or native close restoration differs')
+settings_route_positions = [inputs.index(sample[field]) for field in
+                           ('settingsOpenInput', 'openInput', 'dismissInput', 'settingsCloseInput')]
+need(settings_route_positions == sorted(settings_route_positions)
+     and len(set(settings_route_positions)) == 4,
+     '645 Settings update controls were not exercised in their native route order')
+""").body
+                    return [node, *(ast.copy_location(check, node) for check in checks)]
             return node
 
         def visit_Constant(self, node):
@@ -160,6 +187,8 @@ def adapted_tree(name, *, current_native=False):
         raise ValueError('The645 Flash footer adaptation did not bind the exact frozen controls')
     if name == 'mouse636-search-removal-evidence.py' and search_footer_changes != {'actions': 1, 'ru': 1, 'en': 1}:
         raise ValueError('The645 search-removal adapter did not bind the exact frozen footer and both labels')
+    if name == 'mouse637-update-ui-evidence.py' and update_route_changes != 1:
+        raise ValueError('The645 Settings update adapter did not bind exactly one frozen native route')
     return ast.fix_missing_locations(tree)
 
 

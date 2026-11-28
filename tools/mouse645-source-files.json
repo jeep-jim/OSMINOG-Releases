@@ -1,6 +1,6 @@
 {
-  ".github/workflows/mouse-flash.yml": "9669b8086c44ade5fb90c177e024cb8e6fbb3c3743df99b29865314d2e1fc92f",
-  "desktop/mouse-645-account-smoke.cjs": "a06ef0c3a898a71b0936c732103a219543c79fe8a3ca248bda5dd6dea62f20fe",
+  ".github/workflows/mouse-flash.yml": "d2ea95555b0fd4c8ccda50f49a001728aea4e9c035feee854394034411ffaf99",
+  "desktop/mouse-645-account-smoke.cjs": "13c3b2cdd1ab61d17dbfeac88b706bb6e9884da1cb163567a7ccdd0458ccc298",
   "desktop/mouse-account-proof.cjs": "666eb86ee46b20f9482488c076ea1a2870053c071d5706d79f14e58a6d243186",
   "desktop/mouse-ai-preview.cjs": "1add03477dcc145eb7e0e154a737f9f02ea7633406cae6cab78c7d1b2ff12628",
   "desktop/mouse-config-sync.cjs": "7256c0cdbd40d31a57bdde7712cd07989275b199c1ed1b5dd29ca8cb98240a81",

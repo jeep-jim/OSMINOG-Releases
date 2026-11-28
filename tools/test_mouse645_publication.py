@@ -146,6 +146,102 @@ class ActivationAndLineage(unittest.TestCase):
         self.assertNotIn('publish-mouse642', new)
 
 
+class SettingsUpdateRoute(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.legacy = runpy.run_path(str(TOOLS / 'test_mouse637_update_ui_evidence.py'))
+        cls.reader = runpy.run_path(str(TOOLS / 'mouse645-update-ui-evidence.py'))
+
+    def fixture(self):
+        report, owners, _ = self.legacy['fixture']()
+        report['version'] = '6.0.45'
+        inputs = []
+        for index, sample in enumerate(report['samples']):
+            sample['settingsOpenInput'] = copy.deepcopy(sample['openInput'])
+            sample['settingsOpenInput']['selector'] = '#settings-button'
+            sample['openInput']['selector'] = '#settings-sidebar-update'
+            sample['settingsCloseInput'] = copy.deepcopy(sample['dismissInput'])
+            sample['settingsCloseInput']['selector'] = '#settings-dialog [data-close-dialog]'
+            sample['settingsHandoff'] = {'settingsOpen': True, 'updateOpen': True, 'updateModal': True}
+            sample['after']['settingsOpen'] = False
+            for offset, field in enumerate(('settingsOpenInput', 'openInput', 'dismissInput', 'settingsCloseInput')):
+                event = sample[field]
+                event['source'] = self.reader['N']['source']('darwin')
+                event['at'] = 100 + index * 4 + offset
+                inputs.append(event)
+        return report, owners, inputs
+
+    def verify(self, data):
+        report, owners, inputs = data
+        return self.reader['verify'](report, owners, pid=11, platform='darwin', inputs=inputs,
+                                     input_check=self.legacy['F']['input_event'], origin=self.legacy['ORIGIN'])
+
+    def test_settings_route_keeps_the_retained_phases_geometry_and_surface_probes(self):
+        self.assertEqual(self.verify(self.fixture()), self.legacy['verify'](self.legacy['fixture']()))
+
+    def test_settings_route_requires_all_four_owned_trusted_native_clicks(self):
+        for field in ('settingsOpenInput', 'openInput', 'dismissInput', 'settingsCloseInput'):
+            mutations = [lambda sample: sample.pop(field),
+                         lambda sample: sample[field].update(selector='#version-button'),
+                         lambda sample: sample[field].update(pid=12),
+                         lambda sample: sample[field].update(source='script'),
+                         lambda sample: sample[field].update(tabId='foreign-page'),
+                         lambda sample: sample[field].update(action='drag'),
+                         lambda sample: sample[field]['events'][0].update(trusted=False)]
+            for mutation in mutations:
+                with self.subTest(field=field, mutation=mutation):
+                    data = self.fixture(); mutation(data[0]['samples'][0])
+                    with self.assertRaises(ValueError): self.verify(data)
+
+    def test_settings_route_requires_actual_modal_handoff_and_settings_restoration(self):
+        mutations = [lambda sample: sample.pop('settingsHandoff'),
+                     lambda sample: sample.update(settingsHandoff=[]),
+                     lambda sample: sample['settingsHandoff'].update(settingsOpen=False),
+                     lambda sample: sample['settingsHandoff'].update(updateOpen=False),
+                     lambda sample: sample['settingsHandoff'].update(updateModal=False),
+                     lambda sample: sample['settingsHandoff'].update(updateModal=1),
+                     lambda sample: sample['settingsHandoff'].update(unobserved=True),
+                     lambda sample: sample['after'].pop('settingsOpen'),
+                     lambda sample: sample['after'].update(settingsOpen=True)]
+        for mutation in mutations:
+            with self.subTest(mutation=mutation):
+                data = self.fixture(); mutation(data[0]['samples'][0])
+                with self.assertRaises(ValueError): self.verify(data)
+
+    def test_settings_route_rejects_missing_detached_and_reordered_ledger_events(self):
+        for field in ('settingsOpenInput', 'openInput', 'dismissInput', 'settingsCloseInput'):
+            with self.subTest(field=field, corruption='missing'):
+                data = self.fixture(); data[2].remove(data[0]['samples'][0][field])
+                with self.assertRaises(ValueError): self.verify(data)
+            with self.subTest(field=field, corruption='detached'):
+                data = self.fixture(); sample = data[0]['samples'][0]
+                sample[field] = copy.deepcopy(sample[field]); sample[field]['at'] += 100
+                with self.assertRaises(ValueError): self.verify(data)
+        for index in range(3):
+            with self.subTest(swapped=index):
+                data = self.fixture(); data[2][index], data[2][index + 1] = data[2][index + 1], data[2][index]
+                with self.assertRaises(ValueError): self.verify(data)
+
+    def test_settings_route_adapter_rejects_missing_changed_or_duplicate_frozen_loop(self):
+        scope = REUSE['adapted_tree'].__globals__
+        original = ast.parse("[('openInput', '#version-button'), ('dismissInput', CONTROLS[-1] if theme == 'light' else '#update-minimize')]", mode='eval').body
+        for corruption in ('missing', 'changed', 'duplicate'):
+            tree = REUSE['legacy']()['adapted_tree']('mouse637-update-ui-evidence.py')
+            class Corrupt(ast.NodeTransformer):
+                def visit_For(self, node):
+                    node = self.generic_visit(node)
+                    if ast.dump(node.iter) == ast.dump(original):
+                        if corruption == 'missing': return []
+                        if corruption == 'duplicate': return [node, copy.deepcopy(node)]
+                        node.iter.elts[0].elts[1].value = '#unknown-update-entry'
+                    return node
+            tree = Corrupt().visit(tree)
+            with self.subTest(corruption=corruption), patch.dict(scope, {
+                    'legacy': lambda: {'adapted_tree': lambda *_args, **_kwargs: copy.deepcopy(tree)}}):
+                with self.assertRaisesRegex(ValueError, 'exactly one frozen native route'):
+                    REUSE['adapted_tree']('mouse637-update-ui-evidence.py')
+
+
 class StructuredSource(unittest.TestCase):
     def test_import_preserves_tree_and_executes_real_http_sqlite_fixture(self):
         with tempfile.TemporaryDirectory() as directory:
