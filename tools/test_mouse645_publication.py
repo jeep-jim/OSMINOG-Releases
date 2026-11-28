@@ -242,6 +242,43 @@ class SettingsUpdateRoute(unittest.TestCase):
                     REUSE['adapted_tree']('mouse637-update-ui-evidence.py')
 
 
+class SettingsInputAllowance(unittest.TestCase):
+    def test_actual_adapted_ledger_condition_accepts_234_and_rejects_235(self):
+        tree = REUSE['adapted_tree']('mouse637-features-evidence.py')
+        calls = [node for node in ast.walk(tree) if isinstance(node, ast.Call)
+                 and isinstance(node.func, ast.Name) and node.func.id == 'need'
+                 and len(node.args) == 2 and isinstance(node.args[1], ast.Constant)
+                 and node.args[1].value == '637 actual input ledger missing']
+        self.assertEqual(len(calls), 1)
+        condition = compile(ast.fix_missing_locations(ast.Expression(body=calls[0].args[0])), '<actual645-ledger-check>', 'eval')
+        for count, allowed in [(49, False), (50, True), (230, True), (234, True), (235, False)]:
+            with self.subTest(count=count):
+                self.assertIs(eval(condition, {'native': [None] * count}), allowed)
+        self.assertIs(eval(condition, {'native': tuple([None] * 234)}), False)
+
+    def test_adapter_rejects_missing_changed_or_duplicate_frozen_ledger_limit(self):
+        scope = REUSE['adapted_tree'].__globals__
+        original = ast.parse('50 <= len(native) <= 230', mode='eval').body
+        for corruption in ('missing', 'changed', 'duplicate'):
+            tree = REUSE['legacy']()['adapted_tree']('mouse637-features-evidence.py')
+            matched = []
+            class Corrupt(ast.NodeTransformer):
+                def visit_Compare(self, node):
+                    node = self.generic_visit(node)
+                    if ast.dump(node) == ast.dump(original):
+                        matched.append(node)
+                        if corruption == 'missing': return ast.copy_location(ast.Constant(value=True), node)
+                        if corruption == 'duplicate': return ast.copy_location(ast.BoolOp(op=ast.And(), values=[node, copy.deepcopy(node)]), node)
+                        node.comparators[-1].value = 231
+                    return node
+            tree = Corrupt().visit(tree)
+            self.assertEqual(len(matched), 1)
+            with self.subTest(corruption=corruption), patch.dict(scope, {
+                    'legacy': lambda: {'adapted_tree': lambda *_args, **_kwargs: copy.deepcopy(tree)}}):
+                with self.assertRaisesRegex(ValueError, 'exactly one frozen native ledger limit'):
+                    REUSE['adapted_tree']('mouse637-features-evidence.py')
+
+
 class StructuredSource(unittest.TestCase):
     def test_import_preserves_tree_and_executes_real_http_sqlite_fixture(self):
         with tempfile.TemporaryDirectory() as directory:

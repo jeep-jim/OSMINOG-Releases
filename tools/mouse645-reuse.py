@@ -83,14 +83,22 @@ def adapted_tree(name, *, current_native=False):
     footer_changes = set()
     search_footer_changes = {}
     update_route_changes = 0
+    feature_input_limit_changes = 0
     class Identity(ast.NodeTransformer):
         def visit_Compare(self, node):
+            nonlocal feature_input_limit_changes
             node = self.generic_visit(node)
             if name == 'mouse636-feedback-evidence.py':
                 old = ast.parse("row.get('count') == 6", mode='eval').body
                 if ast.dump(node) == ast.dump(old):
                     footer_changes.add('count')
                     return ast.copy_location(ast.parse("row.get('count') == 7", mode='eval').body, node)
+            if name == 'mouse637-features-evidence.py':
+                old = ast.parse('50 <= len(native) <= 230', mode='eval').body
+                if ast.dump(node) == ast.dump(old):
+                    feature_input_limit_changes += 1
+                    # Opening and closing Settings adds two clicks per theme.
+                    return ast.copy_location(ast.parse('50 <= len(native) <= 234', mode='eval').body, node)
             return node
 
         def visit_List(self, node):
@@ -189,6 +197,8 @@ need(settings_route_positions == sorted(settings_route_positions)
         raise ValueError('The645 search-removal adapter did not bind the exact frozen footer and both labels')
     if name == 'mouse637-update-ui-evidence.py' and update_route_changes != 1:
         raise ValueError('The645 Settings update adapter did not bind exactly one frozen native route')
+    if name == 'mouse637-features-evidence.py' and feature_input_limit_changes != 1:
+        raise ValueError('The645 Settings input allowance did not bind exactly one frozen native ledger limit')
     return ast.fix_missing_locations(tree)
 
 
