@@ -453,14 +453,35 @@ class Native645Evidence(unittest.TestCase):
             accepted = NEW['account'](read)
             self.assertEqual(accepted['installedProcesses'], 14)
             self.assertEqual(accepted['logicalDevices'], 2)
-            name = 'mouse-645-account-02.json'
-            facts = json.loads(read(name)); facts['credentials']['present'] = True
-            (output / name).write_text(json.dumps(facts))
-            receipt = json.loads(read('mouse-645-account-acceptance.json'))
-            row = next(item for item in receipt['artifacts'] if item['file'] == name)
-            row.update(bytes=len(read(name)), sha256=sha(read(name)))
-            (output / 'mouse-645-account-acceptance.json').write_text(json.dumps(receipt))
-            with self.assertRaises(subprocess.CalledProcessError): NEW['account'](read)
+            receipt_name = 'mouse-645-account-acceptance.json'
+            pristine_receipt = read(receipt_name)
+            def late_frame(facts):
+                state = facts['desktopSelection']['after']
+                state['trace'][1]['at'] = state['transition']['layoutAt'] + 1501
+                state['trace'][1]['frameTime'] = state['trace'][1]['at'] - 1
+                state['transition']['totalDurationMs'] = 2000
+            edits = [
+                ('retained credentials', 'mouse-645-account-02.json', lambda f: f['credentials'].update(present=True)),
+                ('untrusted click', 'mouse-645-account-00.json', lambda f: f['desktopSelection']['nativeInputs'][1]['events'][0].update(trusted=False)),
+                ('invented input source', 'mouse-645-account-00.json', lambda f: f['desktopSelection']['nativeInputs'][1].update(source='DOM click')),
+                ('stale transition', 'mouse-645-account-00.json', lambda f: f['desktopSelection']['before'].update(transition=copy.deepcopy(f['desktopSelection']['after']['transition']))),
+                ('missing real RAF2', 'mouse-645-account-00.json', lambda f: f['desktopSelection']['after']['trace'].pop()),
+                ('presentation after deadline', 'mouse-645-account-00.json', late_frame),
+            ]
+            for label, name, edit in edits:
+                with self.subTest(label=label):
+                    pristine_facts = read(name)
+                    try:
+                        facts = json.loads(pristine_facts); edit(facts)
+                        (output / name).write_text(json.dumps(facts))
+                        receipt = json.loads(pristine_receipt)
+                        row = next(item for item in receipt['artifacts'] if item['file'] == name)
+                        row.update(bytes=len(read(name)), sha256=sha(read(name)))
+                        (output / receipt_name).write_text(json.dumps(receipt))
+                        with self.assertRaises(subprocess.CalledProcessError): NEW['account'](read)
+                    finally:
+                        (output / name).write_bytes(pristine_facts)
+                        (output / receipt_name).write_bytes(pristine_receipt)
 
     def test_artifact_inventory_rejects_duplicate_traversal_and_changed_bytes(self):
         rows = [{'file': 'mouse-645-test-' + str(i) + '.json', 'bytes': 2, 'sha256': sha(b'{}')} for i in range(5)]

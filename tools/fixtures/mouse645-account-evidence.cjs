@@ -97,7 +97,25 @@ function envelope() {
     }
     return row;
   });
-  for (const [index, label] of [[0, 'G'], [1, 'A'], [3, 'B']]) rows[index].written = written(label);
+  for (const [index, label] of [[0, 'G'], [1, 'A'], [3, 'B']]) {
+    const row = rows[index], target = work[label].state.desktops.active, previous = target === 'desk-1' ? 'desk-2' : 'desk-1';
+    row.written = written(label);
+    const inputs = ['#desktops-button', '.desktop-card[data-desk="' + target + '"] .desk-open'].map((selector, i) => {
+      const at = row.startedAt + 5 + i * 10, clientPoint = {x: 100 + i * 100, y: 700 - i * 100};
+      return {selector, action: 'click', source: 'CGEvent', pid: row.pid, webContentsId: 400 + index, posted: true,
+        at, observedAt: at + 2, contentBounds: {x: 4, y: 29, width: 1200, height: 794}, zoom: 1,
+        clientPoint, point: {x: clientPoint.x + 4, y: clientPoint.y + 29},
+        events: [{type: 'click', trusted: true, matches: true, selector, at: at + 1, x: clientPoint.x, y: clientPoint.y}]};
+    });
+    row.desktopSelection = {target, before: {desktopId: previous, nativeDesktopId: previous, trayOpen: false, holdsNative: false, transition: null},
+      nativeInputs: inputs, nora: {ready: true, open: true, hidden: false, phase: 'open', inert: false,
+        isOpen: true, preparing: false, holdsNative: true, settled: true},
+      after: {desktopId: target, stateDesktopId: target, nativeDesktopId: target, switching: false,
+        desktopSliding: false, trayOpen: false, holdsNative: false,
+        transition: {strategy: 'live', phase: 'complete', presented: true, startedAt: 200, selectedAt: 220, layoutAt: 230,
+          totalDurationMs: 60, snapshotCaptures: 0, borrowedHold: false, layoutCalls: 1},
+        trace: [{phase: 'present.raf1', at: 238, frameTime: 237}, {phase: 'present.raf2', at: 254, frameTime: 253}]}};
+  }
   for (const [index, id] of [[0, 2], [2, 3]]) rows[index].registration = {account: {...summary(id), recoveryPending: true},
     recoveryShown: true, recoveryLength: 43, credentials: credentials(id)};
   rows[0].avatar = {filename: 'mouse-645-account-avatar.png', bytes: avatar.length, sha256: avatarHash,

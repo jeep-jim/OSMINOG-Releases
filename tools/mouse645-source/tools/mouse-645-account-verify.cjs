@@ -164,6 +164,8 @@ function verify(read) {
   }
   for (const [label, index] of [['G', 0], ['A', 1], ['B', 3]]) {
     const written = reports[index].written, spec = FIXTURES[label], value = workspace(written?.workspace, runId);
+    smoke.assertDesktopSelection(reports[index].desktopSelection, {pid: reports[index].pid,
+      startedAt: reports[index].startedAt, completedAt: reports[index].completedAt, target: value.desktops.active});
     need(written.workspace.theme === (label === 'A' ? 'light' : spec.theme) && written.workspace.paneCount === spec.panes
       && value.appearance.whiteTone === spec.tone && written.workspace.desktopName === spec.name + ' desktop', 'fixture layout/theme disappeared');
     const desk = value.desktops.items.find(row => row.id === value.desktops.active);

@@ -1,6 +1,6 @@
 {
   ".github/workflows/mouse-flash.yml": "d2ea95555b0fd4c8ccda50f49a001728aea4e9c035feee854394034411ffaf99",
-  "desktop/mouse-645-account-smoke.cjs": "13c3b2cdd1ab61d17dbfeac88b706bb6e9884da1cb163567a7ccdd0458ccc298",
+  "desktop/mouse-645-account-smoke.cjs": "a13db8a50a28e12347b1cb8fd479d090dd0f91fc05c1c357743acf8068e21e2b",
   "desktop/mouse-account-proof.cjs": "666eb86ee46b20f9482488c076ea1a2870053c071d5706d79f14e58a6d243186",
   "desktop/mouse-ai-preview.cjs": "1add03477dcc145eb7e0e154a737f9f02ea7633406cae6cab78c7d1b2ff12628",
   "desktop/mouse-config-sync.cjs": "7256c0cdbd40d31a57bdde7712cd07989275b199c1ed1b5dd29ca8cb98240a81",
@@ -28,7 +28,7 @@
   "services/mouse-identity/passwords.cjs": "4b6d3b7d8d6b418378afb7d9da1f6adac5ec92c86be98a2b43aef3c3e84129bc",
   "services/mouse-identity/service.cjs": "0138572bf136f818bc20abd50b4708c4023d01cc79143d1b254b1b9fd45bd8c1",
   "tools/mouse-645-account-manifest.cjs": "9981bdc1b3035bcf781b578fd2cffd8a3d8281ed5798fd3732b7cb4224370bb8",
-  "tools/mouse-645-account-verify.cjs": "40eb339ff504c2590fd9b0bd0272d3b2d70168950f812bc566aea7e7cfdad838",
+  "tools/mouse-645-account-verify.cjs": "133a61ddd31169caf2c0b7c4b41ccd8a3fdc8e62ca9631256fbc3de2a0158a9c",
   "tools/mouse-645-manifest.cjs": "a3bde8134463832b41dbc43cf96c3f1043f3ac35057b4df8045fd7382a89591e",
   "tools/mouse-645-verify.py": "ebbb7f088f7033d0fd199da0508b4539d8479fcf70908a3f8dfdc1c0f9290608",
   "tools/mouse-flash-rtc-smoke.cjs": "e03782cd3ea4dee2348f694960e2cc3940275d889ef3ee734889588f2fdefbea"

@@ -86,7 +86,9 @@ function presentationReadback(scope = globalThis) {
     ready: model?.ready === true, markerReady: scope.document.documentElement.dataset.mouseReady === 'true',
     switching: !!model?.switching, desktopSliding: !!model?.desktopSliding,
     desktopId: model?.desktopId || '', stateDesktopId: model?.state?.desktopId || '',
-    transition: transition ? Object.fromEntries(['phase', 'presented', 'startedAt', 'selectedAt', 'layoutAt', 'totalDurationMs', 'layoutCalls'].map(key => [key, transition[key]])) : null,
+    transition: transition ? Object.fromEntries(['strategy', 'phase', 'presented', 'startedAt', 'selectedAt', 'layoutAt', 'totalDurationMs', 'layoutCalls', 'snapshotCaptures', 'borrowedHold', 'error'].map(key => [key, transition[key]])) : null,
+    trayOpen: scope.document.querySelector('#desktop-tray')?.open === true,
+    holdsNative: scope.MouseTest?.desktopUI?.holdsNative === true,
     trace: scope.__mouse645PresentationTrace?.read() || [],
     longTasks: scope.__mouse645PresentationTrace?.longTasks?.() || {supported: false, entries: []}};
 }
@@ -177,31 +179,111 @@ async function observeNativePresentation({probe, operation, report, timers = {se
   try { return await operation(); }
   finally { timers.clearInterval(timer); sample('after'); }
 }
-async function verifyFrameLeaseCleanup({before, read, until}) {
-  const initial = before.frameLease;
-  assert.equal(typeof before.backgroundThrottling, 'boolean');
-  assert.ok(initial, 'Native frame lease diagnostics are installed');
-  assert.equal(initial.active, false); assert.equal(initial.disposed, false); assert.equal(initial.restoreFailures, 0); assert.notEqual(initial.blocked, true);
-  let after;
-  // This observes cleanup only after the actual switch returned successfully.
-  // Waiting for counters as well as inactive state avoids accepting the old
-  // baseline before a late begin/end IPC pair has reached the main process.
-  await until(() => {
-    const value = read();
-    after = {backgroundThrottling: value.backgroundThrottling, frameLease: value.frameLease};
-    assert.ok(after.frameLease, 'Native frame lease diagnostics remain installed');
-    assert.equal(after.frameLease.restoreFailures, 0, 'Native frame scheduling restoration failed');
-    assert.notEqual(after.frameLease.blocked, true, 'Native frame scheduling remains blocked');
-    return after.frameLease.begins > initial.begins && after.frameLease.releases > initial.releases
-      && after.frameLease.restored > initial.restored && after.frameLease.active === false
-      && after.backgroundThrottling === before.backgroundThrottling;
-  }, 'foreground frame lease IPC cleanup after real presentation', 500);
-  assert.equal(after.frameLease.disposed, false);
-  assert.equal(after.frameLease.begins, initial.begins + 1);
-  assert.equal(after.frameLease.releases, initial.releases + 1);
-  assert.equal(after.frameLease.restored, initial.restored + 1);
-  assert.equal(after.frameLease.priorAllowed, before.backgroundThrottling);
-  return {before: {backgroundThrottling: before.backgroundThrottling, frameLease: initial}, after, settled: true};
+function desktopSelectionSelector(target) {
+  assert.match(target, /^[a-zA-Z0-9_-]{1,100}$/);
+  return '.desktop-card[data-desk="' + target + '"] .desk-open';
+}
+function assertDesktopSelection(value, {pid, startedAt, completedAt, target}) {
+  assert.equal(value?.target, target);
+  assert.equal(value.before.desktopId, value.before.nativeDesktopId);
+  assert.notEqual(value.before.desktopId, target);
+  assert.equal(value.before.trayOpen, false);
+  assert.equal(value.before.holdsNative, false);
+  const selectors = ['#desktops-button', desktopSelectionSelector(target)];
+  assert.equal(value.nativeInputs?.length, 2, 'Exactly two native clicks select an existing desktop');
+  let previousAt = startedAt;
+  for (let i = 0; i < selectors.length; i++) {
+    const input = value.nativeInputs[i];
+    assert.equal(input.selector, selectors[i]); assert.equal(input.action, 'click');
+    assert.equal(input.source, 'CGEvent'); assert.equal(input.pid, pid); assert.equal(input.posted, true);
+    assert.ok(Number.isSafeInteger(input.webContentsId) && input.webContentsId > 0);
+    assert.equal(input.webContentsId, value.nativeInputs[0].webContentsId);
+    assert.ok(Number.isFinite(input.at) && input.at >= previousAt && input.observedAt >= input.at && input.observedAt <= completedAt);
+    previousAt = input.observedAt;
+    assert.ok(Number.isFinite(input.zoom) && input.zoom > 0);
+    for (const key of ['x', 'y']) {
+      assert.ok(Number.isFinite(input.clientPoint[key]) && Number.isInteger(input.point[key]));
+      assert.equal(input.point[key], Math.round(input.contentBounds[key] + input.clientPoint[key] * input.zoom));
+    }
+    assert.ok(input.clientPoint.x >= 0 && input.clientPoint.y >= 0
+      && input.clientPoint.x * input.zoom < input.contentBounds.width
+      && input.clientPoint.y * input.zoom < input.contentBounds.height);
+    const clicks = input.events.filter(event => event.type === 'click');
+    assert.equal(clicks.length, 1, 'One posted native click produces one observed click');
+    const event = clicks[0];
+    assert.equal(event.trusted, true); assert.equal(event.matches, true); assert.equal(event.selector, selectors[i]);
+    assert.ok(event.at >= input.at && event.at <= input.observedAt);
+    assert.ok(Math.abs(event.x - input.clientPoint.x) <= 2 && Math.abs(event.y - input.clientPoint.y) <= 2);
+  }
+  assert.equal(value.nora?.ready, true);
+  for (const key of ['open', 'isOpen', 'holdsNative', 'settled']) assert.equal(value.nora[key], true);
+  for (const key of ['hidden', 'inert', 'preparing']) assert.equal(value.nora[key], false);
+  assert.equal(value.nora.phase, 'open');
+  const after = value.after, transition = after?.transition;
+  for (const key of ['desktopId', 'stateDesktopId', 'nativeDesktopId']) assert.equal(after?.[key], target);
+  for (const key of ['switching', 'desktopSliding', 'trayOpen', 'holdsNative']) assert.equal(after[key], false);
+  assert.equal(transition?.strategy, 'live'); assert.equal(transition.phase, 'complete');
+  assert.equal(transition.presented, true); assert.equal(transition.borrowedHold, false);
+  assert.equal(transition.snapshotCaptures, 0); assert.equal(transition.layoutCalls, 1);
+  assert.ok(!transition.error && Number.isFinite(transition.startedAt)
+    && transition.startedAt > (value.before.transition?.startedAt ?? -1)
+    && transition.selectedAt >= transition.startedAt && transition.layoutAt >= transition.selectedAt
+    && transition.totalDurationMs > 0);
+  const frames = after.trace.filter(event => event.at >= transition.startedAt && /^present\.raf[12]$/.test(event.phase));
+  assert.deepEqual(frames.map(event => event.phase), ['present.raf1', 'present.raf2']);
+  assert.ok(frames[0].at >= transition.layoutAt && frames[1].at >= frames[0].at
+    && frames[1].at - transition.layoutAt <= 1500
+    && frames[1].at <= transition.startedAt + transition.totalDurationMs
+    && Number.isFinite(frames[0].frameTime) && frames[1].frameTime > frames[0].frameTime,
+  'The completed ordinary transition contains both actual animation callbacks');
+  return true;
+}
+async function postNativeClick({selector, win, nativeInput, js, until, ledger, now = Date.now}) {
+  // Reuse the retained hit-test and passive observer. Never dispatch DOM input
+  // or repeat a failed click; the CGEvent must reach this exact exposed target.
+  const {nativeHitTarget} = require('./mouse-smoke-hit-target.cjs');
+  let hit;
+  await until(async () => { hit = await js('(' + nativeHitTarget.toString() + ')(document.querySelector(' + JSON.stringify(selector) + '))');
+    return hit.ready; }, 'account native hit target ' + selector);
+  await js('__mouse633Input.begin(' + JSON.stringify(selector) + ')');
+  const contentBounds = win.getContentBounds(), zoom = win.webContents.getZoomFactor();
+  assert.ok(Number.isFinite(zoom) && zoom > 0);
+  const clientPoint = {x: hit.x, y: hit.y};
+  const point = {x: Math.round(contentBounds.x + hit.x * zoom), y: Math.round(contentBounds.y + hit.y * zoom)};
+  const row = {selector, source: 'CGEvent', action: 'click', pid: process.pid, webContentsId: win.webContents.id,
+    point, clientPoint, contentBounds, zoom, at: now(), events: [], posted: false};
+  ledger.push(row);
+  row.posted = await nativeInput.testClick(point.x, point.y);
+  assert.equal(row.posted, true, 'A single native account-fixture click was posted');
+  await until(async () => { row.events = await js('__mouse633Input.read()');
+    return row.events.some(event => event.type === 'click' && event.trusted && event.matches && event.selector === selector);
+  }, 'account trusted native click ' + selector);
+  row.observedAt = now(); return row;
+}
+async function selectNativeDesktop({target, win, nativeInput, js, until, nativeDesktopId, probe, report}) {
+  const {installInputProbe} = require('./mouse-633-smoke-helpers.cjs');
+  const {noraReadback} = require('./mouse-639-adblock-smoke.cjs').fixtures;
+  report.nativeInputs = [];
+  const click = selector => postNativeClick({selector, win, nativeInput, js, until, ledger: report.nativeInputs});
+  await js('(' + installInputProbe.toString() + ')()');
+  try {
+    await click('#desktops-button');
+    await until(async () => { report.nora = await js('(' + noraReadback.toString() + ')()'); return report.nora.ready; }, 'account Nora fully open');
+    report.nativePresentation = {};
+    await observeNativePresentation({probe, report: report.nativePresentation, operation: async () => {
+      await click(desktopSelectionSelector(target));
+      await until(async () => {
+        report.after = {...await js('(' + presentationReadback.toString() + ')()'), nativeDesktopId: nativeDesktopId()};
+        const state = report.after, transition = state.transition;
+        const fresh = transition && transition.startedAt > (report.before.transition?.startedAt ?? -1);
+        // choose() reports failures through the normal status UI. Preserve that
+        // failure here; a selected model/native ID alone is not presentation.
+        if (fresh && transition.phase === 'failed') throw Error(transition.error || 'Native desktop presentation failed');
+        return fresh && transition.phase === 'complete' && !state.switching && !state.desktopSliding
+          && state.desktopId === target && state.nativeDesktopId === target && !state.trayOpen && !state.holdsNative;
+      }, 'account native desktop selection');
+    }});
+  } finally { await js('globalThis.__mouse633Input?.dispose();true'); }
 }
 async function captureWriterFailure({failed, index, globalCapture, win, screen, nativeImage, output}) {
   if (!failed || ![0, 1, 3].includes(index)) return null;
@@ -325,7 +407,7 @@ async function smoke(ctx) {
     try { fs.writeFileSync(path.join(output, reportName(spec.index, '-exit')), JSON.stringify(receipt) + '\n', {mode: 0o600}); } catch {}
   });
   let failing = false;
-  function nativePresentation() { return {...require('./mouse-native-menu.node').testWindowPresentation(), backgroundThrottling: win.webContents.getBackgroundThrottling(), frameLease: win.mouseFrameLeaseForTest?.() ?? null}; }
+  function nativePresentation() { return {...require('./mouse-native-menu.node').testWindowPresentation(), backgroundThrottling: win.webContents.getBackgroundThrottling()}; }
   async function fail(error) {
     if (failing) return; failing = true;
     // Native account errors are sanitized; assertions here never compare or
@@ -430,13 +512,9 @@ async function smoke(ctx) {
     const target = bank.items[choice.index].id, url = staged.browserOrigin + '/page/' + label + '/';
     facts.desktopSelection = {target, before: {...await js('(' + presentationReadback.toString() + ')()'), nativeDesktopId: bank.active}};
     await save();
-    facts.desktopSelection.nativePresentation = {};
-    await observeNativePresentation({probe: nativePresentation, report: facts.desktopSelection.nativePresentation,
-      operation: () => js('MouseTest.switchDesktop(' + JSON.stringify(target) + ',false)')});
-    facts.desktopSelection.frameLeaseCleanup = await verifyFrameLeaseCleanup({
-      before: facts.desktopSelection.nativePresentation.samples[0].native, read: nativePresentation, until});
-    await until(() => js('!MouseTest.model.switching'), 'desktop selection');
-    facts.desktopSelection.after = {...await js('(' + presentationReadback.toString() + ')()'), nativeDesktopId: bank.active};
+    await selectNativeDesktop({target, win, nativeInput: require('./mouse-native-menu.node'), js, until,
+      nativeDesktopId: () => bank.active, probe: nativePresentation, report: facts.desktopSelection});
+    assertDesktopSelection(facts.desktopSelection, {pid: process.pid, startedAt: began, completedAt: Date.now(), target});
     await js('MouseNative.desktops("rename",{id:' + JSON.stringify(target) + ',name:' + JSON.stringify(choice.name + ' desktop') + '})');
     await js('MouseTest.openPage(' + JSON.stringify(url) + ',"p1")');
     const loaded = await page(url);
@@ -694,5 +772,8 @@ module.exports.prepareAccountWindow = prepareAccountWindow;
 module.exports.presentationReadback = presentationReadback;
 module.exports.installPresentationTrace = installPresentationTrace;
 module.exports.observeNativePresentation = observeNativePresentation;
-module.exports.verifyFrameLeaseCleanup = verifyFrameLeaseCleanup;
 module.exports.captureWriterFailure = captureWriterFailure;
+module.exports.desktopSelectionSelector = desktopSelectionSelector;
+module.exports.assertDesktopSelection = assertDesktopSelection;
+module.exports.postNativeClick = postNativeClick;
+module.exports.selectNativeDesktop = selectNativeDesktop;
