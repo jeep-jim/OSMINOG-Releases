@@ -1,70 +1,65 @@
-# Mouse 6.0.44 — pinned Mac arm64 publication
+# Mouse 6.0.44 — pinned Mac arm64 release
 
-**Source accepted and pinned; publication pending.** `pin.json` is ready for the
-authorized publisher and `PUBLISH_OWNER` is present. Fresh publisher native
-verification, package upload, Mac channel advancement and mouse.black
-verification remain pending.
+**Mac 6.0.44 published: source, publisher and public verification PASS.**
+Only macOS arm64 was published. Windows/Linux remain on 6.0.42 unchanged.
 
-## Accepted source
+## Accepted source and immutable pin
 
 | Binding | Accepted value |
 | --- | --- |
-| Source HEAD | [`ad9b8c217da8917f95a2d672e62790f474daef4b`](https://github.com/jeep-jim/OSMINOG/commit/ad9b8c217da8917f95a2d672e62790f474daef4b) |
+| Source HEAD | `ad9b8c217da8917f95a2d672e62790f474daef4b` |
 | Merged source PR | [OSMINOG#226](https://github.com/jeep-jim/OSMINOG/pull/226) |
-| Source merge | [`161f2ebda378c48c1ae714c671c2d91830c4558f`](https://github.com/jeep-jim/OSMINOG/commit/161f2ebda378c48c1ae714c671c2d91830c4558f) |
-| Successful native run | [46106499427](https://github.com/jeep-jim/OSMINOG/actions/runs/46106499427), attempt 1 |
-| Successful native job | [140860337521](https://github.com/jeep-jim/OSMINOG/actions/runs/46106499427/job/140860337521) |
+| Source merge | `161f2ebda378c48c1ae714c671c2d91830c4558f` |
+| Successful source run | [46106499427](https://github.com/jeep-jim/OSMINOG/actions/runs/46106499427), attempt 1 |
+| Successful source job | `140860337521` |
 | Candidate artifact | `mouse-arm64-candidate`, ID `15248501921` |
 | Verification artifact | `mouse-arm64-verification`, ID `15247979966` |
+| Publisher activation merge | `1e85e195bcee576ce15f86f4e5a1289e4209e190` |
 
-Both artifact ZIP SHA-256 hashes and the exact DMG/ZIP byte lengths and SHA-256
-hashes are recorded in `pin.json`. The source run verified the installed and
-updated display name `Mouse`, all 56 bundle localizations, website themes,
-network filters, performance, actual 6.0.43 update/profile retention and the
-reduced-motion scenario with two recorded frames.
+[Immutable pin](https://github.com/jeep-jim/OSMINOG-Releases/blob/1e85e195bcee576ce15f86f4e5a1289e4209e190/staging/mouse/6.0.44-arm64/pin.json)
+records the accepted run/attempt/job, both artifact archive SHA-256 hashes,
+package lengths/hashes and published 643/legacy 629 baselines.
 
-Only macOS arm64 is authorized. Windows/Linux stay on 6.0.42. Earlier publishers,
-pins, release assets and feeds are immutable; 644 wraps the frozen 643 validators
-and retains the exact published 643 and legacy 629 update/profile tests.
+| Package | Bytes | SHA-256 |
+| --- | ---: | --- |
+| `Mouse-Browser-6.0.44-mac-arm64.dmg` | 132744234 | `c489a46d5fd32888533e91ccdaa4f069dc7b461a3c41d8b0d4cf2286e31bb375` |
+| `Mouse-Browser-6.0.44-mac-arm64.zip` | 132788013 | `bc389f06274ef7b72ee28bc1255e2265cf1bc9f205e065bae5d1955a0d88e6af` |
 
-The added gates independently read 644 subscription/theme proof and actual
-Finder/Bundle names before and after the published 643 in-app update. The native
-publisher repeats the source Swift display-name check against its fresh install.
-Both raw branding receipts are hashed, bound to their installation paths and
-matched to the source manifest or actual update receipt. All source helpers are
-fetched from the pinned Git tree; the independent readers and Swift must match.
+## Successful publisher and public verification
 
-## Authorized execution
+[Run 46108907151](https://github.com/jeep-jim/OSMINOG-Releases/actions/runs/46108907151), attempt 1, native
+[job 140868484487](https://github.com/jeep-jim/OSMINOG-Releases/actions/runs/46108907151/job/140868484487), at the activation merge above: **SUCCESS**, completed 28 November 2026 at 12:14:39 KRAT.
+[Publisher acceptance](https://github.com/jeep-jim/OSMINOG/blob/main/docs/desktop/evidence/mouse644-publisher-acceptance.json)
+records fresh native, actual 643→644/legacy 629→644 update/profile and name gates.
+Reduced motion passed with 2 source frames and 1 fresh-publisher frame.
 
-`PUBLISH_OWNER` contains exactly:
+| Result | Verified value |
+| --- | --- |
+| [Release](https://github.com/jeep-jim/OSMINOG-Releases/releases/tag/quadro-macos-v6.0.44-arm64) | ID `461318997`, tag `quadro-macos-v6.0.44-arm64`, published 28 November 2026 at 12:14:08 KRAT |
+| Publisher verification artifact | ID `15248993797`, 117577119 bytes |
+| Artifact SHA-256 | `9678f9bd99e3b8226f273e7237a7e03e38e3955432cee019aefd97c75a962190` |
+| [Public receipt](https://github.com/jeep-jim/OSMINOG/blob/main/docs/desktop/evidence/mouse644-public-macos.json) | PASS, 28.11.2026 12:17:27 KRAT |
+| Public receipt SHA-256 | `8c2027053d6e070bcc102b49487146d32f14c9f34e947238f6b099c04071764d` |
 
-```text
-Mouse Browser 6.0.44: publish pinned source and verified Mac packages
-```
+## Identity and release gates
 
-1. Merge the activation PR after its contract checks pass. The ordinary push
-   trigger on the release repository's main branch starts `publish-mouse644.yml`.
-2. The publisher imports the pinned packages, checks their exact successful
-   source job/attempt, artifact origin/time and merged source HEAD, and repeats
-   the installed native checks on macOS arm64.
-3. After immutable package upload and public byte/hash verification, the
-   publisher advances only the existing Mac channel.
-4. Verify the channel and mouse.black catalog/link/full DMG hash independently.
+Source CI verified **Mouse** through native FileManager/Bundle checks, 56
+bundle localizations, website themes/filters, private/restart, performance,
+actual 643 update/profile retention.
+Physical `Mouse Browser.app`, executable `Mouse Browser`, App ID
+`com.osminog.desktop.preview` and profile `Trader OS` remain compatible with 643.
+The Mac menu/About names are also set to Mouse. These are installed CI checks,
+not a test of the owner's Mac or every website.
 
-Local checks:
+The publisher imported these exact DMG/ZIP bytes **without rebuilding**, checked
+source/run/attempt/job, artifact provenance/hashes and the merged helper tree,
+then repeated fresh native and published 643/legacy 629 updater/profile gates.
+Raw branding receipts bind names to actual install/update paths. Earlier
+publishers, pins and release assets are preserved; frozen validators remain
+unchanged. Only the [Mac feed](https://github.com/jeep-jim/OSMINOG-Releases/blob/3c84b8e9ea6e4afd915987b7509a527de10b13ca/channels/mouse/macos-arm64.json) advanced after uploaded assets passed public byte/hash checks. Separate anonymous 629/643 updater probes accepted the exact DMG.
 
-```sh
-python3 tools/mouse644-release.py validate-template
-python3 tools/mouse644-publish-plan.py macos-arm64
-```
-
-The final command must print `publish=true` for this exact authorized pin.
-The workflow retains all frozen and current contract suites. Pin validation
-does not replace the independent source/fresh-install or public-byte gates.
-
-After activation, `publish-mouse644.yml` imports (does not rebuild) those bytes,
-repeats installed native checks on macOS arm64, uploads immutable packages,
-verifies public download hashes and advances only the existing Mac channel.
-Its verification artifact is `mouse644-release-verification-attempt-N`.
-Verify `https://mouse.black/downloads.json`, the English/Russian download links,
-full DMG byte length/SHA-256, HEAD and Range responses after the catalog sync.
+The final public receipt confirms feed/catalog 6.0.44, HTTP 200 and the current
+Mac link on `/`, `/en/`, `/ru/`, the full DMG length/SHA-256, HEAD 200/Range 206.
+It covers the DMG download; both release packages matched the pin in publisher
+verification. Windows/Linux catalog entries remained unchanged. All times above
+are KRAT (UTC+7). Scope and limits: [task record](https://github.com/jeep-jim/OSMINOG/blob/main/docs/desktop/2026-11-28-mouse644-filter-updates-page-themes.md).
